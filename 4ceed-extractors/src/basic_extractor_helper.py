@@ -311,7 +311,7 @@ def getdm3(input_file):
                 'IsInverted'] = f.original_metadata.DocumentObjectList.TagGroup0.ImageDisplayInfo.IsInverted
         metadata['ImageDisplayInfo'] = ImageDisplayInfo_metadata
         return metadata
-
+#Reads in and parses bytes from .emi files, needs to have error handling implemented in the future
 def getemi(file_name):
     with open(file_name, 'rb') as f:
         text = f.read()
@@ -432,7 +432,7 @@ def getemi(file_name):
             x = x + 1
         metadata['DetectorRange'] = detectorrange_dic
         return metadata
-
+#The getTif function is incomplete at the moment, this code works, but the curator forces tif files to be handled by their own extractors, so Tif's cannot be processed by HyperSpy
 def getTif(input_file):
     metadata=dict()
     f=hs.load(input_file)
@@ -488,6 +488,7 @@ def makePreview(input_file, target):
                 spec_plot_img=hs.plot.plot_spectra(f, style='heatmap')
                 spec_plot_fig=spec_plot_img.get_figure()
                 spec_plot_fig.savefig(target, overwrite=True)
+        #Makes previews for 3D data such as Spectrum Images
         if (f.data.ndim == 3) == True: 
             x_dim= int((eels.data[:,0,0].shape)[0])
             y_dim= int((eels.data[0,:,0].shape)[0])
