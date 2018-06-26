@@ -1,0 +1,254 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema targetNamespace="https://data.nist.gov/od/dm/nexus/experiment/v1.0"
+           xmlns:nx="https://data.nist.gov/od/dm/nexus/experiment/v1.0"
+           xmlns="http://www.w3.org/2001/XMLSchema" 
+           xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           elementFormDefault="unqualified" 
+           attributeFormDefault="unqualified" version="0.10-02-2017">
+
+   <xs:annotation>
+      <xs:documentation>
+        A metadata schema for describing an experiment utilizing equipment
+        from the Nexus Microscopy Lab. 
+      </xs:documentation>
+   </xs:annotation>
+
+   <xs:element name="Experiment" type="nx:Experiment">
+     <xs:annotation>
+       <xs:appinfo>
+       </xs:appinfo>
+       <xs:documentation>
+         a root element for a document describing an Experiment 
+       </xs:documentation>
+     </xs:annotation>
+   </xs:element>
+
+   <xs:complexType name="Experiment">
+      <xs:annotation>
+         <xs:documentation>
+           a description of an experiment using an instrument in Nexus
+           Microscopy Lab
+         </xs:documentation>
+      </xs:annotation>
+      
+      <xs:sequence>
+        
+        <xs:element name="title" type="xs:token" minOccurs="0">
+           <xs:annotation>
+             <xs:appinfo>
+               <label>Identifier</label>
+             </xs:appinfo>
+             <xs:documentation>
+               a unique identifier assigned to this record.
+             </xs:documentation>
+           </xs:annotation>
+        </xs:element>
+
+        <xs:element name="id" type="xs:token" minOccurs="0">
+           <xs:annotation>
+             <xs:appinfo>
+               <label>Identifier</label>
+             </xs:appinfo>
+             <xs:documentation>
+               a unique identifier assigned to this record.
+             </xs:documentation>
+           </xs:annotation>
+        </xs:element>
+
+        <xs:element name="summary" type="nx:Summary">
+           <xs:annotation>
+             <xs:appinfo>
+               <label>Summary</label>
+             </xs:appinfo>
+             <xs:documentation>
+               a collection of metadata that summarize the overall use and 
+               intent of the experiment.  
+             </xs:documentation>
+           </xs:annotation>
+        </xs:element>
+
+        <xs:element name="sample" type="nx:Sample"
+                    minOccurs="0" maxOccurs="unbounded">
+           <xs:annotation>
+             <xs:appinfo>
+               <label>Sample</label>
+             </xs:appinfo>
+             <xs:documentation>
+               a description of a sample examined in this experiment.
+             </xs:documentation>
+           </xs:annotation>
+        </xs:element>
+
+        <xs:element name="activity" type="nx:Activity"
+                    minOccurs="0" maxOccurs="unbounded">
+           <xs:annotation>
+             <xs:appinfo>
+               <label>Activity</label>
+             </xs:appinfo>
+             <xs:documentation>
+               a description of a period of use the instrument during this
+               experimental session.
+             </xs:documentation>
+           </xs:annotation>
+        </xs:element>
+
+      </xs:sequence>
+   </xs:complexType>
+
+   <xs:complexType name="Summary">
+      <xs:annotation>
+         <xs:documentation>
+           a collection of metadata that summarize the overall use and 
+           intent of the experiment.  
+         </xs:documentation>
+      </xs:annotation>
+      
+      <xs:sequence>
+        <xs:element name="experimenter" type="xs:token"
+                    minOccurs="0" maxOccurs="unbounded">
+           <xs:annotation>
+             <xs:appinfo>
+               <label>Experimenter</label>
+             </xs:appinfo>
+             <xs:documentation>
+               The name of a user running this experiment.
+             </xs:documentation>
+           </xs:annotation>
+        </xs:element>
+
+        <xs:element name="experimenter" type="xs:token"
+                    minOccurs="0" maxOccurs="unbounded">
+           <xs:annotation>
+             <xs:appinfo>
+               <label>Experimenter</label>
+             </xs:appinfo>
+             <xs:documentation>
+               The name of a user running this experiment.
+             </xs:documentation>
+           </xs:annotation>
+        </xs:element>
+
+        <xs:element name="collaborator" type="xs:token"
+                    minOccurs="0" maxOccurs="unbounded">
+           <xs:annotation>
+             <xs:appinfo>
+               <label>Collaborator</label>
+             </xs:appinfo>
+             <xs:documentation>
+               The name of a notable collaborator in the experiment
+             </xs:documentation>
+           </xs:annotation>
+        </xs:element>
+
+        <xs:element name="instrument" type="nx:InstrumentName"
+                    minOccurs="0" maxOccurs="unbounded">
+           <xs:annotation>
+             <xs:appinfo>
+               <label>Instrument</label>
+             </xs:appinfo>
+             <xs:documentation>
+               An instrument used in this experiment
+             </xs:documentation>
+           </xs:annotation>
+        </xs:element>
+
+        <xs:element name="startDate" type="xs:date"
+                    minOccurs="0" maxOccurs="unbounded">
+           <xs:annotation>
+             <xs:appinfo>
+               <label>Date of Use</label>
+             </xs:appinfo>
+             <xs:documentation>
+               An instrument used in this experiment
+             </xs:documentation>
+           </xs:annotation>
+        </xs:element>
+
+        <xs:element name="reservationStart" type="xs:time" minOccurs="0">
+           <xs:annotation>
+             <xs:appinfo>
+               <label>Reservation start time</label>
+             </xs:appinfo>
+             <xs:documentation>
+               An instrument used in this experiment
+             </xs:documentation>
+           </xs:annotation>
+        </xs:element>
+
+        <xs:element name="reservationEnd" type="xs:time" minOccurs="0">
+           <xs:annotation>
+             <xs:appinfo>
+               <label>Reservation start time</label>
+             </xs:appinfo>
+             <xs:documentation>
+               An instrument used in this experiment
+             </xs:documentation>
+           </xs:annotation>
+        </xs:element>
+
+        <xs:element name="motivation" type="xs:string" minOccurs="0">
+           <xs:annotation>
+             <xs:appinfo>
+               <label>Motivation</label>
+             </xs:appinfo>
+             <xs:documentation>
+               A prose description of the motivation, purpose, or other intent
+               behind this experiment.
+             </xs:documentation>
+           </xs:annotation>
+        </xs:element>
+
+        
+      </xs:sequence>
+   </xs:complexType>
+
+   <xs:complexType name="Sample">
+      <xs:annotation>
+         <xs:documentation>
+           a collection of metadata that describe a sample examined during
+           an experiment.  
+         </xs:documentation>
+      </xs:annotation>
+      
+      <xs:sequence>
+
+      </xs:sequence>
+   </xs:complexType>
+
+   <xs:complexType name="Activity">
+      <xs:annotation>
+         <xs:documentation>
+           a collection of metadata that describe a period of use of the 
+           instrument.
+         </xs:documentation>
+      </xs:annotation>
+      
+      <xs:sequence>
+
+      </xs:sequence>
+   </xs:complexType>
+
+   <xs:simpleType name="InstrumentName">
+     <xs:annotation>
+       <xs:documentation>
+         Controlled labels that identify available instruments in the 
+         Nexus Microscopy Lab.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+
+       <xs:enumeration value="Titan">
+         <xs:annotation>
+           <xs:documentation>
+             The Titan [?] microscope
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+      </xs:restriction>
+   </xs:simpleType>
+
+</xs:schema>
+
+   
