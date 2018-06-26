@@ -13,7 +13,7 @@
     <reservationStart>10:00:00</reservationStart>
     <reservationEnd>11:00:00</reservationEnd>
     <motivation>
-      Here, we present an prototypical example of an Experiment XML
+      Here, we present a prototypical example of an Experiment XML
       record that can be used for validation of the Experiment schema
       and development of the record filler software.  
     </motivation>
