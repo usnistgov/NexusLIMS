@@ -1,0 +1,8 @@
+# File patterns we want git to ignore
+#
+# backup 
+*~
+*.bak
+
+# dev files
+*.pyc
