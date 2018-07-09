@@ -9,9 +9,8 @@
     <experimenter>Ray Plante</experimenter>
     <collaborator>June Lau</collaborator>
     <instrument>Titan</instrument>
-    <startDate>2018-06-26</startDate>
-    <reservationStart>10:00:00</reservationStart>
-    <reservationEnd>11:00:00</reservationEnd>
+    <reservationStart>2018-06-26T10:00:00</reservationStart>
+    <reservationEnd>2018-06-26T11:00:00</reservationEnd>
     <motivation>
       Here, we present a prototypical example of an Experiment XML
       record that can be used for validation of the Experiment schema

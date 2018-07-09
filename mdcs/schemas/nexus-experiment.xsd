@@ -152,19 +152,7 @@
            </xs:annotation>
         </xs:element>
 
-        <xs:element name="startDate" type="xs:date"
-                    minOccurs="0" maxOccurs="unbounded">
-           <xs:annotation>
-             <xs:appinfo>
-               <label>Date of Use</label>
-             </xs:appinfo>
-             <xs:documentation>
-               An instrument used in this experiment
-             </xs:documentation>
-           </xs:annotation>
-        </xs:element>
-
-        <xs:element name="reservationStart" type="xs:time" minOccurs="0">
+        <xs:element name="reservationStart" type="xs:dateTime" minOccurs="0">
            <xs:annotation>
              <xs:appinfo>
                <label>Reservation start time</label>
@@ -175,7 +163,7 @@
            </xs:annotation>
         </xs:element>
 
-        <xs:element name="reservationEnd" type="xs:time" minOccurs="0">
+        <xs:element name="reservationEnd" type="xs:dateTime" minOccurs="0">
            <xs:annotation>
              <xs:appinfo>
                <label>Reservation start time</label>
