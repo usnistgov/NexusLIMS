@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <nx:Experiment xmlns=""
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                xmlns:nx="https://data.nist.gov/od/dm/nexus/experiment/v1.0">
 
   <title>A Prototype Nexus Experiment</title>
@@ -17,7 +18,48 @@
       and development of the record filler software.  
     </motivation>
   </summary>
-  <sample/>
-  <activity/>
-  <activity/>
+
+  <sample id="nxs0m1p43">
+    <name>CNT plate 1</name>
+    <notes source="ELN">
+      <entry xsi:type="nx:TextEntry">
+        <p>This sample was prepared in the same way as plate 2</p>
+      </entry>        
+      <entry xsi:type="nx:ImageEntry">
+        <imageURL>https://...</imageURL>
+      </entry>        
+      <entry xsi:type="nx:TextEntry">
+        <p>Note the orientation</p>
+      </entry>        
+    </notes>
+  </sample>
+
+  <acquisitionActivity seqno="1">
+    <startTime>2018-06-26T10:03:24</startTime>
+    <sampleID>nxs0m1p43</sampleID>
+
+    <setup>
+      <param name="level">404</param>
+    </setup>
+
+    <notes source="ELN">
+      <entry xsi:type="nx:TextEntry">
+        <p>The focus may be a little off; outer regions are not clear</p>
+        <p>Restricting measurements to central region</p>
+      </entry>        
+    </notes>
+
+    <dataset type="Image">
+      <name>J10394019.dcm"</name>
+      <location>F:\Data\User\***REMOVED***</location>
+      <meta name="posx">1039.3</meta>
+      <meta name="posy">932.8</meta>
+    </dataset>
+    <dataset type="Image">
+      <name>J10394020.dcm"</name>
+      <location>F:\Data\User\***REMOVED***</location>
+      <meta name="posx">1045.8</meta>
+      <meta name="posy">939.3</meta>
+    </dataset>
+  </acquisitionActivity>
 </nx:Experiment>

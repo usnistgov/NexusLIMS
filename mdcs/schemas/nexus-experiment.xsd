@@ -3,8 +3,9 @@
            xmlns:nx="https://data.nist.gov/od/dm/nexus/experiment/v1.0"
            xmlns="http://www.w3.org/2001/XMLSchema" 
            xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           xmlns:xsi="http://www.w3c.org/2001/XMLSchema-instance"
            elementFormDefault="unqualified" 
-           attributeFormDefault="unqualified" version="0.10-02-2017">
+           attributeFormDefault="unqualified" version="0.10-07-2018">
 
    <xs:annotation>
       <xs:documentation>
@@ -79,11 +80,11 @@
            </xs:annotation>
         </xs:element>
 
-        <xs:element name="activity" type="nx:Activity"
+        <xs:element name="acquisitionActivity" type="nx:AcquisitionActivity"
                     minOccurs="0" maxOccurs="unbounded">
            <xs:annotation>
              <xs:appinfo>
-               <label>Activity</label>
+               <label>Acquisition Activity</label>
              </xs:appinfo>
              <xs:documentation>
                a description of a period of use the instrument during this
@@ -199,11 +200,46 @@
       </xs:annotation>
       
       <xs:sequence>
+         <xs:element name="name" type="xs:token" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>
+                 a name for the sample (for display purposes)
+               </xs:documentation>
+            </xs:annotation>
+         </xs:element>
+
+         <xs:element name="description" type="xs:token"
+                     minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:documentation>
+                 a description of the sample (where each occurance can
+                 be thought of as a separate paragraph).
+               </xs:documentation>
+            </xs:annotation>
+         </xs:element>
+
+         <xs:element name="notes" type="nx:Notes"
+                     minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:documentation>
+                 Largely unformatted notes taken regarding the current sample
+               </xs:documentation>
+            </xs:annotation>
+         </xs:element>
 
       </xs:sequence>
+      <xs:attribute name="id" type="xs:string">
+         <xs:annotation>
+            <xs:documentation>
+              an identifier unique to this document that identifies
+              the current sample.  This can be the sample name if it
+              is unique.
+            </xs:documentation>
+         </xs:annotation>
+      </xs:attribute>
    </xs:complexType>
 
-   <xs:complexType name="Activity">
+   <xs:complexType name="AcquisitionActivity">
       <xs:annotation>
          <xs:documentation>
            a collection of metadata that describe a period of use of the 
@@ -212,8 +248,310 @@
       </xs:annotation>
       
       <xs:sequence>
+         <xs:element name="startTime" type="xs:dateTime" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>
+                 a date and time recorded as the start of this activity.
+                 This can be the time of the creation of the of the first 
+                 dataset.  
+               </xs:documentation>
+            </xs:annotation>
+         </xs:element>
+
+         <xs:element name="sampleID" type="xs:token" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>
+                 the identifier for the sample that was part of this
+                 acquisition activity.  This should match a value of
+                 the id attribute for a sample element included in
+                 this document.
+               </xs:documentation>
+            </xs:annotation>
+         </xs:element>
+
+         <xs:element name="setup" type="nx:Setup" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>
+                 metadata describing the set-up of the instrument
+                 during the current activity.
+               </xs:documentation>
+            </xs:annotation>
+         </xs:element>
+
+         <xs:element name="notes" type="nx:Notes"
+                     minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:documentation>
+                 Largely unformatted notes taken regarding the current activity
+               </xs:documentation>
+            </xs:annotation>
+         </xs:element>
+
+         <xs:element name="dataset" type="nx:Dataset"
+                     minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:documentation>
+                 a file or named set of files that was acquired during
+                 the current activity.
+               </xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+      
+      <xs:attribute name="seqno" type="xs:integer">
+         <xs:annotation>
+            <xs:documentation>
+              a number that indicates the order that this activity occurred
+              within a sequence of activities.
+            </xs:documentation>
+         </xs:annotation>
+      </xs:attribute>
+   </xs:complexType>
+
+   <xs:complexType name="Notes">
+      <xs:annotation>
+         <xs:documentation>
+           content pulled as notes and lightly structure.
+         </xs:documentation>
+      </xs:annotation>
+      
+      <xs:sequence>
+         <xs:element name="entry" type="nx:Entry"
+                     minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:documentation>
+                 a section of the notes.  Each section can be of a different
+                 type with different structural content (e.g. for text, an
+                 image, a table, etc.)
+               </xs:documentation>
+            </xs:annotation>
+         </xs:element>
+      </xs:sequence>
+      
+      <xs:attribute name="source" type="xs:string">
+         <xs:annotation>
+            <xs:documentation>
+              a label indicating where the notes were extracted from (e.g. "ELN")
+            </xs:documentation>
+         </xs:annotation>
+      </xs:attribute>
+      
+   </xs:complexType>
+
+   <xs:complexType name="Entry">
+      <xs:annotation>
+         <xs:documentation>
+           An entry into a set of notes.  This type serves as a base type
+           for different sub-types.  
+         </xs:documentation>
+      </xs:annotation>
+
+      <xs:sequence>
+      </xs:sequence>
+   </xs:complexType>
+
+   <xs:complexType name="TextEntry">
+      <xs:annotation>
+         <xs:documentation>
+           An entry into a set of notes.  This type serves as a base type
+           for different sub-types.  
+         </xs:documentation>
+      </xs:annotation>
+
+      <xs:complexContent>
+        <xs:extension base="nx:Entry">
+          <xs:sequence>
+            <xs:element name="p" type="xs:token"
+                        minOccurs="1" maxOccurs="unbounded">
+                <xs:annotation>
+                   <xs:documentation>
+                     Free text content
+                   </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+
+   <xs:complexType name="ImageEntry">
+      <xs:annotation>
+         <xs:documentation>
+           An entry into a set of notes.  This type serves as a base type
+           for different sub-types.  
+         </xs:documentation>
+      </xs:annotation>
+
+      <xs:complexContent>
+        <xs:extension base="nx:Entry">
+          <xs:sequence>
+            <xs:sequence>
+              <xs:element name="imageURL" type="xs:anyURI"
+                          minOccurs="1" maxOccurs="unbounded">
+                  <xs:annotation>
+                     <xs:documentation>
+                       a link to an image inserted into the notes
+                     </xs:documentation>
+                  </xs:annotation>
+              </xs:element>
+            </xs:sequence>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+
+   <xs:complexType name="TableEntry">
+      <xs:annotation>
+         <xs:documentation>
+           An entry into a set of notes.  This type serves as a base type
+           for different sub-types.  
+         </xs:documentation>
+      </xs:annotation>
+
+      <xs:complexContent>
+        <xs:extension base="nx:Entry">
+          <xs:sequence>
+            <xs:sequence>
+              <xs:element name="table" type="nx:Table"
+                          minOccurs="1" maxOccurs="unbounded">
+                  <xs:annotation>
+                     <xs:documentation>
+                       a link to an image inserted into the notes
+                     </xs:documentation>
+                  </xs:annotation>
+              </xs:element>
+            </xs:sequence>
+          </xs:sequence>
+        </xs:extension>
+      </xs:complexContent>
+   </xs:complexType>
+
+   <xs:complexType name="Table">
+      <xs:annotation>
+         <xs:documentation>
+           A single grid of tabular information
+         </xs:documentation>
+      </xs:annotation>
+
+      <xs:sequence>
+        <!-- TBD -->
+      </xs:sequence>
+   </xs:complexType>
+
+   <xs:complexType name="Setup">
+      <xs:annotation>
+         <xs:documentation>
+           Metadata describing the set-up of an instrument (and the
+           samples installed).
+         </xs:documentation>
+      </xs:annotation>
+
+      <xs:sequence>
+        <xs:element name="param" type="nx:Parameter"
+                    minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:documentation>
+                 An arbitrary setup parameter with a name and a value
+               </xs:documentation>
+            </xs:annotation>
+        </xs:element>
+      </xs:sequence>
+   </xs:complexType>
+
+   <xs:complexType name="Dataset">
+      <xs:annotation>
+         <xs:documentation>
+           A description of a file or set of files.
+         </xs:documentation>
+      </xs:annotation>
+
+      <xs:sequence>
+        <xs:element name="name" type="xs:string">
+            <xs:annotation>
+               <xs:documentation>
+                 The name given to the dataset
+               </xs:documentation>
+            </xs:annotation>
+        </xs:element>
+
+        <xs:element name="location" type="xs:string">
+            <xs:annotation>
+               <xs:documentation>
+                 A directory path or URL indicating the location where
+                 the dataset is stored
+               </xs:documentation>
+            </xs:annotation>
+        </xs:element>
+
+        <xs:element name="format" type="xs:string" minOccurs="0">
+            <xs:annotation>
+               <xs:documentation>
+                 A string (can be a MIME type) indicating the format of
+                 the dataset (e.g. TIFF, DICOM, Excel).
+               </xs:documentation>
+            </xs:annotation>
+        </xs:element>
+
+        <xs:element name="description" type="xs:string"
+                    minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:documentation>
+                 a description of the dataset (where each occurance can
+                 be thought of as a separate paragraph).
+               </xs:documentation>
+            </xs:annotation>
+        </xs:element>
+
+        <xs:element name="preview" type="string"
+                    minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:documentation>
+                 URL or string path to a preview rendering of the data
+                 in the dataset.
+               </xs:documentation>
+            </xs:annotation>
+        </xs:element>
+
+        <xs:element name="meta" type="nx:Parameter"
+                    minOccurs="0" maxOccurs="unbounded">
+            <xs:annotation>
+               <xs:documentation>
+                 An arbitrary metadatum with a name and a value
+               </xs:documentation>
+            </xs:annotation>
+        </xs:element>
 
       </xs:sequence>
+
+      <xs:attribute name="type" type="nx:DatasetType">
+         <xs:annotation>
+            <xs:documentation>
+              a label indicating the type of this dataset (taken from
+              a controlled list).
+            </xs:documentation>
+         </xs:annotation>
+      </xs:attribute>
+   </xs:complexType>
+
+   <xs:complexType name="Parameter">
+      <xs:annotation>
+         <xs:documentation>
+           A piece of arbitrary metadata featuring a name and a value.
+         </xs:documentation>
+      </xs:annotation>
+
+      <xs:simpleContent>
+        <xs:extension base="xs:token">
+          <xs:attribute name="name">
+            <xs:annotation>
+              <xs:documentation>
+                The name of the parameter
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>            
+        </xs:extension>          
+      </xs:simpleContent>
+      
    </xs:complexType>
 
    <xs:simpleType name="InstrumentName">
@@ -235,6 +573,74 @@
        </xs:enumeration>
 
       </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="DatasetType">
+     <xs:annotation>
+       <xs:documentation>
+         Controlled labels that identify a functional type data contained in
+         a dataset.
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+
+       <xs:enumeration value="Image">
+         <xs:annotation>
+           <xs:documentation>
+             A 2-D array of data where each value is typically an
+             intensity measurement as function of regularly spaced position
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="Spectrum">
+         <xs:annotation>
+           <xs:documentation>
+             A 1-D array of data where each value is typically an
+             intensity measurement as a function of frequency or energy
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="SpectrumImage">
+         <xs:annotation>
+           <xs:documentation>
+             A 3-D array of data where each value is typically an
+             intensity measurement as a function of regularly space
+             position along two axes and of frequency or energy along 
+             the third.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="Diffraction">
+         <xs:annotation>
+           <xs:documentation>
+             Data that measures an interference pattern
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="Notes">
+         <xs:annotation>
+           <xs:documentation>
+             Arbitrary textual data that typically manually created by
+             a person.
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="Misc">
+         <xs:annotation>
+           <xs:documentation>
+             A dataset that does not qualify as of any of the other
+             defined types.  
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+     </xs:restriction>
    </xs:simpleType>
 
 </xs:schema>
