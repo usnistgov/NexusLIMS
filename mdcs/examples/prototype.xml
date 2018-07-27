@@ -62,4 +62,34 @@
       <meta name="posy">939.3</meta>
     </dataset>
   </acquisitionActivity>
+
+  <notes>
+    <entry xsi:type="nx:TableEntry">
+      <table>
+        <title>Vacuum Pressure</title>
+        <header>
+          <column id="0">Clock Time</column>
+          <column id="1">Pressure (mbars)</column>
+        </header>
+        <rows>
+          <row seqno="0">
+            <cell colid="0">9:32:15</cell>
+            <cell colid="1">957</cell>
+          </row>
+          <row seqno="1">
+            <cell colid="0">9:48:30</cell>
+            <cell colid="1">487</cell>
+          </row>
+          <row seqno="2">
+            <cell colid="0">10:01:45</cell>
+            <cell colid="1">261</cell>
+          </row>
+          <row seqno="3">
+            <cell colid="0">10:17:00</cell>
+            <cell colid="1">130</cell>
+          </row>
+        </rows>
+      </table>
+    </entry>
+  </notes>
 </nx:Experiment>
