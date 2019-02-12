@@ -24,19 +24,20 @@ def getEvents():
     jeol_jem_events = "JEOLJEM3010Events"
     cm30_events = "PhilipsCM30Events"
     em400_events = "PhilipsEM400Events"
-    
-    
-    url='https://***REMOVED***/***REMOVED***/_vti_bin/ListData.svc/'
 
-    instr_name=titan_events
-    r=requests.get(url+"%s"%(instr_name), auth=HttpNtlmAuth(path, pwd))
+    url = 'https://***REMOVED***/***REMOVED***/_vti_bin/ListData.svc/'
+
+    instr_name = titan_events
+    r = requests.get(url + "%s" % instr_name, auth=HttpNtlmAuth(path, pwd))
     print(r.status_code)
     text = r.text
     return text
-    
-def writeEvents():
-    with open('cal_events.xml', 'w') as f: 
-        text = getEvents()
+
+
+def write_events():
+    with open('cal_events.xml', 'w') as f:
+        text = get_events()
         f.write(text)
 
-writeEvents()
+
+write_events()

@@ -9,3 +9,4 @@ gitlab_backup.log
 
 # dev files
 *.pyc
+.idea
