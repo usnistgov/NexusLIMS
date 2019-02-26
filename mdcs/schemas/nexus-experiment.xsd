@@ -642,7 +642,7 @@
             </xs:annotation>
         </xs:element>
 
-        <xs:element name="preview" type="string"
+        <xs:element name="preview" type="xs:string"
                     minOccurs="0" maxOccurs="unbounded">
             <xs:annotation>
                <xs:documentation>
