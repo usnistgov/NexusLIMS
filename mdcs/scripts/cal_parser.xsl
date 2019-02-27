@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+<!-- Add the date namespace to allow use of the EXSLT date function -->
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform" version="1.0"
                 xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices"
                 xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"
@@ -12,14 +13,19 @@
 <xsl:text>
 </xsl:text>
   </xsl:variable>
+  <!--Allow searching by date and by username with parameters-->
+  <!--TODO: search for date inclusive, rather than just looking at d:StartTime
+            (i.e. if a multi-day reservation straddles the given date, return it
+             as well) -->
   <xsl:param name="date"/>
   <xsl:param name="user"/>
-  <xsl:variable name="entrySelector">
-
-  </xsl:variable>
 
   <xsl:template match="/feed">
-
+    <!--The following choose block decides which entry nodes to process. If
+        both date and user parameters are given, select the entries that match
+        those values (using the EXSLT date:date() function as necessary. If only
+        one is given, use that to filter the list of entries. Otherwise, just
+        return all the entries. -->
     <xsl:choose>
       <xsl:when test="$date and $user">
         <xsl:apply-templates select="entry[date:date(./content/m:properties/d:StartTime) = $date and ./link/m:inline/entry/content/m:properties/d:UserName/text() = $user]" />
