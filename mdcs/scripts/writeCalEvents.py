@@ -1,11 +1,19 @@
 #! /usr/bin/env python
-import requests
-from requests_ntlm import HttpNtlmAuth
+import os
+import re
 import logging
+import requests
+
+from requests_ntlm import HttpNtlmAuth
 from lxml import etree, objectify
 from dateparser import parse as dp_parse
 from datetime import datetime
-import re
+
+XSLT_PATH = os.path.join(os.path.dirname(__file__), "cal_parser.xsl")
+INDENT = '  '
+
+# TODO: test cases and automated testing
+#       [x] will require installing pytest
 
 
 def get_auth():
@@ -25,6 +33,134 @@ def get_auth():
     return HttpNtlmAuth(path, passwd)
 
 
+def fetch_xml(instrument=None):
+    """
+    Get the XML responses from the Nexus Sharepoint calendar for one,
+    multiple, or all instruments.
+
+    Parameters
+    ----------
+    instrument : None, str, or list of str
+        As defined in :py:func:`~.get_events`
+        One or more of ['titan', 'quanta', 'jeol_sem', 'jeol_tem', 'cm30',
+        'em400'], or None. If None, all instruments will be returned.
+
+    Returns
+    -------
+    api_response : list of str
+        A list of strings containing the XML calendar information for each
+        instrument requested, stripped of the empty default namespace
+    """
+    # DONE: parse instrument input and loop through to generate total output
+    #       [x] add logic for getting list of instruments to process
+    #       [x] concatenate XML output from each transform into single XML
+    #           document
+
+    # Paths for Nexus Instruments that can be booked through sharepoint
+    # calendar, mapped to more user-friendly names
+    instr_input_dict = {
+        'titan': "FEITitanEvents",
+        'quanta': "FEIQuanta200Events",
+        'jeol_sem': "JEOLJSM7100Events",
+        'hitachi_sem': "HitachiS4700Events",
+        'jeol_tem': "JEOLJEM3010Events",
+        'cm30': "PhilipsCM30Events",
+        'em400': "PhilipsEM400Events"
+    }
+
+    all_events = list(instr_input_dict.values())
+
+    # Parse instrument parameter input
+    if instrument is None:
+        inst_to_fetch = all_events
+    elif isinstance(instrument, str):
+        inst_to_fetch = [instr_input_dict[instrument]]
+    elif hasattr(instrument, '__iter__'):
+        # instrument is a list, tuple, or some other iterable type, so map
+        # inputted values to the events URL suffixes:
+        inst_to_fetch = list(map(instr_input_dict.get, instrument))
+    else:
+        logging.warning('Entered instrument "{}" could not be parsed; '
+                        'reverting to None...'.format(instrument))
+        inst_to_fetch = all_events
+
+    url = 'https://***REMOVED***/***REMOVED***/_vti_bin/' \
+          'ListData.svc/'
+
+    api_response = [''] * len(inst_to_fetch)
+
+    logging.info("Fetching Nexus Calendar Events")
+    for i, instr_name in enumerate(inst_to_fetch):
+        instr_url = url + instr_name + '?$expand=CreatedBy'
+        r = requests.get(instr_url, auth=get_auth())
+        logging.info("  {} -- {} -- response: {}".format(instr_name,
+                                                         instr_url,
+                                                         r.status_code))
+
+        if r.status_code == 200:
+            # XML elements have a default namespace prefix (Atom format),
+            # but lxml does not like an empty prefix, so it is easiest to
+            # just sanitize the input and remove the namespaces as in
+            # https://stackoverflow.com/a/18160164/1435788:
+            xml = re.sub(r'\sxmlns="[^"]+"', '', r.text, count=1)
+
+            # API returns utf-8 encoding, so encode correctly
+            xml = bytes(xml, encoding='utf-8')
+            api_response[i] = xml
+        else:
+            raise requests.exceptions.\
+                ConnectionError('Could not access Nexus SharePoint Calendar '
+                                'API at "{}"'.format(instr_url))
+
+    return api_response
+
+
+def parse_xml(xml, date=None, user=None):
+    """
+    Parse and translate an XML string from the API into a nicer format
+
+    Parameters
+    ----------
+    xml : str
+        A string containing XML, such as that returned by :py:func:`~.fetch_xml`
+    date : None or str
+        Either None or a YYYY-MM-DD date string indicating the date from
+        which events should be fetched (note: the start time of each entry
+        is what will be compared). If None, no date filtering will be
+        performed.
+    user : None or str
+        Either None or a valid NIST username (the short format: e.g. "ear1"
+        instead of ernst.august.ruska@nist.gov).
+
+    Returns
+    -------
+    simplified_dom : :class:`~.signals.BaseSignal
+    """
+    parser = etree.XMLParser(remove_blank_text=True, encoding='utf-8')
+
+    # load XML structure from  string
+    root = etree.fromstring(xml, parser)
+
+    # use LXML to load XSLT stylesheet into xsl_transform
+    # (note, etree.XSLT needs to be called on a root _Element
+    # not an _ElementTree)
+    xsl_dom = etree.parse(XSLT_PATH, parser).getroot()
+    xsl_transform = etree.XSLT(xsl_dom)
+
+    # setup parameters for passing to XSLT parser
+    date_param = "''" if date is None else "'{}'".format(date)
+    # DONE: parsing of username
+    user_param = "''" if user is None else "'{}'".format(user)
+
+    # do XSLT transformation
+    simplified_dom = xsl_transform(root,
+                                   date=date_param,
+                                   user=user_param)
+
+    return simplified_dom
+
+
+# DONE: split up fetching calendar from server and parsing XML response
 def get_events(instrument=None, date=None, user=None):
     """
     Get calendar events for a particular instrument on the Microscopy Nexus,
@@ -45,18 +181,22 @@ def get_events(instrument=None, date=None, user=None):
         but providing the date in the ISO standard format is preferred for
         consistent behavior.
 
-    user : None str
-        Either None or a valid NIST username (the short format: e.g. "***REMOVED***"
-        instead of joshua.taillon). If None, no user filtering will be
-        performed.
+    user : None or str
+        Either None or a valid NIST username (the short format: e.g. "ear1"
+        instead of ernst.august.ruska@nist.gov). If None, no user filtering
+        will be performed. No verification of username is performed,
+        so it is up to the user to make sure this is correct.
 
     Returns:
     --------
-    result : list
-        A list of XML nodes ("entry" nodes in the document) that match the
-        specified criteria
+    output : string
+        A well-formed XML document in a string, containing one or more <event>
+        tags that contain information about each reservation, including title,
+        instrument, user information, reservation purpose, sample details,
+        description, and date/time information.
     """
 
+    # DONE: parsing of date
     # Use dateparser to get python datetime input, and return as YYYY-MM-DD
     if date is not None:
         date_datetime = dp_parse(date, settings={'STRICT_PARSING': True})
@@ -64,106 +204,43 @@ def get_events(instrument=None, date=None, user=None):
             date = datetime.strftime(date_datetime, '%Y-%m-%d')
         else:
             logging.warning("Entered date could not be parsed; reverting to "
-                            "None")
+                            "None...")
             date = None
 
-    # Paths for Nexus Instruments that can be booked through sharepoint calendar
-    titan_events = "FEITitanEvents"
-    quanta_events = "FEIQuanta200Events"
-    jeol_jsm_events = "JEOLJSM7100Events"
-    hitachi_events = "HitachiS4700Events"
-    jeol_jem_events = "JEOLJEM3010Events"
-    cm30_events = "PhilipsCM30Events"
-    em400_events = "PhilipsEM400Events"
+    # Holder for final XML output
+    xml_header = """<?xml version="1.0"?>
+<events>
+{}<dateRetrieved>{}</dateRetrieved>
+""".format(INDENT, datetime.now().isoformat())
 
-    all_events = [titan_events,
-                  quanta_events,
-                  jeol_jsm_events,
-                  hitachi_events,
-                  jeol_jem_events,
-                  cm30_events,
-                  em400_events]
+    output = xml_header
+    xml_strings = fetch_xml(instrument)
+    for xml in xml_strings:
+        # parse the xml into a string, and then indent
+        output += INDENT + str(parse_xml(xml, date, user)).\
+            replace('\n', '\n' + INDENT)
 
-    instr_dict = {
-        'titan': titan_events,
-        'quanta': quanta_events,
-        'jeol_sem': jeol_jsm_events,
-        'jeol_tem': jeol_jem_events,
-        'cm30': cm30_events,
-        'em400': em400_events
-    }
+    output = output.strip().strip('\n')
+    output += "\n</events>"
 
-    url = 'https://***REMOVED***/***REMOVED***/_vti_bin/' \
-          'ListData.svc/'
-
-    # TODO: parse instrument input and loop through to generate total output
-    # TODO: test cases and automated testing
-    #       (will require setting up pytest)
-    # DONE: parsing of date
-    # DONE: parsing of username
-
-    for instr_name in all_events:
-        instr_url = url + instr_name + '?$expand=CreatedBy'
-        r = requests.get(instr_url, auth=get_auth())
-        logging.info("")
-        logging.info("  {} -- {} -- response: {}".format(instr_name,
-                                                         instr_url,
-                                                         r.status_code))
-        if r.status_code == 200:
-            # XML elements have a default namespace prefix (Atom format),
-            # but lxml does not like an empty prefix, so it is easiest to
-            # just sanitize the input and remove the namespaces as in
-            # https://stackoverflow.com/a/18160164/1435788:
-            xml = re.sub(r'\sxmlns="[^"]+"', '', r.text, count=1)
-            xml = bytes(xml, encoding='utf-8')
-
-            parser = etree.XMLParser(remove_blank_text=True, encoding='utf-8')
-
-            # API returns utf-8 encoding, so encode correctly, load from
-            # string, and then get the root tree of that top-level element:
-            root = etree.fromstring(xml, parser)
-
-            # use LXML to load XSLT stylesheet into xsl_transform
-            # (note, etree.XSLT needs to be called on a root _Element
-            # not an _ElementTree)
-            xsl_dom = etree.parse('cal_parser.xsl', parser).getroot()
-            xsl_transform = etree.XSLT(xsl_dom)
-
-            # setup parameters for passing to XSLT parser
-            date_param = "''" if date is None else "'{}'".format(date)
-            user_param = "''" if user is None else "'{}'".format(user)
-
-            # do XSLT transformation
-            simplified_dom = xsl_transform(root,
-                                           date=date_param,
-                                           user=user_param)
-
-            return simplified_dom
-
-            break
-        else:
-            raise requests.exceptions.ConnectionError("Could not access Nexus "
-                                                      "Sharepoint API")
-
-    return text
+    return output
 
 
-def dump_all_calendars():
+def dump_calendars(instrument=None, user=None, date=None):
     """
-    asdasd asd a sdas as das das das das dasdasdasdasdasda d asd
-    asdasdasdasdasda asda sdasd
-    Returns
-    -------
-
+    Write the results of :py:func:`~.get_events` to a file
     """
     with open('cal_events.xml', 'w') as f:
-        text = get_events('all')
+        text = get_events(instrument=instrument, date=date, user=user)
         f.write(text)
 
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    logging.info(get_events(date='2018-12-26'))
-    logging.info(get_events(user='***REMOVED***'))
-    logging.info(get_events(date='2018-12-26', user='***REMOVED***'))
-    logging.info(get_events())
+    # dump_calendars(instrument='jeol_sem')
+    dump_calendars(date='2019-02-28', user=***REMOVED***)
+    # logging.info(get_events(instrument=None))
+    # logging.info(get_events(date='2019-02-25'))
+    # logging.info(get_events(user='***REMOVED***'))
+    # logging.info(get_events(date='2018-12-26', user='***REMOVED***'))
+    # logging.info(get_events())
