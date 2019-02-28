@@ -6,7 +6,7 @@ import os
 #each reservation into an individual XML record structured
 #according to the Summary element of the schema
 
-tree = ET.parse('cal_events.xml')
+tree = ET.parse('2019-02-28_cal_events.xml')
 root = tree.getroot()
 
 for element in root:

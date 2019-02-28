@@ -9,6 +9,8 @@
               indent="yes"
               encoding="UTF-8"
               omit-xml-declaration="yes"/>
+  <!--TODO: output should be structured like the Summary element of the schema
+            (or maybe schema will be modified) -->
   <xsl:variable name="newline">
 <xsl:text>
 </xsl:text>

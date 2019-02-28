@@ -121,7 +121,7 @@ def parse_xml(xml, date=None, user=None):
 
     Parameters
     ----------
-    xml : str
+    xml : str or bytes
         A string containing XML, such as that returned by :py:func:`~.fetch_xml`
     date : None or str
         Either None or a YYYY-MM-DD date string indicating the date from
@@ -207,23 +207,42 @@ def get_events(instrument=None, date=None, user=None):
                             "None...")
             date = None
 
-    # Holder for final XML output
-    xml_header = """<?xml version="1.0"?>
-<events>
-{}<dateRetrieved>{}</dateRetrieved>
-""".format(INDENT, datetime.now().isoformat())
-
-    output = xml_header
+    output = ''
     xml_strings = fetch_xml(instrument)
     for xml in xml_strings:
         # parse the xml into a string, and then indent
         output += INDENT + str(parse_xml(xml, date, user)).\
             replace('\n', '\n' + INDENT)
 
-    output = output.strip().strip('\n')
-    output += "\n</events>"
+    output = wrap_events(output)
 
     return output
+
+
+def wrap_events(events_string):
+    """
+    Helper function to turn events string from :py:func:`~.get_events` into a
+    well-formed XML file
+
+    Parameters
+    ----------
+    events_string : str
+
+    Returns
+    -------
+    result : str
+        The full XML file as a string
+    """
+    # Holder for final XML output
+    result = """<?xml version="1.0"?>
+<events>
+{}<dateRetrieved>{}</dateRetrieved>
+""".format(INDENT, datetime.now().isoformat())
+    result += events_string
+    result = result.strip().strip('\n')
+    result += "\n</events>"
+
+    return result
 
 
 def dump_calendars(instrument=None, user=None, date=None):
@@ -238,7 +257,7 @@ def dump_calendars(instrument=None, user=None, date=None):
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
     # dump_calendars(instrument='jeol_sem')
-    dump_calendars(date='2019-02-28', user=***REMOVED***)
+    dump_calendars(date='2019-02-28')
     # logging.info(get_events(instrument=None))
     # logging.info(get_events(date='2019-02-25'))
     # logging.info(get_events(user='***REMOVED***'))
