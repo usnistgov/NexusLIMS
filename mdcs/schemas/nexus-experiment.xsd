@@ -126,18 +126,6 @@
            </xs:annotation>
         </xs:element>
 
-        <xs:element name="experimenter" type="xs:token"
-                    minOccurs="0" maxOccurs="unbounded">
-           <xs:annotation>
-             <xs:appinfo>
-               <label>Experimenter</label>
-             </xs:appinfo>
-             <xs:documentation>
-               The name of a user running this experiment.
-             </xs:documentation>
-           </xs:annotation>
-        </xs:element>
-
         <xs:element name="collaborator" type="xs:token"
                     minOccurs="0" maxOccurs="unbounded">
            <xs:annotation>
