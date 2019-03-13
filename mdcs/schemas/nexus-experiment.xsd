@@ -659,6 +659,15 @@
             </xs:documentation>
          </xs:annotation>
       </xs:attribute>
+
+      <xs:attribute name="role" type="nx:DatasetRole">
+         <xs:annotation>
+            <xs:documentation>
+              a label indicating the experimental role of this dataset
+              (taken from a controlled list).
+            </xs:documentation>
+         </xs:annotation>
+      </xs:attribute>
    </xs:complexType>
 
    <xs:complexType name="Parameter">
@@ -768,6 +777,55 @@
          </xs:annotation>
        </xs:enumeration>
 
+     </xs:restriction>
+   </xs:simpleType>
+
+   <xs:simpleType name="DatasetRole">
+     <xs:annotation>
+       <xs:documentation>
+         Controlled labels that identify the functional role of a dataset
+       </xs:documentation>
+     </xs:annotation>
+
+     <xs:restriction base="xs:token">
+
+       <xs:enumeration value="Experimental">
+         <xs:annotation>
+           <xs:documentation>
+             "Normal" data collected during typical operation of an instrument
+             for experimental purposes
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="MasterCalibration">
+         <xs:annotation>
+           <xs:documentation>
+             Reference data collected for the purpose of instrument calibration
+             during instrument service events or by allowed super users
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="UserCalibration">
+         <xs:annotation>
+           <xs:documentation>
+             Data collected alongside "Experimental" Datasets by regular users
+             for calibration purposes between service events or for a specific
+             experiment
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
+
+       <xs:enumeration value="Derived">
+         <xs:annotation>
+           <xs:documentation>
+             Data that is not collected form an instrument, but rather
+             derived from raw and/or calibration data as the result of
+             post-acquisition analysis processes
+           </xs:documentation>
+         </xs:annotation>
+       </xs:enumeration>
      </xs:restriction>
    </xs:simpleType>
 
