@@ -14,7 +14,7 @@ INDENT = '  '
 
 # TODO: test cases and automated testing
 #       [x] will require installing pytest
-
+# DONE: add new instruments to calendar handler
 
 def get_auth():
     """
@@ -58,14 +58,21 @@ def fetch_xml(instrument=None):
 
     # Paths for Nexus Instruments that can be booked through sharepoint
     # calendar, mapped to more user-friendly names
+    # Instrument names can be found at
+    # https://***REMOVED***/***REMOVED***/_vti_bin/ListData.svc
+    # and
+    # https://***REMOVED******REMOVED***/NexusMicroscopyLIMS/wikis/Sharepoint-Calendar-Information
     instr_input_dict = {
-        'titan': "FEITitanEvents",
+        'titan': "FEITitanTEM",
         'quanta': "FEIQuanta200Events",
         'jeol_sem': "JEOLJSM7100Events",
         'hitachi_sem': "HitachiS4700Events",
         'jeol_tem': "JEOLJEM3010Events",
         'cm30': "PhilipsCM30Events",
-        'em400': "PhilipsEM400Events"
+        'em400': "PhilipsEM400Events",
+        'hitachi_s5500': "HitachiS5500",
+        'mmsd_titan': "FEITitanSTEM",
+        'fei_helios_db': "FEIHeliosDB"
     }
 
     all_events = list(instr_input_dict.values())
