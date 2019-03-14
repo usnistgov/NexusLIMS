@@ -3,6 +3,9 @@
 # backup 
 *~
 *.bak
+backups
+.access_token
+gitlab_backup.log
 
 # dev files
 *.pyc
