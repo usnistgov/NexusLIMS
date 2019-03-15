@@ -56,7 +56,10 @@
       <xsl:value-of select="content/m:properties/d:Title"/>
     </xsl:element>
     <xsl:element name="instrument">
-      <xsl:value-of select="substring-before(link[@rel='edit']/@title,'EventsItem')"/>
+      <!-- Get name of the instrument (in SharePoint) by going up from entry and -->
+      <!-- getting the title attribute of the link node with rel="self" -->
+      <xsl:value-of select="../link[@rel='self']/@title"/>
+      <!--<xsl:value-of select="substring-before(link[@rel='edit']/@title,'EventsItem')"/>-->
     </xsl:element>
     <xsl:element name="user">
       <xsl:element name="userName">

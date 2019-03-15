@@ -63,7 +63,7 @@ def fetch_xml(instrument=None):
     # and
     # https://***REMOVED******REMOVED***/NexusMicroscopyLIMS/wikis/Sharepoint-Calendar-Information
     instr_input_dict = {
-        'titan': "FEITitanTEM",
+        'msed_titan': "FEITitanTEM",
         'quanta': "FEIQuanta200Events",
         'jeol_sem': "JEOLJSM7100Events",
         'hitachi_sem': "HitachiS4700Events",
@@ -229,7 +229,7 @@ def get_events(instrument=None, date=None, user=None):
 def wrap_events(events_string):
     """
     Helper function to turn events string from :py:func:`~.get_events` into a
-    well-formed XML file
+    well-formed XML file with proper indentation
 
     Parameters
     ----------
@@ -240,11 +240,14 @@ def wrap_events(events_string):
     result : str
         The full XML file as a string
     """
-    # Holder for final XML output
+    # Holder for final XML output with proper header
     result = """<?xml version="1.0"?>
 <events>
 {}<dateRetrieved>{}</dateRetrieved>
 """.format(INDENT, datetime.now().isoformat())
+    # add indent to first line and all newlines:
+    events_string = INDENT + events_string
+    events_string = events_string.replace('\n', '\n' + INDENT)
     result += events_string
     result = result.strip().strip('\n')
     result += "\n</events>"
@@ -263,8 +266,8 @@ def dump_calendars(instrument=None, user=None, date=None):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    # dump_calendars(instrument='jeol_sem')
-    dump_calendars(date='2019-02-28')
+    dump_calendars(instrument='msed_titan')
+    # dump_calendars(date='2019-02-28')
     # logging.info(get_events(instrument=None))
     # logging.info(get_events(date='2019-02-25'))
     # logging.info(get_events(user='***REMOVED***'))
