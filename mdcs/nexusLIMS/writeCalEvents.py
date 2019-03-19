@@ -12,9 +12,10 @@ from datetime import datetime
 XSLT_PATH = os.path.join(os.path.dirname(__file__), "cal_parser.xsl")
 INDENT = '  '
 
-# TODO: test cases and automated testing
+# DONE: test cases and automated testing
 #       [x] will require installing pytest
 # DONE: add new instruments to calendar handler
+
 
 def get_auth():
     """
@@ -266,10 +267,10 @@ def dump_calendars(instrument=None, user=None, date=None):
 
 if __name__ == '__main__':
     logging.basicConfig(level=logging.INFO)
-    dump_calendars(instrument='msed_titan')
+    # dump_calendars(instrument='msed_titan')
     # dump_calendars(date='2019-02-28')
     # logging.info(get_events(instrument=None))
     # logging.info(get_events(date='2019-02-25'))
-    # logging.info(get_events(user='***REMOVED***'))
+    logging.info(get_events(user='***REMOVED***'))
     # logging.info(get_events(date='2018-12-26', user='***REMOVED***'))
     # logging.info(get_events())
