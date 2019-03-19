@@ -6,6 +6,7 @@
 backups
 .access_token
 gitlab_backup.log
+*credentials.ini
 
 # dev files
 *.pyc

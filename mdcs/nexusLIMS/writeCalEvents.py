@@ -5,9 +5,10 @@ import logging
 import requests
 
 from requests_ntlm import HttpNtlmAuth
-from lxml import etree, objectify
+from lxml import etree
 from dateparser import parse as dp_parse
 from datetime import datetime
+from configparser import ConfigParser
 
 XSLT_PATH = os.path.join(os.path.dirname(__file__), "cal_parser.xsl")
 INDENT = '  '
@@ -17,16 +18,43 @@ INDENT = '  '
 # DONE: add new instruments to calendar handler
 
 
-def get_auth():
+def get_auth(filename="credentials.ini"):
     """
-    Set up authentication for the Microscopy Nexus using the miclims account
+    Set up NTLM authentication for the Microscopy Nexus using an account
+    as specified from a file that lives in the package root named
+    .credentials (or some other value provided as a parameter)
+
+    Parameters
+    ----------
+    filename : str
+        Name relative to this file (or absolute path) of file from which to
+        read the parameters
 
     Returns
     -------
-    HttpNtlmAuth authentication handler for requests
+        HttpNtlmAuth authentication handler for requests
+
+    Notes
+    -----
+    The credentials file is expected to have a section
     """
-    username = 'miclims'
-    passwd = '***REMOVED***'
+    # if absolute path was provided, use that, otherwise find filename in
+    # this directory
+    if os.path.isabs(filename):
+        pass
+    else:
+        filename = os.path.join(os.path.dirname(__file__), filename)
+
+    # Raise error if the configuration file is not found
+    if not os.path.isfile(filename):
+        raise FileNotFoundError("Configuration file {} "
+                                "was not found".format(filename))
+
+    config = ConfigParser()
+    config.read(filename)
+
+    username = config.get("nexus_credentials", "username")
+    passwd = config.get("nexus_credentials", "password")
 
     domain = 'nist'
     path = domain + '\\' + username
@@ -266,6 +294,10 @@ def dump_calendars(instrument=None, user=None, date=None):
 
 
 if __name__ == '__main__':
+    """
+    These lines are just for testing. For real use, import the methods you 
+    need and operate from there
+    """
     logging.basicConfig(level=logging.INFO)
     # dump_calendars(instrument='msed_titan')
     # dump_calendars(date='2019-02-28')
