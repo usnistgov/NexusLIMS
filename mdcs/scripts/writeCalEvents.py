@@ -11,7 +11,7 @@ def getEvents():
     #I tried my own credentials today and that still works, so I'm not sure
     #what to do next. 
     username='miclims'
-    pwd='***REMOVED***'
+    pwd='############'
     
     domain='nist'
     path = domain+'\\'+username
