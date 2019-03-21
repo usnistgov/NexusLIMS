@@ -51,6 +51,7 @@ def get_auth(filename="credentials.ini"):
     try:
         username = os.environ['nexusLIMS_user']
         passwd = os.environ['nexusLIMS_pass']
+        logging.info("Authenticating using environment variables")
     except KeyError as e:
         # if absolute path was provided, use that, otherwise find filename in
         # this directory
@@ -140,13 +141,20 @@ def fetch_xml(instrument=None):
 
     api_response = [''] * len(inst_to_fetch)
 
-    logging.info("Fetching Nexus Calendar Events")
     for i, instr_name in enumerate(inst_to_fetch):
         instr_url = url + instr_name + '?$expand=CreatedBy'
+        logging.info("Fetching Nexus calendar events from {}".format(instr_url))
         r = requests.get(instr_url, auth=get_auth())
         logging.info("  {} -- {} -- response: {}".format(instr_name,
                                                          instr_url,
                                                          r.status_code))
+
+        if r.status_code == 401:
+            # Authentication did not succeed and we received an *Unauthorized*
+            # response from the server
+            raise AuthenticationError('Could not authenticate to the Nexus '
+                                      'SharePoint Calendar. Please check the '
+                                      'credentials and try again.')
 
         if r.status_code == 200:
             # XML elements have a default namespace prefix (Atom format),
