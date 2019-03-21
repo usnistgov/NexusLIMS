@@ -1,0 +1,9 @@
+image: python:3.7
+
+before_script:
+  - pip install -r mdcs/nexusLIMS/requirements.txt
+
+tests:
+  stage: test
+  script:
+    - python -m pytest mdcs/nexusLIMS/test
