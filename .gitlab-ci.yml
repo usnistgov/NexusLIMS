@@ -1,8 +1,10 @@
-image: continuumio/miniconda3
-
-tests:
-  stage: test
+test:
+  image: continuumio/miniconda3
   script:
+    - echo ${PATH}
+    - cat /etc/*release
+    - which docker
+    - apt list --installed
     - /opt/conda/bin/conda create --name test_env --file requirements.txt
     - source activate test_env
     - cd mdcs/nexusLIMS/tests && pytest --cov=nexusLIMS .
