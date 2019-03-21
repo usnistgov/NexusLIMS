@@ -4,8 +4,14 @@
 *~
 *.bak
 backups
+
+# Other files
 .access_token
 gitlab_backup.log
+*credentials.ini
+.coverage
 
 # dev files
 *.pyc
+.idea
+.vscode
