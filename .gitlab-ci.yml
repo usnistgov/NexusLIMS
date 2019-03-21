@@ -1,9 +1,8 @@
-image: python:3.7
-
-before_script:
-  - pip install -r mdcs/nexusLIMS/requirements.txt
+image: continuumio/miniconda3:latest
 
 tests:
   stage: test
   script:
-    - python -m pytest mdcs/nexusLIMS/test
+    - conda create --name test_env --file requirements.txt
+    - source activate test_env
+    - cd mdcs/nexusLIMS/tests && pytest --cov=nexusLIMS .
