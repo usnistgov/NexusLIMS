@@ -14,7 +14,6 @@ test:
     # - echo "User is ${nexusLIMS_user}"
     # - ls -lah /opt/conda/bin
     # - cat /etc/*release
-    
     - /opt/conda/bin/conda --version
     - /opt/conda/bin/conda config --set always_yes yes
     - /opt/conda/bin/conda config --set auto_update_conda False    
@@ -27,4 +26,7 @@ test:
     - /opt/conda/bin/conda env list
     - /opt/conda/bin/conda create -p ${env_name} --file mdcs/nexusLIMS/requirements.txt -c conda-forge
     - source /opt/conda/bin/activate ${env_name}
-    - cd mdcs/nexusLIMS/tests && pytest --cov=nexusLIMS .
+
+    - python -c "import os; print(os.environ['nexusLIMS_user'])"
+    - python -c "import os; print(os.environ['nexusLIMS_pass'])"
+    # - cd mdcs/nexusLIMS/tests && pytest --cov=nexusLIMS .
