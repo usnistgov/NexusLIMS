@@ -18,10 +18,9 @@ INDENT = '  '
 # DONE: add new instruments to calendar handler
 
 
-class AuthenticationException(Exception):
+class AuthenticationError(Exception):
     """Class for showing an exception having to do with authentication"""
-    def __init__(self, expression, message):
-        self.expression = expression
+    def __init__(self, message):
         self.message = message
 
 
@@ -58,8 +57,8 @@ def get_auth(filename="credentials.ini"):
 
     # Raise error if the configuration file is not found
     if not os.path.isfile(filename):
-        raise AuthenticationException("Credential file {} "
-                                      "was not found".format(filename))
+        raise AuthenticationError("Credential file {} "
+                                  "was not found".format(filename))
 
     config = ConfigParser()
     config.read(filename)
