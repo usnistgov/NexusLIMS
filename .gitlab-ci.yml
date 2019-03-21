@@ -5,9 +5,10 @@ test:
   #  as /opt/conda/bin/conda
   # following example at https://github.com/conda/conda-gitlab-ci/blob/master/.travis.yml
   script:
-    # - echo ${whoami}
-    # - echo ${id}
-    # - echo ${PATH}
+    - whoami
+    - id
+    - pwd
+    - echo ${PATH}
     # - ls -lah /opt/conda/bin
     - cat /etc/*release
     # - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
@@ -19,6 +20,11 @@ test:
     - /opt/conda/bin/conda config --set auto_update_conda False    
     # Do not update, as we don't have permissions:
     # - /opt/conda/bin/conda update -q --all
-    - /opt/conda/bin/conda create --force --name test_env --file mdcs/nexusLIMS/requirements.txt
-    - source /opt/conda/bin/activate test_env
-    - cd mdcs/nexusLIMS/tests && pytest --cov=nexusLIMS .
+    # --force option is added in conda 4.6, we're on 4.5.12, so instead try to remove if it's there:
+    - env_name=test_env
+    - /opt/conda/bin/conda env list
+    - /opt/conda/bin/conda remove -p /opt/conda/envs/test_env --all
+    - /opt/conda/bin/conda env list
+    # - /opt/conda/bin/conda create --name ${env_name} --file mdcs/nexusLIMS/requirements.txt
+    # - source /opt/conda/bin/activate ${env_name}
+    # - cd mdcs/nexusLIMS/tests && pytest --cov=nexusLIMS .
