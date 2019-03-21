@@ -1,10 +1,18 @@
 test:
-  image: continuumio/miniconda3
+  # Docker is disabled on ***REMOVED*** runner, so image will not work
+  # image: continuumio/miniconda3
+  # While we wait for conda to be installed on the system, we can install it locally
+  # following example at https://github.com/conda/conda-gitlab-ci/blob/master/.travis.yml
   script:
     - echo ${PATH}
     - cat /etc/*release
-    - which docker
-    - apt list --installed
-    - /opt/conda/bin/conda create --name test_env --file requirements.txt
+    - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
+    - bash miniconda.sh -b -p $HOME/miniconda
+    - export PATH="$HOME/miniconda/bin:$PATH"
+    - hash -r
+    - conda config --set always_yes yes
+    - conda config --set auto_update_conda False    
+    - conda update -q --all
+    - conda create --name test_env --file requirements.txt
     - source activate test_env
     - cd mdcs/nexusLIMS/tests && pytest --cov=nexusLIMS .
