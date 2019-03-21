@@ -18,11 +18,22 @@ INDENT = '  '
 # DONE: add new instruments to calendar handler
 
 
+class AuthenticationException(Exception):
+    """Class for showing an exception having to do with authentication"""
+    def __init__(self, expression, message):
+        self.expression = expression
+        self.message = message
+
+
 def get_auth(filename="credentials.ini"):
     """
     Set up NTLM authentication for the Microscopy Nexus using an account
     as specified from a file that lives in the package root named
-    .credentials (or some other value provided as a parameter)
+    .credentials (or some other value provided as a parameter).
+    Alternatively, the stored credentials can be overridden by supplying two
+    environment variables: ``nexusLIMS_user`` and ``nexusLIMS_pass``. These
+    variables will be queried first, and if not found, the method will
+    attempt to use the credential file.
 
     Parameters
     ----------
@@ -47,8 +58,8 @@ def get_auth(filename="credentials.ini"):
 
     # Raise error if the configuration file is not found
     if not os.path.isfile(filename):
-        raise FileNotFoundError("Configuration file {} "
-                                "was not found".format(filename))
+        raise AuthenticationException("Credential file {} "
+                                      "was not found".format(filename))
 
     config = ConfigParser()
     config.read(filename)
