@@ -5,10 +5,10 @@ test:
   #  as /opt/conda/bin/conda
   # following example at https://github.com/conda/conda-gitlab-ci/blob/master/.travis.yml
   script:
-    - echo ${whoami}
-    - echo ${id}
-    - echo ${PATH}
-    - ls -lah /opt/conda/bin
+    # - echo ${whoami}
+    # - echo ${id}
+    # - echo ${PATH}
+    # - ls -lah /opt/conda/bin
     - cat /etc/*release
     # - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
     # - bash miniconda.sh -b -p $HOME/miniconda
@@ -16,7 +16,8 @@ test:
     # - hash -r
     - /opt/conda/bin/conda config --set always_yes yes
     - /opt/conda/bin/conda config --set auto_update_conda False    
-    - /opt/conda/bin/conda update -q --all
+    # Do not update, as we don't have permissions:
+    # - /opt/conda/bin/conda update -q --all
     - /opt/conda/bin/conda create --name test_env --file mdcs/nexusLIMS/requirements.txt
     - source /opt/conda/bin/activate test_env
     - cd mdcs/nexusLIMS/tests && pytest --cov=nexusLIMS .
