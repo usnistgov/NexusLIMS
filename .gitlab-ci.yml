@@ -1,4 +1,4 @@
-test:
+nexusLIMS_tests:
   # Docker is disabled on ***REMOVED*** runner, so image will not work
   # image: continuumio/miniconda3
   # conda should be installed on the ***REMOVED*** runner since 3/21/2019
