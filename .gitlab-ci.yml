@@ -21,10 +21,9 @@ test:
     # Do not update, as we don't have permissions:
     # - /opt/conda/bin/conda update -q --all
     # --force option is added in conda 4.6, we're on 4.5.12, so instead try to remove if it's there:
-    - env_name=test_env
-    - /opt/conda/bin/conda env list
-    - /opt/conda/bin/conda remove -p /opt/conda/envs/test_env --all
-    - /opt/conda/bin/conda env list
-    # - /opt/conda/bin/conda create --name ${env_name} --file mdcs/nexusLIMS/requirements.txt
+    - env_name="$(pwd)/test_env"
+    # - /opt/conda/bin/conda env list
+    - /opt/conda/bin/conda remove -p ${env_name} --all || true
+    - /opt/conda/bin/conda create -p ${env_name} --file mdcs/nexusLIMS/requirements.txt -c conda-forge
     # - source /opt/conda/bin/activate ${env_name}
     # - cd mdcs/nexusLIMS/tests && pytest --cov=nexusLIMS .
