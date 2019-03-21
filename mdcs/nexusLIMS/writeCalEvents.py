@@ -48,23 +48,28 @@ def get_auth(filename="credentials.ini"):
     -----
     The credentials file is expected to have a section
     """
-    # if absolute path was provided, use that, otherwise find filename in
-    # this directory
-    if os.path.isabs(filename):
-        pass
-    else:
-        filename = os.path.join(os.path.dirname(__file__), filename)
+    try:
+        username = os.environ['nexusLIMS_user']
+        passwd = os.environ['nexusLIMS_pass']
+    except KeyError as e:
+        # if absolute path was provided, use that, otherwise find filename in
+        # this directory
+        if os.path.isabs(filename):
+            pass
+        else:
+            filename = os.path.join(os.path.dirname(__file__), filename)
 
-    # Raise error if the configuration file is not found
-    if not os.path.isfile(filename):
-        raise AuthenticationError("Credential file {} "
-                                  "was not found".format(filename))
+        # Raise error if the configuration file is not found
+        if not os.path.isfile(filename):
+            raise AuthenticationError("No credentials were specified with "
+                                      "environment variables, and credential "
+                                      "file {} was not found".format(filename))
 
-    config = ConfigParser()
-    config.read(filename)
+        config = ConfigParser()
+        config.read(filename)
 
-    username = config.get("nexus_credentials", "username")
-    passwd = config.get("nexus_credentials", "password")
+        username = config.get("nexus_credentials", "username")
+        passwd = config.get("nexus_credentials", "password")
 
     domain = 'nist'
     path = domain + '\\' + username
