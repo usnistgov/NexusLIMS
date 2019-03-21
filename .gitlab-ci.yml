@@ -5,16 +5,16 @@ test:
   #  as /opt/conda/bin/conda
   # following example at https://github.com/conda/conda-gitlab-ci/blob/master/.travis.yml
   script:
-    - whoami
-    - id
-    - pwd
-    - echo ${PATH}
+    # Debugging info:
+    # - whoami
+    # - id
+    # - pwd
+    # - echo ${PATH}
+    # - echo ${HOME}
+    # - echo "User is ${nexusLIMS_user}"
     # - ls -lah /opt/conda/bin
-    - cat /etc/*release
-    # - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-    # - bash miniconda.sh -b -p $HOME/miniconda
-    # - export PATH="$HOME/miniconda/bin:$PATH"
-    # - hash -r
+    # - cat /etc/*release
+    
     - /opt/conda/bin/conda --version
     - /opt/conda/bin/conda config --set always_yes yes
     - /opt/conda/bin/conda config --set auto_update_conda False    
