@@ -1,7 +1,10 @@
 import os
 import pytest
+import logging
+import requests
 from lxml import etree
 from .. import writeCalEvents as wce
+from ..writeCalEvents import AuthenticationError
 from collections import OrderedDict
 
 
@@ -61,6 +64,65 @@ class TestCalendarHandling:
     def test_downloading_bad_calendar(self):
         with pytest.raises(KeyError):
             wce.fetch_xml('bogus_instr')
+
+    def test_bad_username(self, monkeypatch):
+        with monkeypatch.context() as m:
+            m.setenv('nexusLIMS_user', 'bad_user')
+            with pytest.raises(AuthenticationError):
+                wce.fetch_xml()
+
+    def test_absolute_path_to_credentials(self, monkeypatch):
+        from ..writeCalEvents import get_auth
+        with monkeypatch.context() as m:
+            m.delenv('nexusLIMS_user')
+            cred_file = os.path.abspath(
+                os.path.join(__file__, '../..', 'credentials.ini.example'))
+            _ = get_auth(cred_file)
+
+    def test_bad_request_response(self, monkeypatch):
+        with monkeypatch.context() as m:
+            class MockResponse(object):
+                def __init__(self):
+                    self.status_code = 404
+
+            def mock_get(url, auth):
+                return MockResponse()
+
+            # User bad username so we don't get a valid response or lock miclims
+            m.setenv('nexusLIMS_user', 'bad_user')
+
+            # use monkeypatch to use our version of get for requests that
+            # always returns a 404
+            monkeypatch.setattr(requests, 'get', mock_get)
+            with pytest.raises(requests.exceptions.ConnectionError):
+                wce.fetch_xml(None)
+
+    def test_fetch_xml_instrument_none(self, monkeypatch):
+        with monkeypatch.context() as m:
+            # use bad username so we don't get a response or lock miclims
+            m.setenv('nexusLIMS_user', 'bad_user')
+            with pytest.raises(AuthenticationError):
+                wce.fetch_xml(None)
+
+    def test_fetch_xml_instrument_tuple(self, monkeypatch):
+        with monkeypatch.context() as m:
+            # use bad username so we don't get a response or lock miclims
+            m.setenv('nexusLIMS_user', 'bad_user')
+            with pytest.raises(AuthenticationError):
+                wce.fetch_xml(instrument=('msed_titan',
+                                          'fei_quanta'))
+
+    def test_fetch_xml_instrument_bogus(self, monkeypatch):
+        with monkeypatch.context() as m:
+            # use bad username so we don't get a response or lock miclims
+            m.setenv('nexusLIMS_user', 'bad_user')
+            with pytest.raises(AuthenticationError):
+                wce.fetch_xml(instrument=5)
+
+    def test_dump_calendars(self, tmp_path):
+        from ..writeCalEvents import dump_calendars
+        f = os.path.join(tmp_path, 'cal_output.xml')
+        dump_calendars(instrument='msed_titan', filename=f)
 
     def test_calendar_parsing_event_number(self, parse_xml):
         # DONE: do tests here on parsed xml (number of events, extract

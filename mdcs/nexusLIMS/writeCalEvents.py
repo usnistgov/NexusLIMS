@@ -307,25 +307,26 @@ def wrap_events(events_string):
     return result
 
 
-def dump_calendars(instrument=None, user=None, date=None):
+def dump_calendars(instrument=None, user=None, date=None,
+                   filename='cal_events.xml'):
     """
     Write the results of :py:func:`~.get_events` to a file
     """
-    with open('cal_events.xml', 'w') as f:
+    with open(filename, 'w') as f:
         text = get_events(instrument=instrument, date=date, user=user)
         f.write(text)
 
 
-if __name__ == '__main__':
-    """
-    These lines are just for testing. For real use, import the methods you 
-    need and operate from there
-    """
-    logging.basicConfig(level=logging.INFO)
+# if __name__ == '__main__':
+#     """
+#     These lines are just for testing. For real use, import the methods you
+#     need and operate from there
+#     """
+    # logging.basicConfig(level=logging.INFO)
     # dump_calendars(instrument='msed_titan')
     # dump_calendars(date='2019-02-28')
     # logging.info(get_events(instrument=None))
     # logging.info(get_events(date='2019-02-25'))
-    logging.info(get_events(user='***REMOVED***'))
+    # logging.info(get_events(user='***REMOVED***'))
     # logging.info(get_events(date='2018-12-26', user='***REMOVED***'))
     # logging.info(get_events())
