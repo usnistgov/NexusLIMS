@@ -52,7 +52,7 @@ def get_auth(filename="credentials.ini"):
         username = os.environ['nexusLIMS_user']
         passwd = os.environ['nexusLIMS_pass']
         logging.info("Authenticating using environment variables")
-    except KeyError as e:
+    except KeyError:
         # if absolute path was provided, use that, otherwise find filename in
         # this directory
         if os.path.isabs(filename):
