@@ -1,5 +1,5 @@
 # File patterns we want git to ignore
-#
+
 # backup 
 *~
 *.bak
@@ -15,3 +15,6 @@ gitlab_backup.log
 *.pyc
 .idea
 .vscode
+
+# pip installation files
+*.egg-info

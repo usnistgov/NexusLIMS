@@ -28,6 +28,8 @@ nexusLIMS_tests:
     # - /opt/conda/bin/conda env list
     - /opt/conda/bin/conda create -p ${env_name} --file mdcs/nexusLIMS/requirements.txt -c conda-forge
     - source /opt/conda/bin/activate ${env_name}
+    # install both the runtime and development requirements:
+    - pip install -e "mdcs/nexusLIMS[devel]"
 
     # Run the actual tests
-    - cd mdcs/nexusLIMS/tests && pytest --cov=nexusLIMS .
+    - pytest --cov=mdcs/nexusLIMS/nexusLIMS mdcs/nexusLIMS/nexusLIMS/tests

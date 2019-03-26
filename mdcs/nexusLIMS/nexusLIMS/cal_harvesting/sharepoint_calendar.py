@@ -18,6 +18,10 @@ INDENT = '  '
 # DONE: add new instruments to calendar handler
 
 
+__all__ = ['AuthenticationError', 'get_auth', 'fetch_xml',
+           'parse_xml', 'get_events', 'wrap_events', 'dump_calendars']
+
+
 class AuthenticationError(Exception):
     """Class for showing an exception having to do with authentication"""
     def __init__(self, message):
@@ -87,8 +91,10 @@ def fetch_xml(instrument=None):
     ----------
     instrument : None, str, or list of str
         As defined in :py:func:`~.get_events`
-        One or more of ['titan', 'quanta', 'jeol_sem', 'jeol_tem', 'cm30',
-        'em400'], or None. If None, all instruments will be returned.
+        One or more of ['msed_titan', 'quanta', 'jeol_sem', 'hitachi_sem',
+        'jeol_tem', 'cm30', 'em400', 'hitachi_s5500', 'mmsd_titan',
+        'fei_helios_db'], or None. If None, events from all instruments will be
+        returned.
 
     Returns
     -------
@@ -228,8 +234,9 @@ def get_events(instrument=None, date=None, user=None):
     Parameters:
     -----------
     instrument : None, str, or list of str
-        One or more of ['titan', 'quanta', 'jeol_sem', 'jeol_tem', 'cm30',
-        'em400'], or None. If None, all instruments will be returned.
+        One or more of ['msed_titan', 'quanta', 'jeol_sem', 'hitachi_sem',
+        'jeol_tem', 'cm30', 'em400', 'hitachi_s5500', 'mmsd_titan',
+        'fei_helios_db'], or None. If None, all instruments will be returned.
 
     date : None or str
         Either None or a YYYY-MM-DD date string indicating the date from
