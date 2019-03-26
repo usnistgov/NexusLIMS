@@ -1,5 +1,5 @@
 import os
-from ..extractors import quanta_tif as qt
+from nexusLIMS.extractors.quanta_tif import get_quanta_metadata
 from configparser import ConfigParser
 
 
@@ -8,7 +8,7 @@ class TestMetadataExtraction:
                                     "files", "quad1image_001.tif")
 
     def test_quanta_extraction(self):
-        metadata = qt.get_metadata(self.QUANTA_TEST_FILE)
+        metadata = get_quanta_metadata(self.QUANTA_TEST_FILE)
 
         # Because the metadata is structured as an .ini file, we can user
         # ConfigParser to get the values from it easily

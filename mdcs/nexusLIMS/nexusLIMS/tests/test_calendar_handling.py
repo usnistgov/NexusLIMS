@@ -1,11 +1,20 @@
 import os
 import pytest
-import logging
 import requests
 from lxml import etree
-from .. import writeCalEvents as wce
-from ..writeCalEvents import AuthenticationError
+from nexusLIMS.cal_harvesting import sharepoint_calendar as sc
+from nexusLIMS.cal_harvesting.sharepoint_calendar import AuthenticationError
 from collections import OrderedDict
+
+import warnings
+warnings.filterwarnings(
+    action='ignore',
+    message=r"DeprecationWarning: Using Ntlm()*",
+    category=DeprecationWarning)
+warnings.filterwarnings(
+    'ignore',
+    r"Manually creating the cbt stuct from the cert hash will be removed",
+    DeprecationWarning)
 
 
 class TestCalendarHandling:
@@ -15,8 +24,13 @@ class TestCalendarHandling:
     # modification made was the manual removal of
     # 'xmlns="http://www.w3.org/2005/Atom"' from the top level element, since
     # this is done by fetch_xml() in the actual processing
-    XML_TEST_FILE = os.path.join(os.path.dirname(__file__),
+    XML_TEST_FILE = os.path.join(os.path.dirname(__file__), "files",
                                  "2019-03-14_titan_tem_cal.xml")
+    CREDENTIAL_FILE_ABS = os.path.abspath(
+        os.path.join(os.path.dirname(__file__),
+                     '..',
+                     'credentials.ini.example'))
+    CREDENTIAL_FILE_REL = os.path.join('..', 'credentials.ini.example')
 
     @pytest.fixture
     def parse_xml(self):
@@ -32,19 +46,19 @@ class TestCalendarHandling:
         # parsed_xml items will be an _XSLTResultTree object with many
         # <event>...</event> tags on the same level
         parsed_xml = dict()
-        parsed_xml['all'] = wce.parse_xml(file_content)           # 403 items
-        parsed_xml['user'] = wce.parse_xml(file_content,
-                                           user='***REMOVED***')            # 10 items
-        parsed_xml['date'] = wce.parse_xml(file_content,
-                                           date='2019-03-06')     # 2 items
-        parsed_xml['date_and_user'] = wce.parse_xml(file_content,
-                                                    date='2019-03-06',
-                                                    user='***REMOVED***')  # 1 item
+        parsed_xml['all'] = sc.parse_xml(file_content)           # 403 items
+        parsed_xml['user'] = sc.parse_xml(file_content,
+                                          user='***REMOVED***')            # 10 items
+        parsed_xml['date'] = sc.parse_xml(file_content,
+                                          date='2019-03-06')     # 2 items
+        parsed_xml['date_and_user'] = sc.parse_xml(file_content,
+                                                   date='2019-03-06',
+                                                   user='***REMOVED***')  # 1 item
 
         # convert parsing result to string and wrap so we have well-formed xml:
         xml_strings = dict()
         for k, v in parsed_xml.items():
-            xml_strings[k] = wce.wrap_events(str(v))
+            xml_strings[k] = sc.wrap_events(str(v))
 
         # get document tree from the raw file and the ones we parsed:
         parsed_docs = dict()
@@ -59,38 +73,35 @@ class TestCalendarHandling:
                                             'cm30', 'em400', 'hitachi_s5500',
                                             'mmsd_titan', 'fei_helios_db'])
     def test_downloading_valid_calendars(self, instrument):
-        wce.fetch_xml(instrument)
+        sc.fetch_xml(instrument)
 
     def test_downloading_bad_calendar(self):
         with pytest.raises(KeyError):
-            wce.fetch_xml('bogus_instr')
+            sc.fetch_xml('bogus_instr')
 
     def test_bad_username(self, monkeypatch):
         with monkeypatch.context() as m:
             m.setenv('nexusLIMS_user', 'bad_user')
             with pytest.raises(AuthenticationError):
-                wce.fetch_xml()
+                sc.fetch_xml()
 
     def test_absolute_path_to_credentials(self, monkeypatch):
-        from ..writeCalEvents import get_auth
+        from nexusLIMS.cal_harvesting.sharepoint_calendar import get_auth
         with monkeypatch.context() as m:
             # remove environment variable so we get into file processing
             m.delenv('nexusLIMS_user')
-            cred_file = os.path.abspath(
-                os.path.join(os.path.dirname(__file__), '..',
-                             'credentials.ini.example'))
-            _ = get_auth(cred_file)
+            _ = get_auth(self.CREDENTIAL_FILE_ABS)
 
     def test_relative_path_to_credentials(self, monkeypatch):
-        from ..writeCalEvents import get_auth
+        from nexusLIMS.cal_harvesting.sharepoint_calendar import get_auth
+        os.chdir(os.path.dirname(__file__))
         with monkeypatch.context() as m:
             # remove environment variable so we get into file processing
             m.delenv('nexusLIMS_user')
-            cred_file = os.path.join('credentials.ini.example')
-            _ = get_auth(cred_file)
+            _ = get_auth(self.CREDENTIAL_FILE_REL)
 
     def test_bad_path_to_credentials(self, monkeypatch):
-        from ..writeCalEvents import get_auth
+        from nexusLIMS.cal_harvesting.sharepoint_calendar import get_auth
         with monkeypatch.context() as m:
             # remove environment variable so we get into file processing
             m.delenv('nexusLIMS_user')
@@ -114,21 +125,21 @@ class TestCalendarHandling:
             # always returns a 404
             monkeypatch.setattr(requests, 'get', mock_get)
             with pytest.raises(requests.exceptions.ConnectionError):
-                wce.fetch_xml(None)
+                sc.fetch_xml(None)
 
     def test_fetch_xml_instrument_none(self, monkeypatch):
         with monkeypatch.context() as m:
             # use bad username so we don't get a response or lock miclims
             m.setenv('nexusLIMS_user', 'bad_user')
             with pytest.raises(AuthenticationError):
-                wce.fetch_xml(None)
+                sc.fetch_xml(None)
 
     def test_fetch_xml_instrument_tuple(self, monkeypatch):
         with monkeypatch.context() as m:
             # use bad username so we don't get a response or lock miclims
             m.setenv('nexusLIMS_user', 'bad_user')
             with pytest.raises(AuthenticationError):
-                wce.fetch_xml(instrument=('msed_titan',
+                sc.fetch_xml(instrument=('msed_titan',
                                           'fei_quanta'))
 
     def test_fetch_xml_instrument_bogus(self, monkeypatch):
@@ -136,15 +147,15 @@ class TestCalendarHandling:
             # use bad username so we don't get a response or lock miclims
             m.setenv('nexusLIMS_user', 'bad_user')
             with pytest.raises(AuthenticationError):
-                wce.fetch_xml(instrument=5)
+                sc.fetch_xml(instrument=5)
 
     def test_dump_calendars(self, tmp_path):
-        from ..writeCalEvents import dump_calendars
+        from nexusLIMS.cal_harvesting.sharepoint_calendar import dump_calendars
         f = os.path.join(tmp_path, 'cal_output.xml')
         dump_calendars(instrument='msed_titan', filename=f)
 
     def test_get_events_good_date(self):
-        from ..writeCalEvents import get_events
+        from nexusLIMS.cal_harvesting.sharepoint_calendar import get_events
         events_1 = get_events(instrument='msed_titan',
                               date='2019-03-13')
         events_2 = get_events(instrument='msed_titan',
@@ -158,7 +169,7 @@ class TestCalendarHandling:
             assert el1.text == el2.text
 
     def test_get_events_bad_date(self, caplog):
-        from ..writeCalEvents import get_events
+        from nexusLIMS.cal_harvesting.sharepoint_calendar import get_events
 
         get_events(instrument='msed_titan', date='The Ides of March')
 

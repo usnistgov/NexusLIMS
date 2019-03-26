@@ -1,4 +1,4 @@
-def get_metadata(filename):
+def get_quanta_metadata(filename):
     """
     Returns the metadata (as a string) from a .tif file saved by the FEI Quanta
     SEM in the Nexus Microscopy Facility
@@ -26,7 +26,7 @@ def get_metadata(filename):
 #     These lines are just for testing. For real use, import the methods you
 #     need and operate from there
 #     """
-#     meta = get_metadata('/mnt/***REMOVED***/Quanta/***REMOVED***/171218 - Evergreen '
-#                         'Sprig - Quanta/quad1image_001.tif')
+#     meta = get_quanta_metadata('/mnt/***REMOVED***/Quanta/***REMOVED***/171218 - '
+#                         'Evergreen Sprig - Quanta/quad1image_001.tif')
 #
 #     print(meta)
