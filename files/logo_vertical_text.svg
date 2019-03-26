@@ -17,7 +17,7 @@
    id="svg1008"
    sodipodi:docname="logo_vertical_text.svg"
    inkscape:version="0.92.4 5da689c313, 2019-01-14"
-   inkscape:export-filename="/home/jat/git_repos/NexusMicroscopyLIMS/files/logo_horizontal_text.png"
+   inkscape:export-filename="/home/jat/git_repos/NexusMicroscopyLIMS/files/logo_vertical_text.png"
    inkscape:export-xdpi="86"
    inkscape:export-ydpi="86">
   <metadata
@@ -28,7 +28,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -184,16 +184,6 @@
        gradientUnits="userSpaceOnUse" />
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient1595"
-       id="linearGradient10082"
-       gradientUnits="userSpaceOnUse" />
-    <linearGradient
-       inkscape:collect="always"
-       xlink:href="#linearGradient1589"
-       id="linearGradient10084"
-       gradientUnits="userSpaceOnUse" />
-    <linearGradient
-       inkscape:collect="always"
        xlink:href="#linearGradient1566"
        id="linearGradient10086"
        gradientUnits="userSpaceOnUse" />
@@ -222,6 +212,16 @@
        xlink:href="#linearGradient1036"
        id="linearGradient10096"
        gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1595"
+       id="linearGradient903"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1589"
+       id="linearGradient907"
+       gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
      pagecolor="#ffffff"
@@ -233,18 +233,18 @@
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
      inkscape:window-width="1920"
-     inkscape:window-height="1171"
+     inkscape:window-height="1125"
      id="namedview1010"
      showgrid="false"
      inkscape:snap-object-midpoints="true"
      inkscape:snap-midpoints="true"
-     inkscape:zoom="0.295"
-     inkscape:cx="1641.3914"
-     inkscape:cy="1020.8707"
-     inkscape:window-x="1920"
+     inkscape:zoom="0.417193"
+     inkscape:cx="117.72193"
+     inkscape:cy="1257.0612"
+     inkscape:window-x="0"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
-     inkscape:current-layer="svg1008"
+     inkscape:current-layer="g6416"
      inkscape:snap-intersection-paths="true"
      showguides="false"
      inkscape:guide-bbox="true"
@@ -521,7 +521,7 @@
          id="path1249-7"
          style="opacity:1;fill:url(#linearGradient10080);fill-opacity:1;stroke:none;stroke-width:25.80888557;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.74901961;paint-order:stroke markers fill" />
       <circle
-         style="opacity:1;fill:url(#linearGradient10082);fill-opacity:1;stroke:none;stroke-width:25.80888557;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.74901961;paint-order:stroke markers fill"
+         style="opacity:1;fill:url(#linearGradient907);fill-opacity:1;stroke:none;stroke-width:25.80888557;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.74901961;paint-order:stroke markers fill"
          id="circle6256"
          cx="347.38144"
          cy="267.17709"
@@ -531,7 +531,7 @@
          cy="218.51831"
          cx="347.38144"
          id="circle6258"
-         style="opacity:1;fill:url(#linearGradient10084);fill-opacity:1;stroke:none;stroke-width:25.80888557;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.74901961;paint-order:stroke markers fill" />
+         style="opacity:1;fill:url(#linearGradient903);fill-opacity:1;stroke:none;stroke-width:25.80888557;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.74901961;paint-order:stroke markers fill" />
       <circle
          style="opacity:1;fill:url(#linearGradient10086);fill-opacity:1;stroke:none;stroke-width:25.80888557;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.74901961;paint-order:stroke markers fill"
          id="circle6260"

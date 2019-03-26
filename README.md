@@ -183,3 +183,24 @@ pytest --cov=nexusLIMS nexusLIMS/tests
 # 
 # =========================== 29 passed in 12.64 seconds ============================
 ```
+
+## About the logo
+
+The logo for the NexusLIMS project is inspired by the Nobel Prize
+[winning](https://www.nobelprize.org/prizes/chemistry/2011/shechtman/facts/) 
+work of 
+[Dan Shechtman](https://www.nist.gov/content/nist-and-nobel/nobel-moment-dan-shechtman)
+during his time at NIST in the 1980s. Using transmission electron diffraction,
+Shechtman measured an unusual diffraction pattern that ultimately overturned
+a fundamental paradigm of crystallography. He had discovered a new class of 
+crystals known as 
+[*quasicrystals*](https://en.wikipedia.org/wiki/Quasicrystal), which have a 
+regular structure and diffract, but are not periodic.
+
+We chose to use Shechtman's 
+[first published](https://journals.aps.org/prl/pdf/10.1103/PhysRevLett.53.1951) 
+diffraction pattern of a quasicrystal as inspiration for the NexusLIMS logo 
+due to its significance in the electron microscopy and crystallography 
+communities and storied NIST heritage:  
+ 
+<img src="files/logo_ideas/shechtman_QC_DP.png"/> :arrow\_right: <img src="files/logo_horizontal_text.png"/>

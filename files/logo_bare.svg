@@ -15,7 +15,7 @@
    viewBox="0 0 19000 19000"
    preserveAspectRatio="xMidYMid meet"
    id="svg1008"
-   sodipodi:docname="NexusLIMS_logo_just_DP_fewer_reflections_no_transp_inbtw.svg"
+   sodipodi:docname="logo_bare.svg"
    inkscape:version="0.92.4 5da689c313, 2019-01-14"
    inkscape:export-filename="/home/jat/git_repos/NexusMicroscopyLIMS/files/NexusLIMS_logo_just_DP_fewer_reflections_no_transp_inbtw.png"
    inkscape:export-xdpi="100"
@@ -28,7 +28,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -184,11 +184,6 @@
        gradientUnits="userSpaceOnUse" />
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient1595"
-       id="linearGradient1676"
-       gradientUnits="userSpaceOnUse" />
-    <linearGradient
-       inkscape:collect="always"
        xlink:href="#linearGradient6897"
        id="linearGradient1699"
        gradientUnits="userSpaceOnUse" />
@@ -214,13 +209,18 @@
        gradientUnits="userSpaceOnUse" />
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient1589"
-       id="linearGradient1731"
+       xlink:href="#linearGradient1036"
+       id="linearGradient1733"
        gradientUnits="userSpaceOnUse" />
     <linearGradient
        inkscape:collect="always"
-       xlink:href="#linearGradient1036"
-       id="linearGradient1733"
+       xlink:href="#linearGradient1595"
+       id="linearGradient897"
+       gradientUnits="userSpaceOnUse" />
+    <linearGradient
+       inkscape:collect="always"
+       xlink:href="#linearGradient1589"
+       id="linearGradient899"
        gradientUnits="userSpaceOnUse" />
   </defs>
   <sodipodi:namedview
@@ -239,8 +239,8 @@
      inkscape:snap-object-midpoints="true"
      inkscape:snap-midpoints="true"
      inkscape:zoom="0.295"
-     inkscape:cx="1294.9072"
-     inkscape:cy="872.80597"
+     inkscape:cx="1058.4411"
+     inkscape:cy="939.585"
      inkscape:window-x="1920"
      inkscape:window-y="0"
      inkscape:window-maximized="1"
@@ -521,7 +521,7 @@
          id="path1249-7"
          style="opacity:1;fill:url(#linearGradient1719);fill-opacity:1;stroke:none;stroke-width:16.49687386;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.74901961;paint-order:stroke markers fill" />
       <circle
-         style="opacity:1;fill:url(#linearGradient1676);fill-opacity:1;stroke:none;stroke-width:16.49687386;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.74901961;paint-order:stroke markers fill"
+         style="opacity:1;fill:url(#linearGradient899);fill-opacity:1;stroke:none;stroke-width:16.49687386;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.74901961;paint-order:stroke markers fill"
          id="circle6256"
          cx="347.38144"
          cy="267.17709"
@@ -531,7 +531,7 @@
          cy="218.51831"
          cx="347.38144"
          id="circle6258"
-         style="opacity:1;fill:url(#linearGradient1731);fill-opacity:1;stroke:none;stroke-width:16.49687386;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.74901961;paint-order:stroke markers fill" />
+         style="opacity:1;fill:url(#linearGradient897);fill-opacity:1;stroke:none;stroke-width:16.49687386;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.74901961;paint-order:stroke markers fill" />
       <circle
          style="opacity:1;fill:url(#linearGradient1662);fill-opacity:1;stroke:none;stroke-width:16.49687386;stroke-linecap:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:0.74901961;paint-order:stroke markers fill"
          id="circle6260"
