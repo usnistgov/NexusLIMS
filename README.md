@@ -201,6 +201,6 @@ We chose to use Shechtman's
 [first published](https://journals.aps.org/prl/pdf/10.1103/PhysRevLett.53.1951) 
 diffraction pattern of a quasicrystal as inspiration for the NexusLIMS logo 
 due to its significance in the electron microscopy and crystallography 
-communities and storied NIST heritage:  
+communities, together with its storied NIST heritage:  
  
-<img src="files/logo_ideas/shechtman_QC_DP.png"/> :arrow\_right: <img src="files/logo_horizontal_text.png"/>
+<img height=150 src="files/logo_ideas/shechtman_QC_DP.png"/> :arrow\_right: <img height=150 src="files/logo_horizontal_text.png"/>
