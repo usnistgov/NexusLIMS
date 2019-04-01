@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="nexus.xsl"?>
+<nx:Experiment xmlns=""
+               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+               xmlns:nx="https://data.nist.gov/od/dm/nexus/experiment/v1.0">
+
+  <title>A Prototype Nexus Experiment</title>
+  <id>ark:/88434/nxp0</id>
+  <summary>
+    <experimenter>Rachel Devers</experimenter>
+    <experimenter>Ray Plante</experimenter>
+    <collaborator>June Lau</collaborator>
+    <instrument>Titan</instrument>
+    <reservationStart>2018-06-26T10:00:00</reservationStart>
+    <reservationEnd>2018-06-26T11:00:00</reservationEnd>
+    <motivation>
+      Here, we present a prototypical example of an Experiment XML
+      record that can be used for validation of the Experiment schema
+      and development of the record filler software.  
+    </motivation>
+  </summary>
+  </nx:Experiment>
