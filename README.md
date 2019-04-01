@@ -5,7 +5,7 @@ Laboratory Information Management System (LIMS). The top level of the repository
 holds a number of folders with files of various interest, but the majority of the
 code that runs the LIMS system is contained within the [`nexusLIMS`](mdcs/nexusLIMS)
 package. Additional information can be found in the
-[project wiki](https://***REMOVED******REMOVED***/NexusMicroscopyLIMS/wikis/home).
+[project wiki](https://***REMOVED***nexuslims/NexusMicroscopyLIMS/wikis/home).
 
 ## Installation
 
@@ -133,12 +133,12 @@ Output:
 
 ## Contributing 
 
-To contribute, please [fork](https://***REMOVED******REMOVED***/NexusMicroscopyLIMS/forks/new)
+To contribute, please [fork](https://***REMOVED***nexuslims/NexusMicroscopyLIMS/forks/new)
 the repository, develop your addition on a
 [feature branch](https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow)
 within your forked repo,
-and submit a [merge request](https://***REMOVED******REMOVED***/NexusMicroscopyLIMS/merge_requests)
-to the [`master`](https://***REMOVED******REMOVED***/NexusMicroscopyLIMS/tree/master)
+and submit a [merge request](https://***REMOVED***nexuslims/NexusMicroscopyLIMS/merge_requests)
+to the [`master`](https://***REMOVED***nexuslims/NexusMicroscopyLIMS/tree/master)
 branch to have it included in the project.
 This project uses testing through the 
 [`pytest`](https://docs.pytest.org/en/latest/) library, and strives for 

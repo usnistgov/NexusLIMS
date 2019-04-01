@@ -112,7 +112,7 @@ def fetch_xml(instrument=None):
     # Instrument names can be found at
     # https://***REMOVED***/***REMOVED***/_vti_bin/ListData.svc
     # and
-    # https://***REMOVED******REMOVED***/NexusMicroscopyLIMS/wikis/Sharepoint-Calendar-Information
+    # https://***REMOVED***nexuslims/NexusMicroscopyLIMS/wikis/Sharepoint-Calendar-Information
     instr_input_dict = {
         'msed_titan': "FEITitanTEM",
         'quanta': "FEIQuanta200Events",
