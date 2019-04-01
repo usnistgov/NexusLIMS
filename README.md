@@ -204,3 +204,5 @@ due to its significance in the electron microscopy and crystallography
 communities, together with its storied NIST heritage:  
  
 <img height=150 src="files/logo_ideas/shechtman_QC_DP.png"/> :arrow\_right: <img height=150 src="files/logo_horizontal_text.png"/>
+
+<!-- Comment for git flow testing  -->
