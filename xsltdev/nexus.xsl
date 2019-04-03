@@ -8,6 +8,7 @@
                 <body>		
                     <h2>A Prototype Nexus Experiment</h2>
                     <h3>id</h3> 
+                    <xsl:value-of select="id"/>
                     
                     
                     <table border="1">
@@ -16,44 +17,60 @@
                             <th>collaborator</th>
                             <th>instrument</th>
                         </tr>
-                        <xsl:apply-templates select="summary"/>
-                       <!--<xsl:for-each select="summary">
-                                   
-                            </xsl:for-each> -->
-                                <tr>
-                                    <td>
-                                        <xsl:value-of select="reservationStart"/>
-                                            <xsl:value-of select="reservationEnd"/>
-                                </td>        
-                                </tr>
-                              
-                                <tr>
-                                    <td>
-                                        <xsl:value-of select="motivation"/>
-                                  </td>
-                                </tr>
-                               
-                          
                         
-                    </table>
+                        <xsl:apply-templates select="summary"/>
+                       <!--<xsl:for-each select="summary">            
+                                   
+                            </xsl:for-each> -->   
+                  </table>
                 </body>
             </html>
             
         </xsl:template>
         <xsl:template match ="summary">
             <xsl:comment>INSIDE SUMMARY TEMPLATE</xsl:comment>
-            <xsl:element name="tr">
-                <xsl:element name="td">
+            <tr>
+                <td>
                     <xsl:value-of select="experimenter"/>
-                </xsl:element>
-                
+                </td>
                 <td>
                     <xsl:value-of select="collaborator"/>
                 </td>
                 <td>
                     <xsl:value-of select="instrument"/>
                 </td>
-            </xsl:element>
+                
+                
+            </tr>
+            
+            <table border="1">
+                <tr bgcolor ="#9acd32">
+            <tr>
+                <th>reservationStart</th>
+                <th>reservationEnd</th>
+                
+            </tr>
+            
+            <tr>
+                <td>
+                    <xsl:value-of select="reservationStart"/>
+                </td>
+                <td>
+                    <xsl:value-of select="reservationEnd"/>
+                </td>        
+            </tr>
+                </tr>
+                <tr>
+                    <th>motivation</th>
+                </tr>
+            
+            <tr>
+                <td>
+                    <xsl:value-of select="motivation"/>
+                </td>
+            </tr>
+            
+            </table>  
         </xsl:template>
     
 </xsl:stylesheet>
