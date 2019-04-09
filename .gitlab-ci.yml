@@ -12,7 +12,7 @@ nexusLIMS_tests:
     - env_name="$(pwd)/test_env"
     - /opt/conda/bin/conda remove -p ${env_name} --all || true
     # loop in case we get the intermittent conda error (from https://unix.stackexchange.com/a/82610):
-    - for i in $(seq 1 5); do [ $i -gt 1 ] && echo "Sleeping for 15 seconds..."; sleep 15; /opt/conda/bin/conda create -p ${env_name} --file mdcs/nexusLIMS/requirments.txt -c conda-forge && s=0 && break || s=$?; done; (exit $s)
+    - for i in $(seq 1 5); do [ $i -gt 1 ] && echo "Sleeping for 15 seconds..."; sleep 15; /opt/conda/bin/conda create -p ${env_name} --file mdcs/nexusLIMS/requirements.txt -c conda-forge && s=0 && break || s=$?; done; (exit $s)
     - source /opt/conda/bin/activate ${env_name}
     - pip install -e "mdcs/nexusLIMS[devel]"
     - pytest --cov=mdcs/nexusLIMS/nexusLIMS mdcs/nexusLIMS/nexusLIMS/tests
