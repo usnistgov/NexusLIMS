@@ -83,7 +83,8 @@ setup(
                       'requests',
                       'requests-ntlm',
                       'ntlm-auth',
-                      'dateparser'],
+                      'dateparser',
+                      'hyperspy'],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
@@ -94,6 +95,8 @@ setup(
                   'pytest',
                   'pytest-cov',
                   ],
+        'doc': ['sphinx',
+                ]
     },
 
     # required to include additional resource files in the package

@@ -4,3 +4,4 @@ generated from instruments in the Electron Microscopy Nexus facility.
 """
 
 from .quanta_tif import get_quanta_metadata
+from .digital_micrograph import get_dm3_metadata
