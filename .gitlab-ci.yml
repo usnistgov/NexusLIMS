@@ -5,31 +5,14 @@ nexusLIMS_tests:
   #  as /opt/conda/bin/conda
   # following example at https://github.com/conda/conda-gitlab-ci/blob/master/.travis.yml
   script:
-    # Debugging info:
-    # - whoami
-    # - id
-    # - pwd
-    # - echo ${PATH}
-    # - echo ${HOME}
-    # - echo "User is ${nexusLIMS_user}"
-    # - ls -lah /opt/conda/bin
-    # - cat /etc/*release
-
     # Setup conda environment:
     - /opt/conda/bin/conda --version
     - /opt/conda/bin/conda config --set always_yes yes
     - /opt/conda/bin/conda config --set auto_update_conda False    
-    # Do not update, as we don't have permissions:
-    # - /opt/conda/bin/conda update -q --all
     - env_name="$(pwd)/test_env"
-    # - /opt/conda/bin/conda env list
-    # --force option is added in conda 4.6, we're on 4.5.12, so instead try to remove if it's there:
     - /opt/conda/bin/conda remove -p ${env_name} --all || true
-    # - /opt/conda/bin/conda env list
-    - for i in 1 2 3 4 5; do echo "conda attempt ${i} of 5"; /opt/conda/bin/conda create -p ${env_name} --file mdcs/nexusLIMS/requirments.txt -c conda-forge && break || sleep 15; done
+    # loop in case we get the intermittent conda error (from https://unix.stackexchange.com/a/82610):
+    - for i in $(seq 1 5); do [ $i -gt 1 ] && echo "Sleeping for 15 seconds..."; sleep 15; /opt/conda/bin/conda create -p ${env_name} --file mdcs/nexusLIMS/requirments.txt -c conda-forge && s=0 && break || s=$?; done; (exit $s)
     - source /opt/conda/bin/activate ${env_name}
-    # install both the runtime and development requirements:
     - pip install -e "mdcs/nexusLIMS[devel]"
-
-    # Run the actual tests
     - pytest --cov=mdcs/nexusLIMS/nexusLIMS mdcs/nexusLIMS/nexusLIMS/tests
