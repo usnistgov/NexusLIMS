@@ -26,7 +26,7 @@ nexusLIMS_tests:
     # --force option is added in conda 4.6, we're on 4.5.12, so instead try to remove if it's there:
     - /opt/conda/bin/conda remove -p ${env_name} --all || true
     # - /opt/conda/bin/conda env list
-    - /opt/conda/bin/conda create -p ${env_name} --file mdcs/nexusLIMS/requirements.txt -c conda-forge
+    - for i in 1 2 3 4 5; do echo "conda attempt ${i} of 5"; /opt/conda/bin/conda create -p ${env_name} --file mdcs/nexusLIMS/requirements.txt -c conda-forge && break || sleep 15; done
     - source /opt/conda/bin/activate ${env_name}
     # install both the runtime and development requirements:
     - pip install -e "mdcs/nexusLIMS[devel]"
