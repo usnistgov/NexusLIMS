@@ -1,11 +1,36 @@
 import os
+import tarfile
 from nexusLIMS.extractors.quanta_tif import get_quanta_metadata
+from nexusLIMS.extractors.digital_micrograph import get_dm3_metadata
 from configparser import ConfigParser
 
 
 class TestMetadataExtraction:
     QUANTA_TEST_FILE = os.path.join(os.path.dirname(__file__),
                                     "files", "quad1image_001.tif")
+    DM3_CTEM_FILE = os.path.join(os.path.dirname(__file__),
+                                 "files", "titan_CTEM_zeroData.dm3")
+    DM3_CTEM_FILE_TGZ = DM3_CTEM_FILE + ".tar.gz"
+    DM3_DP_FILE = os.path.join(os.path.dirname(__file__),
+                               "files", "titan_DP_zeroData.dm3")
+    DM3_DP_FILE_TGZ = DM3_DP_FILE + ".tar.gz"
+
+    @classmethod
+    def setup_class(cls):
+        """
+        Setup the class by extracting the compressed test files
+        """
+        for tarf in [cls.DM3_CTEM_FILE_TGZ, cls.DM3_DP_FILE_TGZ]:
+            with tarfile.open(tarf, 'r:gz') as tar:
+                tar.extractall(path=os.path.dirname(tarf))
+
+    @classmethod
+    def teardown_class(cls):
+        """
+        Teardown the class by deleting the extracted test files
+        """
+        for f in [cls.DM3_CTEM_FILE, cls.DM3_DP_FILE]:
+            os.remove(f)
 
     def test_quanta_extraction(self):
         metadata = get_quanta_metadata(self.QUANTA_TEST_FILE)
@@ -46,3 +71,15 @@ class TestMetadataExtraction:
                                                             "Label MicronBar"
         assert meta.get('HiResIllumination', 'BrightFieldIsOn') == ""
         assert meta.get('HiResIllumination', 'BrightFieldValue') == ""
+
+    def test_dm3_extraction_ctem(self):
+        assert os.path.exists(self.DM3_CTEM_FILE)
+
+        metadata = get_dm3_metadata(self.DM3_CTEM_FILE)
+
+        assert os.path.exists(self.DM3_DP_FILE)
+
+    def test_dm3_extraction_dp(self):
+        assert os.path.exists(self.DM3_DP_FILE)
+
+        metadata = get_dm3_metadata(self.DM3_DP_FILE)
