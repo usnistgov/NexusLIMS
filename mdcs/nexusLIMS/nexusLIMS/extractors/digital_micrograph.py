@@ -62,11 +62,23 @@ def get_dm3_metadata(filename):
     for tg_name, tg in m_tree.DocumentObjectList:
         # tg_name should be 'TagGroup0', 'TagGroup1', etc.
         keys = tg.keys()
+        # we want to keep this, so remove from the list to loop through
         keys.remove('AnnotationGroupList')
         for k in keys:
             # k should be in ['AnnotationType', 'BackgroundColor',
             # 'BackgroundMode', 'FillMode', etc.]
             m_tree = _remove_dtb_element(m_tree, 'DocumentObjectList.'
+                                                 '{}.{}'.format(tg_name, k))
+
+    for tg_name, tg in m_tree.ImageList:
+        # tg_name should be 'TagGroup0', 'TagGroup1', etc.
+        keys = tg.keys()
+        # We want to keep 'ImageTags' and 'Name', so remove from list
+        keys.remove('ImageTags')
+        keys.remove('Name')
+        for k in keys:
+            # k should be in ['ImageData', 'UniqueID']
+            m_tree = _remove_dtb_element(m_tree, 'ImageList.'
                                                  '{}.{}'.format(tg_name, k))
 
     return m_tree
