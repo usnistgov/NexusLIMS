@@ -84,6 +84,7 @@ setup(
                       'requests-ntlm',
                       'ntlm-auth',
                       'dateparser',
+                      'pynoid',
                       'hyperspy'],
 
     # List additional groups of dependencies here (e.g. development
