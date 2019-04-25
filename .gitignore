@@ -10,11 +10,13 @@ backups
 gitlab_backup.log
 *credentials.ini
 .coverage
+.env
 
 # dev files
 *.pyc
 .idea
 .vscode
+test_data/
 **/doc/build
 
 # pip installation files

@@ -65,7 +65,7 @@ setup(
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 3.6'
+        'Programming Language :: Python :: 3.7'
     ],
 
     # What does your project relate to?
@@ -84,7 +84,7 @@ setup(
                       'requests-ntlm',
                       'ntlm-auth',
                       'dateparser',
-                      'pynoid',
+                      'pynoid @ git+https://github.com/***REMOVED***/pynoid@master',
                       'hyperspy'],
 
     # List additional groups of dependencies here (e.g. development
@@ -95,9 +95,8 @@ setup(
         'devel': ['coverage',
                   'pytest',
                   'pytest-cov',
-                  ],
-        'doc': ['sphinx',
-                ]
+                  'sphinx'
+                  ]
     },
 
     # required to include additional resource files in the package
