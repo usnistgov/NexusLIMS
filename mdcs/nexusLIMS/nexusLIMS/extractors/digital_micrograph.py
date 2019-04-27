@@ -83,14 +83,24 @@ def process_tecnai_microscope_info(microscope_info, delimiter=u'\u2028'):
 
     # String
     tmp = __find_val('Mode ', tecnai_info)
-    info_dict['Mode'] = tmp[:tmp.index(' Image Defocus')]
+    info_dict['Mode'] = tmp[:tmp.index(' Defocus')]
+    # 'Mode' should be five terms long, and the last term is either 'Image',
+    # 'Diffraction', (or maybe something else)
 
     # Float (micrometer)
-    info_dict['Image_Defocus'] = float(tmp.split('Image Defocus (um) ')[1]
-                                       .split()[0])
+    if 'Magn ' in tmp:  # Imaging mode
+        info_dict['Defocus'] = float(tmp.split('Defocus (um) ')[1].split()[0])
+    elif 'CL ' in tmp:  # Diffraction mode
+        info_dict['Defocus'] = float(tmp.split('Defocus ')[1].split()[0])
 
+    # This value changes based on whether in image or diffraction mode
+    # (magnification or camera length)
     # Integer
-    info_dict['Magnification'] = int(tmp.split('Magn ')[1].strip('x'))
+    if info_dict['Mode'].split()[4] == 'Image':
+        info_dict['Magnification'] = int(tmp.split('Magn ')[1].strip('x'))
+    # Float
+    elif info_dict['Mode'].split()[4] == 'Diffraction':
+        info_dict['Camera_Length'] = float(tmp.split('CL ')[1].strip('m'))
 
     # Integer (1 to 5)
     info_dict['Spot'] = int(__find_val('Spot ', tecnai_info))
@@ -119,15 +129,16 @@ def process_tecnai_microscope_info(microscope_info, delimiter=u'\u2028'):
 
     def __read_aperture(val, tecnai_info_):
         """Helper method to test if aperture has value or is retracted"""
-        value = __find_val(val, tecnai_info_)
-        value = value.strip(' um')
         try:
+            value = __find_val(val, tecnai_info_)
+            value = value.strip(' um')
             res = int(value)
-        except ValueError:
+        except (ValueError, AttributeError):
             res = None
         return res
 
-    # Either an integer value or None (indicating the aperture was not inserted)
+    # Either an integer value or None (indicating the aperture was not
+    # inserted or tag did not exist in the metadata)
     info_dict['C1_Aperture'] = __read_aperture('C1 Aperture: ', tecnai_info)
     info_dict['C2_Aperture'] = __read_aperture('C2 Aperture: ', tecnai_info)
     info_dict['Obj_Aperture'] = __read_aperture('OBJ Aperture: ', tecnai_info)
