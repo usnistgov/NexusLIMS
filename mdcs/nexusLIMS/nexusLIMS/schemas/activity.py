@@ -106,6 +106,7 @@ def read_metadata(sig):
     return m
 
 
+# TODO: tests for all of AcquisitionActivity
 class AcquisitionActivity:
     """
     A collection of files/metadata attributed to a physical acquisition activity
@@ -231,12 +232,13 @@ class AcquisitionActivity:
             values_to_search = self.unique_params
 
         # DONE: implement setup parameter determination
+        # TODO: tests for setup parameter determination
         # m will be individual dictionaries, since meta is list of dicts
         i = 0
         setup_params = {}
         for m, f in zip(self.meta, self.files):
             # loop through the values_to_search
-            print(f)
+            # print(f)
             # using .copy() on the set allows us to remove values during each
             # iteration, as described in:
             # https://stackoverflow.com/a/22847851/1435788
