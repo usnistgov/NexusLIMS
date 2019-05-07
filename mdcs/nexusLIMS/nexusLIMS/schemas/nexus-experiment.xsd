@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema targetNamespace="https://data.nist.gov/od/dm/nexus/experiment/v1.0"
            xmlns:nx="https://data.nist.gov/od/dm/nexus/experiment/v1.0"
-           xmlns="http://www.w3.org/2001/XMLSchema" 
-           xmlns:xs="http://www.w3.org/2001/XMLSchema" 
+           xmlns="http://www.w3.org/2001/XMLSchema"
+           xmlns:xs="http://www.w3.org/2001/XMLSchema"
            xmlns:xsi="http://www.w3c.org/2001/XMLSchema-instance"
-           elementFormDefault="unqualified" 
-           attributeFormDefault="unqualified" version="0.10-07-2018">
+           elementFormDefault="unqualified" attributeFormDefault="unqualified"
+           version="0.10-07-2018">
 
    <xs:annotation>
       <xs:documentation>
@@ -328,7 +328,8 @@
       <xs:attribute name="source" type="xs:string">
          <xs:annotation>
             <xs:documentation>
-              a label indicating where the notes were extracted from (e.g. "ELN")
+              a label indicating where the notes were extracted from
+              (e.g. "ELN")
             </xs:documentation>
          </xs:annotation>
       </xs:attribute>
@@ -431,8 +432,7 @@
       </xs:annotation>
 
       <xs:sequence>
-         <xs:element name="title" type="xs:token"
-                     minOccurs="0" maxOccurs="1">
+         <xs:element name="title" type="xs:token" minOccurs="0" maxOccurs="1">
             <xs:annotation>
                <xs:documentation>
                  the title for the table
@@ -715,8 +715,8 @@
    <xs:simpleType name="DatasetType">
      <xs:annotation>
        <xs:documentation>
-         Controlled labels that identify a functional type data contained in
-         a dataset.
+         Controlled labels that identify a functional type data contained
+         in a dataset.
        </xs:documentation>
      </xs:annotation>
 
@@ -725,8 +725,8 @@
        <xs:enumeration value="Image">
          <xs:annotation>
            <xs:documentation>
-             A 2-D array of data where each value is typically an
-             intensity measurement as function of regularly spaced position
+             A 2-D array of data where each value is typically an intensity
+             measurement as function of regularly spaced position
            </xs:documentation>
          </xs:annotation>
        </xs:enumeration>
@@ -734,8 +734,8 @@
        <xs:enumeration value="Spectrum">
          <xs:annotation>
            <xs:documentation>
-             A 1-D array of data where each value is typically an
-             intensity measurement as a function of frequency or energy
+             A 1-D array of data where each value is typically an intensity
+             measurement as a function of frequency or energy
            </xs:documentation>
          </xs:annotation>
        </xs:enumeration>
@@ -743,10 +743,9 @@
        <xs:enumeration value="SpectrumImage">
          <xs:annotation>
            <xs:documentation>
-             A 3-D array of data where each value is typically an
-             intensity measurement as a function of regularly space
-             position along two axes and of frequency or energy along 
-             the third.
+             A 3-D array of data where each value is typically an intensity
+             measurement as a function of regularly position along two spatial
+             axes and of frequency or energy along the third.
            </xs:documentation>
          </xs:annotation>
        </xs:enumeration>
@@ -754,7 +753,9 @@
        <xs:enumeration value="Diffraction">
          <xs:annotation>
            <xs:documentation>
-             Data that measures an interference pattern
+             2-D array of data where each value is an intensity as a function
+             of position in reciprocal space; represents the electron
+             diffraction pattern of a material
            </xs:documentation>
          </xs:annotation>
        </xs:enumeration>
@@ -762,8 +763,7 @@
        <xs:enumeration value="Notes">
          <xs:annotation>
            <xs:documentation>
-             Arbitrary textual data that typically manually created by
-             a person.
+             Arbitrary textual data, typically manually created by a person.
            </xs:documentation>
          </xs:annotation>
        </xs:enumeration>
@@ -771,8 +771,8 @@
        <xs:enumeration value="Misc">
          <xs:annotation>
            <xs:documentation>
-             A dataset that does not qualify as of any of the other
-             defined types.  
+             A dataset that does not qualify as of any of the other defined
+             types.
            </xs:documentation>
          </xs:annotation>
        </xs:enumeration>
@@ -820,9 +820,9 @@
        <xs:enumeration value="Derived">
          <xs:annotation>
            <xs:documentation>
-             Data that is not collected form an instrument, but rather
-             derived from raw and/or calibration data as the result of
-             post-acquisition analysis processes
+             Data that is not collected form an instrument, but rather derived
+             from raw and/or calibration data as the result of post-acquisition
+             analysis processes
            </xs:documentation>
          </xs:annotation>
        </xs:enumeration>
