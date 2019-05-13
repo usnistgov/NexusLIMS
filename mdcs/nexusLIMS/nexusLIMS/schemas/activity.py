@@ -1,3 +1,31 @@
+#  NIST Public License - 2019
+#
+#  This software was developed by employees of the National Institute of
+#  Standards and Technology (NIST), an agency of the Federal Government
+#  and is being made available as a public service. Pursuant to title 17
+#  United States Code Section 105, works of NIST employees are not subject
+#  to copyright protection in the United States.  This software may be
+#  subject to foreign copyright.  Permission in the United States and in
+#  foreign countries, to the extent that NIST may hold copyright, to use,
+#  copy, modify, create derivative works, and distribute this software and
+#  its documentation without fee is hereby granted on a non-exclusive basis,
+#  provided that this notice and disclaimer of warranty appears in all copies.
+#
+#  THE SOFTWARE IS PROVIDED 'AS IS' WITHOUT ANY WARRANTY OF ANY KIND,
+#  EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT LIMITED
+#  TO, ANY WARRANTY THAT THE SOFTWARE WILL CONFORM TO SPECIFICATIONS, ANY
+#  IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
+#  AND FREEDOM FROM INFRINGEMENT, AND ANY WARRANTY THAT THE DOCUMENTATION
+#  WILL CONFORM TO THE SOFTWARE, OR ANY WARRANTY THAT THE SOFTWARE WILL BE
+#  ERROR FREE.  IN NO EVENT SHALL NIST BE LIABLE FOR ANY DAMAGES, INCLUDING,
+#  BUT NOT LIMITED TO, DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES,
+#  ARISING OUT OF, RESULTING FROM, OR IN ANY WAY CONNECTED WITH THIS SOFTWARE,
+#  WHETHER OR NOT BASED UPON WARRANTY, CONTRACT, TORT, OR OTHERWISE, WHETHER
+#  OR NOT INJURY WAS SUSTAINED BY PERSONS OR PROPERTY OR OTHERWISE, AND
+#  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,
+#  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
+#
+
 import os as _os
 import logging as _logging
 from datetime import datetime as _datetime
@@ -319,3 +347,98 @@ class AcquisitionActivity:
 
         # store what we calculated as unique metadata into the attribute
         self.unique_meta = unique_meta
+
+    def as_xml(self, seqno, sample_id,
+               indent_level=1, print_xml=False):
+        """
+        Build an XML string representation of this AcquisitionActivity (for
+        use in instances of the NexusLIMS schema)
+
+        Parameters
+        ----------
+        seqno : int
+            An integer number representing what number activity this is in a
+            sequence of activities.
+        sample_id : str
+            A unique identifier pointing to a sample identifier. No checks
+            are done on this value; it is merely reproduced in the XML output
+        indent_level : int
+            (Default is 1) the level of indentation to use in exporting. If
+            0, no lines will be indented. A value of 1 should be appropriate
+            for most cases as used in the Nexus schema
+        print_xml : bool
+            Whether to print the XML output to the console or not (Default:
+            False)
+
+        Returns
+        -------
+        activity_xml : str
+            A string representing this AcquisitionActivity (note: is not a
+            properly-formed complete XML document since it does not have a
+            header or namespace definitions)
+        """
+
+        activity_xml = ''
+        INDENT = '  ' * indent_level
+        line_ending = '\n'
+
+        activity_xml += f'{INDENT}<acquisitionActivity seqno="{seqno}">{line_ending}'
+        activity_xml += f'{INDENT*2}<startTime>{self.start.isoformat()}' \
+                        f'</startTime>{line_ending}'
+        activity_xml += f'{INDENT*2}<sampleID>{sample_id}</sampleID>{line_ending}'
+        activity_xml += f'{INDENT*2}<setup>{line_ending}'
+        for pk, pv in sorted(self.setup_params.items()):
+            activity_xml += f'{INDENT*3}<param name="{pk}">' \
+                          f'{pv}</param>{line_ending}'
+        activity_xml += f'{INDENT*2}</setup>{line_ending}'
+
+        # TODO: Remove example notes entry for production
+        #      This is a temporary output for example records
+        activity_xml += f'{INDENT*2}<notes source="ELN">{line_ending}'
+        activity_xml += f'{INDENT*3}<entry xsi:type="nx:TextEntry">{line_ending}'
+        activity_xml += f'{INDENT*4}<p>This is an example note entry for ' \
+                        f'an acquisitionActivity</p>' \
+                        f'<p>Its text representation in Python is ' \
+                        f'"{self}"</p>{line_ending}'
+        activity_xml += f'{INDENT*3}</entry>{line_ending}'
+        activity_xml += f'{INDENT*2}</notes>{line_ending}'
+
+        # This is kind of a temporary hack until I figure out a better solution
+        # TODO: fix determination of dataset types
+        mode_to_dataset_type_map = {
+            'IMAGING': 'Image',
+            'DIFFRACTION': 'Diffraction'
+        }
+        for f, m, um in zip(self.files, self.meta, self.unique_meta):
+            # build path to thumbnail
+            fname = _os.path.basename(f)
+            thumb_name = f'{fname}.thumb.png'
+            thumb_path = _os.path.join(_os.path.dirname(f),
+                                       '.nexuslims',
+                                       thumb_name)
+
+            # f is string; um is a dictionary
+            activity_xml += f'{INDENT*2}<dataset ' \
+                            f'type="{mode_to_dataset_type_map[self.mode]}" ' \
+                            f'role="Experimental">{line_ending}'
+            activity_xml += f'{INDENT*3}<name>{_os.path.basename(f)}' \
+                            f'</name>{line_ending}'
+            activity_xml += f'{INDENT*3}<location>{f}' \
+                            f'</location>{line_ending}'
+            activity_xml += f'{INDENT*3}<preview>{thumb_path}' \
+                            f'</preview>{line_ending}'
+            for meta_k, meta_v in sorted(um.items()):
+                activity_xml += f'{INDENT*3}<meta name="{meta_k}">' \
+                              f'{meta_v}</meta>{line_ending}'
+            activity_xml += f'{INDENT*2}</dataset>{line_ending}'
+
+        activity_xml += f'{INDENT}</acquisitionActivity>{line_ending}'
+
+        if print_xml:
+            print(activity_xml)
+
+        return activity_xml
+
+# TODO: need to build thumbnails for each dataset and save in right place
+#       (see notebook in /mnt/***REMOVED***/mmfnexus/Titan/***REMOVED***/181113 - AM 17-4
+#       - 1050C - ***REMOVED*** - Titan/2019-03-22 Exploring metadata.ipynb

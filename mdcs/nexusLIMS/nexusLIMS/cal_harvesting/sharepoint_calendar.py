@@ -1,16 +1,46 @@
 #! /usr/bin/env python
-import os
-import re
-import logging
-import requests
 
-from requests_ntlm import HttpNtlmAuth
-from lxml import etree
-from dateparser import parse as dp_parse
-from datetime import datetime
-from configparser import ConfigParser
+#  NIST Public License - 2019
+#
+#  This software was developed by employees of the National Institute of
+#  Standards and Technology (NIST), an agency of the Federal Government
+#  and is being made available as a public service. Pursuant to title 17
+#  United States Code Section 105, works of NIST employees are not subject
+#  to copyright protection in the United States.  This software may be
+#  subject to foreign copyright.  Permission in the United States and in
+#  foreign countries, to the extent that NIST may hold copyright, to use,
+#  copy, modify, create derivative works, and distribute this software and
+#  its documentation without fee is hereby granted on a non-exclusive basis,
+#  provided that this notice and disclaimer of warranty appears in all copies.
+#
+#  THE SOFTWARE IS PROVIDED 'AS IS' WITHOUT ANY WARRANTY OF ANY KIND,
+#  EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT LIMITED
+#  TO, ANY WARRANTY THAT THE SOFTWARE WILL CONFORM TO SPECIFICATIONS, ANY
+#  IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,
+#  AND FREEDOM FROM INFRINGEMENT, AND ANY WARRANTY THAT THE DOCUMENTATION
+#  WILL CONFORM TO THE SOFTWARE, OR ANY WARRANTY THAT THE SOFTWARE WILL BE
+#  ERROR FREE.  IN NO EVENT SHALL NIST BE LIABLE FOR ANY DAMAGES, INCLUDING,
+#  BUT NOT LIMITED TO, DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES,
+#  ARISING OUT OF, RESULTING FROM, OR IN ANY WAY CONNECTED WITH THIS SOFTWARE,
+#  WHETHER OR NOT BASED UPON WARRANTY, CONTRACT, TORT, OR OTHERWISE, WHETHER
+#  OR NOT INJURY WAS SUSTAINED BY PERSONS OR PROPERTY OR OTHERWISE, AND
+#  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,
+#  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
+#
 
-XSLT_PATH = os.path.join(os.path.dirname(__file__), "cal_parser.xsl")
+import os as _os
+import re as _re
+import logging as _logging
+import requests as _requests
+
+from requests_ntlm import HttpNtlmAuth as _HttpNtlmAuth
+from lxml import etree as _etree
+from dateparser import parse as _dp_parse
+from datetime import datetime as _datetime
+from configparser import ConfigParser as _ConfigParser
+
+_logger = _logging.getLogger(__name__)
+XSLT_PATH = _os.path.join(_os.path.dirname(__file__), "cal_parser.xsl")
 INDENT = '  '
 
 # DONE: test cases and automated testing
@@ -57,24 +87,24 @@ def get_auth(filename="credentials.ini"):
         the repository as an example.
     """
     try:
-        username = os.environ['nexusLIMS_user']
-        passwd = os.environ['nexusLIMS_pass']
-        logging.info("Authenticating using environment variables")
+        username = _os.environ['nexusLIMS_user']
+        passwd = _os.environ['nexusLIMS_pass']
+        _logger.info("Authenticating using environment variables")
     except KeyError:
         # if absolute path was provided, use that, otherwise find filename in
         # this directory
-        if os.path.isabs(filename):
+        if _os.path.isabs(filename):
             pass
         else:
-            filename = os.path.join(os.path.dirname(__file__), filename)
+            filename = _os.path.join(_os.path.dirname(__file__), filename)
 
         # Raise error if the configuration file is not found
-        if not os.path.isfile(filename):
+        if not _os.path.isfile(filename):
             raise AuthenticationError("No credentials were specified with "
                                       "environment variables, and credential "
                                       "file {} was not found".format(filename))
 
-        config = ConfigParser()
+        config = _ConfigParser()
         config.read(filename)
 
         username = config.get("nexus_credentials", "username")
@@ -83,9 +113,9 @@ def get_auth(filename="credentials.ini"):
     domain = 'nist'
     path = domain + '\\' + username
 
-    auth = HttpNtlmAuth(path, passwd)
-
-    return auth
+    auth = _HttpNtlmAuth(path, passwd)
+    
+    return auth 
 
 
 def fetch_xml(instrument=None):
@@ -144,7 +174,7 @@ def fetch_xml(instrument=None):
         # inputted values to the events URL suffixes:
         inst_to_fetch = list(map(instr_input_dict.get, instrument))
     else:
-        logging.warning('Entered instrument "{}" could not be parsed; '
+        _logger.warning('Entered instrument "{}" could not be parsed; '
                         'reverting to None...'.format(instrument))
         inst_to_fetch = all_events
 
@@ -155,9 +185,9 @@ def fetch_xml(instrument=None):
 
     for i, instr_name in enumerate(inst_to_fetch):
         instr_url = url + instr_name + '?$expand=CreatedBy'
-        logging.info("Fetching Nexus calendar events from {}".format(instr_url))
-        r = requests.get(instr_url, auth=get_auth())
-        logging.info("  {} -- {} -- response: {}".format(instr_name,
+        _logger.info("Fetching Nexus calendar events from {}".format(instr_url))
+        r = _requests.get(instr_url, auth=get_auth())
+        _logger.info("  {} -- {} -- response: {}".format(instr_name,
                                                          instr_url,
                                                          r.status_code))
 
@@ -173,13 +203,13 @@ def fetch_xml(instrument=None):
             # but lxml does not like an empty prefix, so it is easiest to
             # just sanitize the input and remove the namespaces as in
             # https://stackoverflow.com/a/18160164/1435788:
-            xml = re.sub(r'\sxmlns="[^"]+"', '', r.text, count=1)
+            xml = _re.sub(r'\sxmlns="[^"]+"', '', r.text, count=1)
 
             # API returns utf-8 encoding, so encode correctly
             xml = bytes(xml, encoding='utf-8')
             api_response[i] = xml
         else:
-            raise requests.exceptions.\
+            raise _requests.exceptions.\
                 ConnectionError('Could not access Nexus SharePoint Calendar '
                                 'API at "{}"'.format(instr_url))
 
@@ -207,16 +237,16 @@ def parse_xml(xml, date=None, user=None):
     -------
     simplified_dom : ``lxml.XSLT`` transformation result
     """
-    parser = etree.XMLParser(remove_blank_text=True, encoding='utf-8')
+    parser = _etree.XMLParser(remove_blank_text=True, encoding='utf-8')
 
     # load XML structure from  string
-    root = etree.fromstring(xml, parser)
+    root = _etree.fromstring(xml, parser)
 
     # use LXML to load XSLT stylesheet into xsl_transform
     # (note, etree.XSLT needs to be called on a root _Element
     # not an _ElementTree)
-    xsl_dom = etree.parse(XSLT_PATH, parser).getroot()
-    xsl_transform = etree.XSLT(xsl_dom)
+    xsl_dom = _etree.parse(XSLT_PATH, parser).getroot()
+    xsl_transform = _etree.XSLT(xsl_dom)
 
     # setup parameters for passing to XSLT parser
     date_param = "''" if date is None else "'{}'".format(date)
@@ -271,11 +301,11 @@ def get_events(instrument=None, date=None, user=None):
     # DONE: parsing of date
     # Use dateparser to get python datetime input, and return as YYYY-MM-DD
     if date is not None:
-        date_datetime = dp_parse(date, settings={'STRICT_PARSING': True})
+        date_datetime = _dp_parse(date, settings={'STRICT_PARSING': True})
         if date_datetime:
-            date = datetime.strftime(date_datetime, '%Y-%m-%d')
+            date = _datetime.strftime(date_datetime, '%Y-%m-%d')
         else:
-            logging.warning("Entered date could not be parsed; reverting to "
+            _logger.warning("Entered date could not be parsed; reverting to "
                             "None...")
             date = None
 
@@ -309,7 +339,7 @@ def wrap_events(events_string):
     result = """<?xml version="1.0"?>
 <events>
 {}<dateRetrieved>{}</dateRetrieved>
-""".format(INDENT, datetime.now().isoformat())
+""".format(INDENT, _datetime.now().isoformat())
     # add indent to first line and all newlines:
     events_string = INDENT + events_string
     events_string = events_string.replace('\n', '\n' + INDENT)
@@ -329,6 +359,45 @@ def dump_calendars(instrument=None, user=None, date=None,
         text = get_events(instrument=instrument, date=date, user=user)
         f.write(text)
 
+
+# TODO: we need a class here that represents one entry from the calendar
+class CalendarEvent:
+    """
+     A representation of a single calendar event returned from the SharePoint
+     API
+
+     Instances of this class correspond to AcquisitionActivity nodes in the
+     `NexusLIMS schema <https://data.nist.gov/od/dm/nexus/experiment/v1.0>`_
+
+     Attributes
+     ----------
+     start : datetime.datetime
+         The start point of this AcquisitionActivity
+     end : datetime.datetime
+         The end point of this AcquisitionActivity
+     mode : str
+         The microscope mode for this AcquisitionActivity (i.e. 'IMAGING',
+         'DIFFRACTION', 'SCANNING', etc.)
+     unique_params : set
+         A set of dictionary keys that comprises all unique metadata keys
+         contained within the files of this AcquisitionActivity
+     setup_params : dict
+         A dictionary containing metadata about the data that is shared
+         amongst all data files in this AcquisitionActivity
+     unique_meta : list
+         A list of dictionaries (one for each file in this
+         AcquisitionActivity) containing metadata key-value pairs that are
+         unique to each file in ``files`` (i.e. those that could not be moved
+         into ``setup_params`)
+     files : list
+         A list of filenames belonging to this AcquisitionActivity
+     sigs : list
+         A list of *lazy* (to minimize loading times) HyperSpy signals in this
+         AcquisitionActivity. HyperSpy is used to facilitate metadata reading
+     meta : list
+         A list of dictionaries containing the "important" metadata for each
+         signal/file in ``sigs`` and ``files``
+     """
 
 # if __name__ == '__main__':
 #     """
