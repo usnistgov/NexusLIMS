@@ -685,11 +685,18 @@
                 The name of the parameter
               </xs:documentation>
             </xs:annotation>
-          </xs:attribute>            
-        </xs:extension>          
-      </xs:simpleContent>
-      
-   </xs:complexType>
+          </xs:attribute>
+          <xs:attribute name="unit">
+            <xs:annotation>
+              <xs:documentation>
+                A physical unit associated with the value of this parameter
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+
+  </xs:complexType>
 
    <xs:simpleType name="InstrumentName">
      <xs:annotation>
@@ -830,5 +837,3 @@
    </xs:simpleType>
 
 </xs:schema>
-
-   
