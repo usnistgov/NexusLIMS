@@ -8,6 +8,7 @@ coverage = '*'
 pytest = '*'
 pytest-cov = '*'
 sphinx = '*'
+sphinx-bootstrap-theme = "*"
 nexuslims = {editable = true,path = "./mdcs/nexusLIMS"}
 
 [packages]
@@ -18,7 +19,6 @@ requests-ntlm = '*'
 ntlm-auth = '*'
 dateparser = '*'
 hyperspy = '*'
-sphinx-bootstrap-theme = "*"
 
 [requires]
 python_version = "3.7"
