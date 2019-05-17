@@ -1,0 +1,10 @@
+dl.exception, dl.function {
+    border-top-style: solid;
+    border-top-width: thin;
+    margin-top: 30px;
+    border-top-color: #555555;
+}
+
+#sidebar {
+    word-break: break-all;
+}
