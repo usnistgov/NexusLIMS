@@ -9,7 +9,6 @@ pytest = '*'
 pytest-cov = '*'
 sphinx = '*'
 nexuslims = {editable = true,path = "./mdcs/nexusLIMS"}
-sphinx-catalystcloud-theme = "*"
 
 [packages]
 pynoid = {git = "https://github.com/***REMOVED***/pynoid.git"}
