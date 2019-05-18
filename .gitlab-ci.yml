@@ -15,8 +15,7 @@ nexusLIMS_tests:
 
 docs:
   script:
-    - pipenv run python -m sphinx.cmd.build mdcs/nexusLIMS/doc/source mdcs/nexusLIMS/doc/build -n -E -a -j auto -b html
-    - mv mdcs/nexusLIMS/doc/build/* public/doc/
+    - pipenv run python -m sphinx.cmd.build mdcs/nexusLIMS/doc/source public -n -E -a -j auto -b html
   artifacts:
     paths:
       - public

@@ -173,8 +173,7 @@ class TestCalendarHandling:
 
         get_events(instrument='msed_titan', date='The Ides of March')
 
-        assert 'WARNING  ' \
-               'Entered date could not be parsed; reverting to None...' in \
+        assert 'Entered date could not be parsed; reverting to None...' in \
                caplog.text
 
     def test_calendar_parsing_event_number(self, parse_xml):
