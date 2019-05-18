@@ -1,24 +1,43 @@
-dl.exception, dl.function, dl.class{
-    border-top-style: solid;
-    border-top-width: thin;
-    margin-top: 30px;
-    border-top-color: #555555;
+/*               */
+/* Miscellaneous */
+/*               */
+
+/* Chill out the highlighting color for search results */
+dt:target, span.highlighted {
+    background-color: #fff9d3;
 }
 
-#sidebar {
-    word-break: break-all;
+/* Style custom "dummy-sidebarrel" class to make the
+deactivated links look deactivated */
+.navbar-nav>li.dummy-sidebarrel>a,
+.navbar-nav>li.dummy-sidebarrel>a:hover,
+.navbar-nav>li.dummy-sidebarrel>a:focus {
+    color: #dcdcdc;
 }
 
+/*         */
+/* Sidebar */
+/*         */
+
+/* Format the headers in the sidebar */
 div#sidebar > h4 {
     margin-left: 16px;
     margin-bottom: 5px;
     color: #158cba;
 }
 
+/* Custom class (no-hover) that will suppress underline in the sidebar */
 div#sidebar > h4 > a.no-hover:hover {
     text-decoration: none;
 }
 
+/* Make long links in the sidebar use an ellipsis rather than overflowing */
+.bs-sidenav .nav .nav > li > a {
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Make sidebar image not so huge and centered */
 div#sidebar > img {
     display: block;
     margin-left: auto;
@@ -26,29 +45,35 @@ div#sidebar > img {
     width: 50%;
 }
 
-dt:target, span.highlighted {
-    background-color: #fff9d3;
+/*         */
+/* Autodoc */
+/*         */
+
+/* Make autodoc sections a little more distinct with a border */
+dl.exception, dl.function, dl.class{
+    border-top-style: solid;
+    border-top-width: thin;
+    margin-top: 30px;
+    border-top-color: #555555;
 }
 
-.navbar-nav>li.dummy-sidebarrel>a,
-.navbar-nav>li.dummy-sidebarrel>a:hover,
-.navbar-nav>li.dummy-sidebarrel>a:focus {
-    color: #dcdcdc;
-}
-
+/* Change code coloring site-wide */
 code {
     color: #0a5680;
 }
 
+/* Make the leading class names in autodoc less vibrant */
 code.descclassname {
     color: #919ba1;
 }
 
+/* Make class name in autodoc same size as before */
 code.descname {
     padding: 2px 0px;
     font-size: inherit;
 }
 
+/* Format the text for the caption of the autodoc toctree */
 div.toctree-wrapper > p.caption > span.caption-text {
     font-size: 24px;
     margin-top: 20px;
