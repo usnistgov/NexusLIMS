@@ -1,18 +1,14 @@
+# Install the environment
+before_script:
+  - env_name="$(pwd)/test_env"
+  - /opt/conda/bin/conda remove -p ${env_name} --all || true
+  - echo "Use conda to install the base python environment so we don't mess with system packages"
+  - for i in $(seq 1 5); do [ $i -gt 1 ] && echo "Sleeping for 15 seconds..."; sleep 15; /opt/conda/bin/conda create -p ${env_name} python=3.7 && s=0 && break || s=$?; done; (exit $s)
+  - source /opt/conda/bin/activate ${env_name}
+  - echo "install pipenv to build the actual environment"
+  - pip install pipenv
+  - pipenv install --dev
+
 nexusLIMS_tests:
-  # Docker is disabled on ***REMOVED*** runner, so image will not work
-  # image: continuumio/miniconda3
-  # conda should be installed on the ***REMOVED*** runner since 3/21/2019
-  #  as /opt/conda/bin/conda
-  # following example at https://github.com/conda/conda-gitlab-ci/blob/master/.travis.yml
   script:
-    # Setup conda environment:
-    - /opt/conda/bin/conda --version
-    - /opt/conda/bin/conda config --set always_yes yes
-    - /opt/conda/bin/conda config --set auto_update_conda False    
-    - env_name="$(pwd)/test_env"
-    - /opt/conda/bin/conda remove -p ${env_name} --all || true
-    # loop in case we get the intermittent conda error (from https://unix.stackexchange.com/a/82610):
-    - for i in $(seq 1 5); do [ $i -gt 1 ] && echo "Sleeping for 15 seconds..."; sleep 15; /opt/conda/bin/conda create -p ${env_name} --file mdcs/nexusLIMS/requirements.txt -c conda-forge && s=0 && break || s=$?; done; (exit $s)
-    - source /opt/conda/bin/activate ${env_name}
-    - pip install -e "mdcs/nexusLIMS[devel]"
-    - pytest --cov=mdcs/nexusLIMS/nexusLIMS mdcs/nexusLIMS/nexusLIMS/tests
+    - pipenv run pytest --cov=mdcs/nexusLIMS/nexusLIMS mdcs/nexusLIMS/nexusLIMS/tests
