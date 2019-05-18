@@ -9,31 +9,53 @@ package. Additional information can be found in the
 
 ## Installation
 
-To install the `nexusLIMS` package (in a reproducible manner), first install
-Anaconda (the 
-[`miniconda`](https://docs.conda.io/en/latest/miniconda.html) 
-distribution is recommended). 
-[Create](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-with-commands)
-a new environment using the 
-[`requirements.txt`](mdcs/nexusLIMS/requirements.txt) file by running
+We use the [`pipenv`](https://docs.pipenv.org/en/latest/) framework to manage
+dependencies and create reproducible deployments. Once the project is released,
+it will be available through a normal `pip install` command via 
+[pypi](https://pypi.org/). In the meantime during development, installing 
+the `nexusLIMS` package will require 
+[installing](https://docs.pipenv.org/en/latest/install/#installing-pipenv) 
+`pipenv`. Once you hav a python distribution of some sort, this can typically
+be accomplished with:
 
 ```bash
-conda create -n nexus_env --file mdcs/nexusLIMS/requirements.txt -c conda-forge
+pip install --user pipenv
 ``` 
 
-from an Anaconda prompt. 
-[Activate](https://docs.conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#creating-an-environment-with-commands) 
-the `nexus_env` environment, clone this repository using `git`, and install 
-the `nexusLIMS` package by running
+Once `pipenv` is installed, clone this repository using `git`, and then install 
+the `nexusLIMS` package by running `pipenv` from the root of the repository.
+The `Pipfile` will be examined and dependencies automatically resolved and 
+installed into a local python virtual environment:
 
 ```bash
-pip install <path_to_repo>/mdcs/nexusLIMS
+pipenv install --dev
 ```  
 
 ## Basic use
 
-Once the package is installed using `pip`, the code can be used like any other
-Python library. For example, to extract the metadata from a `.tif` file saved
+### Getting into the environment
+
+Once the package is installed using `pipenv`, the code can be used like any 
+other Python library within the resulting virtual environment. 
+
+`pipenv` allows you to run a single command inside that environment by using 
+the `pipenv run` command from the repository:
+
+```bash
+$ pipenv run python
+```
+
+To use the environment from other directories, you can also "activate" the 
+environment using the `$ pipenv shell` command. This will spawn a new shell that
+ensures all commands will have access to the installed packages.
+
+### Using the library
+
+Once you are in a python interpreter (such as `python`, `ipython`, `jupyter`, 
+etc.) from the installed environment, you can access the code of this library
+through the `nexusLIMS` package.
+
+For example, to extract the metadata from a `.tif` file saved
 on the FEI Quanta, run the following code:
 
 ```python
@@ -44,10 +66,14 @@ get_quanta_metadata("path_to_file.tif")
 To interact with the SharePoint Calendaring system for the Nexus Facility, the 
 code expects that two variables are set in the environment: `nexusLIMS_user` and
 `nexusLIMS_pass`. These should be a set of valid NIST credentials that have
-access to the SharePoint system, and can be set prior to running any Python
-code, 
-[by the `conda` environment](https://conda.io/projects/conda/en/latest/user-guide/tasks/manage-environments.html#macos-and-linux),
-or from within Python as shown in the example below:
+access to the SharePoint system, and can be set by creating a `.env` file in the
+base directory. `pipenv` will source variables from this file when entering
+the environment (through the `pipenv shell` or `pipenv run` commands) 
+prior to running any other code. To use this setup locally, copy the 
+`.env.example` file into `.env`, and change the values to a valid 
+username/password combination with read access to the SharePoint calendar.
+Otherwise, the environment can be set within a Python script as in the following
+example:
 
 ```python
 import os
@@ -151,37 +177,39 @@ IDE that includes coverage tracking (such as
 running the tests. For example:
 
 ```bash
-cd <path_to_repo>/mdcs/nexusLIMS
-pytest --cov=nexusLIMS nexusLIMS/tests
+$ cd <path_to_repo>/mdcs/nexusLIMS
+$ pytest --cov=nexusLIMS nexusLIMS/tests
 
-# Output: 
-# =============================== test session starts ===============================
-# platform linux -- Python 3.6.8, pytest-4.3.0, py-1.8.0, pluggy-0.9.0
+# Output:
+# =================================== test session starts ===================================
+# platform linux -- Python 3.7.3, pytest-4.4.1, py-1.8.0, pluggy-0.9.0
 # rootdir: ***REMOVED***NexusMicroscopyLIMS/mdcs/nexusLIMS/nexusLIMS/tests, inifile: pytest.ini
 # plugins: cov-2.6.1
-# collected 29 items
+# collected 31 items
 # 
-# nexusLIMS/tests/test_calendar_handling.py ...........................       [ 93%]
-# nexusLIMS/tests/test_metadata_extractors.py .                               [ 96%]
-# nexusLIMS/tests/test_version.py .                                           [100%]
+# nexusLIMS/tests/test_calendar_handling.py ...........................               [ 87%]
+# nexusLIMS/tests/test_metadata_extractors.py ...                                     [ 96%]
+# nexusLIMS/tests/test_version.py .                                                   [100%]
 # 
-# ----------- coverage: platform linux, python 3.6.8-final-0 -----------
+# ----------- coverage: platform linux, python 3.7.3-final-0 --------------------------------
 # Name                                              Stmts   Miss  Cover
-# ---------------------------------------------------------------------
-# nexusLIMS/__init__.py                                 0      0   100%
+# -------------------------------------------------------------------------------------------
+# nexusLIMS/__init__.py                                 2      0   100%
 # nexusLIMS/cal_harvesting/__init__.py                  0      0   100%
-# nexusLIMS/cal_harvesting/sharepoint_calendar.py      93      0   100%
-# nexusLIMS/extractors/__init__.py                      1      0   100%
+# nexusLIMS/cal_harvesting/sharepoint_calendar.py      95      0   100%
+# nexusLIMS/extractors/__init__.py                      2      0   100%
+# nexusLIMS/extractors/digital_micrograph.py          129     96    26%
 # nexusLIMS/extractors/quanta_tif.py                    6      0   100%
-# nexusLIMS/tests/test_calendar_handling.py           137      0   100%
-# nexusLIMS/tests/test_metadata_extractors.py          36      0   100%
-# nexusLIMS/tests/test_version.py                       5      0   100%
+# nexusLIMS/schemas/activity.py                       134    118    12%
+# test_calendar_handling.py                           138      0   100%
+# test_metadata_extractors.py                          56      0   100%
+# test_version.py                                       5      0   100%
 # nexusLIMS/version.py                                  1      0   100%
-# ---------------------------------------------------------------------
-# TOTAL                                               279      0   100%
+# -------------------------------------------------------------------------------------------
+# TOTAL                                               568    214    62%
 # 
 # 
-# =========================== 29 passed in 12.64 seconds ============================
+# =============================== 31 passed in 17.92 seconds ================================
 ```
 
 ## About the logo
@@ -204,5 +232,3 @@ due to its significance in the electron microscopy and crystallography
 communities, together with its storied NIST heritage:  
  
 <img height=150 src="files/logo_ideas/shechtman_QC_DP.png"/> :arrow\_right: <img height=150 src="files/logo_horizontal_text.png"/>
-
-<!-- Comment for git flow testing  -->
