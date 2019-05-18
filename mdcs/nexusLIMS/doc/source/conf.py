@@ -12,13 +12,15 @@
 #
 import os
 import sys
+import shutil
 sys.path.insert(0, os.path.abspath('../../'))
 import nexusLIMS.version
+from datetime import datetime
 
 # -- Project information -----------------------------------------------------
 
 project = 'NexusLIMS'
-copyright = '2018-2019, NIST Office of Data and Informatics'
+copyright = f'{datetime.now().year}, NIST Office of Data and Informatics'
 author = 'NIST Office of Data and Informatics'
 
 # The full version, including alpha/beta/rc tags
@@ -82,7 +84,9 @@ exclude_patterns = [
     'Thumbs.db',
     '.DS_Store',
     'build',
-
+    'api/nexusLIMS.rst',
+    'api/nexusLIMS.version.rst',
+    'README.rst'
 ]
 
 # Keep warnings as “system message” paragraphs in the built documents.
@@ -109,9 +113,13 @@ html_last_updated_fmt = '%b, %d, %Y'
 html_use_smartypants = True
 html_show_sourcelink = True
 html_show_sphinx = True
-html_show_copyright = False
+html_show_copyright = True
 
-html_sidebars = { '**': ['localtoc.html'] }
+# html_sidebars = {'**': ['localtoc.html', 'sourcelink.html', 'searchbox.html']}
+html_sidebars = {'**': ['custom-sidebar.html',
+                        'localtoc.html',
+                        'searchbox.html',
+                        'sourcelink.html']}
 
 
 html_theme_options = {
@@ -119,7 +127,7 @@ html_theme_options = {
     'navbar_title': " ",
 
     # Tab name for entire site. (Default: "Site")
-    'navbar_site_name': "Documentation",
+    'navbar_site_name': "Site Map",
 
     # A list of tuples containing pages or urls to link to.
     # Valid tuples should be in the following forms:
@@ -129,13 +137,14 @@ html_theme_options = {
     # Note the "1" or "True" value above as the third argument to indicate
     # an arbitrary url.
     'navbar_links': [
+        ("API Docs", 'api'),
         ("Repository",
          "https://***REMOVED***nexuslims/NexusMicroscopyLIMS", True),
         ("NIST ODI", "https://www.nist.gov/mml/odi", True),
     ],
 
     # Render the next and previous page links in navbar. (Default: true)
-    'navbar_sidebarrel': False,
+    'navbar_sidebarrel': True,
 
     # Render the current pages TOC in the navbar. (Default: true)
     'navbar_pagenav': False,
@@ -145,7 +154,7 @@ html_theme_options = {
 
     # Global TOC depth for "site" navbar tab. (Default: 1)
     # Switching to -1 shows all levels.
-    'globaltoc_depth': 2,
+    'globaltoc_depth': -1,
 
     # Include hidden TOCs in Site navbar?
     #
@@ -188,7 +197,20 @@ html_theme_options = {
 }
 
 
+# api-doc autogeneration adapted from
+# https://github.com/isogeo/isogeo-api-py-minsdk/blob/master/docs/conf.py
+def run_apidoc(_):
+    from sphinx.ext.apidoc import main
+
+    cur_dir = os.path.normpath(os.path.dirname(__file__))
+    output_path = os.path.join(cur_dir, 'api')
+    shutil.rmtree(output_path, ignore_errors=True)
+    modules = os.path.normpath(os.path.join(cur_dir, "../../nexusLIMS"))
+    main(['-f', '-M', '-T', '-o', output_path, modules])
+
+
 def setup(app):
+    app.connect('builder-inited', run_apidoc)
     app.add_stylesheet("custom-styles.css")
 
 

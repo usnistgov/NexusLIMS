@@ -1,11 +1,9 @@
-.. include:: ../../../../README.rst
-
-
-API Documentation
-=================
 .. toctree::
+   :titlesonly:
    :maxdepth: 2
+   :hidden:
 
-   apidoc/nexusLIMS
+   Package Introduction <self>
+   api
 
-
+.. include:: README.rst

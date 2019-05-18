@@ -1,4 +1,4 @@
-dl.exception, dl.function {
+dl.exception, dl.function, dl.class{
     border-top-style: solid;
     border-top-width: thin;
     margin-top: 30px;
@@ -7,4 +7,50 @@ dl.exception, dl.function {
 
 #sidebar {
     word-break: break-all;
+}
+
+div#sidebar > h4 {
+    margin-left: 16px;
+    margin-bottom: 5px;
+    color: #158cba;
+}
+
+div#sidebar > h4 > a.no-hover:hover {
+    text-decoration: none;
+}
+
+div#sidebar > img {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+    width: 50%;
+}
+
+dt:target, span.highlighted {
+    background-color: #fff9d3;
+}
+
+.navbar-nav>li.dummy-sidebarrel>a,
+.navbar-nav>li.dummy-sidebarrel>a:hover,
+.navbar-nav>li.dummy-sidebarrel>a:focus {
+    color: #dcdcdc;
+}
+
+code {
+    color: #0a5680;
+}
+
+code.descclassname {
+    color: #919ba1;
+}
+
+code.descname {
+    padding: 2px 0px;
+    font-size: inherit;
+}
+
+div.toctree-wrapper > p.caption > span.caption-text {
+    font-size: 24px;
+    margin-top: 20px;
+    margin-bottom: 10px;
 }
