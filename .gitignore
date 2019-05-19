@@ -15,6 +15,7 @@ gitlab_backup.log
 *.pyc
 .idea
 .vscode
+**/doc/build
 
 # pip installation files
 *.egg-info

@@ -46,11 +46,15 @@ def get_auth(filename="credentials.ini"):
 
     Returns
     -------
-        HttpNtlmAuth authentication handler for requests
+    auth : ``requests_ntlm.HttpNtlmAuth``
+        NTLM authentication handler for ``requests``
 
     Notes
     -----
-    The credentials file is expected to have a section
+        The credentials file is expected to have a section named
+        ``[nexus_credentials]`` and two values: ``username`` and
+        ``password``. See the ``credentials.ini.example`` file included in
+        the repository as an example.
     """
     try:
         username = os.environ['nexusLIMS_user']
@@ -79,7 +83,9 @@ def get_auth(filename="credentials.ini"):
     domain = 'nist'
     path = domain + '\\' + username
 
-    return HttpNtlmAuth(path, passwd)
+    auth = HttpNtlmAuth(path, passwd)
+
+    return auth
 
 
 def fetch_xml(instrument=None):
@@ -89,7 +95,7 @@ def fetch_xml(instrument=None):
 
     Parameters
     ----------
-    instrument : None, str, or list of str
+    instrument : None, str, or list
         As defined in :py:func:`~.get_events`
         One or more of ['msed_titan', 'quanta', 'jeol_sem', 'hitachi_sem',
         'jeol_tem', 'cm30', 'em400', 'hitachi_s5500', 'mmsd_titan',
@@ -98,7 +104,7 @@ def fetch_xml(instrument=None):
 
     Returns
     -------
-    api_response : list of str
+    api_response : list
         A list of strings containing the XML calendar information for each
         instrument requested, stripped of the empty default namespace
     """
@@ -199,7 +205,7 @@ def parse_xml(xml, date=None, user=None):
 
     Returns
     -------
-    simplified_dom : :class:`~.signals.BaseSignal
+    simplified_dom : ``lxml.XSLT`` transformation result
     """
     parser = etree.XMLParser(remove_blank_text=True, encoding='utf-8')
 
@@ -231,31 +237,31 @@ def get_events(instrument=None, date=None, user=None):
     Get calendar events for a particular instrument on the Microscopy Nexus,
     on some date, or by some user
 
-    Parameters:
-    -----------
-    instrument : None, str, or list of str
+    Parameters
+    ----------
+    instrument : None, str, or list
         One or more of ['msed_titan', 'quanta', 'jeol_sem', 'hitachi_sem',
         'jeol_tem', 'cm30', 'em400', 'hitachi_s5500', 'mmsd_titan',
-        'fei_helios_db'], or None. If None, all instruments will be returned.
+        'fei_helios_db'], or ``None``. If ``None``, all instruments will be
+        returned.
 
     date : None or str
         Either None or a YYYY-MM-DD date string indicating the date from
         which events should be fetched (note: the start time of each entry
         is what will be compared). If None, no date filtering will be
-        performed. Date will be parsed by
-        https://dateparser.readthedocs.io/en/latest/#dateparser.parse,
+        performed. Date will be parsed by :py:func:`dateparser.parse`,
         but providing the date in the ISO standard format is preferred for
         consistent behavior.
 
     user : None or str
-        Either None or a valid NIST username (the short format: e.g. "ear1"
+        Either None or a valid NIST username (the short format: e.g. ``"ear1"``
         instead of ernst.august.ruska@nist.gov). If None, no user filtering
         will be performed. No verification of username is performed,
         so it is up to the user to make sure this is correct.
 
-    Returns:
-    --------
-    output : string
+    Returns
+    -------
+    output : str
         A well-formed XML document in a string, containing one or more <event>
         tags that contain information about each reservation, including title,
         instrument, user information, reservation purpose, sample details,
