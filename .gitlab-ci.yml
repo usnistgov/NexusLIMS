@@ -1,21 +1,28 @@
-# Install the environment
-before_script:
-  - env_name="$(pwd)/test_env"
-  - /opt/conda/bin/conda remove -p ${env_name} --all || true
-  - echo "Use conda to install the base python environment so we don't mess with system packages"
-  - for i in $(seq 1 5); do [ $i -gt 1 ] && echo "Sleeping for 15 seconds..."; sleep 15; /opt/conda/bin/conda create -p ${env_name} python=3.7 && s=0 && break || s=$?; done; (exit $s)
-  - source /opt/conda/bin/activate ${env_name}
-  - echo "install pipenv to build the actual environment"
-  - pip install pipenv
-  - pipenv install --dev
-
 nexusLIMS_tests:
   script:
     - pipenv run pytest --cov=mdcs/nexusLIMS/nexusLIMS mdcs/nexusLIMS/nexusLIMS/tests
+  # Install the environment
+  before_script:
+    - env_name="$(pwd)/test_env"
+    - /opt/conda/bin/conda remove -p ${env_name} --all || true
+    - echo "Use conda to install the base python environment so we don't mess with system packages"
+    - for i in $(seq 1 5); do [ $i -gt 1 ] && echo "Sleeping for 15 seconds..."; sleep 15; /opt/conda/bin/conda create -p ${env_name} python=3.7 && s=0 && break || s=$?; done; (exit $s)
+    - source /opt/conda/bin/activate ${env_name}
+    - echo "install pipenv to build the actual environment"
+    - pip install pipenv
+    - pipenv install --dev
+  cache:
+    paths:
+      - test_env
+
 
 pages:
   script:
     - pipenv run python -m sphinx.cmd.build mdcs/nexusLIMS/doc/source public/doc -n -E -a -j auto -b html
+  before_script:
+    - source /opt/conda/bin/activate ${env_name}
+    - pip install pipenv
+    - pipenv install --dev
   artifacts:
     paths:
       - public
