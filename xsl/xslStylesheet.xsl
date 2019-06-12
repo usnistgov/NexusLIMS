@@ -12,7 +12,7 @@
         </head>
         
         <!-- Create floating button in bottom right which jumps to the top of the page when clicked -->
-        <script type="text/javascript" src="stylesheet-JS.js">//</script>
+        <script type="text/javascript" src="../stylesheet-JS.js">//</script>
         <button type="button" value="Top" onclick="toTop()" 
             style="position:fixed;bottom:20px;right:30px;background-color:#e87474;border:none;
             outline:none;color:white;cursor:pointer;padding:15px;border-radius:4px;font-size:15px">
