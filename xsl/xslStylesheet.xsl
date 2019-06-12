@@ -1,0 +1,166 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
+    xmlns:xs="http://www.w3.org/2001/XMLSchema"
+    xmlns:nx="https://data.nist.gov/od/dm/nexus/experiment/v1.0"
+    exclude-result-prefixes="xs"
+    version="2.0">    
+    
+    <xsl:template match="/nx:Experiment">
+        <head>
+            <!-- Define site title for the page -->
+            <title>NIST Microscopy, <xsl:value-of select="title"/></title>
+        </head>
+        
+        <!-- Create floating button in bottom right which jumps to the top of the page when clicked -->
+        <script type="text/javascript" src="../stylesheet-JS.js">//</script>
+        <button type="button" value="Top" onclick="toTop()" 
+            style="position:fixed;bottom:20px;right:30px;background-color:#e87474;border:none;
+            outline:none;color:white;cursor:pointer;padding:15px;border-radius:4px;font-size:15px">
+            Top
+        </button>
+        
+        <!-- Display the experiment title and experimenter at the top of the page -->
+        <h1>
+            <xsl:apply-templates select="title"/>
+        </h1>
+        <h3>
+            <xsl:value-of select="summary/experimenter"/>
+        </h3>
+        
+        <!-- Add a horizontal line separating the title and experimenter -->
+        <hr></hr>
+        
+        <!-- Display the motivation for the experiment -->
+        <div style="font-size:16pt;"><b>Motivation</b></div>
+        <div style="font-size:14pt"><xsl:value-of select="summary/motivation"/></div>
+        
+        <!-- Add blank space between sections -->
+        <br/><br/>
+        
+        <!-- Display summary information (date, time, instrument, and id) -->
+        <div align="center" style="border-style:solid;border-width:2px;padding:6px;">
+            <div><b>Instrument: </b>
+                <xsl:value-of select="summary/instrument"/>
+            </div>
+            <div><b>Date: </b>
+                <!-- Tokenize()[1] splits the date/time using 'T' as the delimiter and takes the 1st index
+                    which corresponds to the date value -->
+                <xsl:value-of select="tokenize(summary/reservationStart,'T')[1]"/>
+            </div>
+            <div><b>Start Time: </b>
+                <!-- Tokenize()[2] splits the date/time using 'T' as the delimiter and takes the 2nd index
+                    which corresponds to the time value -->
+                <xsl:value-of select="tokenize(summary/reservationStart,'T')[2]"/> 
+            </div>
+            <div><b>End Time: </b>
+                <xsl:value-of select="tokenize(summary/reservationEnd,'T')[2]"/>
+            </div>
+            <!-- Display id associated with the time on the machine -->
+            <div><b>id: </b>
+                <xsl:value-of select="id"/>
+            </div>
+        </div>
+        
+        <!-- Display information about the sample -->  
+        <h3>Sample Information</h3> 
+        <table border="2" align="center">
+            <tr bgcolor="#0ab226">
+              <th>Sample Name</th>
+              <th>Notes</th>
+              <th>Description</th>
+              <th>Thumbnail</th>
+            </tr>
+            <!-- Populates the sample information table with informatoin corresponding to the headings -->
+            <xsl:apply-templates select="sample"/>
+        </table>
+        
+        <br/> <!-- Add a break for readability -->
+        
+        <h3>Acquisition Activities</h3>
+        <table border="2" align="center" style="width:90%;">
+            <tr bgcolor="#f4aa42">
+                <!-- Generate links from the top acquisition activity
+                    table to the corresponding activity -->
+                <xsl:for-each select="acquisitionActivity">
+                    <th align="center">
+                        <!-- Automatically generates a reference id corresponding to each acquisition activity
+                            which allows for a link to the specific page location of the activity parameters -->
+                        <a href="#{generate-id(current())}">
+                            <h3><b>Acquisition <xsl:value-of select="@seqno"/></b></h3>
+                        </a> 
+                        <h4><b>Start Time:</b></h4>
+                        <h4><b><xsl:value-of select="tokenize(startTime,'T')[2]"/></b></h4>
+                    </th>
+                </xsl:for-each>
+            </tr>
+        </table>
+        
+        <br/>
+        <hr></hr> 
+        
+        <!-- Loop through each acquisition activity -->
+        <xsl:for-each select="acquisitionActivity">
+            <h2>
+                <!-- Generate name id which corresponds to the link associated with the acquisition activity --> 
+                <a name="{generate-id(current())}">
+                    <b>Acquisition Activity <xsl:value-of select="@seqno"/></b>
+                </a>
+            </h2>
+            <div>Start time: <xsl:value-of select="tokenize(startTime,'T')[2]"/></div>
+        
+            <!-- Generate the table with setup conditions for each acquisition activity -->
+            <table border="1" style="border-collapse:collapse;">
+                <tr bgcolor="#84b1f9">
+                    <th>Setup</th>
+                </tr>
+                <!-- Loop through each setup value under the 'param' heading -->
+                <xsl:for-each select="setup/param">
+                    <xsl:sort select="@name"/>
+                    <tr>
+                        <!-- Populate setup table with parameter name and value -->
+                        <td><b><xsl:value-of select="@name"/></b></td>
+                        <td><xsl:value-of select="current()"/></td>
+                    </tr>
+                </xsl:for-each>
+            </table>            
+                
+            <!-- Generate metadata table for each image taken for respective acquisition activities -->
+            <xsl:for-each select="dataset">
+                <h4><b>
+                    <xsl:value-of select="@type"/>: <xsl:value-of select="name"/> 
+                </b></h4>
+                <p>Thumbnail Location: <xsl:value-of select="preview"/></p>
+                <table border="1" style="border-collapse:collapse;">
+                    <tr bgcolor="#84b1f9">
+                        <th>Parameter</th>
+                    </tr>
+                    <!-- Loop through each metadata parameter -->
+                    <xsl:for-each select="meta">
+                        <xsl:sort select="@name"/>
+                        <tr>
+                            <!-- Populate table values with the metadata name and value -->
+                            <td><b><xsl:value-of select="@name"/></b></td>
+                            <td><xsl:value-of select="current()"/></td>
+                        </tr>
+                    </xsl:for-each>                        
+                </table>                
+            </xsl:for-each>
+            <hr></hr>
+            <br/>
+        </xsl:for-each>
+    </xsl:template>
+    
+    <!-- ====== Templates ====== -->
+    
+    <!-- Template for displaying sample information -->
+    <xsl:template match="sample">
+            <tr align="center">
+                <!-- Fetch values to match the table headings and assign them to table cells -->
+                <td><xsl:value-of select="name"/></td>
+                <td><xsl:value-of select="notes"/></td>
+                <td><xsl:value-of select="description"/></td>
+                <td><xsl:value-of select="notes/entry/imageURL"/></td>
+            </tr>
+    </xsl:template>  
+    
+</xsl:stylesheet>
