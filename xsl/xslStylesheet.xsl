@@ -75,31 +75,29 @@
         
         
         <!-- ============= Main Generation of the Page ============= -->
-        
-        <!-- Add sidebar to the page -->
-        <div class="sidenav">
-            <!-- Include sidebar heading -->
-            <h1 style="color:#999a9e;font-size:24px;padding-left:10px;">
-                Acquisition Events
-            </h1>
-            
-            <!-- Procedurally generate unique id numbers which relate each acquisition event to its position on
-                the webpage such that it will jump there when the link is clicked -->
-            <xsl:for-each select="acquisitionActivity">
-                <a href="#{generate-id(current())}">
-                    Acquisition <xsl:value-of select="@seqno"/>
-                </a>
-                <!-- Tokenize()[2] splits the date/time using 'T' as the delimiter and takes the 2nd index
-                        which corresponds to the time value -->
-                <div>Start Time: <xsl:value-of select="tokenize(startTime,'T')[2]"/></div>
-                
-                <!-- Add a horizontal line to separate sections in the sidebar -->
-                <hr></hr>
-            </xsl:for-each>
-        </div>
-        
+        <html>
         <!-- Execute showButtonOnScroll() whenever page is scrolled to have the button which jumps back to the top appear -->
         <body onscroll="showButtonOnScroll()"> 
+            <!-- Add sidebar to the page -->
+            <div class="sidenav">
+                <!-- Include sidebar heading -->
+                <h1 style="color:#999a9e;font-size:24px;padding-left:10px;">
+                    Acquisition Events
+                </h1>
+                
+                <!-- Procedurally generate unique id numbers which relate each acquisition event to its position on
+                    the webpage such that it will jump there when the link is clicked -->
+                <xsl:for-each select="acquisitionActivity">
+                    <a href="#{generate-id(current())}">
+                        Acquisition <xsl:value-of select="@seqno+1"/>
+                    </a>
+                    <div>Mode: <xsl:value-of select="setup/param[@name='Mode']"/></div>
+                    
+                    <!-- Add a horizontal line to separate sections in the sidebar -->
+                    <hr></hr>
+                </xsl:for-each>
+            </div>
+        
             <div class="main">
                 <!-- Define site title for the page -->
                 <title>NIST Microscopy, <xsl:value-of select="title"/></title>
@@ -129,7 +127,7 @@
                 <br/><br/>
                 
                 <!-- Display summary information (date, time, instrument, and id) -->
-                <div align="center" style="border-style:none;border-width:2px;padding:6px;">
+                <div align="left" style="border-style:none;border-width:2px;padding:6px;">
                     <div><b>Instrument: </b>
                         <xsl:value-of select="summary/instrument"/>
                     </div>
@@ -167,15 +165,15 @@
                 
                 <br/> <!-- Add a break for readability -->
                 
-                <h3>Acquisition Activities</h3>
+<!--                <h3>Acquisition Activities</h3>
                 <table border="2" align="center" style="width:90%;">
                     <tr bgcolor="#f4aa42">
-                        <!-- Generate links from the top acquisition activity
-                            table to the corresponding activity -->
+                        <!-\- Generate links from the top acquisition activity
+                            table to the corresponding activity -\->
                         <xsl:for-each select="acquisitionActivity">
                             <th align="center">
-                                <!-- Automatically generates a reference id corresponding to each acquisition activity
-                                    which allows for a link to the specific page location of the activity parameters -->
+                                <!-\- Automatically generates a reference id corresponding to each acquisition activity
+                                    which allows for a link to the specific page location of the activity parameters -\->
                                 <a href="#{generate-id(current())}">
                                     <h3><b>Acquisition <xsl:value-of select="@seqno"/></b></h3>
                                 </a> 
@@ -184,7 +182,7 @@
                             </th>
                         </xsl:for-each>
                     </tr>
-                </table>
+                </table>-->
                 
                 <br/>
                 <hr></hr> 
@@ -194,7 +192,7 @@
                     <h2>
                         <!-- Generate name id which corresponds to the link associated with the acquisition activity --> 
                         <a name="{generate-id(current())}">
-                            <b>Acquisition Activity <xsl:value-of select="@seqno"/></b>
+                            <b>Acquisition Activity <xsl:value-of select="@seqno+1"/></b>
                         </a>
                     </h2>
                     <div><b>Start time:</b> <xsl:value-of select="tokenize(startTime,'T')[2]"/></div>
@@ -242,6 +240,7 @@
                 </xsl:for-each>
             </div>
         </body>
+        </html>
     </xsl:template>
     
     
