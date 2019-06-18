@@ -6,14 +6,16 @@
     version="2.0">    
     
     <xsl:template match="/nx:Experiment">
+        <!-- CSS styling which is applied to various elements of the html output --> 
         <style>
-            div {
+            div { /* Set the font for the page */
             font-family: "Lato", sans-serif;
             }
-            .sidenav {
+            
+            .sidenav { /* Parameters for the sidebar */
             height: 100%;
             width: 160px;
-            position: fixed;
+            position: fixed; /* Sets the sidebar to always be visible even when the page is scrolled */
             z-index: 1;
             top: 0;
             left: 0;
@@ -22,25 +24,25 @@
             background-color: #111;
             }
             
-            .sidenav a {
-            padding: 6px 8px 6px 16px;
+            .sidenav a { /* Parameters for the acquisition activity links within the sidebar */
+            padding: 6px 12px 6px 16px;
             text-decoration: none;
-            font-size: 22px;
-            color: #818181;
+            font-size: 18px;
+            color: #9b9da0;
             display: block;
             }
             
-            .sidenav div {
+            .sidenav div { /* Parameters for other text found in the sidebar (e.g. start time( */
             font-size: 13px;
             padding: 1px 6px 5px 20px;
             color: #818181;
             }
             
-            .sidenav a:hover {
+            .sidenav a:hover { /* Change the color of the links when the mouse is hovered over them */
             color: #f1f1f1;
             }
             
-            .main {
+            .main { /* Set parameters for the rest of the page in order to adjust for the sidebar being there */
             margin-left: 160px; /* Same width as the sidebar + left position in px */
             padding: 0px 10px;
             }
@@ -51,19 +53,25 @@
             }
         </style>
         
+        <!-- Add sidebar to the page -->
         <div class="sidenav">
+            <!-- Include sidebar heading -->
             <h1 style="color:#999a9e;font-size:24px;padding-left:10px;">
                 Acquisition Events
             </h1>
             
+            <!-- Procedurally generate unique id numbers which relate each acquisition event to its position on
+                the webpage such that it will jump there when the link is clicked -->
             <xsl:for-each select="acquisitionActivity">
                 <a href="#{generate-id(current())}">
                     Acquisition <xsl:value-of select="@seqno"/>
                 </a>
+                <!-- Tokenize()[2] splits the date/time using 'T' as the delimiter and takes the 2nd index
+                        which corresponds to the time value -->
                 <div>Start Time: <xsl:value-of select="tokenize(startTime,'T')[2]"/></div>
                 
+                <!-- Add a horizontal line to separate sections in the sidebar -->
                 <hr></hr>
-                
             </xsl:for-each>
         </div>
         
@@ -205,6 +213,7 @@
                         </xsl:for-each>                        
                     </table>                
                 </xsl:for-each>
+                <!-- Add a horizontal line to separate each acquisition activity -->
                 <hr></hr>
                 <br/>
             </xsl:for-each>
@@ -216,7 +225,7 @@
     <!-- Template for displaying sample information -->
     <xsl:template match="sample">
         <tr align="center">
-            <!-- Fetch values to match the table headings and assign them to table cells -->
+            <!-- Fetch values to match the table headings and assign them to corresponding table cells -->
             <td><xsl:value-of select="name"/></td>
             <td><xsl:value-of select="notes"/></td>
             <td><xsl:value-of select="description"/></td>
