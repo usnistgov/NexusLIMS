@@ -9,6 +9,14 @@ nexusLIMS.extractors package
 Submodules
 ----------
 
+nexusLIMS.extractors.digital\_micrograph module
+-----------------------------------------------
+
+.. automodule:: nexusLIMS.extractors.digital_micrograph
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
 nexusLIMS.extractors.quanta\_tif module
 ---------------------------------------
 

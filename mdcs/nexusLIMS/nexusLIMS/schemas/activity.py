@@ -58,34 +58,33 @@ def read_metadata(sig):
 
     Currently, the following tags are considered "important", but this will
     be modified for different instrument, file types, etc.:
+
     - General .dm3 tags:
-        ImageTags.Microscope_Info.Indicated_Magnification
-        ImageTags.Microscope_Info.Actual_Magnification
-        ImageTags.Microscope_Info.Csmm
-        ImageTags.Microscope_Info.STEM_Camera_Length
-        ImageTags.Microscope_Info.Voltage
+        - ``ImageTags.Microscope_Info.Indicated_Magnification``
+        - ``ImageTags.Microscope_Info.Actual_Magnification``
+        - ``ImageTags.Microscope_Info.Csmm``
+        - ``ImageTags.Microscope_Info.STEM_Camera_Length``
+        - ``ImageTags.Microscope_Info.Voltage``
 
     - Tecnai info:
-        ImageTags.Tecnai.Microscope_Info['Gun_Name']
-        ImageTags.Tecnai.Microscope_Info['Extractor_Voltage']
-        ImageTags.Tecnai.Microscope_Info['Gun_Lens_No']
-        ImageTags.Tecnai.Microscope_Info['Emission_Current']
-        ImageTags.Tecnai.Microscope_Info['Spot']
-        ImageTags.Tecnai.Microscope_Info['Mode']
-        C2, C3, Obj, Dif lens strength:
-          ImageTags.Tecnai.Microscope_Info['C2_Strength', 'C3_Strength',
-                                           'Obj_Strength', 'Dif_Strength']
-        ImageTags.Tecnai.Microscope_Info['Image_Shift_x'/'Image_Shift_y'])
-        ImageTags.Tecnai.Microscope_Info['Stage_Position_x' (y/z/theta/phi)]
-        C1/C2/Objective/SA aperture sizes:
-        ImageTags.Tecnai.Microscope_Info['(C1/C2/Obj/SA)_Aperture']
-        ImageTags.Tecnai.Microscope_Info['Filter_Settings']['Mode']
-        ImageTags.Tecnai.Microscope_Info['Filter_Settings']['Dispersion']
-        ImageTags.Tecnai.Microscope_Info['Filter_Settings']['Aperture']
-        ImageTags.Tecnai.Microscope_Info['Filter_Settings']['Prism_Shift']
-        ImageTags.Tecnai.Microscope_Info['Filter_Settings']['Drift_Tube']
-        ImageTags.Tecnai.Microscope_Info['Filter_Settings'][
-        'Total_Energy_Loss']
+        - ``ImageTags.Tecnai.Microscope_Info['Gun_Name']``
+        - ``ImageTags.Tecnai.Microscope_Info['Extractor_Voltage']``
+        - ``ImageTags.Tecnai.Microscope_Info['Gun_Lens_No']``
+        - ``ImageTags.Tecnai.Microscope_Info['Emission_Current']``
+        - ``ImageTags.Tecnai.Microscope_Info['Spot']``
+        - ``ImageTags.Tecnai.Microscope_Info['Mode']``
+        - C2, C3, Obj, Dif lens strength:
+            - ``ImageTags.Tecnai.Microscope_Info['C2_Strength', 'C3_Strength', 'Obj_Strength', 'Dif_Strength']``
+        - ``ImageTags.Tecnai.Microscope_Info['Image_Shift_x'/'Image_Shift_y'])``
+        - ``ImageTags.Tecnai.Microscope_Info['Stage_Position_x' (y/z/theta/phi)]``
+        - C1/C2/Objective/SA aperture sizes:
+            - ``ImageTags.Tecnai.Microscope_Info['(C1/C2/Obj/SA)_Aperture']``
+        - ``ImageTags.Tecnai.Microscope_Info['Filter_Settings']['Mode']``
+        - ``ImageTags.Tecnai.Microscope_Info['Filter_Settings']['Dispersion']``
+        - ``ImageTags.Tecnai.Microscope_Info['Filter_Settings']['Aperture']``
+        - ``ImageTags.Tecnai.Microscope_Info['Filter_Settings']['Prism_Shift']``
+        - ``ImageTags.Tecnai.Microscope_Info['Filter_Settings']['Drift_Tube']``
+        - ``ImageTags.Tecnai.Microscope_Info['Filter_Settings']['Total_Energy_Loss']``
     """
     m = {}
     # Obviously will need to be changed for non-dm3 data and other
@@ -161,7 +160,7 @@ class AcquisitionActivity:
         A list of dictionaries (one for each file in this
         AcquisitionActivity) containing metadata key-value pairs that are
         unique to each file in ``files`` (i.e. those that could not be moved
-        into ``setup_params`)
+        into ``setup_params``)
     files : list
         A list of filenames belonging to this AcquisitionActivity
     sigs : list

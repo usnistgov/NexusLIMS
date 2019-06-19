@@ -13,6 +13,7 @@ Subpackages
 
     nexusLIMS.cal_harvesting
     nexusLIMS.extractors
+    nexusLIMS.schemas
 
 Submodules
 ----------
