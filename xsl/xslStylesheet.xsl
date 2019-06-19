@@ -77,13 +77,17 @@
         <!-- ============= Main Generation of the Page ============= -->
         <html>
         <!-- Execute showButtonOnScroll() whenever page is scrolled to have the button which jumps back to the top appear -->
-        <body onscroll="showButtonOnScroll()"> 
+        <body onscroll="showButtonOnScroll()"> \
+            
             <!-- Add sidebar to the page -->
             <div class="sidenav">
                 <!-- Include sidebar heading -->
-                <h1 style="color:#999a9e;font-size:24px;padding-left:10px;">
-                    Acquisition Events
-                </h1>
+                <h1 style="color:#999a9e;font-size:24px;padding-left:10px;"><u>
+                    Navigation
+                </u></h1>
+                
+                <a href="#{generate-id(experiment/summary)}">Summary</a>
+                <hr/>
                 
                 <!-- Procedurally generate unique id numbers which relate each acquisition event to its position on
                     the webpage such that it will jump there when the link is clicked -->
@@ -94,7 +98,7 @@
                     <div>Mode: <xsl:value-of select="setup/param[@name='Mode']"/></div>
                     
                     <!-- Add a horizontal line to separate sections in the sidebar -->
-                    <hr></hr>
+                    <hr/>
                 </xsl:for-each>
             </div>
         
@@ -120,7 +124,7 @@
                 <hr></hr>
                 
                 <!-- Display the motivation for the experiment -->
-                <div style="font-size:16pt;"><b>Motivation</b></div>
+                <div style="font-size:16pt;" name="#{generate-id(experiment/summary)}"><b>Motivation</b></div>
                 <div style="font-size:14pt"><xsl:value-of select="summary/motivation"/></div>
                 
                 <!-- Add blank space between sections -->
