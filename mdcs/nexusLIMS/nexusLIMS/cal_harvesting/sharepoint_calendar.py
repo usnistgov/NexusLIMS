@@ -404,11 +404,11 @@ class CalendarEvent:
 #     These lines are just for testing. For real use, import the methods you
 #     need and operate from there
 #     """
-    # logging.basicConfig(level=logging.INFO)
-    # dump_calendars(instrument='msed_titan')
-    # dump_calendars(date='2019-02-28')
-    # logging.info(get_events(instrument=None))
-    # logging.info(get_events(date='2019-02-25'))
-    # logging.info(get_events(user='***REMOVED***'))
-    # logging.info(get_events(date='2018-12-26', user='***REMOVED***'))
-    # logging.info(get_events())
+#     _logging.basicConfig(level=_logging.INFO)
+#     dump_calendars(instrument='msed_titan')
+#     dump_calendars(date='2019-02-28')
+#     _logging.info(get_events(instrument=None))
+#     _logging.info(get_events(date='2019-02-25'))
+#     _logging.info(get_events(user='***REMOVED***'))
+#     _logging.info(get_events(date='2018-12-26', user='***REMOVED***'))
+#     _logging.info(get_events())

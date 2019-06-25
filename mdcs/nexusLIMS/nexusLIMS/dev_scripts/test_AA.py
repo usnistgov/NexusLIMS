@@ -45,18 +45,20 @@ _logger.setLevel(logging.INFO)
 
 hostname = socket.gethostname()
 
-path_roots = dict(
-    poole=dict(
-        remote='/usr/local/mnt/***REMOVED***/',
-        local='***REMOVED***NexusMicroscopyLIMS/test_data/'
-    ),
-    ***REMOVED***=dict(
-        remote='/mnt/***REMOVED***/',
-        local='***REMOVED***NexusMicroscopyLIMS/test_data/'
-    )
-)
+# path_roots = dict(
+#     poole=dict(
+#         remote='/usr/local/mnt/***REMOVED***/',
+#         local='***REMOVED***NexusMicroscopyLIMS/test_data/'
+#     ),
+#     ***REMOVED***=dict(
+#         remote='/mnt/***REMOVED***/',
+#         local='***REMOVED***NexusMicroscopyLIMS/test_data/'
+#     )
+# )
+#
+# path_root = path_roots[hostname]['remote']
 
-path_root = path_roots[hostname]['remote']
+path_root = '***REMOVED***/'
 path_to_search = os.path.join(path_root, 'mmfnexus/Titan/***REMOVED***/',
                               '181113 - ***REMOVED*** - ***REMOVED*** - Titan/')
 
@@ -65,7 +67,7 @@ logging.getLogger('hyperspy.io_plugins.digital_micrograph').setLevel(
 
 files = glob(os.path.join(path_to_search, "*.dm3"))
 files.sort(key=os.path.getmtime)
-files = files[:-2]
+# files = files[:-2]
 
 mtimes = [''] * len(files)
 modes = [''] * len(files)
@@ -108,7 +110,7 @@ for i, (f, t, m) in enumerate(zip(files, mtimes, modes)):
     # AcquisitionActivity. End the current AcquisitionActivity and create a new
     # one with this file's information
     else:
-        # AcquisitionActivty end time is previous mtime
+        # AcquisitionActivity end time is previous mtime
         activities[-1].end = datetime.fromisoformat(mtimes[i - 1])
         # New AcquisitionActivity start time is t
         activities.append(AcquisitionActivity(start=datetime.fromisoformat(t),
@@ -119,8 +121,7 @@ for i, (f, t, m) in enumerate(zip(files, mtimes, modes)):
     if i == len(files) - 1:
         activities[-1].end = datetime.fromisoformat(t)
 
-INDENT = '    '
-
+acq_activities = ''
 for i, a in enumerate(activities):
     AA_logger = logging.getLogger('nexusLIMS.schemas.activity')
     AA_logger.setLevel(logging.ERROR)
@@ -128,46 +129,4 @@ for i, a in enumerate(activities):
     a.store_unique_metadata()
 
     a.as_xml(i, 'f81d3518-10af-4fab-9bd3-cfa2b0aea807',
-             indent_level=1, print_xml=True)
-    # print(f'<acquisitionActivity seqno="{i}">')
-    # print(f'{INDENT}<startTime>{a.start.isoformat()}</startTime>')
-    # print(f'{INDENT}<sampleID>f81d3518-10af-4fab-9bd3-cfa2b0aea807</sampleID>')
-    # print()
-    # print(f'{INDENT}<setup>')
-    # for pk, pv in a.setup_params.items():
-    #     print(f'{INDENT}{INDENT}<param name="{pk}">{pv}</param>')
-    # print(f'{INDENT}</setup>')
-    # print('')
-    #
-    # print(f'{INDENT}<notes source="ELN">')
-    # print(f'{INDENT}{INDENT}<entry xsi:type="nx:TextEntry">')
-    # print(f'{INDENT}{INDENT}{INDENT}<p>This is an example note entry for '
-    #       f'an acquisitionActivity</p>'
-    #       f'<p>Its text representation in Python is "{a}"</p>')
-    # print(f'{INDENT}{INDENT}</entry>')
-    # print(f'{INDENT}</notes>')
-    #
-    # #
-    # mode_to_dataset_type_map = {
-    #     'IMAGING': 'Image',
-    #     'DIFFRACTION': 'Diffraction'
-    # }
-    # for f, m, um in zip(a.files, a.meta, a.unique_meta):
-    #     # build path to thumbnail
-    #     fname = os.path.basename(f)
-    #     thumb_name = f'{fname}.thumb.png'
-    #     thumb_path = os.path.join(os.path.dirname(f),
-    #                               '.nexuslims',
-    #                               thumb_name)
-    #
-    #     # f is string; um is a dictionary
-    #     print(f'{INDENT}<dataset type="{mode_to_dataset_type_map[a.mode]}" '
-    #           f'role="Experimental">')
-    #     print(f'{INDENT}{INDENT}<name>{os.path.basename(f)}</name>')
-    #     print(f'{INDENT}{INDENT}<location>{f}</location>')
-    #     print(f'{INDENT}{INDENT}<preview>{thumb_path}</preview>')
-    #     for meta_k, meta_v in um.items():
-    #         print(f'{INDENT}{INDENT}<meta name="{meta_k}">{meta_v}</meta>')
-    #     print(f'{INDENT}</dataset>')
-    #
-    # print(f'</acquisitionActivity>')
+             indent_level=1, print_xml=False)
