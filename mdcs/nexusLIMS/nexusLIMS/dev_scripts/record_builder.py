@@ -82,6 +82,7 @@ def build_record(path, instrument, date, user):
 
     # Insert XML prolog, XSLT reference, and namespaces.
     xml_record += "<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n"
+    # TODO: Determine which stylesheet will be applied to the generated record and appropriately assign the href
     xml_record += "<?xml-stylesheet type=\"text/xsl\" href=\"../xslStylesheet.xsl\"?>\n"
     xml_record += "<nx:Experiment xmlns=\"\"\n"
     xml_record += "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"

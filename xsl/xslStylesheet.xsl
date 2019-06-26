@@ -96,7 +96,7 @@
                     Navigation
                 </h1>
                 
-                <a href="#{generate-id(experiment/summary)}">Summary</a>
+                <a href="#{generate-id(experiment/event)}">Summary</a>
                 <hr/>
                 
                 <!-- Procedurally generate unique id numbers which relate each acquisition event to its position on
@@ -114,53 +114,53 @@
         
             <div class="main">
                 <!-- Define site title for the page -->
-                <title>NIST Microscopy, <xsl:value-of select="title"/></title>
+                <title>NIST Microscopy, <xsl:value-of select="event/title"/></title>
                 
                 <!-- Create floating button in bottom right which jumps to the top of the page when clicked -->
-                <script type="text/javascript" src="../stylesheet-JS.js">//</script>
+                <script type="text/javascript" src="stylesheet-JS.js">//</script>
                 <button id="to_top_button" type="button" value="Top" onclick="toTop()">
                     Top
                 </button>
                 
                 <!-- Display the experiment title and experimenter at the top of the page -->
                 <h1>
-                    <xsl:apply-templates select="title"/>
+                    <xsl:value-of select="event/title"/>
                 </h1>
                 <h3>
-                    <xsl:value-of select="summary/experimenter"/>
+                    <xsl:value-of select="event/user/user"/>
                 </h3>
                 
                 <!-- Add a horizontal line separating the title and experimenter -->
                 <hr></hr>
                 
                 <!-- Display the motivation for the experiment -->
-                <div style="font-size:16pt;" name="#{generate-id(experiment/summary)}"><b>Motivation</b></div>
-                <div style="font-size:14pt"><xsl:value-of select="summary/motivation"/></div>
+                <div style="font-size:16pt;" name="#{generate-id(event)}"><b>Motivation</b></div>
+                <div style="font-size:13pt"><xsl:value-of select="event/purpose"/></div>
                 
                 <!-- Add blank space between sections -->
-                <br/><br/>
+                <br/>
                 
                 <!-- Display summary information (date, time, instrument, and id) -->
                 <div align="left" style="border-style:none;border-width:2px;padding:6px;">
                     <div><b>Instrument: </b>
-                        <xsl:value-of select="summary/instrument"/>
+                        <xsl:value-of select="event/instrument"/>
                     </div>
                     <div><b>Date: </b>
                         <!-- Tokenize()[1] splits the date/time using 'T' as the delimiter and takes the 1st index
                             which corresponds to the date value -->
-                        <xsl:value-of select="tokenize(summary/reservationStart,'T')[1]"/>
+                        <xsl:value-of select="tokenize(event/startTime,'T')[1]"/>
                     </div>
                     <div><b>Start Time: </b>
                         <!-- Tokenize()[2] splits the date/time using 'T' as the delimiter and takes the 2nd index
                             which corresponds to the time value -->
-                        <xsl:value-of select="tokenize(summary/reservationStart,'T')[2]"/> 
+                        <xsl:value-of select="tokenize(event/startTime,'T')[2]"/> 
                     </div>
                     <div><b>End Time: </b>
-                        <xsl:value-of select="tokenize(summary/reservationEnd,'T')[2]"/>
+                        <xsl:value-of select="tokenize(event/endTime,'T')[2]"/>
                     </div>
                     <!-- Display id associated with the time on the machine -->
                     <div><b>Session ID: </b>
-                        <xsl:value-of select="id"/>
+                        <xsl:value-of select="event/eventId"/>
                     </div>
                 </div>
                 
@@ -169,15 +169,15 @@
                 <table border="3" style="border-collapse:collapse;">
                     <tr>
                         <th>Sample Name</th>
-                        <th><xsl:value-of select="sample/name"/></th>
+                        <th><xsl:value-of select="event/sampleDetails"/></th>
                     </tr>
                     <tr>
                         <th>Notes</th>
-                        <th><xsl:value-of select="sample/notes/entry"/></th>
+                        <th><!--  --></th>
                     </tr>
                     <tr>
                         <th>Description</th>
-                        <th><xsl:value-of select="sample/description"/></th>
+                        <th><xsl:value-of select="event/description"/></th>
                     </tr>
                 </table>
                 
