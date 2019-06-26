@@ -78,8 +78,7 @@ def build_record(path, instrument, date, user):
     xml_record = ''
 
     if date is None:
-        date = _datetime.fromtimestamp(_os.path.getmtime(path)).\
-               strftime('%Y-%m-%d')
+        date = _datetime.fromtimestamp(_os.path.getmtime(path)).strftime('%Y-%m-%d')
 
     # Insert XML prolog, XSLT reference, and namespaces.
     xml_record += "<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n"
@@ -88,17 +87,20 @@ def build_record(path, instrument, date, user):
     xml_record += "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
     xml_record += "xmlns:nx=\"https://data.nist.gov/od/dm/nexus/experiment/v1.0\">\n"
 
-    # TODO: Insert information pulled from Sharepoint calendar before adding AcquisitionActivities
+    xml_record += sp_cal.get_events(instrument, date, user)
     xml_record += build_acq_activities(path)
 
-    xml_record += "</nx:Experiment>" # Add closing tag for root element.
+    xml_record += "</nx:Experiment>"  # Add closing tag for root element.
 
     return xml_record
 
 
 def build_acq_activities(path):
     """
-    Build an XML string representation of each AcquisitionActivity for a single microscopy session.
+    Build an XML string representation of each AcquisitionActivity for a single microscopy session. This includes
+    setup parameters and metadata associated with each dataset obtained during a microscopy session. Unique
+    AcquisitionActivities are delimited via comparison of imaging modes (e.g. a switch from Imaging to Diffraction mode
+    consitutes 2 unique AcquisitionActivities).
 
     Parameters
     ----------
@@ -111,6 +113,7 @@ def build_acq_activities(path):
         A string representing the XML output for each AcquisitionActivity associated with a given
         reservation/experiment on a microscope.
     """
+
     _logger = _logging.getLogger(__name__)
     _logger.setLevel(_logging.INFO)
 
@@ -185,6 +188,30 @@ def build_acq_activities(path):
     return acq_activities
 
 
+def dump_record(path, instrument=None, date=None, user=None):
+    """
+    Writes an XML record composed of information pulled from the Sharepoint calendar as well as metadata extracted
+    from the microscope data (e.g. dm3 files).
+
+    Parameters
+    ----------
+    path : str
+        A string file path which points to the file location of the microscopy metadata.
+    instrument : str
+        A string which corresponds to the type of microscope used to generate the data to be dumped.
+    date : str
+        A string which corresponds to the event date from which events are going to be fetched from.
+    user : str
+        A string which corresponds to the NIST user who performed the microscopy.
+    """
+
+    filename = 'compiled_record.xml'
+    # filename = 'xml_record_'+instrument+'_'+date+'_'+user+'.xml'
+    with open(filename, 'w') as f:
+        text = build_record(path=path, instrument=instrument, date=date, user=user)
+        f.write(text)
+
+
 if __name__ == '__main__':
     """
     These lines are just for testing. For real use, import the methods you
@@ -194,4 +221,5 @@ if __name__ == '__main__':
     path_root = '***REMOVED***/'
     path_to_search = _os.path.join(path_root, 'mmfnexus/Titan/***REMOVED***/', '181113 - ***REMOVED*** - ***REMOVED*** - Titan')
 
-    print(build_record(path=path_to_search, instrument='msed_titan', date='2018-11-13', user='***REMOVED***'))
+    # print(build_record(path=path_to_search, instrument='msed_titan', date='2018-11-13', user='***REMOVED***'))
+    # dump_record(path_to_search,'msed_titan','2018-11-13','***REMOVED***')
