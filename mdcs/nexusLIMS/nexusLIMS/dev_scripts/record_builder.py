@@ -88,8 +88,8 @@ def build_record(path, instrument, date, user):
     xml_record += "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
     xml_record += "xmlns:nx=\"https://data.nist.gov/od/dm/nexus/experiment/v1.0\">\n"
 
-    xml_record += sp_cal.get_events(instrument, date, user)
-    xml_record += build_acq_activities(path)
+    xml_record += sp_cal.get_events(instrument=instrument, date=date, user=user, wrap=False)
+    xml_record += build_acq_activities(path=path)
 
     xml_record += "</nx:Experiment>"  # Add closing tag for root element.
 

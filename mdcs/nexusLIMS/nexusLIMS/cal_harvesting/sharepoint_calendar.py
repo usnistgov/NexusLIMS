@@ -319,7 +319,7 @@ def parse_xml(xml, date=None, user=None):
 
 
 # DONE: split up fetching calendar from server and parsing XML response
-def get_events(instrument=None, date=None, user=None):
+def get_events(instrument=None, date=None, user=None, wrap=True):
     """
     Get calendar events for a particular instrument on the Microscopy Nexus,
     on some date, or by some user
@@ -345,6 +345,9 @@ def get_events(instrument=None, date=None, user=None):
         instead of ernst.august.ruska@nist.gov). If None, no user filtering
         will be performed. No verification of username is performed,
         so it is up to the user to make sure this is correct.
+
+    wrap : bool
+        Boolean used to choose whether to apply the wrap_events() function to the output XML string.
 
     Returns
     -------
@@ -373,7 +376,8 @@ def get_events(instrument=None, date=None, user=None):
         output += INDENT + str(parse_xml(xml, date, user)).\
             replace('\n', '\n' + INDENT)
 
-    #output = wrap_events(output)
+    if wrap:
+        output = wrap_events(output)
 
     return output
 
