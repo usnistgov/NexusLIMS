@@ -83,7 +83,7 @@ def build_record(path, instrument, date, user):
     # Insert XML prolog, XSLT reference, and namespaces.
     xml_record += "<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n"
     # TODO: Determine which stylesheet will be applied to the generated record and appropriately assign the href
-    xml_record += "<?xml-stylesheet type=\"text/xsl\" href=\"../xslStylesheet.xsl\"?>\n"
+    xml_record += "<?xml-stylesheet type=\"text/xsl\" href=\"./xslStylesheet.xsl\"?>\n"
     xml_record += "<nx:Experiment xmlns=\"\"\n"
     xml_record += "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
     xml_record += "xmlns:nx=\"https://data.nist.gov/od/dm/nexus/experiment/v1.0\">\n"
@@ -142,10 +142,6 @@ def build_acq_activities(path):
     activities = []
 
     for i, (f, t, m) in enumerate(zip(files, mtimes, modes)):
-        # temporarily ignore files with this year's date
-        if t.startswith('2019'):
-            continue
-
         # set last_mode to this mode if this is the first iteration; otherwise set
         # it to the last mode that we saw
         last_mode = m if i == 0 else modes[i - 1]
@@ -220,7 +216,9 @@ if __name__ == '__main__':
     """
 
     path_root = '***REMOVED***/'
-    path_to_search = _os.path.join(path_root, 'mmfnexus/Titan/***REMOVED***/', '181113 - ***REMOVED*** - ***REMOVED*** - Titan')
+    # path_to_search = _os.path.join(path_root, 'mmfnexus/Titan/***REMOVED***/', '181113 - ***REMOVED*** - ***REMOVED*** - Titan')
+    path_to_search = _os.path.join(path_root, 'mmfnexus/Titan/***REMOVED***/',
+                                   '***REMOVED*** 6hr 750C - number4 - ***REMOVED*** - Titan')
 
-    # print(build_record(path=path_to_search, instrument='msed_titan', date='2018-11-13', user='***REMOVED***'))
+    print(build_record(path=path_to_search, instrument='msed_titan', date='2019-03-27', user='***REMOVED***'))
     # dump_record(path_to_search,'msed_titan','2018-11-13','***REMOVED***')

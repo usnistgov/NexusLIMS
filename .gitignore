@@ -21,3 +21,6 @@ test_data/
 
 # pip installation files
 *.egg-info
+
+# pytest coverage results
+htmlcov/
