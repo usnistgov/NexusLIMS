@@ -18,6 +18,7 @@ gitlab_backup.log
 .vscode
 test_data/
 **/doc/build
+_coverage_output
 
 # pip installation files
 *.egg-info
