@@ -43,10 +43,6 @@ _logger = _logging.getLogger(__name__)
 XSLT_PATH = _os.path.join(_os.path.dirname(__file__), "cal_parser.xsl")
 INDENT = '  '
 
-# DONE: test cases and automated testing
-#       [x] will require installing pytest
-# DONE: add new instruments to calendar handler
-
 
 __all__ = ['AuthenticationError', 'get_auth', 'fetch_xml',
            'parse_xml', 'get_events', 'wrap_events', 'dump_calendars']
@@ -56,6 +52,67 @@ class AuthenticationError(Exception):
     """Class for showing an exception having to do with authentication"""
     def __init__(self, message):
         self.message = message
+
+
+# TODO: we need a class here that represents one entry from the calendar
+class CalendarEvent:
+    """
+     A representation of a single calendar event returned from the SharePoint
+     API
+
+     Instances of this class correspond to AcquisitionActivity nodes in the
+     `NexusLIMS schema <https://data.nist.gov/od/dm/nexus/experiment/v1.0>`_
+
+     Attributes
+     ----------
+     start : datetime.datetime
+         The start point of this AcquisitionActivity
+     end : datetime.datetime
+         The end point of this AcquisitionActivity
+     mode : str
+         The microscope mode for this AcquisitionActivity (i.e. 'IMAGING',
+         'DIFFRACTION', 'SCANNING', etc.)
+     unique_params : set
+         A set of dictionary keys that comprises all unique metadata keys
+         contained within the files of this AcquisitionActivity
+     setup_params : dict
+         A dictionary containing metadata about the data that is shared
+         amongst all data files in this AcquisitionActivity
+     unique_meta : list
+         A list of dictionaries (one for each file in this
+         AcquisitionActivity) containing metadata key-value pairs that are
+         unique to each file in ``files`` (i.e. those that could not be moved
+         into ``setup_params`)
+     files : list
+         A list of filenames belonging to this AcquisitionActivity
+     sigs : list
+         A list of *lazy* (to minimize loading times) HyperSpy signals in this
+         AcquisitionActivity. HyperSpy is used to facilitate metadata reading
+     meta : list
+         A list of dictionaries containing the "important" metadata for each
+         signal/file in ``sigs`` and ``files``
+     """
+
+    def __init__(self,
+                 start=_datetime.now(),
+                 end=_datetime.now(),
+                 mode='',
+                 unique_params=None,
+                 setup_params=None,
+                 unique_meta=None,
+                 files=None,
+                 sigs=None,
+                 meta=None):
+
+        self.start = start
+        self.end = end
+        self.mode = mode
+        self.unique_params = set() if unique_params is None else unique_params
+        self.setup_params = setup_params
+        self.unique_meta = unique_meta
+        self.files = [] if files is None else files
+        self.sigs = [] if sigs is None else sigs
+        self.meta = [] if meta is None else meta
 
 
 def get_auth(filename="credentials.ini"):
@@ -262,7 +319,7 @@ def parse_xml(xml, date=None, user=None):
 
 
 # DONE: split up fetching calendar from server and parsing XML response
-def get_events(instrument=None, date=None, user=None):
+def get_events(instrument=None, date=None, user=None, wrap=True):
     """
     Get calendar events for a particular instrument on the Microscopy Nexus,
     on some date, or by some user
@@ -288,6 +345,9 @@ def get_events(instrument=None, date=None, user=None):
         instead of ernst.august.ruska@nist.gov). If None, no user filtering
         will be performed. No verification of username is performed,
         so it is up to the user to make sure this is correct.
+
+    wrap : bool
+        Boolean used to choose whether to apply the wrap_events() function to the output XML string.
 
     Returns
     -------
@@ -316,7 +376,8 @@ def get_events(instrument=None, date=None, user=None):
         output += INDENT + str(parse_xml(xml, date, user)).\
             replace('\n', '\n' + INDENT)
 
-    output = wrap_events(output)
+    if wrap:
+        output = wrap_events(output)
 
     return output
 
@@ -337,9 +398,9 @@ def wrap_events(events_string):
     """
     # Holder for final XML output with proper header
     result = """<?xml version="1.0"?>
-<events>
-{}<dateRetrieved>{}</dateRetrieved>
-""".format(INDENT, _datetime.now().isoformat())
+    <events>
+    {}<dateRetrieved>{}</dateRetrieved>
+    """.format(INDENT, _datetime.now().isoformat())
     # add indent to first line and all newlines:
     events_string = INDENT + events_string
     events_string = events_string.replace('\n', '\n' + INDENT)
@@ -359,56 +420,16 @@ def dump_calendars(instrument=None, user=None, date=None,
         text = get_events(instrument=instrument, date=date, user=user)
         f.write(text)
 
-
-# TODO: we need a class here that represents one entry from the calendar
-class CalendarEvent:
-    """
-     A representation of a single calendar event returned from the SharePoint
-     API
-
-     Instances of this class correspond to AcquisitionActivity nodes in the
-     `NexusLIMS schema <https://data.nist.gov/od/dm/nexus/experiment/v1.0>`_
-
-     Attributes
-     ----------
-     start : datetime.datetime
-         The start point of this AcquisitionActivity
-     end : datetime.datetime
-         The end point of this AcquisitionActivity
-     mode : str
-         The microscope mode for this AcquisitionActivity (i.e. 'IMAGING',
-         'DIFFRACTION', 'SCANNING', etc.)
-     unique_params : set
-         A set of dictionary keys that comprises all unique metadata keys
-         contained within the files of this AcquisitionActivity
-     setup_params : dict
-         A dictionary containing metadata about the data that is shared
-         amongst all data files in this AcquisitionActivity
-     unique_meta : list
-         A list of dictionaries (one for each file in this
-         AcquisitionActivity) containing metadata key-value pairs that are
-         unique to each file in ``files`` (i.e. those that could not be moved
-         into ``setup_params`)
-     files : list
-         A list of filenames belonging to this AcquisitionActivity
-     sigs : list
-         A list of *lazy* (to minimize loading times) HyperSpy signals in this
-         AcquisitionActivity. HyperSpy is used to facilitate metadata reading
-     meta : list
-         A list of dictionaries containing the "important" metadata for each
-         signal/file in ``sigs`` and ``files``
-     """
-
 # if __name__ == '__main__':
 #     """
 #     These lines are just for testing. For real use, import the methods you
 #     need and operate from there
 #     """
-    # logging.basicConfig(level=logging.INFO)
-    # dump_calendars(instrument='msed_titan')
-    # dump_calendars(date='2019-02-28')
-    # logging.info(get_events(instrument=None))
-    # logging.info(get_events(date='2019-02-25'))
-    # logging.info(get_events(user='***REMOVED***'))
-    # logging.info(get_events(date='2018-12-26', user='***REMOVED***'))
-    # logging.info(get_events())
+#     _logging.basicConfig(level=_logging.INFO)
+#     dump_calendars(instrument='msed_titan')
+#     dump_calendars(date='2019-02-28')
+#     _logging.info(get_events(instrument=None))
+#     _logging.info(get_events(date='2019-02-25'))
+#     _logging.info(get_events(user='***REMOVED***'))
+#     _logging.info(get_events(date='2018-12-26', user='***REMOVED***'))
+#     _logging.info(get_events())

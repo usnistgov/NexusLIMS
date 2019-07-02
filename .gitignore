@@ -22,3 +22,6 @@ _coverage_output
 
 # pip installation files
 *.egg-info
+
+# pytest coverage results
+htmlcov/
