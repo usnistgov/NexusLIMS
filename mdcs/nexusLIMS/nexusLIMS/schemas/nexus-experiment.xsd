@@ -1,839 +1,807 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <xs:schema targetNamespace="https://data.nist.gov/od/dm/nexus/experiment/v1.0"
-           xmlns:nx="https://data.nist.gov/od/dm/nexus/experiment/v1.0"
-           xmlns="http://www.w3.org/2001/XMLSchema" 
-           xmlns:xs="http://www.w3.org/2001/XMLSchema" 
-           xmlns:xsi="http://www.w3c.org/2001/XMLSchema-instance"
-           elementFormDefault="unqualified" 
-           attributeFormDefault="unqualified" version="0.10-07-2018">
+  xmlns:nx="https://data.nist.gov/od/dm/nexus/experiment/v1.0"
+  xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:xsi="http://www.w3c.org/2001/XMLSchema-instance" elementFormDefault="unqualified"
+  attributeFormDefault="unqualified" version="0.10-07-2018">
 
-   <xs:annotation>
-      <xs:documentation>
+  <xs:annotation>
+    <xs:documentation>
         A metadata schema for describing an experiment utilizing equipment
         from the Nexus Microscopy Lab. 
       </xs:documentation>
-   </xs:annotation>
+  </xs:annotation>
 
-   <xs:element name="Experiment" type="nx:Experiment">
-     <xs:annotation>
-       <xs:appinfo>
+  <xs:element name="Experiment" type="nx:Experiment">
+    <xs:annotation>
+      <xs:appinfo>
        </xs:appinfo>
-       <xs:documentation>
-         a root element for a document describing an Experiment 
+      <xs:documentation>
+         The root element for a document describing an Experiment 
        </xs:documentation>
-     </xs:annotation>
-   </xs:element>
+    </xs:annotation>
+  </xs:element>
 
-   <xs:complexType name="Experiment">
-      <xs:annotation>
-         <xs:documentation>
-           a description of an experiment using an instrument in Nexus
+  <xs:complexType name="Experiment">
+    <xs:annotation>
+      <xs:documentation>
+           A description of an experiment using an instrument in Nexus
            Microscopy Lab
          </xs:documentation>
-      </xs:annotation>
-      
-      <xs:sequence>
-        
-        <xs:element name="title" type="xs:token" minOccurs="0">
-           <xs:annotation>
-             <xs:appinfo>
+    </xs:annotation>
+
+    <xs:sequence>
+
+      <xs:element name="title" type="xs:token" minOccurs="0">
+        <xs:annotation>
+          <xs:appinfo>
+               <label>Title</label>
+             </xs:appinfo>
+          <xs:documentation>The title of this experiment</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+
+      <xs:element name="id" type="xs:token" minOccurs="0">
+        <xs:annotation>
+          <xs:appinfo>
                <label>Identifier</label>
              </xs:appinfo>
-             <xs:documentation>
-               a unique identifier assigned to this record.
+          <xs:documentation>
+               A unique identifier assigned to this record.
              </xs:documentation>
-           </xs:annotation>
-        </xs:element>
+        </xs:annotation>
+      </xs:element>
 
-        <xs:element name="id" type="xs:token" minOccurs="0">
-           <xs:annotation>
-             <xs:appinfo>
-               <label>Identifier</label>
-             </xs:appinfo>
-             <xs:documentation>
-               a unique identifier assigned to this record.
-             </xs:documentation>
-           </xs:annotation>
-        </xs:element>
-
-        <xs:element name="summary" type="nx:Summary">
-           <xs:annotation>
-             <xs:appinfo>
+      <xs:element name="summary" type="nx:Summary">
+        <xs:annotation>
+          <xs:appinfo>
                <label>Summary</label>
              </xs:appinfo>
-             <xs:documentation>
-               a collection of metadata that summarize the overall use and 
+          <xs:documentation>
+               A collection of metadata that summarize the overall use and 
                intent of the experiment.  
              </xs:documentation>
-           </xs:annotation>
-        </xs:element>
+        </xs:annotation>
+      </xs:element>
 
-        <xs:element name="sample" type="nx:Sample"
-                    minOccurs="0" maxOccurs="unbounded">
-           <xs:annotation>
-             <xs:appinfo>
+      <xs:element name="sample" type="nx:Sample" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:appinfo>
                <label>Sample</label>
              </xs:appinfo>
-             <xs:documentation>
-               a description of a sample examined in this experiment.
+          <xs:documentation>
+               A description of a sample examined in this experiment.
              </xs:documentation>
-           </xs:annotation>
-        </xs:element>
+        </xs:annotation>
+      </xs:element>
 
-        <xs:element name="acquisitionActivity" type="nx:AcquisitionActivity"
-                    minOccurs="0" maxOccurs="unbounded">
-           <xs:annotation>
-             <xs:appinfo>
+      <xs:element name="acquisitionActivity" type="nx:AcquisitionActivity" minOccurs="0"
+        maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:appinfo>
                <label>Acquisition Activity</label>
              </xs:appinfo>
-             <xs:documentation>
-               a description of a period of use the instrument during this
+          <xs:documentation>
+               A description of a specific group of data acqusition during this
                experimental session.
              </xs:documentation>
-           </xs:annotation>
-        </xs:element>
+        </xs:annotation>
+      </xs:element>
 
-        <xs:element name="notes" type="nx:Notes"
-                    minOccurs="0" maxOccurs="unbounded">
-          <xs:annotation>
-            <xs:documentation>
+      <xs:element name="notes" type="nx:Notes" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
               Largely unformatted notes taken regarding the current sample
             </xs:documentation>
-          </xs:annotation>
-        </xs:element>
+        </xs:annotation>
+      </xs:element>
 
-      </xs:sequence>
-   </xs:complexType>
+    </xs:sequence>
+  </xs:complexType>
 
-   <xs:complexType name="Summary">
-      <xs:annotation>
-         <xs:documentation>
-           a collection of metadata that summarize the overall use and 
+  <xs:complexType name="Summary">
+    <xs:annotation>
+      <xs:documentation>
+           A collection of metadata that summarize the overall use and 
            intent of the experiment.  
          </xs:documentation>
-      </xs:annotation>
-      
-      <xs:sequence>
-        <xs:element name="experimenter" type="xs:token"
-                    minOccurs="0" maxOccurs="unbounded">
-           <xs:annotation>
-             <xs:appinfo>
+    </xs:annotation>
+
+    <xs:sequence>
+      <xs:element name="experimenter" type="xs:token" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:appinfo>
                <label>Experimenter</label>
              </xs:appinfo>
-             <xs:documentation>
-               The name of a user running this experiment.
+          <xs:documentation>
+               The name of the user running this experiment.
              </xs:documentation>
-           </xs:annotation>
-        </xs:element>
+        </xs:annotation>
+      </xs:element>
 
-        <xs:element name="collaborator" type="xs:token"
-                    minOccurs="0" maxOccurs="unbounded">
-           <xs:annotation>
-             <xs:appinfo>
+      <xs:element name="collaborator" type="xs:token" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:appinfo>
                <label>Collaborator</label>
              </xs:appinfo>
-             <xs:documentation>
+          <xs:documentation>
                The name of a notable collaborator in the experiment
              </xs:documentation>
-           </xs:annotation>
-        </xs:element>
+        </xs:annotation>
+      </xs:element>
 
-        <xs:element name="instrument" type="nx:InstrumentName"
-                    minOccurs="0" maxOccurs="unbounded">
-           <xs:annotation>
-             <xs:appinfo>
+      <xs:element name="instrument" type="nx:InstrumentName" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:appinfo>
                <label>Instrument</label>
              </xs:appinfo>
-             <xs:documentation>
-               An instrument used in this experiment
+          <xs:documentation>
+               The instrument used in this experiment
              </xs:documentation>
-           </xs:annotation>
-        </xs:element>
+        </xs:annotation>
+      </xs:element>
 
-        <xs:element name="reservationStart" type="xs:dateTime" minOccurs="0">
-           <xs:annotation>
-             <xs:appinfo>
+      <xs:element name="reservationStart" type="xs:dateTime" minOccurs="0">
+        <xs:annotation>
+          <xs:appinfo>
                <label>Reservation start time</label>
              </xs:appinfo>
-             <xs:documentation>
-               An instrument used in this experiment
-             </xs:documentation>
-           </xs:annotation>
-        </xs:element>
+          <xs:documentation>The start time of this experiment</xs:documentation>
+        </xs:annotation>
+      </xs:element>
 
-        <xs:element name="reservationEnd" type="xs:dateTime" minOccurs="0">
-           <xs:annotation>
-             <xs:appinfo>
-               <label>Reservation start time</label>
+      <xs:element name="reservationEnd" type="xs:dateTime" minOccurs="0">
+        <xs:annotation>
+          <xs:appinfo>
+               <label>Reservation end time</label>
              </xs:appinfo>
-             <xs:documentation>
-               An instrument used in this experiment
-             </xs:documentation>
-           </xs:annotation>
-        </xs:element>
+          <xs:documentation>The end time of this experiment</xs:documentation>
+        </xs:annotation>
+      </xs:element>
 
-        <xs:element name="motivation" type="xs:string" minOccurs="0">
-           <xs:annotation>
-             <xs:appinfo>
+      <xs:element name="motivation" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:appinfo>
                <label>Motivation</label>
              </xs:appinfo>
-             <xs:documentation>
+          <xs:documentation>
                A prose description of the motivation, purpose, or other intent
                behind this experiment.
              </xs:documentation>
-           </xs:annotation>
-        </xs:element>
+        </xs:annotation>
+      </xs:element>
 
-        
-      </xs:sequence>
-   </xs:complexType>
 
-   <xs:complexType name="Sample">
-      <xs:annotation>
-         <xs:documentation>
-           a collection of metadata that describe a sample examined during
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Sample">
+    <xs:annotation>
+      <xs:documentation>
+           A collection of metadata that describe a sample examined during
            an experiment.  
          </xs:documentation>
-      </xs:annotation>
-      
-      <xs:sequence>
-         <xs:element name="name" type="xs:token" minOccurs="0">
-            <xs:annotation>
-               <xs:documentation>
-                 a name for the sample (for display purposes)
-               </xs:documentation>
-            </xs:annotation>
-         </xs:element>
+    </xs:annotation>
 
-         <xs:element name="description" type="xs:token"
-                     minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation>
-               <xs:documentation>
-                 a description of the sample (where each occurance can
+    <xs:sequence>
+      <xs:element name="name" type="xs:token" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+                 A name for the sample (for display purposes)
+               </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+
+      <xs:element name="description" type="xs:token" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+                 A description of the sample (where each occurance can
                  be thought of as a separate paragraph).
                </xs:documentation>
-            </xs:annotation>
-         </xs:element>
+        </xs:annotation>
+      </xs:element>
 
-         <xs:element name="notes" type="nx:Notes"
-                     minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation>
-               <xs:documentation>
+      <xs:element name="notes" type="nx:Notes" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
                  Largely unformatted notes taken regarding the current sample
                </xs:documentation>
-            </xs:annotation>
-         </xs:element>
+        </xs:annotation>
+      </xs:element>
 
-      </xs:sequence>
-      <xs:attribute name="id" type="xs:string">
-         <xs:annotation>
-            <xs:documentation>
-              an identifier unique to this document that identifies
+    </xs:sequence>
+    <xs:attribute name="id" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+              An identifier (unique to this document) that identifies
               the current sample.  This can be the sample name if it
               is unique.
             </xs:documentation>
-         </xs:annotation>
-      </xs:attribute>
-   </xs:complexType>
-
-   <xs:complexType name="AcquisitionActivity">
-      <xs:annotation>
-         <xs:documentation>
-           a collection of metadata that describe a period of use of the 
-           instrument.
-         </xs:documentation>
       </xs:annotation>
-      
-      <xs:sequence>
-         <xs:element name="startTime" type="xs:dateTime" minOccurs="0">
-            <xs:annotation>
-               <xs:documentation>
-                 a date and time recorded as the start of this activity.
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="AcquisitionActivity">
+    <xs:annotation>
+      <xs:documentation>
+           A collection of metadata that describe a specific group
+           of acquired data during the Experiment.
+         </xs:documentation>
+    </xs:annotation>
+
+    <xs:sequence>
+      <xs:element name="startTime" type="xs:dateTime" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+                 A date and time recorded as the start of this activity.
                  This can be the time of the creation of the of the first 
                  dataset.  
                </xs:documentation>
-            </xs:annotation>
-         </xs:element>
+        </xs:annotation>
+      </xs:element>
 
-         <xs:element name="sampleID" type="xs:token" minOccurs="0">
-            <xs:annotation>
-               <xs:documentation>
-                 the identifier for the sample that was part of this
+      <xs:element name="sampleID" type="xs:token" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+                 The identifier for the sample that was part of this
                  acquisition activity.  This should match a value of
                  the id attribute for a sample element included in
                  this document.
                </xs:documentation>
-            </xs:annotation>
-         </xs:element>
+        </xs:annotation>
+      </xs:element>
 
-         <xs:element name="setup" type="nx:Setup" minOccurs="0">
-            <xs:annotation>
-               <xs:documentation>
-                 metadata describing the set-up of the instrument
-                 during the current activity.
+      <xs:element name="setup" type="nx:Setup" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+                 Metadata describing the set-up of the instrument
+                 during the current Acqusition Activity.
                </xs:documentation>
-            </xs:annotation>
-         </xs:element>
+        </xs:annotation>
+      </xs:element>
 
-         <xs:element name="notes" type="nx:Notes"
-                     minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation>
-               <xs:documentation>
-                 Largely unformatted notes taken regarding the current activity
+      <xs:element name="notes" type="nx:Notes" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+            Largely unformatted notes taken regarding the current Acqusition Activity
                </xs:documentation>
-            </xs:annotation>
-         </xs:element>
+        </xs:annotation>
+      </xs:element>
 
-         <xs:element name="dataset" type="nx:Dataset"
-                     minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation>
-               <xs:documentation>
-                 a file or named set of files that was acquired during
-                 the current activity.
+      <xs:element name="dataset" type="nx:Dataset" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+                 A file or named set of files that was acquired during
+                 the current Acqusition Activity.
                </xs:documentation>
-            </xs:annotation>
-         </xs:element>
-      </xs:sequence>
-      
-      <xs:attribute name="seqno" type="xs:integer">
-         <xs:annotation>
-            <xs:documentation>
-              a number that indicates the order that this activity occurred
-              within a sequence of activities.
-            </xs:documentation>
-         </xs:annotation>
-      </xs:attribute>
-   </xs:complexType>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
 
-   <xs:complexType name="Notes">
+    <xs:attribute name="seqno" type="xs:integer">
       <xs:annotation>
-         <xs:documentation>
-           content pulled as notes and lightly structure.
-         </xs:documentation>
+        <xs:documentation>
+          A number that indicates the order that this Acqusition Activity occurred
+          within a sequence of Acqusition Activities.
+            </xs:documentation>
       </xs:annotation>
-      
-      <xs:sequence>
-         <xs:element name="entry" type="nx:Entry"
-                     minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation>
-               <xs:documentation>
-                 a section of the notes.  Each section can be of a different
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="Notes">
+    <xs:annotation>
+      <xs:documentation>
+           Generic content pulled as notes (lightly structured).
+         </xs:documentation>
+    </xs:annotation>
+
+    <xs:sequence>
+      <xs:element name="entry" type="nx:Entry" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+                 A section of the notes.  Each section can be of a different
                  type with different structural content (e.g. for text, an
                  image, a table, etc.)
                </xs:documentation>
-            </xs:annotation>
-         </xs:element>
-      </xs:sequence>
-      
-      <xs:attribute name="source" type="xs:string">
-         <xs:annotation>
-            <xs:documentation>
-              a label indicating where the notes were extracted from (e.g. "ELN")
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+
+    <xs:attribute name="source" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+              A label indicating where the notes were extracted from (e.g. "ELN")
             </xs:documentation>
-         </xs:annotation>
-      </xs:attribute>
-      
-   </xs:complexType>
+      </xs:annotation>
+    </xs:attribute>
 
-   <xs:complexType name="Entry">
-      <xs:annotation>
-         <xs:documentation>
+  </xs:complexType>
+
+  <xs:complexType name="Entry">
+    <xs:annotation>
+      <xs:documentation>
            An entry into a set of notes.  This type serves as a base type
            for different sub-types.  
          </xs:documentation>
-      </xs:annotation>
+    </xs:annotation>
 
-      <xs:sequence>
-      </xs:sequence>
-   </xs:complexType>
+    <xs:sequence> </xs:sequence>
+  </xs:complexType>
 
-   <xs:complexType name="TextEntry">
-      <xs:annotation>
-         <xs:documentation>
-           An entry into a set of notes.  This type serves as a base type
-           for different sub-types.  
+  <xs:complexType name="TextEntry">
+    <xs:annotation>
+      <xs:documentation>
+           A text entry into a set of notes.
          </xs:documentation>
-      </xs:annotation>
+    </xs:annotation>
 
-      <xs:complexContent>
-        <xs:extension base="nx:Entry">
-          <xs:sequence>
-            <xs:element name="p" type="xs:token"
-                        minOccurs="1" maxOccurs="unbounded">
-                <xs:annotation>
-                   <xs:documentation>
-                     Free text content
-                   </xs:documentation>
-                </xs:annotation>
-            </xs:element>
-          </xs:sequence>
-        </xs:extension>
-      </xs:complexContent>
-   </xs:complexType>
-
-   <xs:complexType name="ImageEntry">
-      <xs:annotation>
-         <xs:documentation>
-           An entry into a set of notes.  This type serves as a base type
-           for different sub-types.  
-         </xs:documentation>
-      </xs:annotation>
-
-      <xs:complexContent>
-        <xs:extension base="nx:Entry">
-          <xs:sequence>
-            <xs:sequence>
-              <xs:element name="imageURL" type="xs:anyURI"
-                          minOccurs="1" maxOccurs="unbounded">
-                  <xs:annotation>
-                     <xs:documentation>
-                       a link to an image inserted into the notes
-                     </xs:documentation>
-                  </xs:annotation>
-              </xs:element>
-            </xs:sequence>
-          </xs:sequence>
-        </xs:extension>
-      </xs:complexContent>
-   </xs:complexType>
-
-   <xs:complexType name="TableEntry">
-      <xs:annotation>
-         <xs:documentation>
-           An entry into a set of notes.  This type serves as a base type
-           for different sub-types.  
-         </xs:documentation>
-      </xs:annotation>
-
-      <xs:complexContent>
-        <xs:extension base="nx:Entry">
-          <xs:sequence>
-            <xs:sequence>
-              <xs:element name="table" type="nx:Table"
-                          minOccurs="1" maxOccurs="unbounded">
-                  <xs:annotation>
-                     <xs:documentation>
-                       a link to an image inserted into the notes
-                     </xs:documentation>
-                  </xs:annotation>
-              </xs:element>
-            </xs:sequence>
-          </xs:sequence>
-        </xs:extension>
-      </xs:complexContent>
-   </xs:complexType>
-
-   <xs:complexType name="Table">
-      <xs:annotation>
-         <xs:documentation>
-           A single grid of tabular information
-         </xs:documentation>
-      </xs:annotation>
-
-      <xs:sequence>
-         <xs:element name="title" type="xs:token"
-                     minOccurs="0" maxOccurs="1">
-            <xs:annotation>
-               <xs:documentation>
-                 the title for the table
-               </xs:documentation>
-            </xs:annotation>
-         </xs:element>
-         <xs:element name="header" type="nx:TableHeader">
-            <xs:annotation>
-               <xs:documentation>
-                 the description of the table's columns
-               </xs:documentation>
-            </xs:annotation>
-         </xs:element>
-         <xs:element name="rows" type="nx:TableRows">
-            <xs:annotation>
-               <xs:documentation>
-                 the main data of the table, organized into rows
-               </xs:documentation>
-            </xs:annotation>
-         </xs:element>
-      </xs:sequence>
-   </xs:complexType>
-
-   <xs:complexType name="TableHeader">
-      <xs:annotation>
-         <xs:documentation>
-           a description of a table's columns
-         </xs:documentation>
-      </xs:annotation>
-
-      <xs:sequence>
-         <xs:element name="column" type="nx:TableColumn"
-                     minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation>
-               <xs:documentation>
-                 a single row of data in the table
-               </xs:documentation>
-            </xs:annotation>
-         </xs:element>
-      </xs:sequence>
-   </xs:complexType>
-
-   <xs:complexType name="TableColumn">
-      <xs:annotation>
-         <xs:documentation>
-           a description of one column in a table
-         </xs:documentation>
-      </xs:annotation>
-
-      <xs:simpleContent>
-        <xs:extension base="xs:token">
-          <xs:attribute name="id">
+    <xs:complexContent>
+      <xs:extension base="nx:Entry">
+        <xs:sequence>
+          <xs:element name="p" type="xs:token" minOccurs="1" maxOccurs="unbounded">
             <xs:annotation>
               <xs:documentation>
+                     Free text content
+                   </xs:documentation>
+            </xs:annotation>
+          </xs:element>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="ImageEntry">
+    <xs:annotation>
+      <xs:documentation>
+           An image entry into a set of notes.  
+         </xs:documentation>
+    </xs:annotation>
+
+    <xs:complexContent>
+      <xs:extension base="nx:Entry">
+        <xs:sequence>
+          <xs:sequence>
+            <xs:element name="imageURL" type="xs:anyURI" minOccurs="1" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>
+                       A link to an image inserted into the notes
+                     </xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:sequence>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="TableEntry">
+    <xs:annotation>
+      <xs:documentation>
+           A table entry into a set of notes.
+         </xs:documentation>
+    </xs:annotation>
+
+    <xs:complexContent>
+      <xs:extension base="nx:Entry">
+        <xs:sequence>
+          <xs:sequence>
+            <xs:element name="table" type="nx:Table" minOccurs="1" maxOccurs="unbounded">
+              <xs:annotation>
+                <xs:documentation>
+                       Tabular content inserted into the notes
+                     </xs:documentation>
+              </xs:annotation>
+            </xs:element>
+          </xs:sequence>
+        </xs:sequence>
+      </xs:extension>
+    </xs:complexContent>
+  </xs:complexType>
+
+  <xs:complexType name="Table">
+    <xs:annotation>
+      <xs:documentation>
+           A single grid of tabular information
+         </xs:documentation>
+    </xs:annotation>
+
+    <xs:sequence>
+      <xs:element name="title" type="xs:token" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation>
+                 The title for the table
+               </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="header" type="nx:TableHeader">
+        <xs:annotation>
+          <xs:documentation>
+                 The description of the table's columns
+               </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="rows" type="nx:TableRows">
+        <xs:annotation>
+          <xs:documentation>
+                 The main data of the table, organized into rows
+               </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TableHeader">
+    <xs:annotation>
+      <xs:documentation>
+           A description of a table's columns
+         </xs:documentation>
+    </xs:annotation>
+
+    <xs:sequence>
+      <xs:element name="column" type="nx:TableColumn" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+                 A single column of data in the table
+               </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TableColumn">
+    <xs:annotation>
+      <xs:documentation>
+           A description of one column in a table
+         </xs:documentation>
+    </xs:annotation>
+
+    <xs:simpleContent>
+      <xs:extension base="xs:token">
+        <xs:attribute name="id">
+          <xs:annotation>
+            <xs:documentation>
                 The identifier to assign to this column (for reference by
                 cell elements).
               </xs:documentation>
-            </xs:annotation>
-          </xs:attribute>            
-        </xs:extension>          
-      </xs:simpleContent>
-      
-   </xs:complexType>
-
-   <xs:complexType name="TableRows">
-      <xs:annotation>
-         <xs:documentation>
-           the main data body of a table, organized as a sequence of rows.
-         </xs:documentation>
-      </xs:annotation>
-
-      <xs:sequence>
-         <xs:element name="row" type="nx:TableRow"
-                     minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation>
-               <xs:documentation>
-                 a single row of data in the table
-               </xs:documentation>
-            </xs:annotation>
-         </xs:element>
-      </xs:sequence>
-   </xs:complexType>
-
-   <xs:complexType name="TableRow">
-      <xs:annotation>
-         <xs:documentation>
-           a single row of a table
-         </xs:documentation>
-      </xs:annotation>
-
-      <xs:sequence>
-         <xs:element name="cell" type="nx:TableCell"
-                     minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation>
-               <xs:documentation>
-                 a single cell in the row.
-               </xs:documentation>
-            </xs:annotation>
-         </xs:element>
-      </xs:sequence>
-
-      <xs:attribute name="seqno" type="xs:integer">
-         <xs:annotation>
-            <xs:documentation>
-              a number that indicates the order that the row appears
-              in the table.
-            </xs:documentation>
-         </xs:annotation>
-      </xs:attribute>
-      
-   </xs:complexType>
-
-   <xs:complexType name="TableCell">
-      <xs:annotation>
-        <xs:documentation>
-          a container for data in one cell of the table.
-        </xs:documentation>
-      </xs:annotation>
-
-      <xs:simpleContent>
-        <xs:extension base="xs:token">
-          <xs:attribute name="colid">
-            <xs:annotation>
-              <xs:documentation>
-                The identifier for the column that this cell corresponds to
-              </xs:documentation>
-            </xs:annotation>
-          </xs:attribute>            
-        </xs:extension>          
-      </xs:simpleContent>
-      
-   </xs:complexType>
-
-   <xs:complexType name="Setup">
-      <xs:annotation>
-         <xs:documentation>
-           Metadata describing the set-up of an instrument (and the
-           samples installed).
-         </xs:documentation>
-      </xs:annotation>
-
-      <xs:sequence>
-        <xs:element name="param" type="nx:Parameter"
-                    minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation>
-               <xs:documentation>
-                 An arbitrary setup parameter with a name and a value
-               </xs:documentation>
-            </xs:annotation>
-        </xs:element>
-      </xs:sequence>
-   </xs:complexType>
-
-   <xs:complexType name="Dataset">
-      <xs:annotation>
-         <xs:documentation>
-           A description of a file or set of files.
-         </xs:documentation>
-      </xs:annotation>
-
-      <xs:sequence>
-        <xs:element name="name" type="xs:string">
-            <xs:annotation>
-               <xs:documentation>
-                 The name given to the dataset
-               </xs:documentation>
-            </xs:annotation>
-        </xs:element>
-
-        <xs:element name="location" type="xs:string">
-            <xs:annotation>
-               <xs:documentation>
-                 A directory path or URL indicating the location where
-                 the dataset is stored
-               </xs:documentation>
-            </xs:annotation>
-        </xs:element>
-
-        <xs:element name="format" type="xs:string" minOccurs="0">
-            <xs:annotation>
-               <xs:documentation>
-                 A string (can be a MIME type) indicating the format of
-                 the dataset (e.g. TIFF, DICOM, Excel).
-               </xs:documentation>
-            </xs:annotation>
-        </xs:element>
-
-        <xs:element name="description" type="xs:string"
-                    minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation>
-               <xs:documentation>
-                 a description of the dataset (where each occurance can
-                 be thought of as a separate paragraph).
-               </xs:documentation>
-            </xs:annotation>
-        </xs:element>
-
-        <xs:element name="preview" type="xs:string"
-                    minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation>
-               <xs:documentation>
-                 URL or string path to a preview rendering of the data
-                 in the dataset.
-               </xs:documentation>
-            </xs:annotation>
-        </xs:element>
-
-        <xs:element name="meta" type="nx:Parameter"
-                    minOccurs="0" maxOccurs="unbounded">
-            <xs:annotation>
-               <xs:documentation>
-                 An arbitrary metadatum with a name and a value
-               </xs:documentation>
-            </xs:annotation>
-        </xs:element>
-
-      </xs:sequence>
-
-      <xs:attribute name="type" type="nx:DatasetType">
-         <xs:annotation>
-            <xs:documentation>
-              a label indicating the type of this dataset (taken from
-              a controlled list).
-            </xs:documentation>
-         </xs:annotation>
-      </xs:attribute>
-
-      <xs:attribute name="role" type="nx:DatasetRole">
-         <xs:annotation>
-            <xs:documentation>
-              a label indicating the experimental role of this dataset
-              (taken from a controlled list).
-            </xs:documentation>
-         </xs:annotation>
-      </xs:attribute>
-   </xs:complexType>
-
-   <xs:complexType name="Parameter">
-      <xs:annotation>
-         <xs:documentation>
-           A piece of arbitrary metadata featuring a name and a value.
-         </xs:documentation>
-      </xs:annotation>
-
-      <xs:simpleContent>
-        <xs:extension base="xs:token">
-          <xs:attribute name="name">
-            <xs:annotation>
-              <xs:documentation>
-                The name of the parameter
-              </xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
-          <xs:attribute name="unit">
-            <xs:annotation>
-              <xs:documentation>
-                A physical unit associated with the value of this parameter
-              </xs:documentation>
-            </xs:annotation>
-          </xs:attribute>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:simpleContent>
 
   </xs:complexType>
 
-   <xs:simpleType name="InstrumentName">
-     <xs:annotation>
-       <xs:documentation>
+  <xs:complexType name="TableRows">
+    <xs:annotation>
+      <xs:documentation>
+           The main data body of a table, organized as a sequence of rows.
+         </xs:documentation>
+    </xs:annotation>
+
+    <xs:sequence>
+      <xs:element name="row" type="nx:TableRow" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+                 A single row of data in the table
+               </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="TableRow">
+    <xs:annotation>
+      <xs:documentation>
+           A single row of a table
+         </xs:documentation>
+    </xs:annotation>
+
+    <xs:sequence>
+      <xs:element name="cell" type="nx:TableCell" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+                 A single cell in a row of a table.
+               </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+
+    <xs:attribute name="seqno" type="xs:integer">
+      <xs:annotation>
+        <xs:documentation>
+              A number that indicates the order that the row appears
+              in the table.
+            </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+
+  </xs:complexType>
+
+  <xs:complexType name="TableCell">
+    <xs:annotation>
+      <xs:documentation>
+          A container for data in one cell of the table.
+        </xs:documentation>
+    </xs:annotation>
+
+    <xs:simpleContent>
+      <xs:extension base="xs:token">
+        <xs:attribute name="colid">
+          <xs:annotation>
+            <xs:documentation>
+                The identifier for the column that this cell corresponds to
+              </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+
+  </xs:complexType>
+
+  <xs:complexType name="Setup">
+    <xs:annotation>
+      <xs:documentation>
+           Metadata describing the set-up of an instrument (values common
+           to all datasets within an Acqusition Activity).
+         </xs:documentation>
+    </xs:annotation>
+
+    <xs:sequence>
+      <xs:element name="param" type="nx:Parameter" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+                 An arbitrary setup parameter with a name and a value 
+               </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="Dataset">
+    <xs:annotation>
+      <xs:documentation>
+           A description of a file or set of files.
+         </xs:documentation>
+    </xs:annotation>
+
+    <xs:sequence>
+      <xs:element name="name" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+                 The name given to the dataset
+               </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+
+      <xs:element name="location" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>
+                 A directory path or URL indicating the location where
+                 the dataset is stored
+               </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+
+      <xs:element name="format" type="xs:string" minOccurs="0">
+        <xs:annotation>
+          <xs:documentation>
+                 A string (can be a MIME type) indicating the format of
+                 the dataset (e.g. TIFF, DICOM, Excel).
+               </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+
+      <xs:element name="description" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+                 A description of the dataset (where each occurance can
+                 be thought of as a separate paragraph).
+               </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+
+      <xs:element name="preview" type="xs:string" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+                 URL or string path to a preview rendering (thumbnail) of the data
+                 in the dataset.
+               </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+
+      <xs:element name="meta" type="nx:Parameter" minOccurs="0" maxOccurs="unbounded">
+        <xs:annotation>
+          <xs:documentation>
+                 An arbitrary metadatum with a name and a value unique to this dataset
+               </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+
+    </xs:sequence>
+
+    <xs:attribute name="type" type="nx:DatasetType">
+      <xs:annotation>
+        <xs:documentation>
+              A label indicating the type of this dataset (taken from
+              a controlled list).
+            </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+
+    <xs:attribute name="role" type="nx:DatasetRole">
+      <xs:annotation>
+        <xs:documentation>
+              A label indicating the experimental role of this dataset
+              (taken from a controlled list).
+            </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="Parameter">
+    <xs:annotation>
+      <xs:documentation>
+           A piece of arbitrary metadata featuring a name and a value, unique 
+           to a dataset within an Acqusition Activity.
+         </xs:documentation>
+    </xs:annotation>
+
+    <xs:simpleContent>
+      <xs:extension base="xs:token">
+        <xs:attribute name="name">
+          <xs:annotation>
+            <xs:documentation>
+                The name of the parameter
+              </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+        <xs:attribute name="unit">
+          <xs:annotation>
+            <xs:documentation>
+                A physical unit associated with the value of this parameter
+              </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+      </xs:extension>
+    </xs:simpleContent>
+
+  </xs:complexType>
+
+  <xs:simpleType name="InstrumentName">
+    <xs:annotation>
+      <xs:documentation>
          Controlled labels that identify available instruments in the 
          Nexus Microscopy Lab.
        </xs:documentation>
-     </xs:annotation>
+    </xs:annotation>
 
-     <xs:restriction base="xs:token">
+    <xs:restriction base="xs:token">
 
-       <xs:enumeration value="Titan">
-         <xs:annotation>
-           <xs:documentation>
-             The Titan [?] microscope
+      <xs:enumeration value="Titan">
+        <xs:annotation>
+          <xs:documentation>
+             The FEI Titan microscope
            </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
+        </xs:annotation>
+      </xs:enumeration>
 
-      </xs:restriction>
-   </xs:simpleType>
+    </xs:restriction>
+  </xs:simpleType>
 
-   <xs:simpleType name="DatasetType">
-     <xs:annotation>
-       <xs:documentation>
+  <xs:simpleType name="DatasetType">
+    <xs:annotation>
+      <xs:documentation>
          Controlled labels that identify a functional type data contained in
          a dataset.
        </xs:documentation>
-     </xs:annotation>
+    </xs:annotation>
 
-     <xs:restriction base="xs:token">
+    <xs:restriction base="xs:token">
 
-       <xs:enumeration value="Image">
-         <xs:annotation>
-           <xs:documentation>
+      <xs:enumeration value="Image">
+        <xs:annotation>
+          <xs:documentation>
              A 2-D array of data where each value is typically an
              intensity measurement as function of regularly spaced position
            </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
+        </xs:annotation>
+      </xs:enumeration>
 
-       <xs:enumeration value="Spectrum">
-         <xs:annotation>
-           <xs:documentation>
+      <xs:enumeration value="Spectrum">
+        <xs:annotation>
+          <xs:documentation>
              A 1-D array of data where each value is typically an
              intensity measurement as a function of frequency or energy
            </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
+        </xs:annotation>
+      </xs:enumeration>
 
-       <xs:enumeration value="SpectrumImage">
-         <xs:annotation>
-           <xs:documentation>
+      <xs:enumeration value="SpectrumImage">
+        <xs:annotation>
+          <xs:documentation>
              A 3-D array of data where each value is typically an
              intensity measurement as a function of regularly space
              position along two axes and of frequency or energy along 
              the third.
            </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
+        </xs:annotation>
+      </xs:enumeration>
 
-       <xs:enumeration value="Diffraction">
-         <xs:annotation>
-           <xs:documentation>
-             Data that measures an interference pattern
+      <xs:enumeration value="Diffraction">
+        <xs:annotation>
+          <xs:documentation>
+             Data that measures a (usually electron) diffraction pattern
            </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
+        </xs:annotation>
+      </xs:enumeration>
 
-       <xs:enumeration value="Notes">
-         <xs:annotation>
-           <xs:documentation>
-             Arbitrary textual data that typically manually created by
-             a person.
+      <xs:enumeration value="Notes">
+        <xs:annotation>
+          <xs:documentation>
+             Arbitrary textual data that is typically manually created by
+             the Experimenter.
            </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
+        </xs:annotation>
+      </xs:enumeration>
 
-       <xs:enumeration value="Misc">
-         <xs:annotation>
-           <xs:documentation>
+      <xs:enumeration value="Misc">
+        <xs:annotation>
+          <xs:documentation>
              A dataset that does not qualify as of any of the other
              defined types.  
            </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
+        </xs:annotation>
+      </xs:enumeration>
 
-     </xs:restriction>
-   </xs:simpleType>
+    </xs:restriction>
+  </xs:simpleType>
 
-   <xs:simpleType name="DatasetRole">
-     <xs:annotation>
-       <xs:documentation>
+  <xs:simpleType name="DatasetRole">
+    <xs:annotation>
+      <xs:documentation>
          Controlled labels that identify the functional role of a dataset
        </xs:documentation>
-     </xs:annotation>
+    </xs:annotation>
 
-     <xs:restriction base="xs:token">
+    <xs:restriction base="xs:token">
 
-       <xs:enumeration value="Experimental">
-         <xs:annotation>
-           <xs:documentation>
+      <xs:enumeration value="Experimental">
+        <xs:annotation>
+          <xs:documentation>
              "Normal" data collected during typical operation of an instrument
              for experimental purposes
            </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
+        </xs:annotation>
+      </xs:enumeration>
 
-       <xs:enumeration value="MasterCalibration">
-         <xs:annotation>
-           <xs:documentation>
+      <xs:enumeration value="MasterCalibration">
+        <xs:annotation>
+          <xs:documentation>
              Reference data collected for the purpose of instrument calibration
              during instrument service events or by allowed super users
            </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
+        </xs:annotation>
+      </xs:enumeration>
 
-       <xs:enumeration value="UserCalibration">
-         <xs:annotation>
-           <xs:documentation>
+      <xs:enumeration value="UserCalibration">
+        <xs:annotation>
+          <xs:documentation>
              Data collected alongside "Experimental" Datasets by regular users
              for calibration purposes between service events or for a specific
              experiment
            </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
+        </xs:annotation>
+      </xs:enumeration>
 
-       <xs:enumeration value="Derived">
-         <xs:annotation>
-           <xs:documentation>
+      <xs:enumeration value="Derived">
+        <xs:annotation>
+          <xs:documentation>
              Data that is not collected form an instrument, but rather
              derived from raw and/or calibration data as the result of
              post-acquisition analysis processes
            </xs:documentation>
-         </xs:annotation>
-       </xs:enumeration>
-     </xs:restriction>
-   </xs:simpleType>
+        </xs:annotation>
+      </xs:enumeration>
+    </xs:restriction>
+  </xs:simpleType>
 
 </xs:schema>
