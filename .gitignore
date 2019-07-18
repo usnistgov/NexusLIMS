@@ -1,6 +1,6 @@
 # File patterns we want git to ignore
 
-# backup 
+# backup
 *~
 *.bak
 backups

@@ -13,8 +13,16 @@
             font-family: "Lato", sans-serif;
             }
                         
-            button { /* Changes cursor type when hovering over a button */
-            cursor: pointer;
+            button { 
+            cursor: pointer; /* Changes cursor type when hovering over a button */
+            }
+            
+            img {
+            max-width: 100%;
+            max-height: auto;
+            margin-left: auto; /* Center justify images */
+            margin-right: auto;
+            display: block;
             }
             
             .sidenav { /* Parameters for the sidebar */
@@ -54,7 +62,51 @@
             clear: both;
             }
             
-            #to_top_button { /* Parameters for the button which jumps to the top of the page */
+            .slide {
+            display: none;
+            }
+            
+            .slideshow-container {
+            max-width: 800px;
+            position: relative;
+            margin: auto;
+            }
+            
+            .prev, .next { /* Parameters for the 'next' and 'prev' buttons on the slideshow gallery */
+            cursor: pointer;
+            position: absolute;
+            top: 50%;
+            width: auto;
+            padding: 16px;
+            margin-top: -22px;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+            transition: 0.6s ease;
+            border-radius: 0 3px 3px 0;
+            user-select: none;
+            }
+            
+            .next { /*Have the 'next' button appear on the right of the slideshow gallery */
+            right: 0;
+            border-radius: 3px 0 0 3px;
+            }
+            
+            .prev:hover, .next:hover { /* Have a background appear when the prev/next buttons are hovered over */
+            background-color: rgba(0,0,0,0.8);
+            }
+            
+            .text { /* Parameters for the caption text displayed in the image gallery */
+            color: #f2f2f2;
+            font-size: 15px;
+            padding: 8px 12px;
+            position: absolute;
+            bottom: 8px;
+            width: 100%;
+            text-align: center;
+            }
+            
+            #to_top_button { /* Parameters for the button which jumps to the top of the page when clicked */
             display: none; /* Set button to hidden on default so that it will appear when the page is scrolled */
             position: fixed;
             bottom: 20px;
@@ -90,7 +142,7 @@
             background-color: #ccc;
             }
             
-            .accordion:after {
+            .accordion:after { /* Parameters for the accordion header while it is open */
             content: '\002B';
             color: #777;
             font-weight: bold;
@@ -212,47 +264,67 @@
                 
                 <!-- Add blank space between sections -->
                 <br/>
-                
-                <!-- Display summary information (date, time, instrument, and id) -->
-                <div align="left" style="border-style:none;border-width:2px;padding:6px;">
-                    <div><b>Instrument: </b>
-                        <xsl:value-of select="event/instrument"/>
+                <div class="row">
+                    <div class="column">
+                        <!-- Display summary information (date, time, instrument, and id) -->
+                        <div align="left" style="border-style:none;border-width:2px;padding:6px;">
+                            <div><b>Instrument: </b>
+                                <xsl:value-of select="event/instrument"/>
+                            </div>
+                            <div><b>Date: </b>
+                                <!-- Tokenize()[1] splits the date/time using 'T' as the delimiter and takes the 1st index
+                                    which corresponds to the date value -->
+                                <xsl:value-of select="tokenize(event/startTime,'T')[1]"/>
+                            </div>
+                            <div><b>Start Time: </b>
+                                <!-- Tokenize()[2] splits the date/time using 'T' as the delimiter and takes the 2nd index
+                                    which corresponds to the time value -->
+                                <xsl:value-of select="tokenize(event/startTime,'T')[2]"/> 
+                            </div>
+                            <div><b>End Time: </b>
+                                <xsl:value-of select="tokenize(event/endTime,'T')[2]"/>
+                            </div>
+                            <!-- Display id associated with the time on the machine -->
+                            <div><b>Session ID: </b>
+                                <xsl:value-of select="event/eventId"/>
+                            </div>
+                        </div>
+                        
+                        <!-- Display information about the sample -->  
+                        <h3>Sample Information</h3> 
+                        <table border="3" style="border-collapse:collapse;">
+                            <tr>
+                                <th align="left">Sample Name</th>
+                                <th align="left"><xsl:value-of select="event/sampleDetails"/></th>
+                            </tr>
+                            <tr>
+                                <th align="left">Sample ID</th>
+                                <th align="left"><xsl:value-of select="acquisitionActivity[@seqno=1]/sampleID"/></th>
+                            </tr>
+                            <tr>
+                                <th align="left">Description</th>
+                                <th align="left"><xsl:value-of select="event/description"/></th>
+                            </tr>
+                        </table>
                     </div>
-                    <div><b>Date: </b>
-                        <!-- Tokenize()[1] splits the date/time using 'T' as the delimiter and takes the 1st index
-                            which corresponds to the date value -->
-                        <xsl:value-of select="tokenize(event/startTime,'T')[1]"/>
-                    </div>
-                    <div><b>Start Time: </b>
-                        <!-- Tokenize()[2] splits the date/time using 'T' as the delimiter and takes the 2nd index
-                            which corresponds to the time value -->
-                        <xsl:value-of select="tokenize(event/startTime,'T')[2]"/> 
-                    </div>
-                    <div><b>End Time: </b>
-                        <xsl:value-of select="tokenize(event/endTime,'T')[2]"/>
-                    </div>
-                    <!-- Display id associated with the time on the machine -->
-                    <div><b>Session ID: </b>
-                        <xsl:value-of select="event/eventId"/>
+                    
+                    <!-- Image gallery showing images from every dataset of the session -->
+                    <div class="column">
+                        <div class="slideshow-container" id="img_gallery">
+                            <div class="slide">
+                                <img src="http://qnimate.com/wp-content/uploads/2014/06/placeholder.jpg"/>
+                                <div class="text">Placeholder</div>
+                            </div>
+                            <div class="slide">
+                                <img src="https://langleyinsuranceagents.com/wp-content/uploads/2018/09/image-placeholder-300x225.png"/>
+                                <div class="text">Placeholder</div>
+                            </div>
+                            
+                            <a class="prev" onclick="plusSlide(-1)">&lt;</a>
+                            <a class="next" onclick="plusSlide(1)">&gt;</a>
+                        </div>
                     </div>
                 </div>
-                
-                <!-- Display information about the sample -->  
-                <h3>Sample Information</h3> 
-                <table border="3" style="border-collapse:collapse;">
-                    <tr>
-                        <th align="left">Sample Name</th>
-                        <th align="left"><xsl:value-of select="event/sampleDetails"/></th>
-                    </tr>
-                    <tr>
-                        <th align="left">Sample ID</th>
-                        <th align="left"><xsl:value-of select="acquisitionActivity[@seqno=1]/sampleID"/></th>
-                    </tr>
-                    <tr>
-                        <th align="left">Description</th>
-                        <th align="left"><xsl:value-of select="event/description"/></th>
-                    </tr>
-                </table>
                 
                 <br/> <!-- Add a break for readability -->
                 
@@ -268,36 +340,26 @@
                         <a class="link" href="https:\\nist.gov" target="_blank" style="font-size:14px">(Original Data - placeholder)</a>
                     </h2>
                     
-                    <div class="row">
-                        <!-- Create accordion which contains acquisition activity setup parameters -->
-                        <button class="accordion" style="font-weight:bold;font-size:21px">Activity Parameters</button>
-                        <div class="panel">
-                            <div><b>Start time:</b> <xsl:value-of select="tokenize(startTime,'T')[2]"/></div>                         
-                            <div class="column">  
-                                <!-- Generate the table with setup conditions for each acquisition activity -->
-                                <table border="1" style="border-collapse:collapse;">
-                                    <tr bgcolor="#84b1f9">
-                                        <th>Setup</th>
-                                    </tr>
-                                    <!-- Loop through each setup value under the 'param' heading -->
-                                    <xsl:for-each select="setup/param">
-                                        <xsl:sort select="@name"/>
-                                        <tr>
-                                            <!-- Populate setup table with parameter name and value -->
-                                            <td><b><xsl:value-of select="@name"/></b></td>
-                                            <td><xsl:value-of select="current()"/></td>
-                                        </tr>
-                                    </xsl:for-each>
-                                </table>
-                            </div>
-                            
-                            <!-- TODO: Create image gallery for each image associated with an AcquisitionActivity -->
-                            <div class="column">
-                                <img src="https://media.npr.org/assets/img/2019/04/10/black-hole-a-consensus-32a870a982f0c4f503914c6006dfdd05366678f7-s1100-c15.jpg"
-                                    style="height:80%;width:80%;"/>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- Create accordion which contains acquisition activity setup parameters -->
+                    <button class="accordion" style="font-weight:bold;font-size:21px">Activity Parameters</button>
+                    <div class="panel">
+                        <div><b>Start time:</b> <xsl:value-of select="tokenize(startTime,'T')[2]"/></div>                         
+                        <!-- Generate the table with setup conditions for each acquisition activity -->
+                        <table border="1" style="border-collapse:collapse;">
+                            <tr bgcolor="#84b1f9">
+                                <th>Setup</th>
+                            </tr>
+                            <!-- Loop through each setup value under the 'param' heading -->
+                            <xsl:for-each select="setup/param">
+                                <xsl:sort select="@name"/>
+                                <tr>
+                                    <!-- Populate setup table with parameter name and value -->
+                                    <td><b><xsl:value-of select="@name"/></b></td>
+                                    <td><xsl:value-of select="current()"/></td>
+                                </tr>
+                            </xsl:for-each>
+                        </table>                        
+                    </div>                    
                     
                     <hr></hr>
                     
@@ -308,7 +370,6 @@
                             <div id="#{generate-id(current())}" class="modal">
                                 <div class="modal-content">
                                     <span class="close" onclick="closeModal('#{generate-id(current())}')">X</span>
-                                    <p><xsl:value-of select="location"/></p>
                                     <img src="http://www.lozano-hemmer.com/image_sets/method_random/method_random2.jpg"/>
                                 </div>
                             </div>
@@ -318,7 +379,7 @@
                             <div class="panel">
                                 <br/>
                                 <!-- TODO: Button which opens a modal box displaying the image for each dataset, respectively -->
-                                <button onclick="openModal('#{generate-id(current())}')">View Image (temp)</button>
+                                <button onclick="openModal('#{generate-id(current())}')">View Thumbnail</button>
                                 <xsl:if test="meta"> <!-- Checks whether there are parameters and only creates a table if there is -->
                                    <table border="1" style="border-collapse:collapse;">
                                        <tr bgcolor="#84b1f9">
@@ -389,6 +450,49 @@
                             panel.style.maxHeight = panel.scrollHeight + "px";
                         } 
                     });
+                }
+                
+                //Function to close all open accordions [DEVELOP]
+                function closeAccor() {
+                    
+                }
+                
+                //Handler for moving through an image gallery
+                var slideIndex = 1;
+                showSlides(slideIndex);
+                
+                function plusSlide(n) {
+                    showSlides(slideIndex += n);
+                }
+                
+                function currentSlide(n) {
+                    showSlides(slideIndex = n);
+                }
+                
+                function showSlides(n) {
+                    var i;
+                    var slides = document.getElementsByClassName("slide");
+                    if (n > slides.length) {slideIndex = 1}    
+                    if (n < 1) {slideIndex = slides.length}
+                    for (i = 0; i < slides.length; i++) {
+                        slides[i].style.display = "none";  
+                    }
+                    slides[slideIndex-1].style.display = "block";
+                }
+
+                //Function which adds a new slide to the overall image gallery for each dataset [WAITING ON THUMBNAILS TO BE ABLE TO TEST]
+                function addSlide(source) {
+                    var slide = document.createElement("div");
+                    slide.class = "slide";                    
+                    var image = document.createElement("img");
+                    image.src = source;
+                    var text = document.createElement("div");
+                    text.class = "text"
+                    text.innerHTML = source;
+                    
+                    slide.innerHTML = image + source;
+                    
+                    document.getElementById("img_gallery").appendChild(slide);
                 }
                 ]]></xsl:comment>
                 
