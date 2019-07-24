@@ -857,38 +857,33 @@
   <xs:complexType name="Instrument">
     <xs:annotation>
       <xs:documentation>
-        A collection of metadata that describes an instrument in the
+        The identification of an instrument in the
         NIST Electron Microscopy Nexus facility.
       </xs:documentation>
     </xs:annotation>
-    
-    <xs:sequence>
-      <xs:element name="name" type="nx:InstrumentName">
-        <xs:annotation>
-          <xs:documentation>
-            A name for the instrument (taken from a list of controlled labels)
-          </xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      
-      <xs:element name="instrument_URI" type="xs:anyURI" minOccurs="0">
-        <xs:annotation>
-          <xs:documentation>
-            An (optional) link to this instrument in another database
-          </xs:documentation>
-        </xs:annotation>
-      </xs:element>
-      
-      
-    </xs:sequence>
-    <xs:attribute name="id" type="nx:InstrumentPID">
-      <xs:annotation>
-        <xs:documentation>
-          An unique identifier that identifies the instrument within
-          the NIST Electron Microscopy Nexus facility.
-        </xs:documentation>
-      </xs:annotation>
-    </xs:attribute>
+
+    <xs:simpleContent>
+      <xs:extension base="nx:InstrumentName">
+
+        <xs:attribute name="pid" type="nx:InstrumentPID">
+          <xs:annotation>
+            <xs:documentation>
+              An unique identifier that identifies the instrument within
+              the NIST Electron Microscopy Nexus facility.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+
+        <xs:attribute name="ref" type="xs:anyURI">
+          <xs:annotation>
+            <xs:documentation>
+              An (optional) link to this instrument in another database
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+
+      </xs:extension>
+    </xs:simpleContent>
   </xs:complexType>
 
   <xs:simpleType name="DatasetType">
