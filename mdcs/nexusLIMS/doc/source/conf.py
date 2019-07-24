@@ -66,7 +66,10 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
                            'https://dateparser.readthedocs.io/en/latest/',
                            None),
                        'hyperspy': (
-                           'http://hyperspy.org/hyperspy-doc/current/', None)
+                           'http://hyperspy.org/hyperspy-doc/current/', None),
+                       'numpy': (
+                           'https://docs.scipy.org/doc/numpy/', None),
+                       'matplotlib': ('https://matplotlib.org/', None)
                        }
 
 import sphinx_bootstrap_theme
