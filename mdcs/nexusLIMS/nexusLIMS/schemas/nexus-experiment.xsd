@@ -81,7 +81,7 @@
             <label>Project</label>
           </xs:appinfo>
           <xs:documentation>
-            A description of projects of which this Experiment is a part.
+            A description of a project of which this Experiment is a part.
           </xs:documentation>
         </xs:annotation>
       </xs:element>
@@ -232,13 +232,14 @@
     </xs:attribute>
   </xs:complexType>
 
-    <xs:complexType name="Project">
+  <xs:complexType name="Project">
     <xs:annotation>
       <xs:documentation>
            A collection of metadata that describes a project to which an
            Experiment can belong.
       </xs:documentation>
     </xs:annotation>
+    
     <xs:sequence>
       <xs:element name="name" type="xs:token" minOccurs="0">
         <xs:annotation>
@@ -247,22 +248,24 @@
                </xs:documentation>
         </xs:annotation>
       </xs:element>
-
-      <xs:element name="division" type="xs:integer" minOccurs="0">
+  
+      <xs:element name="division" type="xs:token" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
-            The division ID (an integer) to which this project belongs
+            The division ID to which this project belongs
           </xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="group" type="xs:integer" minOccurs="0">
+      
+      <xs:element name="group" type="xs:token" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
-            The group ID (an integer) within a division to which this
+            The group ID within a division to which this
             project belongs
           </xs:documentation>
         </xs:annotation>
       </xs:element>
+      
       <xs:element name="project_id" type="xs:token" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
@@ -270,7 +273,8 @@
           </xs:documentation>
         </xs:annotation>
       </xs:element>
-      <xs:element name="project_URI" type="xs:anyURI" minOccurs="0">
+      
+      <xs:element name="ref" type="xs:anyURI" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
             An (optional) link to this project in another database
