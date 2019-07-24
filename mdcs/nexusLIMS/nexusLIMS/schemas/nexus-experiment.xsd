@@ -141,7 +141,7 @@
         </xs:annotation>
       </xs:element>
 
-      <xs:element name="instrument" type="nx:InstrumentName" minOccurs="0" maxOccurs="unbounded">
+      <xs:element name="instrument" type="nx:Instrument" minOccurs="0" maxOccurs="unbounded">
         <xs:annotation>
           <xs:appinfo>
                <label>Instrument</label>
@@ -728,23 +728,222 @@
   <xs:simpleType name="InstrumentName">
     <xs:annotation>
       <xs:documentation>
-         Controlled labels that identify available instruments in the
-         Nexus Microscopy Lab.
+         Controlled labels that identify available instruments in the 
+         NIST Electron Microscopy Nexus facility (as named in the SharePoint
+         calendar resource).
        </xs:documentation>
     </xs:annotation>
 
     <xs:restriction base="xs:token">
 
-      <xs:enumeration value="Titan">
+      <xs:enumeration value="FEI Titan TEM">
         <xs:annotation>
           <xs:documentation>
-             The FEI Titan microscope
-           </xs:documentation>
+            The FEI Titan transmission electron microscope in ***REMOVED***
+          </xs:documentation>
         </xs:annotation>
       </xs:enumeration>
 
+      <xs:enumeration value="FEI Titan STEM">
+        <xs:annotation>
+          <xs:documentation>
+            The FEI Titan scanning transmission electron microscope in ***REMOVED***
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      
+      <xs:enumeration value="FEI Helios">
+        <xs:annotation>
+          <xs:documentation>
+            The FEI Helios dual beam FIB/SEM in ***REMOVED***
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      
+      <xs:enumeration value="FEI Quanta200">
+        <xs:annotation>
+          <xs:documentation>
+            The FEI Quanta 200 environmental scanning electron microscope in ***REMOVED***
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      
+      <xs:enumeration value="Hitachi S4700">
+        <xs:annotation>
+          <xs:documentation>
+            The Hitachi S4700 scanning electron microscope in ***REMOVED***
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      
+      <xs:enumeration value="Hitachi S5500">
+        <xs:annotation>
+          <xs:documentation>
+            The Hitachi S5500 scanning electron microscope in ***REMOVED***
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      
+      <xs:enumeration value="JEOL JEM3010">
+        <xs:annotation>
+          <xs:documentation>
+            The JEOL JEM3010 transmission electron microscope in ***REMOVED***
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      
+      <xs:enumeration value="JEOL JSM7100">
+        <xs:annotation>
+          <xs:documentation>
+            The JEOL JSM7100 scanning electron microscope in ***REMOVED***
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      
+      <xs:enumeration value="Philips EM400">
+        <xs:annotation>
+          <xs:documentation>
+            The Phillips EM400 transmission electron microscope in ***REMOVED***
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      
+      <xs:enumeration value="Philips CM30">
+        <xs:annotation>
+          <xs:documentation>
+            The Phillips CM30 transmission electron microscope
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>      
+
     </xs:restriction>
   </xs:simpleType>
+  
+  <xs:simpleType name="InstrumentPID">
+    <xs:annotation>
+      <xs:documentation>
+        Controlled unique IDs used to identify available 
+        instruments in the NIST Electron Microscopy Nexus
+        facility. These are the same PID values used in the
+        SharePoint calendar system.
+      </xs:documentation>
+    </xs:annotation>
+    
+    <xs:restriction base="xs:token">
+      
+      <xs:enumeration value="FEI-Titan-TEM-635816">
+        <xs:annotation>
+          <xs:documentation>
+            The FEI Titan transmission electron microscope in ***REMOVED***
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      
+      <xs:enumeration value="FEI-Titan-STEM-630901">
+        <xs:annotation>
+          <xs:documentation>
+            The FEI Titan scanning transmission electron microscope in ***REMOVED***
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      
+      <xs:enumeration value="FEI-Helios-DB-636663">
+        <xs:annotation>
+          <xs:documentation>
+            The FEI Helios dual beam FIB/SEM in ***REMOVED***
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      
+      <xs:enumeration value="FEI-Quanta200-ESEM-633137">
+        <xs:annotation>
+          <xs:documentation>
+            The FEI Quanta 200 environmental scanning electron microscope in ***REMOVED***
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      
+      <xs:enumeration value="Hitachi-S4700-SEM-606559">
+        <xs:annotation>
+          <xs:documentation>
+            The Hitachi S4700 scanning electron microscope in ***REMOVED***
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      
+      <xs:enumeration value="Hitachi-S5500-SEM-635262">
+        <xs:annotation>
+          <xs:documentation>
+            The Hitachi S5500 scanning electron microscope in ***REMOVED***
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+
+      <xs:enumeration value="JEOL-JEM3010-TEM-565989">
+        <xs:annotation>
+          <xs:documentation>
+            The JEOL JEM3010 transmission electron microscope in ***REMOVED***
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+
+      <xs:enumeration value="JEOL-JSM7100-SEM-N102656">
+        <xs:annotation>
+          <xs:documentation>
+            The JEOL JSM7100 scanning electron microscope in ***REMOVED***
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+
+      <xs:enumeration value="Philips-EM400-TEM-599910">
+        <xs:annotation>
+          <xs:documentation>
+            The Phillips EM400 transmission electron microscope in ***REMOVED***
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+      
+      <xs:enumeration value="Philips-CM30-TEM-540388">
+        <xs:annotation>
+          <xs:documentation>
+            The Phillips CM30 transmission electron microscope
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>      
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="Instrument">
+    <xs:annotation>
+      <xs:documentation>
+        The identification of an instrument in the
+        NIST Electron Microscopy Nexus facility.
+      </xs:documentation>
+    </xs:annotation>
+
+    <xs:simpleContent>
+      <xs:extension base="nx:InstrumentName">
+
+        <xs:attribute name="pid" type="nx:InstrumentPID">
+          <xs:annotation>
+            <xs:documentation>
+              An unique identifier that identifies the instrument within
+              the NIST Electron Microscopy Nexus facility.
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+
+        <xs:attribute name="ref" type="xs:anyURI">
+          <xs:annotation>
+            <xs:documentation>
+              An (optional) link to this instrument in another database
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
+
+      </xs:extension>
+    </xs:simpleContent>
+  </xs:complexType>
 
   <xs:simpleType name="DatasetType">
     <xs:annotation>
