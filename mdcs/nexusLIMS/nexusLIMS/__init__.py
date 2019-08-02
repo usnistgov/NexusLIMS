@@ -28,3 +28,4 @@
 
 from .schemas.activity import AcquisitionActivity
 from .cal_harvesting import sharepoint_calendar
+from .dev_scripts import record_builder

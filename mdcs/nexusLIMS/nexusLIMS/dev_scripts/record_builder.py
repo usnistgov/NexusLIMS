@@ -79,9 +79,8 @@ def build_record(path, instrument, date, user):
 
     # Insert XML prolog, XSLT reference, and namespaces.
     xml_record += "<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n"
-    # TODO: Determine which stylesheet will be applied to the generated record and appropriately assign the href
-    # TODO: Header elements likely will be changed once integration into CDCS determined
-    xml_record += "<?xml-stylesheet type=\"text/xsl\" href=\"./xslStylesheet.xsl\"?>\n"
+    # TODO: Header elements may be changed once integration into CDCS determined
+    xml_record += "<?xml-stylesheet type=\"text/xsl\" href=\"\"?>\n"
     xml_record += "<nx:Experiment xmlns=\"\"\n"
     xml_record += "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
     xml_record += "xmlns:nx=\"https://data.nist.gov/od/dm/nexus/experiment/v1.0\">\n"

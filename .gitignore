@@ -25,3 +25,6 @@ _coverage_output
 
 # pytest coverage results
 htmlcov/
+
+# pickle save files
+*.pk
