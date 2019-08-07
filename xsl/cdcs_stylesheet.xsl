@@ -1,9 +1,13 @@
 <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema"
     xmlns:nx="https://data.nist.gov/od/dm/nexus/experiment/v1.0"
-    version="2.0">
-    <xsl:template match="/nx:Experiment">
-        
+    version="1.0">
+    <xsl:output method="html" indent="yes" encoding="UTF-8"/>
+    <xsl:template match="/">
+        <xsl:apply-templates select="/nx:Experiment"/>
+    </xsl:template>
+    <xsl:template match="nx:Experiment">
+      <div>        
         <!-- ============ CSS Styling ============ --> 
         <style>
             body { /* Set the font style for the page */
@@ -256,23 +260,31 @@
                             <xsl:value-of select="summary/instrument"/>
                         </div>
                         <div><b>Date: </b>
-                            <!-- Tokenize()[1] splits the date/time using 'T' as the delimiter and takes the 1st index
-                                which corresponds to the date value -->
-                            <xsl:value-of select="tokenize(summary/reservationStart,'T')[1]"/>
+                            <xsl:call-template name="tokenize-select">
+                              <xsl:with-param name="text" select="summary/reservationStart"/>
+                              <xsl:with-param name="delim">T</xsl:with-param>
+                              <xsl:with-param name="i" select="1"/>
+                            </xsl:call-template>
                         </div>
                         <div><b>Start Time: </b>
-                            <!-- Tokenize()[2] splits the date/time using 'T' as the delimiter and takes the 2nd index
-                                which corresponds to the time value -->
-                            <xsl:value-of select="tokenize(summary/reservationStart,'T')[2]"/> 
+                            <xsl:call-template name="tokenize-select">
+                              <xsl:with-param name="text" select="summary/reservationStart"/>
+                              <xsl:with-param name="delim">T</xsl:with-param>
+                              <xsl:with-param name="i" select="2"/>
+                            </xsl:call-template>
                         </div>
                         <div><b>End Time: </b>
-                            <xsl:value-of select="tokenize(summary/reservationEnd,'T')[2]"/>
+                            <xsl:call-template name="tokenize-select">
+                              <xsl:with-param name="text" select="summary/reservationStart"/>
+                              <xsl:with-param name="delim">T</xsl:with-param>
+                              <xsl:with-param name="i" select="2"/>
+                            </xsl:call-template>
                         </div>
                         <!-- Display id associated with the time on the machine -->
                         <div><b>Session ID: </b>
                             <xsl:value-of select="id"/>
                         </div>
-                        <a class="link" href="https:\\nist.gov" target="_blank" style="font-size:14px">(Original Data - placeholder)</a>
+                        <a class="link" href="https:\\nist.gov" target="_blank" style="font-size:14px">(Original Data)</a>
                     </div>
                     
                     <!-- Display information about the sample -->  
@@ -325,7 +337,13 @@
                 <!-- Create accordion which contains acquisition activity setup parameters -->
                 <button class="accordion" style="font-weight:bold;font-size:21px">Activity Parameters</button>
                 <div class="panel">
-                    <div><b>Start time:</b> <xsl:value-of select="tokenize(startTime,'T')[2]"/></div>                         
+                    <div><b>Start time:</b>
+                    <xsl:call-template name="tokenize-select">
+                      <xsl:with-param name="text" select="summary/reservationStart"/>
+                      <xsl:with-param name="delim">T</xsl:with-param>
+                      <xsl:with-param name="i" select="2"/>
+                    </xsl:call-template></div>
+
                     <!-- Generate the table with setup conditions for each acquisition activity -->
                     <table border="1" style="border-collapse:collapse;">
                         <tr bgcolor="#84b1f9">
@@ -485,6 +503,52 @@
             }
             ]]></xsl:comment>
             
-        </script>        
+        </script>
+      </div>
+    </xsl:template>
+
+    <!--
+      - split a string by a given delimiter and then select out a given
+      - element
+      - @param text   the text to split
+      - @param delim  the delimiter to split by (default: a single space)
+      - @param i      the number of the element in the split array desired,
+      -               where 1 is the first element (default: 1)
+      -->
+    <xsl:template name="tokenize-select">
+      <xsl:param name="text"/>
+      <xsl:param name="delim" select="' '"/>
+      <xsl:param name="i" select="1"/>
+
+      <xsl:choose>
+      
+        <!-- we want the first element; we can deliver it  -->
+        <xsl:when test="$i=1">
+          <xsl:choose>
+            <xsl:when test="contains($text,$delim)">
+              <xsl:value-of select="substring-before($text,$delim)"/>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:value-of select="$text"/>
+            </xsl:otherwise>
+          </xsl:choose>
+        </xsl:when>
+
+        <!-- should not happen -->
+        <xsl:when test="$i &lt;= 1"/>
+
+        <!-- need an element that's not first one; strip off the first element
+             and recurse into this function -->
+        <xsl:otherwise>
+          <xsl:call-template name="tokenize-select">
+            <xsl:with-param name="text">
+              <xsl:value-of select="substring-after($text,$delim)"/>
+            </xsl:with-param>
+            <xsl:with-param name="delim" select="$delim"/>
+            <xsl:with-param name="i" select="$i - 1"/>
+          </xsl:call-template>
+        </xsl:otherwise>
+        
+      </xsl:choose>
     </xsl:template>
 </xsl:stylesheet>

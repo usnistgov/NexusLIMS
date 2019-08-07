@@ -29,6 +29,7 @@
 import os as _os
 import time as _time
 import pickle as _pickle
+import requests as _requests
 from nexusLIMS import record_builder
 
 
@@ -84,7 +85,7 @@ def add_record_to_cdcs(abs_path):
     user = _os.path.basename(path)
     record = record_builder.build_record(path=abs_path, instrument=instrument, date=date, user=user)
 
-    # TODO: Push record to CDCS through API call
+    # TODO: Push record to CDCS through API call (Python requests library?)
 
 
 if __name__ == '__main__':
