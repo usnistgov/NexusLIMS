@@ -17,6 +17,7 @@
                         
             button { 
             cursor: pointer; /* Changes cursor type when hovering over a button */
+            font-size: 12px;
             }
             
             img {
@@ -27,29 +28,38 @@
             display: block;
             }
             
+            th,td {
+            font-size: 14px;
+            }
+            
+            .header {
+            font-size: 19px;
+            text-decoration: none;
+            color: black;
+            }
+            
+            .header:hover {
+            cursor: default;
+            color: black;
+            }
+            
             .sidenav { /* Parameters for the sidebar */
-            height: 100%;
-            width: 160px;
-            position: fixed; /* Sets the sidebar to always be visible even when the page is scrolled */
-            z-index: 1;
-            top: 0;
-            left: 0;
+            width: 170px;
+            position: absolute;
+            z-index: auto;
             overflow-x: hidden;
-            padding-top: 20px;
-            border-style: none solid none none;
+            background-color: #ffffff;
+            border-style: solid solid solid none;
             border-width: 2px;
             }
             
             .sidenav a { /* Parameters for the acquisition activity links within the sidebar */
-            padding: 6px 12px 6px 16px;
             text-decoration: none;
-            font-size: 18px;
-            display: block;
+            font-size: 16px;
             }
             
             .sidenav div { /* Parameters for other text found in the sidebar (e.g. start time) */
-            font-size: 13px;
-            padding: 1px 6px 5px 20px;
+            font-size: 11px;
             }
             
             /* Set up 2 divided columns to separate setup parameters and the corresponding image gallery */
@@ -99,29 +109,19 @@
             background-color: rgba(145,145,145,0.8);
             }
             
-            .text { /* Parameters for the caption text displayed in the image gallery */
-            color: #f2f2f2;
-            font-size: 15px;
-            padding: 8px 12px;
-            position: absolute;
-            bottom: 8px;
-            width: 100%;
-            text-align: center;
-            }
-            
             #to_top_button { /* Parameters for the button which jumps to the top of the page when clicked */
             display: none; /* Set button to hidden on default so that it will appear when the page is scrolled */
             position: fixed;
-            bottom: 20px;
-            right: 30px;
+            bottom: 35px;
+            right: 45px;
             background-color: #e87474;
             border: none;
             outline: none;
             color: white;
             cursor: pointer;
-            padding: 15px;
-            border-radius: 4px;
-            font-size: 15px;
+            padding: 15px 20px;
+            border-radius: 3px;
+            font-size: 14px;
             }
             
             #to_top_button:hover { /* Changes the color of the button when hovered over */
@@ -187,7 +187,7 @@
             }
             
             .close { /* Parameters for 'X' used to close the modal box */
-            color: #aaaaaa;
+            color: #000;
             float: right;
             font-size: 28px;
             font-weight: bold;
@@ -195,17 +195,13 @@
             
             .close:hover, /* Changes color of close button and cursor type when hovering over it */
             .close:focus {
-            color: #000;
+            color: #525252;
             text-decoration: none;
             cursor: pointer;
             }
             
-            .link a:hover { /* Change the links when the mouse is hovered over them */
-            cursor: pointer;
-            }
-            
-            .main { /* Set parameters for the rest of the page in order to adjust for the sidebar being there */
-            margin-left: 160px; /* Same width as the sidebar + left position in px */
+            .main_body { /* Set parameters for the rest of the page in order to adjust for the sidebar being there */
+            margin-left: 170px; /* Same width as the sidebar + left position in px */
             padding: 0px 10px;
             }
         </style>
@@ -213,28 +209,19 @@
         <!-- ============= Main Generation of the Page ============= -->
         <!-- Add sidebar to the page -->
         <div class="sidenav">
-            <!-- Include sidebar heading -->
-            <h1 style="font-size:24px;padding-left:10px;">
-                Navigation
-            </h1>
-            
-            <a href="#{generate-id(experiment/summary)}">Summary</a>
-            <hr/>
-            
+            <h2 style="font-size:22px;">Contents</h2>
             <!-- Procedurally generate unique id numbers which relate each acquisition event to its position on
                 the webpage such that it will jump there when the link is clicked -->
             <xsl:for-each select="acquisitionActivity">
                 <a class="link" href="#{generate-id(current())}">
                     Activity <xsl:value-of select="@seqno+1"/>
                 </a>
-                <div>Mode: <xsl:value-of select="setup/param[@name='Mode']"/></div>
-                
-                <!-- Add a horizontal line to separate sections in the sidebar -->
-                <hr/>
+                <div><xsl:value-of select="setup/param[@name='Mode']"/></div>
             </xsl:for-each>
+            <button onclick="closeAccords()">Close Accordions</button>
         </div>
     
-        <div class="main">                        
+        <div class="main_body">                        
             <!-- Display the experiment title and experimenter at the top of the page -->
             <h1>
                 <xsl:value-of select="title"/>
@@ -243,17 +230,12 @@
                 <xsl:value-of select="summary/experimenter"/>
             </h3>
             
-            <!-- Add a horizontal line separating the title and experimenter -->
-            <hr></hr>
-            
             <!-- Display the motivation for the experiment -->
-            <div style="font-size:16pt;" name="#{generate-id(summary)}"><b>Motivation</b></div>
-            <div style="font-size:13pt"><xsl:value-of select="summary/motivation"/></div>
+            <div style="font-size:20px;"><b>Motivation</b></div>
+            <div style="font-size:16px;"><xsl:value-of select="summary/motivation"/></div>
             
-            <!-- Add blank space between sections -->
-            <br/>
             <div class="row">
-                <div class="column">
+                <div class="column" style="font-size:15px;">
                     <!-- Display summary information (date, time, instrument, and id) -->
                     <div align="left" style="border-style:none;border-width:2px;padding:6px;">
                         <div><b>Instrument: </b>
@@ -275,7 +257,7 @@
                         </div>
                         <div><b>End Time: </b>
                             <xsl:call-template name="tokenize-select">
-                              <xsl:with-param name="text" select="summary/reservationStart"/>
+                              <xsl:with-param name="text" select="summary/reservationEnd"/>
                               <xsl:with-param name="delim">T</xsl:with-param>
                               <xsl:with-param name="i" select="2"/>
                             </xsl:call-template>
@@ -284,12 +266,12 @@
                         <div><b>Session ID: </b>
                             <xsl:value-of select="id"/>
                         </div>
-                        <a class="link" href="https:\\nist.gov" target="_blank" style="font-size:14px">(Original Data)</a>
+                        <a class="link" href="https:\\nist.gov" target="_blank" style="font-size:14px;">(Original Data)</a>
                     </div>
                     
                     <!-- Display information about the sample -->  
                     <h3>Sample Information</h3> 
-                    <table border="3" style="border-collapse:collapse;width:80%">
+                    <table border="3" style="border-collapse:collapse;width:80%;">
                         <tr>
                             <th align="left">Sample Name</th>
                             <th align="left"><xsl:value-of select="sample/name"/></th>
@@ -320,22 +302,20 @@
                     </div>
                 </div>
             </div>
-            
-            <br/> <!-- Add a break for readability -->
-            
+            <hr/>
             <!-- Loop through each acquisition activity -->
             <xsl:for-each select="acquisitionActivity">
                 <div></div>
-                <h2>
+                <div>
                     <!-- Generate name id which corresponds to the link associated with the acquisition activity --> 
-                    <a name="{generate-id(current())}">
+                    <a name="{generate-id(current())}" class="header">
                         <b>Acquisition Activity <xsl:value-of select="@seqno+1"/></b>
                     </a>
-                    <div style="font-size:19px"><i><xsl:value-of select="setup/param[@name='Mode']"/></i></div>
-                </h2>
+                    <div style="font-size:15px"><i><xsl:value-of select="setup/param[@name='Mode']"/></i></div>
+                </div>
                 
                 <!-- Create accordion which contains acquisition activity setup parameters -->
-                <button class="accordion" style="font-weight:bold;font-size:21px">Activity Parameters</button>
+                <button class="accordion" style="font-weight:bold;font-size:19px;">Activity Parameters</button>
                 <div class="panel">
                     <div><b>Start time:</b>
                     <xsl:call-template name="tokenize-select">
@@ -359,31 +339,28 @@
                             </tr>
                         </xsl:for-each>
                     </table>                        
-                </div>                    
-                
-                <hr></hr>
-                
-                <div class="row">
-                    <!-- Generate metadata table for each image dataset taken for respective acquisition activities -->
-                    <xsl:for-each select="dataset">
-                        <!-- Generate unique modal box for each dataset which contains the corresponding image, accessed via a button -->
-                        <div id="#{generate-id(current())}" class="modal">
-                            <div class="modal-content">
-                                <span class="close" onclick="closeModal('#{generate-id(current())}')">X</span>
-                                <img src="https://www.nanoimages.com/wp-content/uploads/Metal_BSE.jpg"/>
-                            </div>
+                </div>
+                <br/>
+                <!-- Generate metadata table for each image dataset taken for respective acquisition activities -->
+                <xsl:for-each select="dataset">
+                    <!-- Generate unique modal box for each dataset which contains the corresponding image, accessed via a button -->
+                    <div id="#{generate-id(current())}" class="modal">
+                        <div class="modal-content">
+                            <span class="close" onclick="closeModal('#{generate-id(current())}')">X</span>
+                            <img src="https://www.nanoimages.com/wp-content/uploads/Metal_BSE.jpg"/>
                         </div>
-                        
-                        <!-- Create accordion which contains metadata for each image dataset -->
-                        <button class="accordion"><b><xsl:value-of select="@type"/>: <xsl:value-of select="name"/></b></button>
-                        <div class="panel">
-                            <br/>
-                            <!-- TODO: Button which opens a modal box displaying the image for each dataset, respectively -->
-                            <button onclick="openModal('#{generate-id(current())}')">View Thumbnail</button>
-                            <xsl:if test="meta"> <!-- Checks whether there are parameters and only creates a table if there is -->
+                    </div>
+                    
+                    <!-- Create accordion which contains metadata for each image dataset -->
+                    <button class="accordion"><b><xsl:value-of select="@type"/>: <xsl:value-of select="name"/></b></button>
+                    <div class="panel">
+                        <xsl:choose>
+                            <xsl:when test="meta"> <!-- Checks whether there are parameters and only creates a table if there is --> 
                                <table border="1" style="border-collapse:collapse;">
                                    <tr bgcolor="#84b1f9">
-                                       <th>Parameter</th>
+                                       <th><b>Parameter</b></th>
+                                       <!-- Button which opens a modal box displaying the image for each dataset, respectively -->
+                                       <th><button onclick="openModal('#{generate-id(current())}')">View Thumbnail</button></th>
                                    </tr>
                                    <!-- Loop through each metadata parameter -->
                                    <xsl:for-each select="meta">
@@ -395,12 +372,14 @@
                                        </tr>
                                    </xsl:for-each>                        
                                </table>
-                            </xsl:if>
-                        </div>
-                    </xsl:for-each>
-
-                    <br/>
-                </div>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <button onclick="openModal('#{generate-id(current())}')">View Thumbnail</button>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </div>
+                </xsl:for-each>
+                <br/>
             </xsl:for-each>
         </div>
         
@@ -458,6 +437,20 @@
                     } 
                 });
             }
+                        
+            //Function to close all open accordions
+            function closeAccords() {
+                var acc = document.getElementsByClassName("accordion");
+                var i;
+                
+                for (i = 0; i < acc.length; i++) {
+                    var panel = acc[i].nextElementSibling;
+                    if (panel.style.maxHeight) {
+                        acc[i].classList.toggle("active");
+                        panel.style.maxHeight = null;
+                    }
+                }
+            }
             
             //Handler for moving through an image gallery
             var slideIndex = 1;
@@ -496,13 +489,7 @@
                 
                 document.getElementById("img_gallery").appendChild(slide);
             }
-            
-            //Function to close all open accordions [TODO]
-            function closeAccor() {
-                
-            }
             ]]></xsl:comment>
-            
         </script>
       </div>
     </xsl:template>
