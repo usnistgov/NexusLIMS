@@ -1,6 +1,6 @@
 # File patterns we want git to ignore
 
-# backup 
+# backup
 *~
 *.bak
 backups
@@ -26,3 +26,6 @@ _coverage_output
 
 # pytest coverage results
 htmlcov/
+
+# pickle save files
+*.pk
