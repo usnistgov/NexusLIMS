@@ -35,10 +35,12 @@ from nexusLIMS import record_builder
 
 def find_new_sessions():
     """
-    Checks through the files/folders which contain microscopy data to see which folders have been created or updated
-    since the previous call of the function. All newly updated or created sessions since the last check will be
-    processed via add_record_to_cdcs(path), creating a record and pushing it the CDCS client. The time of the
-    previous run will be kept within an accompanying pickle file.
+    Checks through the files/folders which contain microscopy data to see which
+    folders have been created or updated since the previous call of the
+    function. All newly updated or created sessions since the last check will be
+    processed via add_record_to_cdcs(path), creating a record and pushing it
+    the CDCS client. The time of the previous run will be kept within an
+    accompanying pickle file.
     """
     # TODO: Manage data path (allow for user input.?)
     data_path = '//***REMOVED***/***REMOVED***/mmfnexus/Titan/***REMOVED***'
@@ -51,7 +53,8 @@ def find_new_sessions():
 
     for f in _os.listdir(data_path):
         abs_path = _os.path.join(data_path, f)
-        if _os.path.isdir(abs_path) and _os.path.getmtime(abs_path) > last_check:
+        if _os.path.isdir(abs_path) and \
+                _os.path.getmtime(abs_path) > last_check:
             add_record_to_cdcs(abs_path)
 
     # last_check = _time.time()
@@ -63,14 +66,15 @@ def find_new_sessions():
 
 def add_record_to_cdcs(abs_path):
     """
-    Builds an XML record associated with a given microscopy session (a folder indicated by 'path') and passes the
-    resulting XML file to CDCS through its API, matching it with an appropriate schema.
+    Builds an XML record associated with a given microscopy session (a folder
+    indicated by 'path') and passes the resulting XML file to CDCS through
+    its API, matching it with an appropriate schema.
 
     Parameters
     ----------
     abs_path : str
-        A file path which corresponds to the folder pertaining to an individual microscopy session of which a record
-        will be built.
+        A file path which corresponds to the folder pertaining to an individual
+        microscopy session of which a record will be built.
     """
     path, file = _os.path.split(abs_path)
     date = _time.strftime('%Y-%m-%d', _time.gmtime(_os.path.getmtime(abs_path)))
@@ -80,16 +84,21 @@ def add_record_to_cdcs(abs_path):
                   'Quanta': 'quanta',
                   'Titan': 'msed_titan'}
     instrument = _os.path.basename(_os.path.split(path)[0])
-    instrument = instr_list[instrument]  # Reassigns instrument to str from 'instr_list' which corresponds to how the
-                                         # Sharepoint calendar accesses information
+
+    # Reassigns instrument to str from 'instr_list' which corresponds to how the
+    # Sharepoint calendar accesses information
+    instrument = instr_list[instrument]
+
     user = _os.path.basename(path)
-    record = record_builder.build_record(path=abs_path, instrument=instrument, date=date, user=user)
+    record = record_builder.build_record(path=abs_path, instrument=instrument,
+                                         date=date, user=user)
 
     # TODO: Push record to CDCS through API call (Python requests library?)
 
 
 if __name__ == '__main__':
     """
-    These lines are just for testing. For real use, import the methods you need and operate from there
+    These lines are just for testing. For real use, import the methods you need
+    and operate from there
     """
     find_new_sessions()
