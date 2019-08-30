@@ -26,15 +26,3 @@
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
 
-from .schemas.activity import AcquisitionActivity
-from .harvester import sharepoint_calendar
-from .builder import record_builder
-
-import socket as _socket
-
-nexus_paths = {'limsimages': '/data/smb/mmfnexus/',
-               '***REMOVED***': '/mnt/***REMOVED***/',
-               '***REMOVED***': '***REMOVED***/mmfnexus/',
-               '***REMOVED***': ''}
-
-nexus_root_path = nexus_paths[_socket.gethostname()]

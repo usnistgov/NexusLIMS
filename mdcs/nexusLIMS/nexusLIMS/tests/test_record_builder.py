@@ -1,6 +1,6 @@
 import os
 from nexusLIMS import nexus_root_path as _nexus_root_path
-from nexusLIMS.dev_scripts import record_builder as _rb
+from nexusLIMS.builder import record_builder as _rb
 from lxml import etree as et
 
 # TODO: Figure out a way to include test files without a large compressed file

@@ -2,8 +2,8 @@ import os
 import pytest
 import requests
 from lxml import etree
-from nexusLIMS.cal_harvesting import sharepoint_calendar as sc
-from nexusLIMS.cal_harvesting.sharepoint_calendar import AuthenticationError
+from nexusLIMS.harvester import sharepoint_calendar as sc
+from nexusLIMS.harvester.sharepoint_calendar import AuthenticationError
 from collections import OrderedDict
 
 import warnings
@@ -86,14 +86,14 @@ class TestCalendarHandling:
                 sc.fetch_xml()
 
     def test_absolute_path_to_credentials(self, monkeypatch):
-        from nexusLIMS.cal_harvesting.sharepoint_calendar import get_auth
+        from nexusLIMS.harvester.sharepoint_calendar import get_auth
         with monkeypatch.context() as m:
             # remove environment variable so we get into file processing
             m.delenv('nexusLIMS_user')
             _ = get_auth(self.CREDENTIAL_FILE_ABS)
 
     def test_relative_path_to_credentials(self, monkeypatch):
-        from nexusLIMS.cal_harvesting.sharepoint_calendar import get_auth
+        from nexusLIMS.harvester.sharepoint_calendar import get_auth
         os.chdir(os.path.dirname(__file__))
         with monkeypatch.context() as m:
             # remove environment variable so we get into file processing
@@ -101,7 +101,7 @@ class TestCalendarHandling:
             _ = get_auth(self.CREDENTIAL_FILE_REL)
 
     def test_bad_path_to_credentials(self, monkeypatch):
-        from nexusLIMS.cal_harvesting.sharepoint_calendar import get_auth
+        from nexusLIMS.harvester.sharepoint_calendar import get_auth
         with monkeypatch.context() as m:
             # remove environment variable so we get into file processing
             m.delenv('nexusLIMS_user')
@@ -150,12 +150,12 @@ class TestCalendarHandling:
                 sc.fetch_xml(instrument=5)
 
     def test_dump_calendars(self, tmp_path):
-        from nexusLIMS.cal_harvesting.sharepoint_calendar import dump_calendars
+        from nexusLIMS.harvester.sharepoint_calendar import dump_calendars
         f = os.path.join(tmp_path, 'cal_output.xml')
         dump_calendars(instrument='msed_titan', filename=f)
 
     def test_get_events_good_date(self):
-        from nexusLIMS.cal_harvesting.sharepoint_calendar import get_events
+        from nexusLIMS.harvester.sharepoint_calendar import get_events
         events_1 = get_events(instrument='msed_titan',
                               date='2019-03-13')
         events_2 = get_events(instrument='msed_titan',
@@ -169,7 +169,7 @@ class TestCalendarHandling:
             assert el1.text == el2.text
 
     def test_get_events_bad_date(self, caplog):
-        from nexusLIMS.cal_harvesting.sharepoint_calendar import get_events
+        from nexusLIMS.harvester.sharepoint_calendar import get_events
 
         get_events(instrument='msed_titan', date='The Ides of March')
 
