@@ -1,6 +1,5 @@
 import os
-import socket
-from nexusLIMS import nexus_paths as _nexus_paths
+from nexusLIMS import nexus_root_path as _nexus_root_path
 from nexusLIMS.dev_scripts import record_builder as _rb
 from lxml import etree as et
 
@@ -8,10 +7,8 @@ from lxml import etree as et
 
 
 class TestRecordBuilder:
-    nexus_root_path = _nexus_paths[socket.gethostname()]
-
     def test_record_builder(self):
-        path_to_search = os.path.join(self.nexus_root_path, 'Titan/***REMOVED***/',
+        path_to_search = os.path.join(_nexus_root_path, 'Titan/***REMOVED***/',
                                       '181113 - ***REMOVED*** - '
                                       '***REMOVED*** - Titan')
 
@@ -46,7 +43,7 @@ class TestRecordBuilder:
 
     # TODO: Test acquisition activity contents
     def test_acq_builder(self):
-        path_to_search = os.path.join(self.nexus_root_path, 'Titan/***REMOVED***/',
+        path_to_search = os.path.join(_nexus_root_path, 'Titan/***REMOVED***/',
                                       '181113 - ***REMOVED*** - '
                                       '***REMOVED*** - Titan')
         _rb.build_acq_activities(path_to_search)
