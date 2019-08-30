@@ -183,27 +183,41 @@ def build_acq_activities(path):
     return acq_activities
 
 
-def dump_record(path, instrument=None, date=None, user=None):
+def dump_record(path,
+                filename=None,
+                instrument=None,
+                date=None,
+                user=None):
     """
-    Writes an XML record composed of information pulled from the Sharepoint calendar as well as metadata extracted
-    from the microscope data (e.g. dm3 files).
+    Writes an XML record composed of information pulled from the Sharepoint
+    calendar as well as metadata extracted from the microscope data (e.g. dm3
+    files).
 
     Parameters
     ----------
     path : str
-        A string file path which points to the file location of the microscopy metadata.
+        A string file path which points to the file location of the microscopy
+        metadata
+    filename : None or str
+        The filename of the dumped xml file to write. If none, a d
     instrument : str
-        A string which corresponds to the type of microscope used to generate the data to be dumped.
+        A string which corresponds to the type of microscope used to generate
+        the data to be dumped
     date : str
-        A string which corresponds to the event date from which events are going to be fetched from.
+        A string which corresponds to the event date from which events are going
+        to be fetched from
     user : str
-        A string which corresponds to the NIST user who performed the microscopy.
+        A string which corresponds to the NIST user who performed the
+        microscopy experiment
     """
-
-    filename = 'compiled_record.xml'
-    # filename = 'xml_record_'+instrument+'_'+date+'_'+user+'.xml'
+    if filename is None:
+        filename = 'compiled_record' + \
+                   (f'_{instrument}' if instrument else '') + \
+                   (f'_{date}' if date else '') + \
+                   (f'_{user}' if user else '') + '.xml'
     with open(filename, 'w') as f:
-        text = build_record(path=path, instrument=instrument, date=date, user=user)
+        text = build_record(path=path, instrument=instrument,
+                            date=date, user=user)
         f.write(text)
 
 
