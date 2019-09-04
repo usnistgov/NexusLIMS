@@ -1,5 +1,5 @@
 import os
-from nexusLIMS import nexus_root_path as _nexus_root_path
+from nexusLIMS import mmf_nexus_root_path as _mmf_nexus_root_path
 from nexusLIMS.builder import record_builder as _rb
 from lxml import etree as et
 
@@ -8,7 +8,7 @@ from lxml import etree as et
 
 class TestRecordBuilder:
     def test_record_builder(self):
-        path_to_search = os.path.join(_nexus_root_path, 'Titan/***REMOVED***/',
+        path_to_search = os.path.join(_mmf_nexus_root_path, 'Titan/***REMOVED***/',
                                       '181113 - ***REMOVED*** - '
                                       '***REMOVED*** - Titan')
 
@@ -43,7 +43,7 @@ class TestRecordBuilder:
 
     # TODO: Test acquisition activity contents
     def test_acq_builder(self):
-        path_to_search = os.path.join(_nexus_root_path, 'Titan/***REMOVED***/',
+        path_to_search = os.path.join(_mmf_nexus_root_path, 'Titan/***REMOVED***/',
                                       '181113 - ***REMOVED*** - '
                                       '***REMOVED*** - Titan')
         _rb.build_acq_activities(path_to_search)

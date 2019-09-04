@@ -32,9 +32,15 @@ from .builder import record_builder
 
 import socket as _socket
 
-nexus_paths = {'limsimages': '/data/smb/mmfnexus/',
-               '***REMOVED***': '/mnt/***REMOVED***/',
-               '***REMOVED***': '***REMOVED***/mmfnexus/',
-               '***REMOVED***': ''}
+mmf_nexus_paths = {'limsimages': '/data/smb/mmfnexus/',
+                   '***REMOVED***': '/mnt/***REMOVED***/',
+                   '***REMOVED***': '***REMOVED***/mmfnexus/',
+                   '***REMOVED***': ''}
 
-nexus_root_path = nexus_paths[_socket.gethostname()]
+nexuslims_paths = {'limsimages': '/data/smb/nexusLIMS/mmfnexus/',
+                   '***REMOVED***': '/mnt/***REMOVED***/nexusLIMS/mmfnexus/',
+                   '***REMOVED***': '***REMOVED***/nexusLIMS/mmfnexus/',
+                   '***REMOVED***': ''}
+
+mmf_nexus_root_path = mmf_nexus_paths[_socket.gethostname()]
+nexuslims_root_path = nexuslims_paths[_socket.gethostname()]
