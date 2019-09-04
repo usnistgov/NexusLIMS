@@ -29,23 +29,26 @@ import numpy as np
 from nexusLIMS.extractors.thumbnail_generator import sig_to_thumbnail
 import hyperspy.api as hs
 
+extension = '.png'
+dpi = 100
+
 
 def oned_signals():
     s = hs.datasets.example_signals.EDS_TEM_Spectrum()
     s.metadata.General.title = 'Dummy spectrum'
     print('1D: Single spectrum')
-    sig_to_thumbnail(s, '***REMOVED***tmp/1-spectrum.png', dpi=300)
+    sig_to_thumbnail(s, f'***REMOVED***tmp/1-spectrum{extension}', dpi=dpi)
 
     oned_s = hs.stack([s * i for i in np.arange(.1, 1, .1)],
                       new_axis_name='x')
     oned_s.metadata.General.title = 'Dummy line scan'
     print('1D: Line scan')
-    sig_to_thumbnail(oned_s, '***REMOVED***tmp/2-linescan.png', dpi=300)
+    sig_to_thumbnail(oned_s, f'***REMOVED***tmp/2-linescan{extension}', dpi=dpi)
 
     s3 = hs.load('***REMOVED***tmp/EELS_SI.hdf5')
     s3.metadata.General.title = 'Example spectrum image'
     print('1D: Spectrum image (2d)')
-    sig_to_thumbnail(s3, '***REMOVED***tmp/3-2dSI.png', dpi=300)
+    sig_to_thumbnail(s3, f'***REMOVED***tmp/3-2dSI{extension}', dpi=dpi)
 
     s = hs.datasets.example_signals.EDS_SEM_Spectrum()
     oned_s = hs.stack([s * i for i in np.arange(.1, 1, .1)])
@@ -53,26 +56,27 @@ def oned_signals():
     threed_s = hs.stack([twod_s] * 5)
     threed_s.metadata.General.title = 'Example multi-dimensional EDS spectrum'
     print('1D: Spectrum image (3d)')
-    sig_to_thumbnail(threed_s, '***REMOVED***tmp/4-3dSI.png', dpi=300)
+    sig_to_thumbnail(threed_s, f'***REMOVED***tmp/4-3dSI{extension}', dpi=dpi)
 
 
 def twod_signals():
     s = hs.load('***REMOVED***tmp/diffraction.dm3')
     print('2D: Diffraction pattern')
-    sig_to_thumbnail(s, '***REMOVED***tmp/5-diffraction.png', dpi=300)
+    sig_to_thumbnail(s, f'***REMOVED***tmp/5-diffraction{extension}', dpi=dpi)
 
     s2 = hs.load('***REMOVED***tmp/darkfield image.dm3')
     print('2D: Image')
-    sig_to_thumbnail(s2, '***REMOVED***tmp/6-DF_image.png', dpi=300)
+    sig_to_thumbnail(s2, f'***REMOVED***tmp/6-DF_image{extension}', dpi=dpi)
 
     s3 = hs.load('***REMOVED***tmp/through_focal_series_ex.dm3')
     s3.metadata.General.title = "Through Focal Series"
     print('2D: Image stack')
-    sig_to_thumbnail(s3, '***REMOVED***tmp/7-image_series.png', dpi=300)
+    sig_to_thumbnail(s3, f'***REMOVED***tmp/7-image_series{extension}', dpi=dpi)
 
     s4 = hs.load('***REMOVED***tmp/4d_stem.hdf5')
     print('2D: Hyperimage')
-    sig_to_thumbnail(s4.inav[:,:], '***REMOVED***tmp/8-hyperimage.png', dpi=300)
+    sig_to_thumbnail(s4.inav[:, :], f'***REMOVED***tmp/8-hyperimage{extension}',
+                     dpi=dpi)
 
 
 def other_signals():
@@ -93,7 +97,7 @@ def other_signals():
     s = s.transpose(navigation_axes=3)
     s.metadata.General.title = 'Signal with higher-order dimensionality'
     print('Higher dimensional signal')
-    sig_to_thumbnail(s, '***REMOVED***tmp/9-more_dimensions.png', dpi=300)
+    sig_to_thumbnail(s, f'***REMOVED***tmp/9-more_dimensions{extension}', dpi=dpi)
 
 
 if __name__ == '__main__':

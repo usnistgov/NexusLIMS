@@ -34,8 +34,8 @@ from skimage.io import imread as _imread
 import skimage.transform as _tform
 from skimage.transform import resize as _resize
 import matplotlib.pyplot as _plt
-from matplotlib.offsetbox import AnchoredOffsetbox as _aob
-from matplotlib.offsetbox import OffsetImage as _oi
+from matplotlib.offsetbox import AnchoredOffsetbox as _AOb
+from matplotlib.offsetbox import OffsetImage as _OIm
 from matplotlib.transforms import Bbox as _Bbox
 
 _dir_path = _os.path.dirname(_os.path.realpath(__file__))
@@ -53,7 +53,7 @@ def _full_extent(ax, items, pad=0.0):
     return bbox.expanded(1.0 + pad, 1.0 + pad)
 
 
-def _project_image_stack(s, num=5, dpi=300, v_shear=0.3, h_scale=0.3):
+def _project_image_stack(s, num=5, dpi=92, v_shear=0.3, h_scale=0.3):
     """
     Create a preview of an image stack by selecting a number of example frames
     and projecting them into a pseudo-3D display.
@@ -124,7 +124,7 @@ def _project_image_stack(s, num=5, dpi=300, v_shear=0.3, h_scale=0.3):
     return output
 
 
-def sig_to_thumbnail(s, out_path, dpi=300):
+def sig_to_thumbnail(s, out_path, dpi=92):
     """
     Generate a thumbnail of from an arbitrary HyperSpy signal. For a 2D
     signal, the signal from the first navigation position is used (most
@@ -209,9 +209,9 @@ def sig_to_thumbnail(s, out_path, dpi=300):
                             mode='wrap', anti_aliasing=True)
 
             # Create matplotlib annotation with image in center
-            imagebox = _oi(stamp, zoom=1, alpha=.15)
+            imagebox = _OIm(stamp, zoom=1, alpha=.15)
             imagebox.image.axes = ax
-            ao = _aob('center', pad=1, borderpad=0, child=imagebox)
+            ao = _AOb('center', pad=1, borderpad=0, child=imagebox)
             ao.patch.set_alpha(0)
             ax.add_artist(ao)
 
@@ -235,7 +235,7 @@ def sig_to_thumbnail(s, out_path, dpi=300):
         # we're looking at an image stack
         elif s.axes_manager.navigation_dimension == 1:
             _plt.figure()
-            _plt.imshow(_project_image_stack(s))
+            _plt.imshow(_project_image_stack(s, dpi=dpi))
             ax = _plt.gca()
             ax.set_position([0, 0, 1, .8])
             ax.set_axis_off()
