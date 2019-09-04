@@ -31,7 +31,7 @@ import os as _os
 import logging as _logging
 import hyperspy.api_nogui as _hs
 from datetime import datetime as _datetime
-from nexusLIMS import AcquisitionActivity
+from nexusLIMS import AcquisitionActivity as _AcqAc
 from nexusLIMS import sharepoint_calendar as sp_cal
 from glob import glob as _glob
 from timeit import default_timer as _timer
@@ -75,7 +75,8 @@ def build_record(path, instrument, date, user):
     xml_record = ''
 
     if date is None:
-        date = _datetime.fromtimestamp(_os.path.getmtime(path)).strftime('%Y-%m-%d')
+        date = _datetime.fromtimestamp(_os.path.getmtime(path)).strftime(
+            '%Y-%m-%d')
 
     # Insert XML prolog, XSLT reference, and namespaces.
     xml_record += "<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n"
@@ -83,10 +84,12 @@ def build_record(path, instrument, date, user):
     xml_record += "<?xml-stylesheet type=\"text/xsl\" href=\"\"?>\n"
     xml_record += "<nx:Experiment xmlns=\"\"\n"
     xml_record += "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
-    xml_record += "xmlns:nx=\"https://data.nist.gov/od/dm/nexus/experiment/v1.0\">\n"
+    xml_record += "xmlns:nx=\"" \
+                  "https://data.nist.gov/od/dm/nexus/experiment/v1.0\">\n"
 
     # TODO: Account for results from multiple sessions?
-    xml_record += sp_cal.get_events(instrument=instrument, date=date, user=user, wrap=False)
+    xml_record += sp_cal.get_events(instrument=instrument, date=date,
+                                    user=user, wrap=False)
     xml_record += build_acq_activities(path=path)
 
     xml_record += "</nx:Experiment>"  # Add closing tag for root element.
@@ -96,21 +99,24 @@ def build_record(path, instrument, date, user):
 
 def build_acq_activities(path):
     """
-    Build an XML string representation of each AcquisitionActivity for a single microscopy session. This includes
-    setup parameters and metadata associated with each dataset obtained during a microscopy session. Unique
-    AcquisitionActivities are delimited via comparison of imaging modes (e.g. a switch from Imaging to Diffraction mode
-    constitutes 2 unique AcquisitionActivities).
+    Build an XML string representation of each AcquisitionActivity for a
+    single microscopy session. This includes setup parameters and metadata
+    associated with each dataset obtained during a microscopy session. Unique
+    AcquisitionActivities are delimited via comparison of imaging modes (e.g. a
+    switch from Imaging to Diffraction mode constitutes 2 unique
+    AcquisitionActivities).
 
     Parameters
     ----------
     path : str
-        A string file path which points to the file folder in which microscopy data is located.
+        A string file path which points to the file folder in which microscopy
+        data is located.
 
     Returns
     -------
     acq_activities : str
-        A string representing the XML output for each AcquisitionActivity associated with a given
-        reservation/experiment on a microscope.
+        A string representing the XML output for each AcquisitionActivity
+        associated with a given reservation/experiment on a microscope.
     """
 
     _logger = _logging.getLogger(__name__)
@@ -127,7 +133,8 @@ def build_acq_activities(path):
     modes = [''] * len(files)
     start_timer = _timer()
     for i, f in enumerate(files):
-        mode = _hs.load(f, lazy=True).original_metadata.ImageList.TagGroup0.ImageTags.Microscope_Info.Imaging_Mode
+        mode = _hs.load(f, lazy=True).original_metadata.\
+            ImageList.TagGroup0.ImageTags.Microscope_Info.Imaging_Mode
         mtimes[i] = _datetime.fromtimestamp(_os.path.getmtime(f)).isoformat()
         modes[i] = mode
         this_mtime = _datetime.fromtimestamp(
@@ -140,8 +147,8 @@ def build_acq_activities(path):
     activities = []
 
     for i, (f, t, m) in enumerate(zip(files, mtimes, modes)):
-        # set last_mode to this mode if this is the first iteration; otherwise set
-        # it to the last mode that we saw
+        # set last_mode to this mode if this is the first iteration;
+        # otherwise set it to the last mode that we saw
         last_mode = m if i == 0 else modes[i - 1]
 
         # if this is the first iteration, start a new AcquisitionActivity and
@@ -149,22 +156,22 @@ def build_acq_activities(path):
         if i == 0:
             _logger.debug(t)
             start_time = _datetime.fromisoformat(t)
-            aa = AcquisitionActivity(start=start_time, mode=m)
+            aa = _AcqAc(start=start_time, mode=m)
             activities.append(aa)
 
-        # if this file's mode is the same as the last, just add it to the current
-        # activity's file list
+        # if this file's mode is the same as the last, just add it to the
+        # current activity's file list
         if m == last_mode:
             activities[-1].add_file(f)
 
         # this file's mode is different, so it belongs to the next
-        # AcquisitionActivity. End the current AcquisitionActivity and create a new
-        # one with this file's information
+        # AcquisitionActivity. End the current AcquisitionActivity and create
+        # a new one with this file's information
         else:
             # AcquisitionActivity end time is previous mtime
             activities[-1].end = _datetime.fromisoformat(mtimes[i - 1])
             # New AcquisitionActivity start time is t
-            activities.append(AcquisitionActivity(start=_datetime.fromisoformat(t), mode=m))
+            activities.append(_AcqAc(start=_datetime.fromisoformat(t), mode=m))
             activities[-1].add_file(f)
 
         # We have reached the last file, so end the current activity
@@ -178,7 +185,8 @@ def build_acq_activities(path):
         a.store_setup_params()
         a.store_unique_metadata()
 
-        acq_activities += a.as_xml(i, 'f81d3518-10af-4fab-9bd3-cfa2b0aea807', indent_level=1, print_xml=False)
+        acq_activities += a.as_xml(i, 'f81d3518-10af-4fab-9bd3-cfa2b0aea807',
+                                   indent_level=1, print_xml=False)
 
     return acq_activities
 

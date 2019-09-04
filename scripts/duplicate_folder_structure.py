@@ -54,6 +54,7 @@ if __name__ == '__main__':
 
     if args.dry_run:
         print("*** DRY RUN SPECIFIED; NO DIRECTORIES ARE BEING CREATED ***\n")
+        args.verbose = True
 
     for p in args.input_path, args.output_path:
         if not os.path.isdir(p):
@@ -74,11 +75,13 @@ if __name__ == '__main__':
 
         structure = os.path.join(args.output_path,
                                  rel_path)
-        if args.verbose:
-            print(structure)
+        # if args.verbose:
+        #     print(structure)
         if not os.path.isdir(structure):
             if not args.dry_run:
                 os.mkdir(structure)
+            else: print(f'Will create {structure}')
         else:
             if args.verbose:
-                print(f"!! {structure} already exists !!")
+                pass
+                # print(f"!! {structure} already exists !!")
