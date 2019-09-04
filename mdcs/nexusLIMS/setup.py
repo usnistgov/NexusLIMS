@@ -84,7 +84,6 @@ setup(
                       'requests-ntlm',
                       'ntlm-auth',
                       'dateparser',
-                      'pynoid @ git+https://github.com/***REMOVED***/pynoid@master',
                       'hyperspy'],
 
     # List additional groups of dependencies here (e.g. development
