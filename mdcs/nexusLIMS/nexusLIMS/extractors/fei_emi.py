@@ -29,13 +29,14 @@ from hyperspy.io import load as _hs_load
 
 def get_emi_metadata(filename):
     """
-    Returns metadata (as a dict) from an FEI .emi file + its associated .ser files, with some non-relevant information
-    stripped.
+    Returns metadata (as a dict) from an FEI .emi file + its associated .ser
+    files, with some non-relevant information stripped.
 
     Parameters
     ----------
     filename : str
-        Path to FEI .emi file, HyperSpy automatically parses the .ser files associated with each .emi file.
+        Path to FEI .emi file, HyperSpy automatically parses the .ser files
+        associated with each .emi file.
 
     Returns
     -------
@@ -44,12 +45,16 @@ def get_emi_metadata(filename):
     """
     # Trees:
     # ObjectInfo & ser_header_parameters
-    s = _hs_load(filename, lazy=True)   # Loads in each .ser file associated with the passed .emi file into a list
-                                        # Each .ser file contain the same information(?), so only need to work with
-                                        # the first list element, s[0]
+
+    # Loads in each .ser file associated with the passed .emi file into a list
+    # Each .ser file contain the same information(?), so only need to work with
+    # the first list element, s[0]
+    s = _hs_load(filename, lazy=True)
+
     # Remove parts of the tree that are not of interest
-    for leaf in ['ser_header_parameters', 'ObjectInfo.TrueImageHeaderInfo', 'ObjectInfo.Manufacturer',
-                 'ObjectInfo.Uuid', 'ObjectInfo.DetectorRange']:
+    for leaf in ['ser_header_parameters', 'ObjectInfo.TrueImageHeaderInfo',
+                 'ObjectInfo.Manufacturer', 'ObjectInfo.Uuid',
+                 'ObjectInfo.DetectorRange']:
         dtb_metadata = _remove_dtb_element(s[0].original_metadata, leaf)
 
     metadata = dtb_metadata.as_dictionary()
@@ -88,8 +93,8 @@ def _remove_dtb_element(tree, path):
 
 def _find_dict_root(nested_dict):
     """
-    Helper function to recursively parse through nested dictionaries such that only the most
-    central entries are isolated and returned.
+    Helper function to recursively parse through nested dictionaries such that
+    only the most central entries are isolated and returned.
 
     Parameters
     ----------
@@ -99,15 +104,17 @@ def _find_dict_root(nested_dict):
     Returns
     -------
     root_dict : dict
-        Dictionary which has been parsed such that only the lowest level elements are still present.
+        Dictionary which has been parsed such that only the lowest level
+        elements are still present.
     """
     root_dict = {}
     for key in nested_dict:
         if not isinstance(nested_dict[key], dict):
             root_dict[key] = nested_dict[key]
         else:
-            nested_dict[key].update(root_dict)  # merge the dictionary to be passed with lowest elements already
-                                                # isolated so that no information is lost during recursive loops
+            # merge the dictionary to be passed with lowest elements already
+            # isolated so that no information is lost during recursive loops
+            nested_dict[key].update(root_dict)
             root_dict = _find_dict_root(nested_dict[key])
 
     return root_dict
