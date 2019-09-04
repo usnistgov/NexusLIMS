@@ -38,15 +38,14 @@ from lxml import etree as _etree
 from dateparser import parse as _dp_parse
 from datetime import datetime as _datetime
 from configparser import ConfigParser as _ConfigParser
+from nexusLIMS.instruments import instrument_db as _instr_db
 
 _logger = _logging.getLogger(__name__)
 XSLT_PATH = _os.path.join(_os.path.dirname(__file__), "cal_parser.xsl")
 INDENT = '  '
 
-
 __all__ = ['AuthenticationError', 'get_auth', 'fetch_xml',
            'parse_xml', 'get_events', 'wrap_events', 'dump_calendars']
-
 
 class AuthenticationError(Exception):
     """Class for showing an exception having to do with authentication"""
@@ -206,45 +205,27 @@ def fetch_xml(instrument=None):
     # https://***REMOVED***/***REMOVED***/_vti_bin/ListData.svc
     # and
     # https://***REMOVED***nexuslims/NexusMicroscopyLIMS/wikis/Sharepoint-Calendar-Information
-    instr_input_dict = {
-        'msed_titan': "FEITitanTEMEvents",
-        'quanta': "FEIQuanta200Events",
-        'jeol_sem': "JEOLJSM7100Events",
-        'hitachi_sem': "HitachiS4700Events",
-        'jeol_tem': "JEOLJEM3010Events",
-        'cm30': "PhilipsCM30Events",
-        'em400': "PhilipsEM400Events",
-        'hitachi_s5500': "HitachiS5500Events",
-        'mmsd_titan': "FEITitanSTEMEvents",
-        'fei_helios_db': "FEIHeliosDBEvents"
-    }
 
-    all_events = list(instr_input_dict.values())
-
-    # Parse instrument parameter input
+    # Parse instrument parameter input, leaving inst_to_fetch as list of
+    # nexuslims.instruments._Instrument objects
     if instrument is None:
-        inst_to_fetch = all_events
+        inst_to_fetch = list(_instr_db.values())
     elif isinstance(instrument, str):
-        inst_to_fetch = [instr_input_dict[instrument]]
+        inst_to_fetch = [_instr_db[instrument]]
     elif hasattr(instrument, '__iter__'):
-        # instrument is a list, tuple, or some other iterable type, so map
-        # inputted values to the events URL suffixes:
-        inst_to_fetch = list(map(instr_input_dict.get, instrument))
+        inst_to_fetch = [_instr_db[i] for i in instrument]
     else:
         _logger.warning('Entered instrument "{}" could not be parsed; '
                         'reverting to None...'.format(instrument))
-        inst_to_fetch = all_events
-
-    url = 'https://***REMOVED***/***REMOVED***/_vti_bin/' \
-          'ListData.svc/'
+        inst_to_fetch = list(_instr_db.values())
 
     api_response = [''] * len(inst_to_fetch)
 
-    for i, instr_name in enumerate(inst_to_fetch):
-        instr_url = url + instr_name + '?$expand=CreatedBy'
+    for i, instr in enumerate(inst_to_fetch):
+        instr_url = instr.api_url + '?$expand=CreatedBy'
         _logger.info("Fetching Nexus calendar events from {}".format(instr_url))
         r = _requests.get(instr_url, auth=get_auth())
-        _logger.info("  {} -- {} -- response: {}".format(instr_name,
+        _logger.info("  {} -- {} -- response: {}".format(instr.name,
                                                          instr_url,
                                                          r.status_code))
 

@@ -4,6 +4,7 @@ import requests
 from lxml import etree
 from nexusLIMS.harvester import sharepoint_calendar as sc
 from nexusLIMS.harvester.sharepoint_calendar import AuthenticationError
+from nexusLIMS.instruments import instrument_db
 from collections import OrderedDict
 
 import warnings
@@ -68,10 +69,7 @@ class TestCalendarHandling:
 
         return raw_doc, parsed_docs
 
-    @pytest.mark.parametrize('instrument', ['msed_titan', 'quanta', 'jeol_sem',
-                                            'hitachi_sem', 'jeol_tem',
-                                            'cm30', 'em400', 'hitachi_s5500',
-                                            'mmsd_titan', 'fei_helios_db'])
+    @pytest.mark.parametrize('instrument', list(instrument_db.keys()))
     def test_downloading_valid_calendars(self, instrument):
         sc.fetch_xml(instrument)
 
@@ -139,8 +137,8 @@ class TestCalendarHandling:
             # use bad username so we don't get a response or lock miclims
             m.setenv('nexusLIMS_user', 'bad_user')
             with pytest.raises(AuthenticationError):
-                sc.fetch_xml(instrument=('msed_titan',
-                                          'fei_quanta'))
+                sc.fetch_xml(instrument=('FEI-Titan-TEM-635816',
+                                          'FEI-Quanta200-ESEM-633137'))
 
     def test_fetch_xml_instrument_bogus(self, monkeypatch):
         with monkeypatch.context() as m:
@@ -152,13 +150,13 @@ class TestCalendarHandling:
     def test_dump_calendars(self, tmp_path):
         from nexusLIMS.harvester.sharepoint_calendar import dump_calendars
         f = os.path.join(tmp_path, 'cal_output.xml')
-        dump_calendars(instrument='msed_titan', filename=f)
+        dump_calendars(instrument='FEI-Titan-TEM-635816', filename=f)
 
     def test_get_events_good_date(self):
         from nexusLIMS.harvester.sharepoint_calendar import get_events
-        events_1 = get_events(instrument='msed_titan',
+        events_1 = get_events(instrument='FEI-Titan-TEM-635816',
                               date='2019-03-13')
-        events_2 = get_events(instrument='msed_titan',
+        events_2 = get_events(instrument='FEI-Titan-TEM-635816',
                               date='March 13th, 2019')
         doc1 = etree.fromstring(events_1)
         doc2 = etree.fromstring(events_2)
@@ -171,7 +169,7 @@ class TestCalendarHandling:
     def test_get_events_bad_date(self, caplog):
         from nexusLIMS.harvester.sharepoint_calendar import get_events
 
-        get_events(instrument='msed_titan', date='The Ides of March')
+        get_events(instrument='FEI-Titan-TEM-635816', date='The Ides of March')
 
         assert 'Entered date could not be parsed; reverting to None...' in \
                caplog.text
