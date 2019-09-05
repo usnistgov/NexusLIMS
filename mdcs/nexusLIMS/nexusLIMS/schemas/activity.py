@@ -231,11 +231,14 @@ class AcquisitionActivity:
             # if preview does not exist yet, generate it and save to
             # preview_fname
             if not _os.path.isfile(preview_fname):
+                _logger.info(f'Generating preview: {preview_fname}')
                 # Create the directory for the thumbnail, if needed
                 _pathlib.Path(_os.path.dirname(preview_fname)).mkdir(
                     parents=True, exist_ok=True)
                 # Generate the thumbnail
                 _s2thumb(s, out_path=preview_fname)
+            else:
+                _logger.info(f'Preview already exists: {preview_fname}')
             self.previews.append(preview_fname)
             self.sigs.append(s)
             self.meta.append(read_metadata(s))

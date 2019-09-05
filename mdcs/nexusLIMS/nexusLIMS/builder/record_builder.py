@@ -37,6 +37,8 @@ from nexusLIMS.harvester import sharepoint_calendar as _sp_cal
 from glob import glob as _glob
 from timeit import default_timer as _timer
 
+_logger = _logging.getLogger(__name__)
+
 
 def build_record(path, instrument, date, user):
     """
@@ -89,8 +91,11 @@ def build_record(path, instrument, date, user):
                   "https://data.nist.gov/od/dm/nexus/experiment/v1.0\">\n"
 
     # TODO: Account for results from multiple sessions?
+    _logger.info(f"Getting calendar events with instrument: {instrument}, "
+                 f"date: {date}, user: {user}")
     xml_record += _sp_cal.get_events(instrument=instrument, date=date,
                                      user=user, wrap=False)
+    _logger.info(f"Building acquisition activities for {path}")
     xml_record += build_acq_activities(path=path)
 
     xml_record += "</nx:Experiment>"  # Add closing tag for root element.
@@ -135,6 +140,7 @@ def build_acq_activities(path):
 
     mtimes = [''] * len(files)
     modes = [''] * len(files)
+    _logger.info(f'Loading files; getting mtime and modes for this activity')
     start_timer = _timer()
     for i, f in enumerate(files):
         mode = _hs.load(f, lazy=True).original_metadata.\
@@ -166,6 +172,7 @@ def build_acq_activities(path):
         # if this file's mode is the same as the last, just add it to the
         # current activity's file list
         if m == last_mode:
+            _logger.info(f'Adding {f} to activity')
             activities[-1].add_file(f)
 
         # this file's mode is different, so it belongs to the next
@@ -176,6 +183,7 @@ def build_acq_activities(path):
             activities[-1].end = _datetime.fromisoformat(mtimes[i - 1])
             # New AcquisitionActivity start time is t
             activities.append(_AcqAc(start=_datetime.fromisoformat(t), mode=m))
+            _logger.info(f'Adding {f} to activity')
             activities[-1].add_file(f)
 
         # We have reached the last file, so end the current activity
@@ -183,11 +191,14 @@ def build_acq_activities(path):
             activities[-1].end = _datetime.fromisoformat(t)
 
     acq_activities = ''
+    _logger.info('Finished detecting activities')
     sample_id = str(_uuid4())       # just a random string for now
     for i, a in enumerate(activities):
         aa_logger = _logging.getLogger('nexusLIMS.schemas.activity')
-        aa_logger.setLevel(_logging.ERROR)
+        # aa_logger.setLevel(_logging.ERROR)
+        _logger.info(f'Activity {i}: storing setup parameters')
         a.store_setup_params()
+        _logger.info(f'Activity {i}: storing unique metadata values')
         a.store_unique_metadata()
 
         acq_activities += a.as_xml(i, sample_id,

@@ -13,201 +13,238 @@
         <!-- ============ CSS Styling ============ --> 
         <style>
             body { /* Set the font style for the page */
-            font-family: "Lato", sans-serif;
+                font-family: "Lato", sans-serif;
             }
+            
+            /* Link colors */
+            a:link {
+            color: #3865a3;
+            }
+            a:visited {
+            color: #3865a3;
+            }
+            a:hover {
+            color: #5e7ca3;
+            } 
                         
             button { 
-            cursor: pointer; /* Changes cursor type when hovering over a button */
+             cursor: pointer; /* Changes cursor type when hovering over a button */
+            }
+            
+            button.aa_button {
+              -webkit-appearance: none;
+              -moz-appearance: none;
+              appearance: none;
+              display:inline-block;
             }
             
             img {
-            max-width: 100%;
-            max-height: auto;
-            margin-left: auto; /* Center justify images */
-            margin-right: auto;
-            display: block;
+                max-width: 100%;
+                max-height: auto;
+                margin-left: auto; /* Center justify images */
+                margin-right: auto;
+                display: block;
             }
             
             .sidenav { /* Parameters for the sidebar */
-            height: 100%;
-            width: 160px;
-            position: fixed; /* Sets the sidebar to always be visible even when the page is scrolled */
-            z-index: 1;
-            top: 0;
-            left: 0;
-            overflow-x: hidden;
-            padding-top: 20px;
-            border-style: solid;
-            border-width: 2px;
+                height: 100%;
+                width: 160px;
+                position: fixed; /* Sets the sidebar to always be visible even when the page is scrolled */
+                z-index: 1;
+                top: 0;
+                left: 0;
+                overflow-x: hidden;
+                padding-top: 20px;
+                border-style: solid;
+                border-width: 2px;
             }
             
             .sidenav a { /* Parameters for the acquisition activity links within the sidebar */
-            padding: 6px 12px 6px 16px;
-            text-decoration: none;
-            font-size: 18px;
-            display: block;
+              padding: 6px 12px 6px 16px;
+              text-decoration: none;
+              font-size: 18px;
+              display: block;
+              font-weight: bold;
             }
             
             .sidenav div { /* Parameters for other text found in the sidebar (e.g. start time( */
-            font-size: 13px;
-            padding: 1px 6px 5px 20px;
+               font-size: 13px;
+               padding: 1px 6px 5px 20px;
             }
             
             /* Set up 2 divided columns to separate setup parameters and the corresponding image gallery */
             .column { 
-            float: left;
-            width: 50%;
+             float: left;
+             width: 50%;
             }
             
             .row:after {
-            content: "";
-            display: table;
-            clear: both;
+               content: "";
+               display: table;
+               clear: both;
             }
             
             .slide {
-            display: none;
+             display: none;
             }
             
             .slideshow-container {
-            max-width: 800px;
-            position: relative;
-            margin: auto;
+             max-width: 800px;
+             position: relative;
+             margin: auto;
             }
             
             .prev, .next { /* Parameters for the 'next' and 'prev' buttons on the slideshow gallery */
-            cursor: pointer;
-            position: absolute;
-            top: 50%;
-            width: auto;
-            padding: 16px;
-            margin-top: -22px;
-            color: white;
-            font-weight: bold;
-            font-size: 18px;
-            transition: 0.6s ease;
-            border-radius: 0 3px 3px 0;
-            user-select: none;
-            background-color: rgba(0,0,0,0.4);
+                cursor: pointer;
+                position: absolute;
+                top: 50%;
+                width: auto;
+                padding: 16px;
+                margin-top: -22px;
+                color: white;
+                font-weight: bold;
+                font-size: 18px;
+                transition: 0.6s ease;
+                border-radius: 3px 0px 0px 3px;
+                user-select: none;
+                background-color: rgba(0,0,0,0.4);
             }
             
             .next { /*Have the 'next' button appear on the right of the slideshow gallery */
-            right: 0;
-            border-radius: 3px 0 0 3px;
+               right: 0;
+               border-radius: 0px 3px 3px 0px;
             }
             
             .prev:hover, .next:hover { /* Have a background appear when the prev/next buttons are hovered over */
-            background-color: rgba(0,0,0,0.8);
+              background-color: rgba(0,0,0,0.8);
             }
             
             .text { /* Parameters for the caption text displayed in the image gallery */
-            color: black;
-            font-size: 15px;
-            padding: 8px 12px;
-            position: absolute;
-            bottom: -1.1em;
-            width: 100%;
-            text-align: center;
+             color: black;
+             font-size: 15px;
+             padding: 8px 12px;
+             position: absolute;
+             bottom: -1.1em;
+             width: 100%;
+             text-align: center;
             }
             
             #to_top_button { /* Parameters for the button which jumps to the top of the page when clicked */
-            display: none; /* Set button to hidden on default so that it will appear when the page is scrolled */
-            position: fixed;
-            bottom: 20px;
-            right: 30px;
-            background-color: #e87474;
-            border: none;
-            outline: none;
-            color: white;
-            cursor: pointer;
-            padding: 15px;
-            border-radius: 4px;
-            font-size: 15px;
+              display: none; /* Set button to hidden on default so that it will appear when the page is scrolled */
+              position: fixed;
+              bottom: 20px;
+              right: 30px;
+              background-color: #3865a3;
+              border: none;
+              outline: none;
+              color: white;
+              cursor: pointer;
+              padding: 15px;
+              border-radius: 4px;
+              font-size: 15px;
             }
             
             #to_top_button:hover { /* Changes the color of the button when hovered over */
-            background-color: #555;
+                background-color: #5e7ca3;
             }
             
             .accordion { /* Parameters for accordions used to hide parameter / metadata tables */
-            background-color: #eee;
-            color: #444;
-            cursor: pointer;
-            padding: 18px;
-            width: 95%;
-            border: none;
-            text-align: left;
-            outline: none;
-            font-size: 15px;
-            transition: 0.4s;
+             background-color: #eee;
+             color: #444;
+             cursor: pointer;
+             padding: 18px;
+             width: 95%;
+             border: none;
+             text-align: left;
+             outline: none;
+             font-size: 15px;
+             transition: 0.4s;
             }
             
             .active, .accordion:hover { /* Change color of the accordion when it is active or hovered over */
-            background-color: #ccc;
+               background-color: #ccc;
             }
             
             .accordion:after { /* Parameters for the accordion header while it is open */
-            content: '\002B';
-            color: #777;
-            font-weight: bold;
-            float: right;
-            margin-left: 5px;
+               content: '\002B';
+               color: #777;
+               font-weight: bold;
+               float: right;
+               margin-left: 5px;
             }
             
             .active:after {
-            content: '\2212';
+               content: '\2212';
             }
             
             .panel { /* Parameters for the contents of the accordion */
-            padding: 0 18px;
-            background-color: white;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.2s ease-out;
+             padding: 0 18px;
+             background-color: white;
+             max-height: 0;
+             overflow: hidden;
+             transition: max-height 0.2s ease-out;
             }
             
             .modal { /* Parameters for modal boxes */
-            display: none;
-            position: fixed;
-            z-index: 1;
-            padding-top: 100px;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(209,203,203,0.7);
+               display: none;
+               position: fixed;
+               z-index: 1;
+               padding-top: 100px;
+               left: 0;
+               top: 0;
+               width: 100%;
+               height: 100%;
+               overflow: auto;
+               background-color: rgba(209,203,203,0.7);
             }
             
             .modal-content { /* Parameters for content within modal boxes */
-            background-color: #fefefe;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
+                background-color: #fefefe;
+                margin: auto;
+                padding: 20px;
+                border: 1px solid #888;
+                width: 80%;
             }
             
             .close { /* Parameters for 'X' used to close the modal box */
-            color: #aaaaaa;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
+                color: #aaaaaa;
+                float: right;
+                font-size: 28px;
+                font-weight: bold;
             }
             
             .close:hover, /* Changes color of close button and cursor type when hovering over it */
             .close:focus {
-            color: #000;
-            text-decoration: none;
-            cursor: pointer;
+                color: #000;
+                text-decoration: none;
+                cursor: pointer;
             }
             
             .link a:hover { /* Change the links when the mouse is hovered over them */
-            cursor: pointer;
+              cursor: pointer;
             }
             
             .main { /* Set parameters for the rest of the page in order to adjust for the sidebar being there */
-            margin-left: 160px; /* Same width as the sidebar + left position in px */
-            padding: 0px 10px;
+               margin-left: 160px; /* Same width as the sidebar + left position in px */
+               padding: 0px 10px;
+            }
+            
+            table.preview-and-table {
+                margin-bottom:2em;
+            }
+            
+            table.meta-table {
+             border-collapse: collapse;
+            }
+            
+            table.meta-table td, table.meta-table th {
+              padding: 0.3em;
+            }
+            
+            table.meta-table th {
+               background-color: #3a65a2;
+               border-color: black;
+               color: white;
             }
         </style>
         
@@ -337,18 +374,18 @@
                         <a name="{generate-id(current())}">
                             <b>Acquisition Activity <xsl:value-of select="@seqno+1"/></b>
                         </a>
-                        <div style="font-size:19px"><i><xsl:value-of select="setup/param[@name='Mode']"/></i></div>
-                        <a class="link" href="https:\\nist.gov" target="_blank" style="font-size:14px">(Original Data - placeholder)</a>
+                        <div style="font-size:19px">Activity mode: <i><xsl:value-of select="setup/param[@name='Mode']"/></i></div>
                     </h2>
                     
                     <!-- Create accordion which contains acquisition activity setup parameters -->
                     <button class="accordion" style="font-weight:bold;font-size:21px">Activity Parameters</button>
                     <div class="panel">
-                        <div><b>Start time:</b> <xsl:value-of select="tokenize(startTime,'T')[2]"/></div>                         
+                        <div style="padding:0.3em;"><b>Start time:</b> <xsl:value-of select="tokenize(startTime,'T')[2]"/></div>                         
                         <!-- Generate the table with setup conditions for each acquisition activity -->
-                        <table border="1" style="border-collapse:collapse;">
-                            <tr bgcolor="#84b1f9">
-                                <th>Setup</th>
+                        <table class="meta-table" border="1" style="">
+                            <tr>
+                                <th>Setup Parameter</th>
+                                <th>Value</th>
                             </tr>
                             <!-- Loop through each setup value under the 'param' heading -->
                             <xsl:for-each select="setup/param">
@@ -379,28 +416,40 @@
                             <button class="accordion"><b><xsl:value-of select="@type"/>: <xsl:value-of select="name"/></b></button>
                             <div class="panel">
                                 <br/>
-                                <!-- TODO: Button which opens a modal box displaying the image for each dataset, respectively -->
-                                <button onclick="openModal('#{generate-id(current())}')">View Thumbnail</button>
-                                <xsl:if test="meta"> <!-- Checks whether there are parameters and only creates a table if there is -->
-                                   <table border="1" style="border-collapse:collapse;">
-                                       <tr bgcolor="#84b1f9">
-                                           <th>Parameter</th>
-                                       </tr>
-                                       <!-- Loop through each metadata parameter -->
-                                       <xsl:for-each select="meta">
-                                           <xsl:sort select="@name"/>
-                                           <tr>
-                                               <!-- Populate table values with the metadata name and value -->
-                                               <td><b><xsl:value-of select="@name"/></b></td>
-                                               <td><xsl:value-of select="current()"/></td>
-                                           </tr>
-                                       </xsl:for-each>                        
-                                   </table>
-                                </xsl:if>
+                                <form style="display:inline-block;"><xsl:attribute name="action"><xsl:value-of select="$datasetBaseUrl"/><xsl:value-of select="location"/></xsl:attribute>
+                                    <button class="aa_button" type="submit">Download original data</button>
+                                </form>
+                                <table class="preview-and-table">
+                                    <tr>
+                                        <td>
+                                            <a><xsl:attribute name="href"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute>
+                                                <img height="400"><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute></img>
+                                            </a>
+                                        </td>
+                                        
+                                        <xsl:if test="meta"> <!-- Checks whether there are parameters and only creates a table if there is -->
+                                            <td>
+                                                <table class="meta-table" border="1" style="width:100%; border-collapse:collapse;">
+                                                    <tr bgcolor="#3a65a2" color='white'>
+                                                        <th>Parameter</th>
+                                                        <th>Value</th>
+                                                    </tr>
+                                                <!-- Loop through each metadata parameter -->
+                                                <xsl:for-each select="meta">
+                                                    <xsl:sort select="@name"/>
+                                                    <tr>
+                                                        <!-- Populate table values with the metadata name and value -->
+                                                        <td><b><xsl:value-of select="@name"/></b></td>
+                                                        <td><xsl:value-of select="current()"/></td>
+                                                    </tr>
+                                                </xsl:for-each>                        
+                                            </table>
+                                            </td>
+                                        </xsl:if>
+                                    </tr>
+                                </table>
                             </div>
                         </xsl:for-each>
-
-                        <br/>
                     </div>
                 </xsl:for-each>
             </div>
