@@ -27,15 +27,21 @@
 #
 
 import os as _os
+import pathlib as _pathlib
 import logging as _logging
 from datetime import datetime as _datetime
 import hyperspy.api_nogui as _hs
 from nexusLIMS.extractors.digital_micrograph import \
     process_tecnai_microscope_info as _tecnai
+from nexusLIMS import mmf_nexus_root_path as _mmf_path
+from nexusLIMS import nexuslims_root_path as _nx_path
+from nexusLIMS.extractors.thumbnail_generator import \
+    sig_to_thumbnail as _s2thumb
 
 _logger = _logging.getLogger(__name__)
 
 
+# TODO: Metadata parsing will require different method for each instrument
 def read_metadata(sig):
     """
     For a signal like that contained in ``self.sigs``, parse the
@@ -59,7 +65,7 @@ def read_metadata(sig):
     Currently, the following tags are considered "important", but this will
     be modified for different instrument, file types, etc.:
 
-    - General .dm3 tags:
+    - General .dm3 tags (not guaranteed to be present):
         - ``ImageTags.Microscope_Info.Indicated_Magnification``
         - ``ImageTags.Microscope_Info.Actual_Magnification``
         - ``ImageTags.Microscope_Info.Csmm``
@@ -90,7 +96,9 @@ def read_metadata(sig):
     # Obviously will need to be changed for non-dm3 data and other
     # instruments
     ImageTags = sig.original_metadata.ImageList.TagGroup0.ImageTags
-    tecnai_info = _tecnai(ImageTags.Tecnai.Microscope_Info)
+    try:
+        tecnai_info = _tecnai(ImageTags.Tecnai.Microscope_Info)
+    except AttributeError: tecnai_info = None  # Not a tecnai image
     try:
         m['Indicated_Magnification'] = \
             ImageTags.Microscope_Info.Indicated_Magnification
@@ -163,6 +171,8 @@ class AcquisitionActivity:
         into ``setup_params``)
     files : list
         A list of filenames belonging to this AcquisitionActivity
+    previews : list
+        A list of filenames pointing to the previews for each file in ``files``
     sigs : list
         A list of *lazy* (to minimize loading times) HyperSpy signals in this
         AcquisitionActivity. HyperSpy is used to facilitate metadata reading
@@ -179,6 +189,7 @@ class AcquisitionActivity:
                  setup_params=None,
                  unique_meta=None,
                  files=None,
+                 previews=None,
                  sigs=None,
                  meta=None):
         """
@@ -191,6 +202,7 @@ class AcquisitionActivity:
         self.setup_params = setup_params
         self.unique_meta = unique_meta
         self.files = [] if files is None else files
+        self.previews = [] if previews is None else previews
         self.sigs = [] if sigs is None else sigs
         self.meta = [] if meta is None else meta
 
@@ -215,6 +227,16 @@ class AcquisitionActivity:
         if _os.path.exists(fname):
             s = _hs.load(fname, lazy=True)
             self.files.append(fname)
+            preview_fname = fname.replace(_mmf_path, _nx_path) + '.thumb.png'
+            # if preview does not exist yet, generate it and save to
+            # preview_fname
+            if not _os.path.isfile(preview_fname):
+                # Create the directory for the thumbnail, if needed
+                _pathlib.Path(_os.path.dirname(preview_fname)).mkdir(
+                    parents=True, exist_ok=True)
+                # Generate the thumbnail
+                _s2thumb(s, out_path=preview_fname)
+            self.previews.append(preview_fname)
             self.sigs.append(s)
             self.meta.append(read_metadata(s))
         else:
@@ -391,16 +413,16 @@ class AcquisitionActivity:
                           f'{pv}</param>{line_ending}'
         activity_xml += f'{INDENT*2}</setup>{line_ending}'
 
-        # TODO: Remove example notes entry for production
+        # DONE: Remove example notes entry for production
         #      This is a temporary output for example records
-        activity_xml += f'{INDENT*2}<notes source="ELN">{line_ending}'
-        activity_xml += f'{INDENT*3}<entry xsi:type="nx:TextEntry">{line_ending}'
-        activity_xml += f'{INDENT*4}<p>This is an example note entry for ' \
-                        f'an acquisitionActivity</p>' \
-                        f'<p>Its text representation in Python is ' \
-                        f'"{self}"</p>{line_ending}'
-        activity_xml += f'{INDENT*3}</entry>{line_ending}'
-        activity_xml += f'{INDENT*2}</notes>{line_ending}'
+        # activity_xml += f'{INDENT*2}<notes source="ELN">{line_ending}'
+        # activity_xml += f'{INDENT*3}<entry xsi:type="nx:TextEntry">{line_ending}'
+        # activity_xml += f'{INDENT*4}<p>This is an example note entry for ' \
+        #                 f'an acquisitionActivity</p>' \
+        #                 f'<p>Its text representation in Python is ' \
+        #                 f'"{self}"</p>{line_ending}'
+        # activity_xml += f'{INDENT*3}</entry>{line_ending}'
+        # activity_xml += f'{INDENT*2}</notes>{line_ending}'
 
         # This is kind of a temporary hack until I figure out a better solution
         # TODO: fix determination of dataset types
@@ -410,11 +432,8 @@ class AcquisitionActivity:
         }
         for f, m, um in zip(self.files, self.meta, self.unique_meta):
             # build path to thumbnail
-            fname = _os.path.basename(f)
-            thumb_name = f'{fname}.thumb.png'
-            thumb_path = _os.path.join(_os.path.dirname(f),
-                                       '.nexuslims',
-                                       thumb_name)
+            rel_fname = f.replace(_mmf_path, '')
+            rel_thumb_name = f'{rel_fname}.thumb.png'
 
             # f is string; um is a dictionary
             activity_xml += f'{INDENT*2}<dataset ' \
@@ -422,9 +441,9 @@ class AcquisitionActivity:
                             f'role="Experimental">{line_ending}'
             activity_xml += f'{INDENT*3}<name>{_os.path.basename(f)}' \
                             f'</name>{line_ending}'
-            activity_xml += f'{INDENT*3}<location>{f}' \
+            activity_xml += f'{INDENT*3}<location>{rel_fname}' \
                             f'</location>{line_ending}'
-            activity_xml += f'{INDENT*3}<preview>{thumb_path}' \
+            activity_xml += f'{INDENT*3}<preview>{rel_thumb_name}' \
                             f'</preview>{line_ending}'
             for meta_k, meta_v in sorted(um.items()):
                 activity_xml += f'{INDENT*3}<meta name="{meta_k}">' \

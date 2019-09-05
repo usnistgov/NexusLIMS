@@ -30,9 +30,10 @@
 import os as _os
 import logging as _logging
 import hyperspy.api_nogui as _hs
+from uuid import uuid4 as _uuid4
 from datetime import datetime as _datetime
-from nexusLIMS import AcquisitionActivity as _AcqAc
-from nexusLIMS import sharepoint_calendar as sp_cal
+from nexusLIMS.schemas.activity import AcquisitionActivity as _AcqAc
+from nexusLIMS.harvester import sharepoint_calendar as _sp_cal
 from glob import glob as _glob
 from timeit import default_timer as _timer
 
@@ -88,8 +89,8 @@ def build_record(path, instrument, date, user):
                   "https://data.nist.gov/od/dm/nexus/experiment/v1.0\">\n"
 
     # TODO: Account for results from multiple sessions?
-    xml_record += sp_cal.get_events(instrument=instrument, date=date,
-                                    user=user, wrap=False)
+    xml_record += _sp_cal.get_events(instrument=instrument, date=date,
+                                     user=user, wrap=False)
     xml_record += build_acq_activities(path=path)
 
     xml_record += "</nx:Experiment>"  # Add closing tag for root element.
@@ -105,6 +106,8 @@ def build_acq_activities(path):
     AcquisitionActivities are delimited via comparison of imaging modes (e.g. a
     switch from Imaging to Diffraction mode constitutes 2 unique
     AcquisitionActivities).
+
+    Currently only working for 'FEI-Titan-TEM-635816' .dm3 files...
 
     Parameters
     ----------
@@ -125,9 +128,10 @@ def build_acq_activities(path):
     _logging.getLogger('hyperspy.io_plugins.digital_micrograph').setLevel(
         _logging.WARNING)
 
-    files = _glob(_os.path.join(path, "*.dm3"))
+    files = _glob(_os.path.join(path, "**/*.dm3"), recursive=True)
+
+    # sort files by modification time
     files.sort(key=_os.path.getmtime)
-    # files = files[:-2]
 
     mtimes = [''] * len(files)
     modes = [''] * len(files)
@@ -179,13 +183,14 @@ def build_acq_activities(path):
             activities[-1].end = _datetime.fromisoformat(t)
 
     acq_activities = ''
+    sample_id = str(_uuid4())       # just a random string for now
     for i, a in enumerate(activities):
         aa_logger = _logging.getLogger('nexusLIMS.schemas.activity')
         aa_logger.setLevel(_logging.ERROR)
         a.store_setup_params()
         a.store_unique_metadata()
 
-        acq_activities += a.as_xml(i, 'f81d3518-10af-4fab-9bd3-cfa2b0aea807',
+        acq_activities += a.as_xml(i, sample_id,
                                    indent_level=1, print_xml=False)
 
     return acq_activities
@@ -217,6 +222,11 @@ def dump_record(path,
     user : str
         A string which corresponds to the NIST user who performed the
         microscopy experiment
+
+    Returns
+    -------
+    filename : str
+        The name of the created record that was returned
     """
     if filename is None:
         filename = 'compiled_record' + \
@@ -227,18 +237,4 @@ def dump_record(path,
         text = build_record(path=path, instrument=instrument,
                             date=date, user=user)
         f.write(text)
-
-
-# if __name__ == '__main__':
-#     """
-#     These lines are just for testing. For real use, import the methods you
-#     need and operate from there
-#     """
-#
-#     path_root = '***REMOVED***/'
-#     path_to_search = _os.path.join(path_root, 'mmfnexus/Titan/***REMOVED***/', '181113 - ***REMOVED*** - ***REMOVED*** - Titan')
-#     # path_to_search = _os.path.join(path_root, 'mmfnexus/Titan/***REMOVED***/',
-#     #                               '***REMOVED*** 6hr 750C - number4 - ***REMOVED*** - Titan')
-#
-#     # print(build_record(path=path_to_search, instrument='msed_titan', date='2018-11-13', user='***REMOVED***'))
-#     dump_record(path_to_search, 'msed_titan', '2018-11-13', '***REMOVED***')
+    return filename

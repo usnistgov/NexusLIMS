@@ -183,10 +183,8 @@ def fetch_xml(instrument=None):
     ----------
     instrument : None, str, or list
         As defined in :py:func:`~.get_events`
-        One or more of ['msed_titan', 'quanta', 'jeol_sem', 'hitachi_sem',
-        'jeol_tem', 'cm30', 'em400', 'hitachi_s5500', 'mmsd_titan',
-        'fei_helios_db'], or None. If None, events from all instruments will be
-        returned.
+        One or more of the keys of ``nexusLIMS.instruments.instrument_db``,
+        or None. If None, events from all instruments will be returned.
 
     Returns
     -------

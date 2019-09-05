@@ -27,9 +27,6 @@
 #
 
 from ._calendar_root_url import calendar_root_url
-from .schemas.activity import AcquisitionActivity
-from .harvester import sharepoint_calendar
-from .builder import record_builder
 
 import socket as _socket
 
