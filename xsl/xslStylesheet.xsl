@@ -4,7 +4,10 @@
     xmlns:nx="https://data.nist.gov/od/dm/nexus/experiment/v1.0"
     exclude-result-prefixes="xs"
     version="2.0">    
-    
+
+    <xsl:variable name="datasetBaseUrl">http://***REMOVED***/mmfnexus/</xsl:variable>
+    <xsl:variable name="previewBaseUrl">http://***REMOVED***/nexusLIMS/mmfnexus/</xsl:variable>
+
     <xsl:template match="/nx:Experiment">
         
         <!-- ============ CSS Styling ============ --> 
@@ -85,6 +88,7 @@
             transition: 0.6s ease;
             border-radius: 0 3px 3px 0;
             user-select: none;
+            background-color: rgba(0,0,0,0.4);
             }
             
             .next { /*Have the 'next' button appear on the right of the slideshow gallery */
@@ -97,11 +101,11 @@
             }
             
             .text { /* Parameters for the caption text displayed in the image gallery */
-            color: #f2f2f2;
+            color: black;
             font-size: 15px;
             padding: 8px 12px;
             position: absolute;
-            bottom: 8px;
+            bottom: -1.1em;
             width: 100%;
             text-align: center;
             }
@@ -311,15 +315,12 @@
                     <!-- Image gallery showing images from every dataset of the session -->
                     <div class="column">
                         <div class="slideshow-container" id="img_gallery">
-                            <div class="slide">
-                                <img src="http://qnimate.com/wp-content/uploads/2014/06/placeholder.jpg"/>
-                                <div class="text">Placeholder</div>
-                            </div>
-                            <div class="slide">
-                                <img src="https://langleyinsuranceagents.com/wp-content/uploads/2018/09/image-placeholder-300x225.png"/>
-                                <div class="text">Placeholder</div>
-                            </div>
-                            
+                            <xsl:for-each select="//dataset">
+                                <div class="slide">
+                                    <img><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute></img>
+                                    <div class="text"><xsl:value-of select="position()"/> / <xsl:value-of select="count(//dataset)" /></div>
+                                </div>
+                            </xsl:for-each>
                             <a class="prev" onclick="plusSlide(-1)">&lt;</a>
                             <a class="next" onclick="plusSlide(1)">&gt;</a>
                         </div>
@@ -370,7 +371,7 @@
                             <div id="#{generate-id(current())}" class="modal">
                                 <div class="modal-content">
                                     <span class="close" onclick="closeModal('#{generate-id(current())}')">X</span>
-                                    <img src="http://www.lozano-hemmer.com/image_sets/method_random/method_random2.jpg"/>
+                                    <img><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute></img>
                                 </div>
                             </div>
                             
@@ -493,6 +494,29 @@
                     slide.innerHTML = image + source;
                     
                     document.getElementById("img_gallery").appendChild(slide);
+                }
+                
+                // Key handlers
+                document.onkeydown = function(evt) {
+                    evt = evt || window.event;
+                    var isLeft = false;
+                    var isRight = false;
+                    var isEscape = false;
+                    isLeft = (evt.keyCode === 37);
+                    isRight = (evt.keyCode === 39);
+                    isEscape = (evt.keyCode === 27);
+                    if (isLeft) {
+                        plusSlide(-1);
+                    }
+                    if (isRight) {
+                        plusSlide(1);
+                    }
+                    if (isEscape) {
+                        var i;
+                        for (i = 0; i < document.getElementsByClassName("modal").length; i++) {
+                          closeModal(document.getElementsByClassName("modal")[i].id);
+                        }
+                    }
                 }
                 ]]></xsl:comment>
                 
