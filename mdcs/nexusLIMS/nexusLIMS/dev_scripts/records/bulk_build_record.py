@@ -27,17 +27,18 @@
 #
 
 if __name__ == '__main__':
-    import os
-    import time
+    import os as _os
+    import time as _time
     import logging as _logging
     from nexusLIMS import mmf_nexus_root_path as _mmf_nexus_root_path
+    from nexusLIMS import nexuslims_root_path as _nexuslims_root_path
     from nexusLIMS.builder import record_builder as _rb
 
-    d = os.path.join(_mmf_nexus_root_path, 'Titan/***REMOVED***')
-    dirs = [os.path.join(d, o) for o in os.listdir(d)
-                if os.path.isdir(os.path.join(d, o))]
+    d = _os.path.join(_mmf_nexus_root_path, 'Titan/***REMOVED***')
+    dirs = [_os.path.join(d, o) for o in _os.listdir(d)
+                if _os.path.isdir(_os.path.join(d, o))]
 
-    dates = [time.strftime('%Y-%m-%d', time.localtime(os.path.getmtime(p)))
+    dates = [_time.strftime('%Y-%m-%d', _time.localtime(_os.path.getmtime(p)))
              for p in dirs]
 
     aa_logger = _logging.getLogger('nexusLIMS.schemas.activity')
@@ -45,11 +46,15 @@ if __name__ == '__main__':
 
     for d, pth in zip(dates, dirs):
         print(f'{d} : {pth}')
-        filename = _rb.dump_record(pth,
-                                   filename=None,
-                                   instrument='FEI-Titan-TEM-635816',
-                                   date=d,
-                                   user='***REMOVED***')
+        outpath = pth.replace(_mmf_nexus_root_path, _nexuslims_root_path)
+        instrument = 'FEI-Titan-TEM-635816'
+        user = '***REMOVED***'
+        outfilename = f'compiled_record_{instrument}_{d}_{user}.xml'
+        _rb.dump_record(pth,
+                        filename=_os.path.join(outpath, outfilename),
+                        instrument=instrument,
+                        date=d,
+                        user=user)
 
     # path_to_search = os.path.join(_mmf_nexus_root_path, 'Titan/***REMOVED***/',
     #                               '181113 - ***REMOVED*** - '
