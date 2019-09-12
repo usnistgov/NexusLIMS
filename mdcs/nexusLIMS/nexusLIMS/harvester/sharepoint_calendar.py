@@ -33,9 +33,11 @@ import re as _re
 import logging as _logging
 import requests as _requests
 
+import nexusLIMS
 from requests_ntlm import HttpNtlmAuth as _HttpNtlmAuth
 from lxml import etree as _etree
 from dateparser import parse as _dp_parse
+import ldap3 as _ldap3
 from datetime import datetime as _datetime
 from configparser import ConfigParser as _ConfigParser
 from nexusLIMS.instruments import instrument_db as _instr_db
@@ -44,8 +46,9 @@ _logger = _logging.getLogger(__name__)
 XSLT_PATH = _os.path.join(_os.path.dirname(__file__), "cal_parser.xsl")
 INDENT = '  '
 
-__all__ = ['AuthenticationError', 'get_auth', 'fetch_xml',
-           'parse_xml', 'get_events', 'wrap_events', 'dump_calendars']
+__all__ = ['AuthenticationError', 'get_auth', 'fetch_xml', 'get_div_and_group',
+           'parse_xml', 'get_events', '_wrap_events', 'dump_calendars']
+
 
 class AuthenticationError(Exception):
     """Class for showing an exception having to do with authentication"""
@@ -112,6 +115,35 @@ class CalendarEvent:
         self.files = [] if files is None else files
         self.sigs = [] if sigs is None else sigs
         self.meta = [] if meta is None else meta
+
+
+def get_div_and_group(username):
+    """
+    Query the NIST active directory to get division and group information for a
+    user.
+
+    Parameters
+    ----------
+    username : str
+        a valid NIST username (the short format: e.g. "ear1"
+        instead of ernst.august.ruska@nist.gov).
+
+    Returns
+    -------
+    div, group : str
+        The division and group numbers for the user (as strings)
+    """
+    server = _ldap3.Server(nexusLIMS.ldap_url)
+    with _ldap3.Connection(server, auto_bind=True) as conn:
+        conn.search('***REMOVED***',
+                    f'(***REMOVED***{username}***REMOVED***)',
+                    attributes=['*'])
+        res = conn.entries[0]
+
+    div = res.nistdivisionnumber.value
+    group = res.nistgroupnumber.value
+
+    return div, group
 
 
 def get_auth(filename="credentials.ini"):
@@ -183,7 +215,7 @@ def fetch_xml(instrument=None):
     ----------
     instrument : None, str, or list
         As defined in :py:func:`~.get_events`
-        One or more of the keys of ``nexusLIMS.instruments.instrument_db``,
+        One or more of {},
         or None. If None, events from all instruments will be returned.
 
     Returns
@@ -198,7 +230,6 @@ def fetch_xml(instrument=None):
     #           document
 
     # Paths for Nexus Instruments that can be booked through sharepoint
-    # calendar, mapped to more user-friendly names
     # Instrument names can be found at
     # https://***REMOVED***/***REMOVED***/_vti_bin/ListData.svc
     # and
@@ -250,9 +281,10 @@ def fetch_xml(instrument=None):
                                 'API at "{}"'.format(instr_url))
 
     return api_response
+fetch_xml.__doc__ = fetch_xml.__doc__.format([str(k) for k in _instr_db.keys()])
 
 
-def parse_xml(xml, date=None, user=None):
+def parse_xml(xml, date=None, user=None, division=None, group=None):
     """
     Parse and translate an XML string from the API into a nicer format
 
@@ -268,6 +300,14 @@ def parse_xml(xml, date=None, user=None):
     user : None or str
         Either None or a valid NIST username (the short format: e.g. "ear1"
         instead of ernst.august.ruska@nist.gov).
+    division : None or str
+        The division number of the project. If provided, this string will be
+        replicated under the "project" information in the outputted XML.
+    group : None or str
+        The group number of the project. If provided, this string will be
+        replicated under the "project" information in the outputted XML. If
+        ``None`` (and ``user`` is provided), the group will be queried
+        from the active directory server.
 
     Returns
     -------
@@ -285,20 +325,31 @@ def parse_xml(xml, date=None, user=None):
     xsl_transform = _etree.XSLT(xsl_dom)
 
     # setup parameters for passing to XSLT parser
-    date_param = "''" if date is None else "'{}'".format(date)
-    # DONE: parsing of username
-    user_param = "''" if user is None else "'{}'".format(user)
+    def _setup_parameters(param):
+        return "''" if param is None else "'{}'".format(param)
+    date_param = _setup_parameters(date)
+    user_param = _setup_parameters(user)
+
+    division_param = _setup_parameters(division)
+    group_param = _setup_parameters(group)
 
     # do XSLT transformation
     simplified_dom = xsl_transform(root,
                                    date=date_param,
-                                   user=user_param)
+                                   user=user_param,
+                                   division=division_param,
+                                   group=group_param)
 
     return simplified_dom
 
 
 # DONE: split up fetching calendar from server and parsing XML response
-def get_events(instrument=None, date=None, user=None, wrap=True):
+def get_events(instrument=None,
+               date=None,
+               user=None,
+               division=None,
+               group=None,
+               wrap=True):
     """
     Get calendar events for a particular instrument on the Microscopy Nexus,
     on some date, or by some user
@@ -306,11 +357,8 @@ def get_events(instrument=None, date=None, user=None, wrap=True):
     Parameters
     ----------
     instrument : None, str, or list
-        One or more of ['msed_titan', 'quanta', 'jeol_sem', 'hitachi_sem',
-        'jeol_tem', 'cm30', 'em400', 'hitachi_s5500', 'mmsd_titan',
-        'fei_helios_db'], or ``None``. If ``None``, all instruments will be
+        One or more of {}, or ``None``. If ``None``, all instruments will be
         returned.
-
     date : None or str
         Either None or a YYYY-MM-DD date string indicating the date from
         which events should be fetched (note: the start time of each entry
@@ -318,15 +366,24 @@ def get_events(instrument=None, date=None, user=None, wrap=True):
         performed. Date will be parsed by :py:func:`dateparser.parse`,
         but providing the date in the ISO standard format is preferred for
         consistent behavior.
-
     user : None or str
         Either None or a valid NIST username (the short format: e.g. ``"ear1"``
         instead of ernst.august.ruska@nist.gov). If None, no user filtering
         will be performed. No verification of username is performed,
         so it is up to the user to make sure this is correct.
-
+    division : None or str
+        The division number of the project. If provided, this string will be
+        replicated under the "project" information in the outputted XML. If
+        ``None`` (and ``user`` is provided), the division will be queried
+        from the active directory server.
+    group : None or str
+        The group number of the project. If provided, this string will be
+        replicated under the "project" information in the outputted XML. If
+        ``None`` (and ``user`` is provided), the group will be queried
+        from the active directory server.
     wrap : bool
-        Boolean used to choose whether to apply the wrap_events() function to the output XML string.
+        Boolean used to choose whether to apply the _wrap_events() function to
+        the output XML string.
 
     Returns
     -------
@@ -350,18 +407,25 @@ def get_events(instrument=None, date=None, user=None, wrap=True):
 
     output = ''
     xml_strings = fetch_xml(instrument)
+
+    if not division and not group and user:
+        _logging.info('Querying LDAP for division and group info')
+        division, group = get_div_and_group(user)
+
     for xml in xml_strings:
         # parse the xml into a string, and then indent
-        output += INDENT + str(parse_xml(xml, date, user)).\
+        output += INDENT + str(parse_xml(xml, date, user, division, group)).\
             replace('\n', '\n' + INDENT)
 
     if wrap:
-        output = wrap_events(output)
+        output = _wrap_events(output)
 
     return output
+get_events.__doc__ = get_events.__doc__.format([str(k) for k in
+                                               _instr_db.keys()])
 
 
-def wrap_events(events_string):
+def _wrap_events(events_string):
     """
     Helper function to turn events string from :py:func:`~.get_events` into a
     well-formed XML file with proper indentation
@@ -393,22 +457,33 @@ def wrap_events(events_string):
 def dump_calendars(instrument=None, user=None, date=None,
                    filename='cal_events.xml'):
     """
-    Write the results of :py:func:`~.get_events` to a file
+    Write the results of :py:func:`~.get_events` to a file.
+
+    Parameters
+    ----------
+    instrument : None, str, or list
+        One or more of {}, or ``None``. If ``None``, all instruments will be
+        returned.
+
+    date : None or str
+        Either None or a YYYY-MM-DD date string indicating the date from
+        which events should be fetched (note: the start time of each entry
+        is what will be compared). If None, no date filtering will be
+        performed. Date will be parsed by :py:func:`dateparser.parse`,
+        but providing the date in the ISO standard format is preferred for
+        consistent behavior.
+
+    user : None or str
+        Either None or a valid NIST username (the short format: e.g. ``"ear1"``
+        instead of ernst.august.ruska@nist.gov). If None, no user filtering
+        will be performed. No verification of username is performed,
+        so it is up to the user to make sure this is correct.
+
+    filename : str
+        The filename to which the events should be written
     """
     with open(filename, 'w') as f:
         text = get_events(instrument=instrument, date=date, user=user)
         f.write(text)
-
-# if __name__ == '__main__':
-#     """
-#     These lines are just for testing. For real use, import the methods you
-#     need and operate from there
-#     """
-#     _logging.basicConfig(level=_logging.INFO)
-#     dump_calendars(instrument='msed_titan')
-#     dump_calendars(date='2019-02-28')
-#     _logging.info(get_events(instrument=None))
-#     _logging.info(get_events(date='2019-02-25'))
-#     _logging.info(get_events(user='***REMOVED***'))
-#     _logging.info(get_events(date='2018-12-26', user='***REMOVED***'))
-#     _logging.info(get_events())
+dump_calendars.__doc__ = dump_calendars.__doc__.format([str(k) for k in
+                                                       _instr_db.keys()])

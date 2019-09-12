@@ -26,7 +26,8 @@
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
 
-from ._calendar_root_url import calendar_root_url
+from ._urls import calendar_root_url
+from ._urls import ldap_url
 
 import socket as _socket
 

@@ -59,7 +59,7 @@ class TestCalendarHandling:
         # convert parsing result to string and wrap so we have well-formed xml:
         xml_strings = dict()
         for k, v in parsed_xml.items():
-            xml_strings[k] = sc.wrap_events(str(v))
+            xml_strings[k] = sc._wrap_events(str(v))
 
         # get document tree from the raw file and the ones we parsed:
         parsed_docs = dict()

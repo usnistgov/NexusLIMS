@@ -18,6 +18,7 @@ requests-ntlm = "*"
 ntlm-auth = "*"
 dateparser = "*"
 hyperspy = "*"
+ldap3 = "*"
 
 [requires]
 python_version = "3.7"

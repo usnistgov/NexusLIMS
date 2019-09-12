@@ -27,3 +27,4 @@
 #
 
 calendar_root_url = 'https://***REMOVED***/***REMOVED***/'
+ldap_url = 'ldap://***REMOVED***:389'

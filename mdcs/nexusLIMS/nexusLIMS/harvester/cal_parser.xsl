@@ -87,6 +87,26 @@
     <xsl:element name="purpose">
       <xsl:value-of select="content/m:properties/d:ExperimentPurpose"/>
     </xsl:element>
+    <xsl:choose>
+      <xsl:when test="$division or $group">
+        <xsl:element name="project">
+          <xsl:choose>
+            <xsl:when test="$division">
+              <xsl:element name="division">
+                <xsl:value-of select="$division"/>
+              </xsl:element>
+            </xsl:when>
+          </xsl:choose>
+          <xsl:choose>
+            <xsl:when test="$group">
+              <xsl:element name="group">
+                <xsl:value-of select="$group"/>
+              </xsl:element>
+            </xsl:when>
+          </xsl:choose>
+        </xsl:element>
+      </xsl:when>
+    </xsl:choose>
     <xsl:element name="sampleDetails">
       <xsl:value-of select="content/m:properties/d:SampleDetails"/>
     </xsl:element>
