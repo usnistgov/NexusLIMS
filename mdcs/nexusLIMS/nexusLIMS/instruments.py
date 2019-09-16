@@ -54,6 +54,7 @@ class _Instrument:
     calendar_url : str or None
     location : str or None
     name : str or None
+    schema_name : str or None
     property_tag : str or None
     filestore_path : str or None
     """
@@ -63,6 +64,7 @@ class _Instrument:
                  calendar_url=None,
                  location=None,
                  name=None,
+                 schema_name=None,
                  property_tag=None,
                  filestore_path=None):
         """
@@ -73,6 +75,7 @@ class _Instrument:
         self.calendar_url = calendar_url
         self.location = location
         self.name = name
+        self.schema_name = schema_name
         self.property_tag = property_tag
         self.filestore_path = filestore_path
 
@@ -81,6 +84,7 @@ class _Instrument:
                f'API url: {self.api_url}\n' \
                f'Calendar name: {self.calendar_name}\n' \
                f'Calendar url: {self.calendar_url}\n' \
+               f'Schema name: {self.schema_name}\n' \
                f'Location: {self.location}\n' \
                f'Property tag: {self.property_tag}\n' \
                f'Filestore path: {self.filestore_path}'
@@ -96,6 +100,7 @@ instrument_db = {
                     calendar_url=_get_cal_url('FEI%20HeliosDB'),
                     location='***REMOVED***',
                     name='FEI-Helios-DB-636663',
+                    schema_name='FEI Helios',
                     property_tag='636663',
                     filestore_path=None),
     'FEI-Quanta200-ESEM-633137':
@@ -104,6 +109,7 @@ instrument_db = {
                     calendar_url=_get_cal_url('FEI%20Quanta200%20Events'),
                     location='***REMOVED***',
                     name='FEI-Quanta200-ESEM-633137',
+                    schema_name='FEI Quanta200',
                     property_tag='633137',
                     filestore_path='./Quanta'),
     'FEI-Titan-STEM-630901':
@@ -112,6 +118,7 @@ instrument_db = {
                     calendar_url=_get_cal_url('MMSD%20Titan'),
                     location='***REMOVED***',
                     name='FEI-Titan-STEM-630901',
+                    schema_name='FEI Titan STEM',
                     property_tag='630901',
                     filestore_path=None),
     'FEI-Titan-TEM-635816':
@@ -120,6 +127,7 @@ instrument_db = {
                     calendar_url=_get_cal_url('FEI%20Titan%20Events'),
                     location='***REMOVED***',
                     name='FEI-Titan-TEM-635816',
+                    schema_name='FEI Titan TEM',
                     property_tag='635816',
                     filestore_path='./Titan'),
     'Hitachi-S4700-SEM-606559':
@@ -128,6 +136,7 @@ instrument_db = {
                     calendar_url=_get_cal_url('Hitachi%20S4700%20Events'),
                     location='***REMOVED***',
                     name='Hitachi-S4700-SEM-606559',
+                    schema_name='Hitachi S4700',
                     property_tag='606559',
                     filestore_path=None),
     'Hitachi-S5500-SEM-635262':
@@ -136,6 +145,7 @@ instrument_db = {
                     calendar_url=_get_cal_url('HitachiS5500'),
                     location='***REMOVED***',
                     name='Hitachi-S5500-SEM-635262',
+                    schema_name='Hitachi S5500',
                     property_tag='635262',
                     filestore_path=None),
     'JEOL-JEM3010-TEM-565989':
@@ -144,6 +154,7 @@ instrument_db = {
                     calendar_url=_get_cal_url('JEOL%20JEM3010%20Events'),
                     location='***REMOVED***',
                     name='JEOL-JEM3010-TEM-565989',
+                    schema_name='JEOL JEM3010',
                     property_tag='565989',
                     filestore_path='./JEOL3010'),
     'JEOL-JSM7100-SEM-N102656':
@@ -152,6 +163,7 @@ instrument_db = {
                     calendar_url=_get_cal_url('JEOL%20JSM7100%20Events'),
                     location='***REMOVED***',
                     name='JEOL-JSM7100-SEM-N102656',
+                    schema_name='JEOL JSM7100',
                     property_tag='N102656',
                     filestore_path='./7100Jeol'),
     'Philips-CM30-TEM-540388':
@@ -160,6 +172,7 @@ instrument_db = {
                     calendar_url=_get_cal_url('Philips%20CM30%20Events'),
                     location='Unknown',
                     name='Philips-CM30-TEM-540388',
+                    schema_name='Philips CM30',
                     property_tag='540388',
                     filestore_path=None),
     'Philips-EM400-TEM-599910':
@@ -168,6 +181,7 @@ instrument_db = {
                     calendar_url=_get_cal_url('Philips%20EM400%20Events'),
                     location='***REMOVED***',
                     name='Philips-EM400-TEM-599910',
+                    schema_name='Philips EM400',
                     property_tag='599910',
                     filestore_path=None)
 }
