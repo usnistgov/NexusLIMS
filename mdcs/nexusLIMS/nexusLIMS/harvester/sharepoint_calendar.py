@@ -35,19 +35,19 @@ import requests as _requests
 
 import nexusLIMS
 from requests_ntlm import HttpNtlmAuth as _HttpNtlmAuth
-from lxml import etree as _etree
 from dateparser import parse as _dp_parse
 import ldap3 as _ldap3
 from datetime import datetime as _datetime
 from configparser import ConfigParser as _ConfigParser
 from nexusLIMS.instruments import instrument_db as _instr_db
+from nexusLIMS.utils import parse_xml as _parse_xml
 
 _logger = _logging.getLogger(__name__)
 XSLT_PATH = _os.path.join(_os.path.dirname(__file__), "cal_parser.xsl")
 INDENT = '  '
 
 __all__ = ['AuthenticationError', 'get_auth', 'fetch_xml', 'get_div_and_group',
-           'parse_xml', 'get_events', '_wrap_events', 'dump_calendars']
+           'get_events', '_wrap_events', 'dump_calendars']
 
 
 class AuthenticationError(Exception):
@@ -284,65 +284,6 @@ def fetch_xml(instrument=None):
 fetch_xml.__doc__ = fetch_xml.__doc__.format([str(k) for k in _instr_db.keys()])
 
 
-def parse_xml(xml, date=None, user=None, division=None, group=None):
-    """
-    Parse and translate an XML string from the API into a nicer format
-
-    Parameters
-    ----------
-    xml : str or bytes
-        A string containing XML, such as that returned by :py:func:`~.fetch_xml`
-    date : None or str
-        Either None or a YYYY-MM-DD date string indicating the date from
-        which events should be fetched (note: the start time of each entry
-        is what will be compared). If None, no date filtering will be
-        performed.
-    user : None or str
-        Either None or a valid NIST username (the short format: e.g. "ear1"
-        instead of ernst.august.ruska@nist.gov).
-    division : None or str
-        The division number of the project. If provided, this string will be
-        replicated under the "project" information in the outputted XML.
-    group : None or str
-        The group number of the project. If provided, this string will be
-        replicated under the "project" information in the outputted XML. If
-        ``None`` (and ``user`` is provided), the group will be queried
-        from the active directory server.
-
-    Returns
-    -------
-    simplified_dom : ``lxml.XSLT`` transformation result
-    """
-    parser = _etree.XMLParser(remove_blank_text=True, encoding='utf-8')
-
-    # load XML structure from  string
-    root = _etree.fromstring(xml, parser)
-
-    # use LXML to load XSLT stylesheet into xsl_transform
-    # (note, etree.XSLT needs to be called on a root _Element
-    # not an _ElementTree)
-    xsl_dom = _etree.parse(XSLT_PATH, parser).getroot()
-    xsl_transform = _etree.XSLT(xsl_dom)
-
-    # setup parameters for passing to XSLT parser
-    def _setup_parameters(param):
-        return "''" if param is None else "'{}'".format(param)
-    date_param = _setup_parameters(date)
-    user_param = _setup_parameters(user)
-
-    division_param = _setup_parameters(division)
-    group_param = _setup_parameters(group)
-
-    # do XSLT transformation
-    simplified_dom = xsl_transform(root,
-                                   date=date_param,
-                                   user=user_param,
-                                   division=division_param,
-                                   group=group_param)
-
-    return simplified_dom
-
-
 # DONE: split up fetching calendar from server and parsing XML response
 def get_events(instrument=None,
                date=None,
@@ -414,8 +355,11 @@ def get_events(instrument=None,
 
     for xml in xml_strings:
         # parse the xml into a string, and then indent
-        output += INDENT + str(parse_xml(xml, date, user, division, group)).\
-            replace('\n', '\n' + INDENT)
+        output += INDENT + str(_parse_xml(xml, XSLT_PATH,
+                                          date=date, user=user,
+                                          division=division,
+                                          group=group)).replace('\n', '\n' +
+                                                                INDENT)
 
     if wrap:
         output = _wrap_events(output)
@@ -455,6 +399,7 @@ def _wrap_events(events_string):
 
 
 def dump_calendars(instrument=None, user=None, date=None,
+                   group=None, division=None,
                    filename='cal_events.xml'):
     """
     Write the results of :py:func:`~.get_events` to a file.
@@ -464,7 +409,6 @@ def dump_calendars(instrument=None, user=None, date=None,
     instrument : None, str, or list
         One or more of {}, or ``None``. If ``None``, all instruments will be
         returned.
-
     date : None or str
         Either None or a YYYY-MM-DD date string indicating the date from
         which events should be fetched (note: the start time of each entry
@@ -472,18 +416,27 @@ def dump_calendars(instrument=None, user=None, date=None,
         performed. Date will be parsed by :py:func:`dateparser.parse`,
         but providing the date in the ISO standard format is preferred for
         consistent behavior.
-
     user : None or str
         Either None or a valid NIST username (the short format: e.g. ``"ear1"``
         instead of ernst.august.ruska@nist.gov). If None, no user filtering
         will be performed. No verification of username is performed,
         so it is up to the user to make sure this is correct.
-
+    division : None or str
+        The division number of the project. If provided, this string will be
+        replicated under the "project" information in the outputted XML. If
+        ``None`` (and ``user`` is provided), the division will be queried
+        from the active directory server.
+    group : None or str
+        The group number of the project. If provided, this string will be
+        replicated under the "project" information in the outputted XML. If
+        ``None`` (and ``user`` is provided), the group will be queried
+        from the active directory server.
     filename : str
         The filename to which the events should be written
     """
     with open(filename, 'w') as f:
-        text = get_events(instrument=instrument, date=date, user=user)
+        text = get_events(instrument=instrument, date=date, user=user,
+                          division=division, group=group, wrap=True)
         f.write(text)
 dump_calendars.__doc__ = dump_calendars.__doc__.format([str(k) for k in
                                                        _instr_db.keys()])

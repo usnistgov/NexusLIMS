@@ -21,6 +21,8 @@
              as well) -->
   <xsl:param name="date"/>
   <xsl:param name="user"/>
+  <xsl:param name="division"/>
+  <xsl:param name="group"/>
 
   <xsl:template match="/feed">
     <!--The following choose block decides which entry nodes to process. If

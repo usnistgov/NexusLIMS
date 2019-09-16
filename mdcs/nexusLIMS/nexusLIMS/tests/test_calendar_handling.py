@@ -3,6 +3,7 @@ import pytest
 import requests
 from lxml import etree
 from nexusLIMS.harvester import sharepoint_calendar as sc
+from nexusLIMS.utils import parse_xml as _parse_xml
 from nexusLIMS.harvester.sharepoint_calendar import AuthenticationError
 from nexusLIMS.instruments import instrument_db
 from collections import OrderedDict
@@ -27,6 +28,8 @@ class TestCalendarHandling:
     # this is done by fetch_xml() in the actual processing
     XML_TEST_FILE = os.path.join(os.path.dirname(__file__), "files",
                                  "2019-03-14_titan_tem_cal.xml")
+    SC_XSL_FILE = os.path.abspath(
+        os.path.join(os.path.dirname(sc.__file__), 'cal_parser.xsl'))
     CREDENTIAL_FILE_ABS = os.path.abspath(
         os.path.join(os.path.dirname(__file__),
                      '..',
@@ -47,14 +50,22 @@ class TestCalendarHandling:
         # parsed_xml items will be an _XSLTResultTree object with many
         # <event>...</event> tags on the same level
         parsed_xml = dict()
-        parsed_xml['all'] = sc.parse_xml(file_content)           # 403 items
-        parsed_xml['user'] = sc.parse_xml(file_content,
-                                          user='***REMOVED***')            # 10 items
-        parsed_xml['date'] = sc.parse_xml(file_content,
-                                          date='2019-03-06')     # 2 items
-        parsed_xml['date_and_user'] = sc.parse_xml(file_content,
-                                                   date='2019-03-06',
-                                                   user='***REMOVED***')  # 1 item
+        # should be 403 items
+        parsed_xml['all'] = _parse_xml(xml=file_content,
+                                       xslt_file=self.SC_XSL_FILE)
+        # should be 10 items
+        parsed_xml['user'] = _parse_xml(xml=file_content,
+                                        xslt_file=self.SC_XSL_FILE,
+                                        user="***REMOVED***")
+        # should be 2 items
+        parsed_xml['date'] = _parse_xml(xml=file_content,
+                                        xslt_file=self.SC_XSL_FILE,
+                                        date='2019-03-06')
+        # should be 1 item
+        parsed_xml['date_and_user'] = _parse_xml(xml=file_content,
+                                                 xslt_file=self.SC_XSL_FILE,
+                                                 date='2019-03-06',
+                                                 user='***REMOVED***')
 
         # convert parsing result to string and wrap so we have well-formed xml:
         xml_strings = dict()
