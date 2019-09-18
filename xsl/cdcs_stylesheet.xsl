@@ -3,6 +3,10 @@
     xmlns:nx="https://data.nist.gov/od/dm/nexus/experiment/v1.0"
     version="1.0">
     <xsl:output method="html" indent="yes" encoding="UTF-8"/>
+
+    <xsl:variable name="datasetBaseUrl">http://***REMOVED***/mmfnexus/</xsl:variable>
+    <xsl:variable name="previewBaseUrl">http://***REMOVED***/nexusLIMS/mmfnexus/</xsl:variable>
+
     <xsl:template match="/">
         <xsl:apply-templates select="/nx:Experiment"/>
     </xsl:template>
@@ -11,198 +15,259 @@
         <!-- ============ CSS Styling ============ --> 
         <style>
             body { /* Set the font style for the page */
-            font-family: "Lato", sans-serif;
-            overflow-x: hidden;
+                font-family: "Lato", sans-serif;
+                overflow-x: hidden;
             }
-                        
+
+            /* Link colors */
+            a:link {
+                color: #3865a3;
+            }
+            a:visited {
+                color: #3865a3;
+            }
+            a:hover {
+                color: #5e7ca3;
+            }
+
             button { 
-            cursor: pointer; /* Changes cursor type when hovering over a button */
-            font-size: 12px;
+                cursor: pointer; /* Changes cursor type when hovering over a button */
+                font-size: 12px;
             }
             
             img {
-            max-height: 350px;
-            max-width: auto;
-            margin-left: auto; /* Center justify images */
-            margin-right: auto;
-            display: block;
+                max-width: 100%;
+                margin-left: auto; /* Center justify images */
+                margin-right: auto;
+                display: block;
             }
             
             th,td {
-            font-size: 14px;
+                font-size: 14px;
             }
             
             .header {
-            font-size: 19px;
-            text-decoration: none;
-            color: black;
+                font-size: 19px;
+                text-decoration: none;
+                color: black;
             }
             
             .header:hover {
-            cursor: default;
-            color: black;
+                cursor: default;
+                color: black;
             }
             
             .sidenav { /* Parameters for the sidebar */
-            width: 170px;
-            position: absolute;
-            z-index: auto;
-            overflow-x: hidden;
-            background-color: #ffffff;
-            border-style: solid solid solid none;
-            border-width: 2px;
+                width: 170px;
+                position: absolute;
+                z-index: auto;
+                overflow-x: hidden;
+                background-color: #ffffff;
+                border-style: solid solid solid none;
+                border-width: 2px;
             }
             
             .sidenav a { /* Parameters for the acquisition activity links within the sidebar */
-            text-decoration: none;
-            font-size: 16px;
+                text-decoration: none;
+                font-size: 16px;
+                font-weight: bold;
             }
             
             .sidenav div { /* Parameters for other text found in the sidebar (e.g. start time) */
-            font-size: 11px;
+                font-size: 11px;
             }
             
             /* Set up 2 divided columns to separate setup parameters and the corresponding image gallery */
-            .column { 
-            float: left;
-            width: 50%;
+            .row {
+                display: flex;
             }
-            
-            .row:after {
-            content: "";
-            display: table;
-            clear: both;
+
+            .column {
+                flex: 50%;
             }
             
             .slide {
-            display: none;
+                display: none;
             }
             
             .slideshow-container {
-            max-height: 300px;
-            position: relative;
-            margin: auto;
+                position: relative;
+                margin: auto;
+                margin-bottom: 2em;
             }
             
             .prev, .next { /* Parameters for the 'next' and 'prev' buttons on the slideshow gallery */
-            cursor: pointer;
-            position: absolute;
-            top: 50%;
-            width: auto;
-            padding: 16px;
-            margin-top: -22px;
-            color: white;
-            font-weight: bold;
-            font-size: 18px;
-            transition: 0.6s ease;
-            border-radius: 0 3px 3px 0;
-            background-color: rgba(0,0,0,0.8);
-            user-select: none;
+                cursor: pointer;
+                position: absolute;
+                top: 50%;
+                width: auto;
+                padding: 16px;
+                margin-top: -22px;
+                color: white;
+                font-weight: bold;
+                font-size: 18px;
+                transition: 0.6s ease;
+                border-radius: 3px 0px 0px 3px;
+                user-select: none;
+                background-color: rgba(0,0,0,0.4);
             }
             
             .next { /*Have the 'next' button appear on the right of the slideshow gallery */
-            right: 0;
-            border-radius: 3px 0 0 3px;
+                right: 0;
+                border-radius: 0px 3px 3px 0px;
             }
             
             .prev:hover, .next:hover { /* Have a background appear when the prev/next buttons are hovered over */
-            background-color: rgba(145,145,145,0.8);
+                background-color: rgba(145,145,145,0.8);
             }
-            
+
+            .text { /* Parameters for the caption text displayed in the image gallery */
+                color: black;
+                font-size: 1em;
+                padding: 8px 12px;
+                position: absolute;
+                bottom: -2em;
+                width: 100%;
+                text-align: center;
+            }
+
             #to_top_button { /* Parameters for the button which jumps to the top of the page when clicked */
-            display: none; /* Set button to hidden on default so that it will appear when the page is scrolled */
-            position: fixed;
-            bottom: 35px;
-            right: 45px;
-            background-color: #e87474;
-            border: none;
-            outline: none;
-            color: white;
-            cursor: pointer;
-            padding: 15px 20px;
-            border-radius: 3px;
-            font-size: 14px;
+                display: none; /* Set button to hidden on default so that it will appear when the page is scrolled */
+                position: fixed;
+                bottom: 35px;
+                right: 45px;
+                background-color: #3865a3;
+                border: none;
+                outline: none;
+                color: white;
+                cursor: pointer;
+                padding: 15px 20px;
+                border-radius: 3px;
+                font-size: 14px;
             }
             
             #to_top_button:hover { /* Changes the color of the button when hovered over */
-            background-color: #555;
+                background-color: #5e7ca3;
             }
-            
+
             .accordion { /* Parameters for accordions used to hide parameter / metadata tables */
-            background-color: #eee;
-            color: #444;
-            cursor: pointer;
-            padding: 18px;
-            width: 95%;
-            border: none;
-            text-align: left;
-            outline: none;
-            font-size: 15px;
-            transition: 0.4s;
+                background-color: #eee;
+                color: #444;
+                cursor: pointer;
+                padding: 18px;
+                width: 95%;
+                border: none;
+                text-align: left;
+                outline: none;
+                font-size: 15px;
+                transition: 0.4s;
             }
             
             .active, .accordion:hover { /* Change color of the accordion when it is active or hovered over */
-            background-color: #ccc;
+                background-color: #ccc;
             }
             
             .accordion:after { /* Parameters for the accordion header while it is open */
-            content: '\002B';
-            color: #777;
-            font-weight: bold;
-            float: right;
-            margin-left: 5px;
+                content: '\002B';
+                color: #777;
+                font-weight: bold;
+                float: right;
+                margin-left: 5px;
             }
             
             .active:after {
-            content: '\2212';
+                content: '\2212';
             }
             
             .panel { /* Parameters for the contents of the accordion */
-            padding: 0 18px;
-            background-color: white;
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.2s ease-out;
+                background-color: white;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.2s ease-out;
+                width: 95%;
+            }
+
+            img.dataset-preview-img {
+                display: block;
+                width: 100%;
+                height: auto;
+                max-height: 400px;
+                max-width: 400px;
             }
             
             .modal { /* Parameters for modal boxes */
-            display: none;
-            position: fixed;
-            z-index: 1;
-            padding-top: 100px;
-            left: 0;
-            top: 0;
-            width: 100%;
-            height: 100%;
-            overflow: auto;
-            background-color: rgba(209,203,203,0.7);
+                display: none;
+                position: fixed;
+                z-index: 1;
+                padding-top: 100px;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                background-color: rgba(209,203,203,0.7);
             }
             
             .modal-content { /* Parameters for content within modal boxes */
-            background-color: #fefefe;
-            margin: auto;
-            padding: 20px;
-            border: 1px solid #888;
-            width: 80%;
+                background-color: #fefefe;
+                margin: auto;
+                padding: 20px;
+                border: 1px solid #888;
+                width: 80%;
             }
             
             .close { /* Parameters for 'X' used to close the modal box */
-            color: #000;
-            float: right;
-            font-size: 28px;
-            font-weight: bold;
+                color: #000;
+                float: right;
+                font-size: 28px;
+                font-weight: bold;
             }
             
             .close:hover, /* Changes color of close button and cursor type when hovering over it */
-            .close:focus {
-            color: #525252;
-            text-decoration: none;
-            cursor: pointer;
+                .close:focus {
+                color: #525252;
+                text-decoration: none;
+                cursor: pointer;
             }
             
             .main_body { /* Set parameters for the rest of the page in order to adjust for the sidebar being there */
-            margin-left: 170px; /* Same width as the sidebar + left position in px */
-            padding: 0px 10px;
+                margin-left: 170px; /* Same width as the sidebar + left position in px */
+                padding: 0px 10px;
+            }
+
+            .main_body h1 {
+                font-size: 1.5em;
+            }
+
+            .main_body h3 {
+                font-size: 1.1em;
+            }
+
+            table.preview-and-table {
+                margin: 2em auto;
+            }
+
+            table.preview-and-table td {
+                vertical-align: middle;
+                font-size: 0.9em;
+            }
+
+            table.meta-table {
+                border-collapse: collapse;
+            }
+
+            table.meta-table td, table.meta-table th {
+                padding: 0.3em;
+            }
+
+            table.meta-table th {
+                background-color: #3a65a2;
+                border-color: black;
+                color: white;
+            }
+
+            th.parameter-name {
+                font-weight: bold;
             }
         </style>
         
@@ -230,59 +295,71 @@
                 <xsl:value-of select="summary/experimenter"/>
             </h3>
             
-            <!-- Display the motivation for the experiment -->
-            <div style="font-size:20px;"><b>Motivation</b></div>
-            <div style="font-size:16px;"><xsl:value-of select="summary/motivation"/></div>
-            
             <div class="row">
-                <div class="column" style="font-size:15px;">
+                <div class="column" id="session_info_column">
+                    <h3>Reservation Information</h3>
                     <!-- Display summary information (date, time, instrument, and id) -->
-                    <div align="left" style="border-style:none;border-width:2px;padding:6px;">
-                        <div><b>Instrument: </b>
-                            <xsl:value-of select="summary/instrument"/>
-                        </div>
-                        <div><b>Date: </b>
-                            <xsl:call-template name="tokenize-select">
-                              <xsl:with-param name="text" select="summary/reservationStart"/>
-                              <xsl:with-param name="delim">T</xsl:with-param>
-                              <xsl:with-param name="i" select="1"/>
-                            </xsl:call-template>
-                        </div>
-                        <div><b>Start Time: </b>
-                            <xsl:call-template name="tokenize-select">
-                              <xsl:with-param name="text" select="summary/reservationStart"/>
-                              <xsl:with-param name="delim">T</xsl:with-param>
-                              <xsl:with-param name="i" select="2"/>
-                            </xsl:call-template>
-                        </div>
-                        <div><b>End Time: </b>
-                            <xsl:call-template name="tokenize-select">
-                              <xsl:with-param name="text" select="summary/reservationEnd"/>
-                              <xsl:with-param name="delim">T</xsl:with-param>
-                              <xsl:with-param name="i" select="2"/>
-                            </xsl:call-template>
-                        </div>
-                        <!-- Display id associated with the time on the machine -->
-                        <div><b>Session ID: </b>
-                            <xsl:value-of select="id"/>
-                        </div>
-                        <a class="link" href="https:\\nist.gov" target="_blank" style="font-size:14px;">(Original Data)</a>
-                    </div>
-                    
+
+                    <table class="session-info-table" border="3" style="border-collapse:collapse;width:80%;">
+                        <tr>
+                            <th align="left" class="parameter-name">Motivation: </th>
+                            <td align="left"><xsl:value-of select="summary/motivation"/></td>
+                        </tr>
+                        <tr>
+                            <th align="left" class="parameter-name">Instrument: </th>
+                            <td align="left"><xsl:value-of select="summary/instrument"/></td>
+                        </tr>
+                        <tr>
+                            <th align="left" class="parameter-name">Date: </th>
+                            <td align="left">
+                                <xsl:call-template name="tokenize-select">
+                                    <xsl:with-param name="text" select="summary/reservationStart"/>
+                                    <xsl:with-param name="delim">T</xsl:with-param>
+                                    <xsl:with-param name="i" select="1"/>
+                                </xsl:call-template>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th align="left" class="parameter-name">Start Time: </th>
+                            <td align="left">
+                                <xsl:call-template name="tokenize-select">
+                                    <xsl:with-param name="text" select="summary/reservationStart"/>
+                                    <xsl:with-param name="delim">T</xsl:with-param>
+                                    <xsl:with-param name="i" select="2"/>
+                                </xsl:call-template>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th align="left" class="parameter-name">End Time: </th>
+                            <td align="left">
+                                <xsl:call-template name="tokenize-select">
+                                    <xsl:with-param name="text" select="summary/reservationEnd"/>
+                                    <xsl:with-param name="delim">T</xsl:with-param>
+                                    <xsl:with-param name="i" select="2"/>
+                                </xsl:call-template>
+                            </td>
+                        </tr>
+                        <tr>
+                            <th align="left" class="parameter-name">Session ID: </th>
+                            <td align="left"><xsl:value-of select="id"/></td>
+                        </tr>
+                    </table>
+
                     <!-- Display information about the sample -->  
-                    <h3>Sample Information</h3> 
-                    <table border="3" style="border-collapse:collapse;width:80%;">
+                    <h3>Sample Information</h3>
+
+                    <table class="session-info-table" border="3" style="border-collapse:collapse;width:80%;">
                         <tr>
-                            <th align="left">Sample Name</th>
-                            <th align="left"><xsl:value-of select="sample/name"/></th>
+                            <th align="left" class="parameter-name">Sample name: </th>
+                            <td align="left"> <xsl:value-of select="sample/name"/></td>
                         </tr>
                         <tr>
-                            <th align="left">Sample ID</th>
-                            <th align="left"><xsl:value-of select="acquisitionActivity[@seqno=1]/sampleID"/></th>
+                            <th align="left" class="parameter-name">Sample ID: </th>
+                            <td align="left"><xsl:value-of select="acquisitionActivity[@seqno=1]/sampleID"/></td>
                         </tr>
                         <tr>
-                            <th align="left">Description</th>
-                            <th align="left"><xsl:value-of select="sample/description"/></th>
+                            <th align="left" class="parameter-name">Description: </th>
+                            <td align="left"><xsl:value-of select="sample/description"/></td>
                         </tr>
                     </table>
                 </div>
@@ -290,13 +367,12 @@
                 <!-- Image gallery showing images from every dataset of the session -->
                 <div class="column">
                     <div class="slideshow-container" id="img_gallery">
-                        <div class="slide">
-                            <img src="https://www.nanoimages.com/wp-content/uploads/Tin.jpg"/>
-                        </div>
-                        <div class="slide">
-                            <img src="http://www.aerogel.org/wp-content/uploads/2009/03/fenanofoamsem-lanl.jpg"/>
-                        </div>
-                        
+                        <xsl:for-each select="//dataset">
+                            <div class="slide">
+                                <img><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute></img>
+                                <div class="text"><xsl:value-of select="position()"/> / <xsl:value-of select="count(//dataset)" /></div>
+                            </div>
+                        </xsl:for-each>
                         <a class="prev" onclick="plusSlide(-1)">&lt;</a>
                         <a class="next" onclick="plusSlide(1)">&gt;</a>
                     </div>
@@ -311,23 +387,24 @@
                     <a name="{generate-id(current())}" class="header">
                         <b>Acquisition Activity <xsl:value-of select="@seqno+1"/></b>
                     </a>
-                    <div style="font-size:15px"><i><xsl:value-of select="setup/param[@name='Mode']"/></i></div>
+                    <div style="font-size:15px">Activity mode: <i><xsl:value-of select="setup/param[@name='Mode']"/></i></div>
                 </div>
                 
                 <!-- Create accordion which contains acquisition activity setup parameters -->
                 <button class="accordion" style="font-weight:bold;font-size:19px;">Activity Parameters</button>
                 <div class="panel">
-                    <div><b>Start time:</b>
+                    <div style="padding:0.3em;"><b>Start time:</b>
                     <xsl:call-template name="tokenize-select">
-                      <xsl:with-param name="text" select="summary/reservationStart"/>
+                      <xsl:with-param name="text" select="startTime"/>
                       <xsl:with-param name="delim">T</xsl:with-param>
                       <xsl:with-param name="i" select="2"/>
                     </xsl:call-template></div>
 
                     <!-- Generate the table with setup conditions for each acquisition activity -->
-                    <table border="1" style="border-collapse:collapse;">
-                        <tr bgcolor="#84b1f9">
-                            <th>Setup</th>
+                    <table class="meta-table" border="1" style="">
+                        <tr>
+                            <th>Setup Parameter</th>
+                            <th>Value</th>
                         </tr>
                         <!-- Loop through each setup value under the 'param' heading -->
                         <xsl:for-each select="setup/param">
@@ -347,36 +424,47 @@
                     <div id="#{generate-id(current())}" class="modal">
                         <div class="modal-content">
                             <span class="close" onclick="closeModal('#{generate-id(current())}')">X</span>
-                            <img src="https://www.nanoimages.com/wp-content/uploads/Metal_BSE.jpg"/>
+                            <img><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute></img>
                         </div>
                     </div>
                     
                     <!-- Create accordion which contains metadata for each image dataset -->
                     <button class="accordion"><b><xsl:value-of select="@type"/>: <xsl:value-of select="name"/></b></button>
                     <div class="panel">
-                        <xsl:choose>
-                            <xsl:when test="meta"> <!-- Checks whether there are parameters and only creates a table if there is --> 
-                               <table border="1" style="border-collapse:collapse;">
-                                   <tr bgcolor="#84b1f9">
-                                       <th><b>Parameter</b></th>
-                                       <!-- Button which opens a modal box displaying the image for each dataset, respectively -->
-                                       <th><button onclick="openModal('#{generate-id(current())}')">View Thumbnail</button></th>
-                                   </tr>
-                                   <!-- Loop through each metadata parameter -->
-                                   <xsl:for-each select="meta">
-                                       <xsl:sort select="@name"/>
-                                       <tr>
-                                           <!-- Populate table values with the metadata name and value -->
-                                           <td><b><xsl:value-of select="@name"/></b></td>
-                                           <td><xsl:value-of select="current()"/></td>
-                                       </tr>
-                                   </xsl:for-each>                        
-                               </table>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <button onclick="openModal('#{generate-id(current())}')">View Thumbnail</button>
-                            </xsl:otherwise>
-                        </xsl:choose>
+                        <form><xsl:attribute name="action"><xsl:value-of select="$datasetBaseUrl"/><xsl:value-of select="location"/></xsl:attribute>
+                            <button class="aa_button" style="display:block; margin: 2em auto;" type="submit">Download original data</button>
+                        </form>
+                        <table class="preview-and-table">
+                        <tr>
+                            <td>
+                                <a><xsl:attribute name="href"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute>
+                                    <img width="400" height="400" class="dataset-preview-img"><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute></img>
+                                </a>
+                            </td>
+                            <xsl:choose>
+                                <xsl:when test="meta"> <!-- Checks whether there are parameters and only creates a table if there is -->
+                                    <td>
+                                        <table class="meta-table" border="1" style="width:100%; border-collapse:collapse;">
+                                            <tr bgcolor="#3a65a2" color='white'>
+                                                <th>Parameter</th>
+                                                <th>Value</th>
+                                            </tr>
+                                           <!-- Loop through each metadata parameter -->
+                                           <xsl:for-each select="meta">
+                                               <xsl:sort select="@name"/>
+                                               <tr>
+                                                   <!-- Populate table values with the metadata name and value -->
+                                                   <td><b><xsl:value-of select="@name"/></b></td>
+                                                   <td><xsl:value-of select="current()"/></td>
+                                               </tr>
+                                           </xsl:for-each>
+                                       </table>
+                                   </td>
+                                </xsl:when>
+                                <xsl:otherwise/>
+                            </xsl:choose>
+                        </tr>
+                        </table>
                     </div>
                 </xsl:for-each>
                 <br/>
@@ -389,9 +477,8 @@
         </button>
         
         <!-- Javascript which supports some capabilities on the generated page -->
-        <script language="javascript">                
-            
-            <xsl:comment><![CDATA[
+        <script language="javascript">
+            <![CDATA[
             //Function which scrolls to the top of the page
             function toTop(){
                 document.body.scrollTop = document.documentElement.scrollTop = 0;
@@ -489,7 +576,30 @@
                 
                 document.getElementById("img_gallery").appendChild(slide);
             }
-            ]]></xsl:comment>
+
+            // Key handlers
+            document.onkeydown = function(evt) {
+                evt = evt || window.event;
+                var isLeft = false;
+                var isRight = false;
+                var isEscape = false;
+                isLeft = (evt.keyCode === 37);
+                isRight = (evt.keyCode === 39);
+                isEscape = (evt.keyCode === 27);
+                if (isLeft) {
+                    plusSlide(-1);
+                }
+                if (isRight) {
+                    plusSlide(1);
+                }
+                if (isEscape) {
+                    var i;
+                    for (i = 0; i < document.getElementsByClassName("modal").length; i++) {
+                      closeModal(document.getElementsByClassName("modal")[i].id);
+                    }
+                }
+            }
+            ]]>
         </script>
       </div>
     </xsl:template>
