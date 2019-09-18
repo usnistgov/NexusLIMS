@@ -124,7 +124,7 @@ class TestCalendarHandling:
                 def __init__(self):
                     self.status_code = 404
 
-            def mock_get(url, auth):
+            def mock_get(url, auth, verify):
                 return MockResponse()
 
             # User bad username so we don't get a valid response or lock miclims

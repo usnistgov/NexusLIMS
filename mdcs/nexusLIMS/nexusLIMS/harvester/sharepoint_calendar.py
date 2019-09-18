@@ -32,6 +32,8 @@ import os as _os
 import re as _re
 import logging as _logging
 import requests as _requests
+import certifi as _certifi
+import tempfile as _tempfile
 
 import nexusLIMS
 from requests_ntlm import HttpNtlmAuth as _HttpNtlmAuth
@@ -44,6 +46,8 @@ from nexusLIMS.utils import parse_xml as _parse_xml
 
 _logger = _logging.getLogger(__name__)
 XSLT_PATH = _os.path.join(_os.path.dirname(__file__), "cal_parser.xsl")
+CA_BUNDLE_PATH = _os.path.join(_os.path.dirname(__file__),
+                               "sharepoint_cert_bundle.pem")
 INDENT = '  '
 
 __all__ = ['AuthenticationError', 'get_auth', 'fetch_xml', 'get_div_and_group',
@@ -115,6 +119,34 @@ class CalendarEvent:
         self.files = [] if files is None else files
         self.sigs = [] if sigs is None else sigs
         self.meta = [] if meta is None else meta
+
+
+def get(url):
+    """
+    A helper method that mirrors :py:func:`requests.get`, but adds a local
+    certificate authority chain to validate the SharePoint server's certificates
+
+    Parameters
+    ----------
+    url : str
+        The URL to fetch
+
+    Returns
+    -------
+    r : :py:class:`requests.Response`
+        A requests response object
+    """
+    with _tempfile.NamedTemporaryFile() as tmp:
+        with open(_certifi.where(), 'rb') as sys_cert:
+            lines = sys_cert.readlines()
+        tmp.writelines(lines)
+        with open(CA_BUNDLE_PATH, 'rb') as our_cert:
+            lines = our_cert.readlines()
+        tmp.writelines(lines)
+        tmp.seek(0)
+        r = _requests.get(url, auth=get_auth(), verify=tmp.name)
+
+    return r
 
 
 def get_div_and_group(username):
@@ -253,7 +285,7 @@ def fetch_xml(instrument=None):
     for i, instr in enumerate(inst_to_fetch):
         instr_url = instr.api_url + '?$expand=CreatedBy'
         _logger.info("Fetching Nexus calendar events from {}".format(instr_url))
-        r = _requests.get(instr_url, auth=get_auth())
+        r = get(instr_url)
         _logger.info("  {} -- {} -- response: {}".format(instr.name,
                                                          instr_url,
                                                          r.status_code))
