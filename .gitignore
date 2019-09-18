@@ -29,3 +29,6 @@ htmlcov/
 
 # pickle save files
 *.pk
+
+# Oxygen project files
+*.xpr
