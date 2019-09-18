@@ -67,6 +67,5 @@ def parse_xml(xml, xslt_file, **kwargs):
     except _etree.XSLTApplyError:
         for error in xsl_transform.error_log:
             print(error.message, error.line)
-        simplified_dom = None
-
+        raise _etree.XSLTApplyError
     return simplified_dom

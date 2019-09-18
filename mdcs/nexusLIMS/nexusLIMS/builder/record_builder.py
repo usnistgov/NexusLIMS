@@ -31,13 +31,18 @@ import os as _os
 import logging as _logging
 import hyperspy.api_nogui as _hs
 from uuid import uuid4 as _uuid4
+from lxml import etree as _etree
 from datetime import datetime as _datetime
 from nexusLIMS.schemas.activity import AcquisitionActivity as _AcqAc
+from nexusLIMS.instruments import instrument_db as _instr_db
 from nexusLIMS.harvester import sharepoint_calendar as _sp_cal
+from nexusLIMS.utils import parse_xml as _parse_xml
 from glob import glob as _glob
 from timeit import default_timer as _timer
 
 _logger = _logging.getLogger(__name__)
+XSLT_PATH = _os.path.join(_os.path.dirname(__file__),
+                          "cal_events_to_nx_record.xsl")
 
 
 def build_record(path, instrument, date, user):
@@ -90,11 +95,23 @@ def build_record(path, instrument, date, user):
     xml_record += "xmlns:nx=\"" \
                   "https://data.nist.gov/od/dm/nexus/experiment/v1.0\">\n"
 
-    # TODO: Account for results from multiple sessions?
     _logger.info(f"Getting calendar events with instrument: {instrument}, "
                  f"date: {date}, user: {user}")
-    xml_record += _sp_cal.get_events(instrument=instrument, date=date,
-                                     user=user, wrap=False)
+    events_str = _sp_cal.get_events(instrument=instrument, date=date,
+                                    user=user, wrap=True)
+    # TODO: Account for results from multiple sessions? This should only
+    #  happen if one user has multiple reservations on the same date. For now,
+    #  assume the first record is the right one:
+    # Apply XSLT to transform calendar events to single record format:
+    output = _parse_xml(events_str, XSLT_PATH,
+                        instrument_PID=instrument,
+                        instrument_name=_instr_db[instrument].schema_name,
+                        experiment_id=str(_uuid4()),
+                        collaborator=None,
+                        sample_id=str(_uuid4()))
+
+    xml_record += str(output)
+
     _logger.info(f"Building acquisition activities for {path}")
     xml_record += build_acq_activities(path=path)
 

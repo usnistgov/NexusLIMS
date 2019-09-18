@@ -10,8 +10,8 @@ from uuid import UUID as _UUID
 class TestRecordBuilder:
     def test_record_builder(self):
         path_to_search = _os.path.join(_mmf_nexus_root_path, 'Titan/***REMOVED***/',
-                                      '181113 - ***REMOVED*** - '
-                                      '***REMOVED*** - Titan')
+                                       '181113 - ***REMOVED*** - '
+                                       '***REMOVED*** - Titan')
 
         # Build the XML record and write it to a file
         filename = _rb.dump_record(path_to_search,
@@ -22,18 +22,20 @@ class TestRecordBuilder:
         # Read the generated XML file using ElementTree
         assert _os.path.isfile(filename)
         record = et.parse(filename).getroot()
-        event = record.find('event')
         acq_acts = record.findall('acquisitionActivity')
 
         # Test some generated parts taken from the SharePoint calendar as well
         # as from the microscope metadata
-        assert record[0][1].tag == 'userSearched'
-        assert record[0][4][0].tag == 'userName'
-        assert event.find('instrument').text == 'FEITitanTEMEvents'
-        assert event.find('dateSearched').text == '2018-11-13'
-        assert event[0].tag == 'dateSearched'
-        assert event.find('sampleDetails').text == 'AM 17-4'
-        assert event.find('eventId').text == '470'
+        assert record.tag == f'{{{record.nsmap["nx"]}}}Experiment'
+        assert record[0].tag == 'title'
+        assert record.find('summary/experimenter').text == \
+            '***REMOVED*** (Fed)'
+        assert record.find('summary/instrument').attrib['pid'] == \
+            'FEI-Titan-TEM-635816'
+        assert record.find('summary/reservationEnd').text == \
+            '2018-11-13T16:00:00'
+        assert record.find('sample/name').text == 'AM 17-4'
+        assert record.find('id').text == '470'
         assert len(acq_acts) == 9
         for aa in acq_acts:
             ids = aa.findall('sampleID')
