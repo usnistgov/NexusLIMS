@@ -27,6 +27,8 @@
 #
 
 from lxml import etree as _etree
+import certifi as _certifi
+import tempfile as _tempfile
 
 
 def parse_xml(xml, xslt_file, **kwargs):
@@ -69,3 +71,41 @@ def parse_xml(xml, xslt_file, **kwargs):
             print(error.message, error.line)
         raise _etree.XSLTApplyError
     return simplified_dom
+
+
+def nexus_req(url, func, **kwargs):
+    """
+    A helper method that wraps a function from :py:mod:`requests`, but adds a
+    local certificate authority chain to validate the SharePoint server's
+    certificates and authenticates using NTLM.
+
+    Parameters
+    ----------
+    url : str
+        The URL to fetch
+    func : func
+        The function from the ``requests`` library to use (e.g.
+        :py:func:`~requests.get`, :py:func:`~requests.put`,
+        :py:func:`~requests.post`, etc.)
+    **kwargs : dict (optional)
+        Other keyword arguments are passed along to the ``func``
+
+    Returns
+    -------
+    r : :py:class:`requests.Response`
+        A requests response object
+    """
+    from .harvester.sharepoint_calendar import CA_BUNDLE_PATH, get_auth
+    with _tempfile.NamedTemporaryFile() as tmp:
+        with open(_certifi.where(), 'rb') as sys_cert:
+            lines = sys_cert.readlines()
+        tmp.writelines(lines)
+        with open(CA_BUNDLE_PATH, 'rb') as our_cert:
+            lines = our_cert.readlines()
+        tmp.writelines(lines)
+        tmp.seek(0)
+        r = func(url, auth=get_auth(), verify=tmp.name, **kwargs)
+
+    return r
+
+
