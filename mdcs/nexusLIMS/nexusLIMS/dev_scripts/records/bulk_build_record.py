@@ -26,17 +26,18 @@
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
 
-if __name__ == '__main__':
-    import os as _os
-    import time as _time
-    import logging as _logging
-    from nexusLIMS import mmf_nexus_root_path as _mmf_nexus_root_path
-    from nexusLIMS import nexuslims_root_path as _nexuslims_root_path
-    from nexusLIMS.builder import record_builder as _rb
+import os as _os
+import time as _time
+import logging as _logging
+from nexusLIMS import mmf_nexus_root_path as _mmf_nexus_root_path
+from nexusLIMS import nexuslims_root_path as _nexuslims_root_path
+from nexusLIMS.builder import record_builder as _rb
 
+
+def mike():
     d = _os.path.join(_mmf_nexus_root_path, 'Titan/***REMOVED***')
     dirs = [_os.path.join(d, o) for o in _os.listdir(d)
-                if _os.path.isdir(_os.path.join(d, o))]
+            if _os.path.isdir(_os.path.join(d, o))]
 
     dates = [_time.strftime('%Y-%m-%d', _time.localtime(_os.path.getmtime(p)))
              for p in dirs]
@@ -56,13 +57,68 @@ if __name__ == '__main__':
                         date=d,
                         user=user)
 
-    # path_to_search = os.path.join(_mmf_nexus_root_path, 'Titan/***REMOVED***/',
-    #                               '181113 - ***REMOVED*** - '
-    #                               '***REMOVED*** - Titan')
 
-    # Build the XML record and write it to a file
-    # filename = _rb.dump_record(path_to_search,
-    #                            filename=None,
-    #                            instrument='FEI-Titan-TEM-635816',
-    #                            date='2018-11-13',
-    #                            user='***REMOVED***')
+def vlad():
+    d = _os.path.join(_mmf_nexus_root_path, 'Titan/v***REMOVED***')
+    dirs = [_os.path.join(d, o) for o in _os.listdir(d)
+            if _os.path.isdir(_os.path.join(d, o))]
+
+    # Parsing for Vlad's date format (in folder name
+    dates = [''] * len(dirs)
+    for i, d in enumerate(dirs):
+        dirname = d.split(_os.sep)[-1]
+        datepart = dirname.split(' ')[0]
+        # Two exceptions
+        if '#1' in datepart:
+            datepart = datepart[:5]
+        if 'Agar' in datepart:
+            datepart = datepart[:6]
+        dt = _time.strptime(datepart, '%m%d%y')
+        dates[i] = _time.strftime('%Y-%m-%d', dt)
+
+    aa_logger = _logging.getLogger('nexusLIMS.schemas.activity')
+    aa_logger.setLevel(_logging.INFO)
+
+    start_num = 14
+
+    for d, pth in zip(dates[start_num:], dirs[start_num:]):
+        print(f'{d} : {pth}')
+        outpath = pth.replace(_mmf_nexus_root_path, _nexuslims_root_path)
+        instrument = 'FEI-Titan-TEM-635816'
+        user = 'v***REMOVED***'
+        outfilename = f'compiled_record_{instrument}_{d}_{user}.xml'
+        _rb.dump_record(pth,
+                        filename=_os.path.join(outpath, outfilename),
+                        instrument=instrument,
+                        date=d,
+                        user=user)
+
+
+def june():
+    d = _os.path.join(_mmf_nexus_root_path, 'Titan/***REMOVED***/data')
+    dirs = [_os.path.join(d, o) for o in _os.listdir(d)
+            if _os.path.isdir(_os.path.join(d, o))]
+
+    dates = [_time.strftime('%Y-%m-%d', _time.localtime(_os.path.getmtime(p)))
+             for p in dirs]
+
+    aa_logger = _logging.getLogger('nexusLIMS.schemas.activity')
+    aa_logger.setLevel(_logging.INFO)
+
+    for d, pth in zip(dates, dirs):
+        print(f'{d} : {pth}')
+        outpath = pth.replace(_mmf_nexus_root_path, _nexuslims_root_path)
+        instrument = 'FEI-Titan-TEM-635816'
+        user = '***REMOVED***'
+        outfilename = f'compiled_record_{instrument}_{d}_{user}.xml'
+        _rb.dump_record(pth,
+                        filename=_os.path.join(outpath, outfilename),
+                        instrument=instrument,
+                        date=d,
+                        user=user)
+
+if __name__ == '__main__':
+
+    # mike()
+    # vlad()
+    june()

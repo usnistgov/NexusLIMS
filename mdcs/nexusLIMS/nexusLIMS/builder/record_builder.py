@@ -30,6 +30,7 @@
 import os as _os
 import logging as _logging
 import hyperspy.api_nogui as _hs
+import pathlib as _pathlib
 from uuid import uuid4 as _uuid4
 from lxml import etree as _etree
 from datetime import datetime as _datetime
@@ -159,15 +160,36 @@ def build_acq_activities(path):
     modes = [''] * len(files)
     _logger.info(f'Loading files; getting mtime and modes for this activity')
     start_timer = _timer()
+    failed_indices = []
     for i, f in enumerate(files):
-        mode = _hs.load(f, lazy=True).original_metadata.\
-            ImageList.TagGroup0.ImageTags.Microscope_Info.Imaging_Mode
+        try:
+            mode = _hs.load(f, lazy=True).original_metadata.\
+                ImageList.TagGroup0.ImageTags.Microscope_Info.Imaging_Mode
+        # Could not get mode, so assume this one is same as last
+        except AttributeError as _:
+            mode = modes[i-1]
+        except Exception as _:
+            _logger.error(f'Could not load {f} --- skipping file')
+            failed_indices.append(i)
+            continue
         mtimes[i] = _datetime.fromtimestamp(_os.path.getmtime(f)).isoformat()
         modes[i] = mode
         this_mtime = _datetime.fromtimestamp(
             _os.path.getmtime(f)).strftime("%Y-%m-%d %H:%M:%S")
         _logger.info(f'{this_mtime} --- {mode} --- {f}')
     end_timer = _timer()
+
+    # If any files failed to load, remove their corresponding entries from
+    # the lists just generated:
+    if len(failed_indices) > 0:
+        # reverse indices so we remove from right side of list first to avoid
+        # changing the index of later on entries
+        failed_indices = failed_indices[::-1]
+        for idx in failed_indices:
+            _logger.warning(f'Removing {files[idx]} from list of files')
+            del files[idx]
+            del mtimes[idx]
+            del modes[idx]
 
     _logger.info(f'Loading files took {end_timer - start_timer:.2f} seconds')
 
@@ -261,6 +283,7 @@ def dump_record(path,
                    (f'_{instrument}' if instrument else '') + \
                    (f'_{date}' if date else '') + \
                    (f'_{user}' if user else '') + '.xml'
+    _pathlib.Path(_os.path.dirname(filename)).mkdir(parents=True, exist_ok=True)
     with open(filename, 'w') as f:
         text = build_record(path=path, instrument=instrument,
                             date=date, user=user)

@@ -173,36 +173,39 @@ def process_tecnai_microscope_info(microscope_info, delimiter=u'\u2028'):
     info_dict['SA_Aperture'] = __read_aperture('SA Aperture: ', tecnai_info)
 
     # Nested dictionary
-    info_dict['Filter_Settings'] = {}
-    tecnai_filter_info = tecnai_info[tecnai_info.index(
-        'Filter related settings:') + 1:]
-    # String
-    info_dict['Filter_Settings']['Mode'] = __find_val('Mode: ',
-                                                      tecnai_filter_info)
-    # Float (eV/channel)
-    tmp = __find_val('Selected dispersion: ', tecnai_filter_info)
-    tmp = _re.sub(r'\[eV/Channel\]', '', tmp)
-    info_dict['Filter_Settings']['Dispersion'] = float(tmp)
+    try:
+        info_dict['Filter_Settings'] = {}
+        tecnai_filter_info = tecnai_info[tecnai_info.index(
+            'Filter related settings:') + 1:]
+        # String
+        info_dict['Filter_Settings']['Mode'] = __find_val('Mode: ',
+                                                          tecnai_filter_info)
+        # Float (eV/channel)
+        tmp = __find_val('Selected dispersion: ', tecnai_filter_info)
+        tmp = _re.sub(r'\[eV/Channel\]', '', tmp)
+        info_dict['Filter_Settings']['Dispersion'] = float(tmp)
 
-    # Float (millimeter)
-    tmp = __find_val('Selected aperture: ', tecnai_filter_info)
-    tmp = tmp.strip('m')
-    info_dict['Filter_Settings']['Aperture'] = float(tmp)
+        # Float (millimeter)
+        tmp = __find_val('Selected aperture: ', tecnai_filter_info)
+        tmp = tmp.strip('m')
+        info_dict['Filter_Settings']['Aperture'] = float(tmp)
 
-    # Float (eV)
-    tmp = __find_val('Prism shift: ', tecnai_filter_info)
-    tmp = _re.sub(r'\[eV\]', '', tmp)
-    info_dict['Filter_Settings']['Prism_Shift'] = float(tmp)
+        # Float (eV)
+        tmp = __find_val('Prism shift: ', tecnai_filter_info)
+        tmp = _re.sub(r'\[eV\]', '', tmp)
+        info_dict['Filter_Settings']['Prism_Shift'] = float(tmp)
 
-    # Float (eV)
-    tmp = __find_val('Drift tube: ', tecnai_filter_info)
-    tmp = _re.sub(r'\[eV\]', '', tmp)
-    info_dict['Filter_Settings']['Drift_Tube'] = float(tmp)
+        # Float (eV)
+        tmp = __find_val('Drift tube: ', tecnai_filter_info)
+        tmp = _re.sub(r'\[eV\]', '', tmp)
+        info_dict['Filter_Settings']['Drift_Tube'] = float(tmp)
 
-    # Float (eV)
-    tmp = __find_val('Total energy loss: ', tecnai_filter_info)
-    tmp = _re.sub(r'\[eV\]', '', tmp)
-    info_dict['Filter_Settings']['Total_Energy_Loss'] = float(tmp)
+        # Float (eV)
+        tmp = __find_val('Total energy loss: ', tecnai_filter_info)
+        tmp = _re.sub(r'\[eV\]', '', tmp)
+        info_dict['Filter_Settings']['Total_Energy_Loss'] = float(tmp)
+    except ValueError as _:
+        _logger.info('Filter settings not found in Tecnai microscope info')
 
     return info_dict
 

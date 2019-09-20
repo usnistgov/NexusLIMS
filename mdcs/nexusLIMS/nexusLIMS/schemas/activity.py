@@ -117,26 +117,28 @@ def read_metadata(sig):
     try:
         m['Voltage'] = ImageTags.Microscope_Info.Voltage
     except AttributeError: pass
-    for k in ['Gun_Name', 'Extractor_Voltage', 'Gun_Lens_No',
-              'Camera_Length', 'Emission_Current', 'Spot', 'Mode',
-              'C2_Strength', 'C3_Strength', 'Obj_Strength', 'Dif_Strength',
-              'Image_Shift_x', 'Image_Shift_y', 'Stage_Position_x',
-              'Stage_Position_y', 'Stage_Position_z',
-              'Stage_Position_theta', 'Stage_Position_phi',
-              'C1_Aperture', 'C2_Aperture', 'Obj_Aperture',
-              'SA_Aperture']:
-        try:
-            m[k] = tecnai_info[k]
-        except KeyError:
-            _logger.warning(f'Tecnai.Microscope_Info.{k}' +
-                            ' not found in the metadata dictionary')
-    for k in ['Mode', 'Dispersion', 'Aperture', 'Prism_Shift',
-              'Drift_Tube', 'Total_Energy_Loss']:
-        try:
-            m[f'Filter.{k}'] = tecnai_info['Filter_Settings'][k]
-        except KeyError:
-            _logger.warning(f'Filter_Settings.{k} not found' +
-                            ' in the metadata dictionary')
+
+    if tecnai_info:
+        for k in ['Gun_Name', 'Extractor_Voltage', 'Gun_Lens_No',
+                  'Camera_Length', 'Emission_Current', 'Spot', 'Mode',
+                  'C2_Strength', 'C3_Strength', 'Obj_Strength', 'Dif_Strength',
+                  'Image_Shift_x', 'Image_Shift_y', 'Stage_Position_x',
+                  'Stage_Position_y', 'Stage_Position_z',
+                  'Stage_Position_theta', 'Stage_Position_phi',
+                  'C1_Aperture', 'C2_Aperture', 'Obj_Aperture',
+                  'SA_Aperture']:
+            try:
+                m[k] = tecnai_info[k]
+            except KeyError:
+                _logger.info(f'Tecnai.Microscope_Info.{k}' +
+                             ' not found in the metadata dictionary')
+        for k in ['Mode', 'Dispersion', 'Aperture', 'Prism_Shift',
+                  'Drift_Tube', 'Total_Energy_Loss']:
+            try:
+                m[f'Filter.{k}'] = tecnai_info['Filter_Settings'][k]
+            except KeyError:
+                _logger.info(f'Filter_Settings.{k} not found' +
+                             ' in the metadata dictionary')
 
     return m
 
@@ -230,12 +232,23 @@ class AcquisitionActivity:
             preview_fname = fname.replace(_mmf_path, _nx_path) + '.thumb.png'
             # if preview does not exist yet, generate it and save to
             # preview_fname
+
+            # If s is a list of signals, use just the first one for our purposes
+            if isinstance(s, list):
+                num_sigs = len(s)
+                fname = s[0].metadata.General.original_filename
+                s = s[0]
+                s.metadata.General.title = s.metadata.General.title + \
+                                           f' (1 of {num_sigs} total signals ' \
+                                           f'in file "{fname}")'
+
             if not _os.path.isfile(preview_fname):
                 _logger.info(f'Generating preview: {preview_fname}')
                 # Create the directory for the thumbnail, if needed
                 _pathlib.Path(_os.path.dirname(preview_fname)).mkdir(
                     parents=True, exist_ok=True)
                 # Generate the thumbnail
+                s.compute(progressbar=False)
                 _s2thumb(s, out_path=preview_fname)
             else:
                 _logger.info(f'Preview already exists: {preview_fname}')

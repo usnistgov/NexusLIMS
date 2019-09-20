@@ -30,6 +30,8 @@ import numpy as _np
 import tempfile as _tmp
 import hyperspy.api as _hsapi
 import os as _os
+import textwrap as _textwrap
+import matplotlib as _mpl
 from skimage.io import imread as _imread
 import skimage.transform as _tform
 from skimage.transform import resize as _resize
@@ -51,6 +53,55 @@ def _full_extent(ax, items, pad=0.0):
     bbox = _Bbox.union([item.get_window_extent() for item in items])
 
     return bbox.expanded(1.0 + pad, 1.0 + pad)
+
+
+def _set_title(ax, title):
+    """
+    Set an axis title, making sure it is no wider than 60 characters (so it
+    doesn't run over the edges of the plot)
+
+    Parameters
+    ----------
+    ax : :py:mod:`matplotlib.axis`
+        A matplotlib axis instance on which to operate
+    title : str
+        The desired axis title
+    """
+    new_title = _textwrap.fill(title, 60)
+    ax.set_title(new_title)
+
+
+def _get_visible_labels(ax):
+    """
+    Helper method to return only the tick labels that are visible given the
+    current extent of the axes. Useful when calculating the extent of the figure
+    to save so extra white space from invisible labels is not included.
+
+    Parameters
+    ----------
+    ax : :py:mod:`matplotlib.axis`
+        A matplotlib axis instance on which to operate
+
+    Returns
+    -------
+    vis_labels_x, vis_labels_y : tuple of lists
+        lists of only the label objects that are visible on the current axis
+    """
+    vis_labels_x = _mpl.cbook.silent_list('Text xticklabel')
+    vis_labels_y = _mpl.cbook.silent_list('Text yticklabel')
+
+    for l in ax.get_xticklabels():
+        label_pos = l.get_position()[0]
+        x_limits = ax.get_xlim()
+        if x_limits[0] < label_pos < x_limits[1]:
+            vis_labels_x.append(l)
+    for l in ax.get_yticklabels():
+        label_pos = l.get_position()[1]
+        y_limits = ax.get_ylim()
+        if y_limits[0] < label_pos < y_limits[1]:
+            vis_labels_y.append(l)
+
+    return vis_labels_x, vis_labels_y
 
 
 def _project_image_stack(s, num=5, dpi=92, v_shear=0.3, h_scale=0.3):
@@ -110,7 +161,7 @@ def _project_image_stack(s, num=5, dpi=92, v_shear=0.3, h_scale=0.3):
     for idx, tmp in enumerate(tmps):
         img = _plt.imread(tmp.name + '.png')
         img_trans = _tform.warp(img, trans_mat, order=1, preserve_range=True,
-                                   mode='constant', cval=_np.nan,
+                                mode='constant', cval=_np.nan,
                                 output_shape=(int(img.shape[1] * (1 + v_shear)),
                                               int(img.shape[0] * h_scale)))
         im_data[idx] = img_trans
@@ -152,6 +203,16 @@ def sig_to_thumbnail(s, out_path, dpi=92):
     This method heavily utilizes HyperSpy's existing plotting functions to
     figure out how to best display the image
     """
+    def _set_extent_save_and_close():
+        _set_title(ax, s.metadata.General.title)
+        items = [ax, ax.title, ax.xaxis.label, ax.yaxis.label]
+        for labels in _get_visible_labels(ax):
+            items += labels
+        extent = _full_extent(ax, items, pad=0.05).transformed(
+            ax.figure.dpi_scale_trans.inverted())
+        f.savefig(out_path, bbox_inches=extent, dpi=dpi)
+        _plt.close(f)
+
     # Processing 1D signals (spectra, spectrum images, etc)
     if isinstance(s, _hsapi.signals.Signal1D):
         # signal is single spectrum
@@ -162,18 +223,15 @@ def sig_to_thumbnail(s, out_path, dpi=92):
             ax = f.get_axes()[0]
             # Change line color to matplotlib default
             ax.get_lines()[0].set_color(_plt.get_cmap('tab10')(0))
-            ax.set_title(s.metadata.General.title)
-            f.savefig(out_path, dpi=dpi)
-            _plt.close(f)
+            _set_extent_save_and_close()
         # signal is 1D linescan
         elif s.axes_manager.navigation_dimension == 1:
             s.plot()
             s._plot.pointer.set_on(False)       # remove pointer
             f = s._plot.navigator_plot.figure
             f.get_axes()[1].remove()            # remove colorbar scale
-            f.get_axes()[0].set_title(s.metadata.General.title)
-            f.savefig(out_path, bbox_inches='tight', dpi=dpi)
-            _plt.close(f)
+            ax = f.get_axes()[0]
+            _set_extent_save_and_close()
         elif s.axes_manager.navigation_dimension > 1:
             nav_size = s.axes_manager.navigation_size
             if nav_size >= 9:
@@ -195,7 +253,8 @@ def sig_to_thumbnail(s, out_path, dpi=92):
             desc = r'\ x\ '.join([str(x) for x in
                                   s.axes_manager.navigation_shape])
 
-            ax.set_title(s.metadata.General.title + '\n' + r"$\bf{" +
+            _set_title(ax, s.metadata.General.title)
+            ax.set_title(ax.get_title() + '\n' + r"$\bf{" +
                          desc + r'\ Spectrum\ Image}$')
 
             # Load "watermark" stamp and rescale to be appropriately sized
@@ -228,7 +287,7 @@ def sig_to_thumbnail(s, out_path, dpi=92):
                                     colorbar=False, scalebar='all', label=None)
             f = _plt.gcf()
             ax = _plt.gca()
-            ax.set_title(s.metadata.General.title)
+            _set_title(ax, s.metadata.General.title)
             f.tight_layout()
             f.savefig(out_path, dpi=dpi)
             _plt.close(f)
@@ -239,9 +298,10 @@ def sig_to_thumbnail(s, out_path, dpi=92):
             ax = _plt.gca()
             ax.set_position([0, 0, 1, .8])
             ax.set_axis_off()
-            ax.set_title(s.metadata.General.title + '\n' +
-                         r"$\bf{" + str(s.axes_manager.navigation_size)
-                         +'-member' + r'\ Image\ Series}$')
+            _set_title(ax, s.metadata.General.title)
+            ax.set_title(ax.get_title() + '\n' +
+                         r"$\bf{" + str(s.axes_manager.navigation_size) +
+                         r'-member' + r'\ Image\ Series}$')
             _plt.show()
             # use _full_extent to determine the bounding box needed to pick
             # out just the items we're interested in
@@ -284,13 +344,27 @@ def sig_to_thumbnail(s, out_path, dpi=92):
                 # Move scalebar text over if it overlaps outside of axis
                 txt.set_x(txt.get_position()[0] + left_extent * -1)
             # txt.set_y(txt.get_position()[1]*1.1)
-            f.suptitle(s.metadata.General.title + '\n' +
+            f.suptitle(_textwrap.fill(s.metadata.General.title, 60) + '\n' +
                        r"$\bf{" + desc + r'\ Hyperimage}$')
             f.tight_layout(rect=(0, 0, 1,
                                  f.texts[0].get_window_extent().transformed(
                                      f.transFigure.inverted()).bounds[1]))
             f.savefig(out_path, dpi=dpi)
             _plt.close(f)
+
+    # Complex image, so plot power spectrum (like an FFT)
+    elif isinstance(s, _hsapi.signals.ComplexSignal2D):
+        # in tests, setting minimum to a percentile around 66% looks good
+        s.amplitude.plot(interpolation='bilinear', norm='log',
+                         vmin=_np.nanpercentile(s.amplitude.data, 66),
+                         colorbar=None, axes_off=True)
+        f = _plt.gcf()
+        ax = _plt.gca()
+        _set_title(ax, s.metadata.General.title)
+        extent = _full_extent(ax, [ax, ax.title], pad=0.1).transformed(
+                              ax.figure.dpi_scale_trans.inverted())
+        f.savefig(out_path, dpi=dpi, bbox_inches=extent)
+        _plt.close(f)
 
     # if we have a different type of signal, just output a graphical
     # representation of the axis manager
@@ -318,4 +392,3 @@ def sig_to_thumbnail(s, out_path, dpi=92):
             ax.figure.dpi_scale_trans.inverted())
 
         f.savefig(out_path, bbox_inches=extent, dpi=300)
-
