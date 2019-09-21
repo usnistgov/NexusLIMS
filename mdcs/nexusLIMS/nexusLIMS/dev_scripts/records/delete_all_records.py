@@ -26,6 +26,29 @@
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
 
-calendar_root_url = 'https://***REMOVED***/***REMOVED***/'
-ldap_url = 'ldap://***REMOVED***:389'
-cdcs_url = 'https://***REMOVED***137/'
+if __name__ == '__main__':
+
+    import os as _os
+    import requests as _requests
+    from urllib.parse import urljoin as _urljoin
+    from nexusLIMS._urls import cdcs_url as _cdcs_url
+    import warnings as _warnings
+    from urllib3.exceptions import InsecureRequestWarning as _InsecReqWarning
+    from tqdm import tqdm as _tqdm
+
+    _warnings.filterwarnings("ignore",
+                             category=_InsecReqWarning)
+
+    username = _os.environ['nexusLIMS_user']
+    password = _os.environ['nexusLIMS_pass']
+
+    endpoint = _urljoin(_cdcs_url, 'rest/data/')
+
+    r = _requests.request("GET", endpoint, auth=(username, password),
+                          verify=False)
+
+    # Loop through all records owned by this user and delete them
+    for record in _tqdm(r.json()):
+        endpoint = _urljoin(_cdcs_url, f'rest/data/{record["id"]}/')
+        _requests.request("DELETE", endpoint, auth=(username, password),
+                          verify=False)

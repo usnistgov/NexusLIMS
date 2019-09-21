@@ -111,6 +111,12 @@ def build_record(path, instrument, date, user):
                         collaborator=None,
                         sample_id=str(_uuid4()))
 
+    # No calendar events were found
+    if str(output) == '':
+        output = '<title>No matching calendar event found</title>\n' + \
+                 '<id/>\n' + \
+                 '<summary/>'
+
     xml_record += str(output)
 
     _logger.info(f"Building acquisition activities for {path}")

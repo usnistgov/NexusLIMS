@@ -79,19 +79,25 @@ def vlad():
     aa_logger = _logging.getLogger('nexusLIMS.schemas.activity')
     aa_logger.setLevel(_logging.INFO)
 
-    start_num = 14
+    start_num = 0
 
     for d, pth in zip(dates[start_num:], dirs[start_num:]):
-        print(f'{d} : {pth}')
-        outpath = pth.replace(_mmf_nexus_root_path, _nexuslims_root_path)
-        instrument = 'FEI-Titan-TEM-635816'
-        user = 'v***REMOVED***'
-        outfilename = f'compiled_record_{instrument}_{d}_{user}.xml'
-        _rb.dump_record(pth,
-                        filename=_os.path.join(outpath, outfilename),
-                        instrument=instrument,
-                        date=d,
-                        user=user)
+        to_proc = ['51019', '12818', '7219', '121318', '120318', '9219',
+                   '41919']
+        for tp in to_proc:
+            if tp in pth:
+                if d == '2019-09-02':
+                    d = '2019-09-03'
+                print(f'{d} : {pth}')
+                outpath = pth.replace(_mmf_nexus_root_path, _nexuslims_root_path)
+                instrument = 'FEI-Titan-TEM-635816'
+                user = 'v***REMOVED***'
+                outfilename = f'compiled_record_{instrument}_{d}_{user}.xml'
+                _rb.dump_record(pth,
+                                filename=_os.path.join(outpath, outfilename),
+                                instrument=instrument,
+                                date=d,
+                                user=user)
 
 
 def june():
@@ -120,5 +126,5 @@ def june():
 if __name__ == '__main__':
 
     # mike()
-    # vlad()
-    june()
+    vlad()
+    # june()
