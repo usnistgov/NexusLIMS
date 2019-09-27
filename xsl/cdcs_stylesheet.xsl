@@ -700,7 +700,7 @@
             //Function to close all open accordions
             function closeAccords() {
                 $('button[id*=idm]').each(function(){
-                    toggleAA($(this).prop('id'), force_open=true, force_close=false);
+                    toggleAA($(this).prop('id'), force_open=false, force_close=true);
                 });
             }
 
