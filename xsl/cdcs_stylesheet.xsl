@@ -765,12 +765,16 @@
             function showSlides(n) {
                 var i;
                 var slides = document.getElementsByClassName("slide");
-                if (n > slides.length) {slideIndex = 1}    
-                if (n < 1) {slideIndex = slides.length}
-                for (i = 0; i < slides.length; i++) {
-                    slides[i].style.display = "none";  
+                if (slides.length === 0) {
+                    document.getElementById('img_gallery').remove()
+                } else {
+                    if (n > slides.length) {slideIndex = 1}    
+                    if (n < 1) {slideIndex = slides.length}
+                    for (i = 0; i < slides.length; i++) {
+                        slides[i].style.display = "none";  
+                    }
+                    slides[slideIndex-1].style.display = "block";
                 }
-                slides[slideIndex-1].style.display = "block";
             }
 
             //Function which adds a new slide to the overall image gallery for each dataset [WAITING ON THUMBNAILS TO BE ABLE TO TEST]
