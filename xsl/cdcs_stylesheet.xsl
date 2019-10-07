@@ -716,14 +716,17 @@
                 // btn_id is like "idm45757030174584-btn"
                 
                 // strings
-                var collapse_str = "<i class='fa fa-minus-square-o'> Collapse Activity</i>"
-                var expand_str = "<i class='fa fa-plus-square-o'> Expand Activity</i>"
+                var collapse_str = "<i class='fa fa-minus-square-o'></i> Collapse Activity"
+                var expand_str = "<i class='fa fa-plus-square-o'></i> Expand Activity"
 
                 // get jquery object
                 var btn = $('#' + btn_id);
                 
                 // determine what to do
                 var action_is_expand = btn.text().includes('Expand');
+                if ( force_close ) {
+                    action_is_expand = false;
+                }
 
                 // get list of accordions to toggle
                 var acc = btn.parents().eq(2).nextUntil('.container-fluid').filter('.accordion');
