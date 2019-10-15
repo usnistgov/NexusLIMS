@@ -6,6 +6,7 @@
 
     <xsl:variable name="datasetBaseUrl">http://***REMOVED***/mmfnexus/</xsl:variable>
     <xsl:variable name="previewBaseUrl">http://***REMOVED***/nexusLIMS/mmfnexus/</xsl:variable>
+    <xsl:variable name="sharepointBaseUrl">https://***REMOVED***/***REMOVED***/Lists/</xsl:variable>
 
     <xsl:variable name="month-num-dictionary">
         <month month-number="01">January</month>
@@ -22,6 +23,21 @@
         <month month-number="12">December</month>
     </xsl:variable>
     <xsl:key name="lookup.date.month" match="month" use="@month-number"/>
+    
+    
+    <xsl:variable name="sharepoint-instrument-dictionary">
+        <instr display-name="FEI Helios">FEI%20HeliosDB/</instr>
+        <instr display-name="FEI Quanta200">FEI%20Quanta200%20Events/</instr>
+        <instr display-name="FEI Titan STEM">MMSD%20Titan/</instr>
+        <instr display-name="FEI Titan TEM">FEI%20Titan%20Events/</instr>
+        <instr display-name="Hitachi S4700">Hitachi%20S4700%20Events/</instr>
+        <instr display-name="Hitachi S5500">HitachiS5500/</instr>
+        <instr display-name="JEOL JEM3010">JEOL%20JEM3010%20Events/</instr>
+        <instr display-name="JEOL JSM7100">JEOL%20JSM7100%20Events/</instr>
+        <instr display-name="Philips CM30">Philips%20CM30%20Events/</instr>
+        <instr display-name="Philips EM400">Philips%20EM400%20Events/</instr>
+    </xsl:variable>
+    <xsl:key name="lookup.instrument.url" match="instr" use="@display-name"/>
 
     <xsl:template match="/">
         <xsl:apply-templates select="/nx:Experiment"/>
@@ -60,7 +76,7 @@
                 </xsl:with-param>
             </xsl:call-template>
         </xsl:variable>
-      <div>        
+      <div style="width:95%;">        
         <!-- ============ CSS Styling ============ --> 
         <style>
             .main, .sidebar { /* Set the font style for the page */
@@ -216,7 +232,7 @@
             .gal-prev, .gal-next { /* Parameters for the 'next' and 'prev' buttons on the slideshow gallery */
                 cursor: pointer;
                 position: absolute;
-                top: 50%;
+                top: 45%;
                 width: auto;
                 padding: 16px;
                 margin-top: -22px;
@@ -239,14 +255,14 @@
                 color: white;
             }
 
-            .text { /* Parameters for the caption text displayed in the image gallery */
+            .nx-caption { /* Parameters for the caption text displayed in the image gallery */
                 color: black;
-                font-size: 1em;
+                font-size: 14px;
                 padding: 8px 12px;
-                position: absolute;
-                bottom: -2em;
                 width: 100%;
                 text-align: center;
+                margin-top: -1em;
+                line-height: 150%;
             }
 
             .aa_header_row {
@@ -362,6 +378,7 @@
 
             .main h3 {
                 font-size: 1.1em;
+                margin-bottom: 0.1em;
             }
             
             table#summary-table > tbody > tr > * {
@@ -517,6 +534,7 @@
                 left: 20px;
                 font-size: 20px;
                 transition: opacity 0.5s ease-in-out 0s;
+                z-index: 50;
                 }
             @media screen and (max-width: 768px) {
             #sidebar-btn {
@@ -528,6 +546,18 @@
             .slideshow-col {
                 padding: 0;
             }
+            
+            .badge a {
+                color: #fff;
+            }
+            
+            .help-tip {
+                color: #eee;
+            }
+            .help-tip:hover {
+                color: #aaa;
+            }
+            
         </style>
 
         <div id="loading">
@@ -580,7 +610,8 @@
                   <i class="fa fa-file-text"></i> Edit this record
               </button>
               <button id="previous-page-btn" type="button" class="btn btn-default pull-right"
-                  >
+                  data-toggle="tooltip" data-placement="top" 
+                  title="Go back to the previous page">
                   <i class="fa fa-arrow-left"></i> Back to previous
               </button>
           </div>
@@ -600,9 +631,36 @@
                         </xsl:choose>
                     </span>
                     <br/>
-                    <span class="badge list-record-badge yellow-badge"><xsl:value-of select="summary/instrument"/></span>
-                    <span class="badge list-record-badge"><xsl:value-of select="count(//dataset)"/> data
-                        files</span><i class="fa fa-cubes" style="margin-left:0.75em; font-size: small;"/><span style="font-size: small;"><xsl:text>: </xsl:text></span>
+                    <span class="badge list-record-badge yellow-badge">
+                        <xsl:element name="a">
+                            <xsl:attribute name="href">
+                                <xsl:call-template name="get-calendar-link">
+                                    <xsl:with-param name="instrument" select="summary/instrument"></xsl:with-param>
+                                </xsl:call-template></xsl:attribute>
+                            <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                            <xsl:attribute name="data-placement">bottom</xsl:attribute> 
+                            <xsl:attribute name="title">Click to view this instrument on the Sharepoint calendar</xsl:attribute>
+                            <xsl:value-of select="summary/instrument"/>
+                        </xsl:element>
+                    </span>
+                    <span class="badge list-record-badge">
+                        <xsl:element name="a">
+                            <xsl:attribute name="href">
+                                <xsl:value-of select="$datasetBaseUrl"/>
+                                <xsl:call-template name="get-path-of-file">
+                                    <xsl:with-param name="absolute_filename">
+                                        <xsl:value-of select="//dataset[1]/location"/>
+                                    </xsl:with-param>
+                                </xsl:call-template>
+                            </xsl:attribute>
+                            <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                            <xsl:attribute name="data-placement">bottom</xsl:attribute> 
+                            <xsl:attribute name="title">Click to view file listing of this record in the browser</xsl:attribute>
+                            <xsl:value-of select="count(//dataset)"/> data files in <xsl:value-of select="count(//acquisitionActivity)"/> activites 
+                        </xsl:element>
+                    </span>
+                    <i class="fa fa-cubes" style="margin-left:0.75em; font-size: small;"
+                       data-toggle="tooltip" data-placement="bottom" title="Filetypes present in record"/><span style="font-size: small;"><xsl:text>: </xsl:text></span>
                     <xsl:call-template name="extensions-to-badges">
                         <xsl:with-param name="input"><xsl:value-of select="$unique-extensions"/></xsl:with-param>
                     </xsl:call-template>
@@ -627,6 +685,17 @@
                                                     <xsl:value-of select="$reservation-date-part"/>
                                                 </xsl:with-param>
                                             </xsl:call-template>
+                                            <xsl:element name="a">
+                                                <xsl:attribute name="href">
+                                                    <xsl:call-template name="get-calendar-event-link">
+                                                        <xsl:with-param name="instrument" select="summary/instrument"></xsl:with-param>
+                                                        <xsl:with-param name="event-id" select="id"></xsl:with-param>
+                                                    </xsl:call-template>
+                                                </xsl:attribute><xsl:text> </xsl:text>
+                                                <sup style='font-size: 0.5em; top: -1em;'
+                                                     data-toggle='tooltip' data-placement='right'
+                                                     title='Click to view associated record on the Sharepoint calendar'><i class='fa fa-calendar'/></sup>
+                                            </xsl:element>
                                         </xsl:when>
                                         <xsl:when test="$firstfile-date-part != ''">
                                             <xsl:call-template name="localize-date">
@@ -649,7 +718,13 @@
                 </div>            
                 <div class="row">    
                     <div class="col-md-6" id="session_info_column">
-                        <h3 id="res-info-header">Session Summary:</h3>
+                        <h3 id="res-info-header">Session Summary 
+                        <xsl:call-template name="help-tip">
+                            <xsl:with-param name="tip-text">
+                                Summary information is extracted from the Sharepoint calendar 
+                                reservation associated with this record
+                            </xsl:with-param>
+                        </xsl:call-template></h3>
                         <!-- Display summary information (date, time, instrument, and id) -->
     
                         <table class="table table-condensed" id="summary-table" 
@@ -685,15 +760,23 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th align="left" class="col-sm-3 parameter-name">Session ID: </th>
+                                <th align="left" class="col-sm-3 parameter-name">Session ID:<xsl:text> </xsl:text>
+                                    <xsl:call-template name="help-tip">
+                                        <xsl:with-param name="tip-placement">right</xsl:with-param>
+                                        <xsl:with-param name="tip-text">ID from this instrument's Sharepoint calendar listing</xsl:with-param>
+                                    </xsl:call-template></th>
                                 <td align="justify" class="col-sm-9"><xsl:value-of select="id"/></td>
                             </tr>
                             <tr>
                                 <th align="left" class="col-sm-3 parameter-name">Sample name: </th>
-                                <td align="justify" class="col-sm-9"> <xsl:value-of select="sample/name"/></td>
+                                <td align="left" class="col-sm-9"> <xsl:value-of select="sample/name"/></td>
                             </tr>
                             <tr>
-                                <th align="left" class="col-sm-3 parameter-name">Sample ID: </th>
+                                <th align="left" class="col-sm-3 parameter-name">Sample ID:<xsl:text> </xsl:text>
+                                    <xsl:call-template name="help-tip">
+                                        <xsl:with-param name="tip-placement">right</xsl:with-param>
+                                        <xsl:with-param name="tip-text">Automatically generated random ID (for now)</xsl:with-param>
+                                    </xsl:call-template></th>
                                 <td align="justify" class="col-sm-9"><xsl:value-of select="acquisitionActivity[@seqno=1]/sampleID"/></td>
                             </tr>
                             <xsl:choose>
@@ -712,17 +795,32 @@
                     <div class="col-md-6 slideshow-col">
                         <div id="img_gallery">
                             <xsl:for-each select="//dataset">
-                                <div class="slide">
+                                <figure class="slide">
                                     <img class="nx-img"><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute></img>
-                                    <div class="text"><xsl:value-of select="position()"/> / <xsl:value-of select="count(//dataset)" /></div>
-                                </div>
+                                    <figcaption class="nx-caption">
+                                        Dataset <xsl:value-of select="position()"/> of <xsl:value-of select="count(//dataset)" />
+                                        <br/>
+                                        Activity <xsl:value-of select="count(../preceding-sibling::acquisitionActivity) + 1"/> of <xsl:value-of select="count(//acquisitionActivity)"/>
+                                        <xsl:text> </xsl:text>
+                                        <sup>
+                                            <a  href="#{generate-id(..)}" 
+                                            data-toggle='tooltip' data-placement='bottom'
+                                            title='Jump to activity in record'><i class='fa fa-link'/></a>
+                                        </sup>
+                                    </figcaption>
+                                </figure>
                             </xsl:for-each>
-                            <a class="gal-prev" onclick="plusSlide(-1)">&lt;</a>
-                            <a class="gal-next" onclick="plusSlide(1)">&gt;</a>
+                            <a  class="gal-prev" onclick="plusSlide(-1)"
+                                data-toggle="tooltip" data-placement="left" 
+                                title="The left/right arrow keys can also be used to navigate the image gallery">&lt;</a>
+                            <a  class="gal-next" onclick="plusSlide(1)"
+                                data-toggle="tooltip" data-placement="right" 
+                                title="The left/right arrow keys can also be used to navigate the image gallery">&gt;</a>
                         </div>
                     </div>
                 </div>
                 <hr/>
+                
                 <!-- Loop through each acquisition activity -->
                 <xsl:for-each select="acquisitionActivity">
                     <div class="container-fluid">
@@ -1324,6 +1422,25 @@
             </xsl:when>
             <xsl:otherwise>
                 <span style="white-space:nowrap;">
+                    <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                    <xsl:attribute name="data-placement">bottom</xsl:attribute>
+                    <xsl:choose>
+                        <xsl:when test="$input = 'dm3'">
+                            <xsl:attribute name="title">Gatan DigitalMicrograph file</xsl:attribute>
+                        </xsl:when>
+                        <xsl:when test="$input = 'tif'">
+                            <xsl:attribute name="title">Tiff-format image</xsl:attribute>
+                        </xsl:when>
+                        <xsl:when test="$input = 'ser'">
+                            <xsl:attribute name="title">FEI .ser file</xsl:attribute>
+                        </xsl:when>
+                        <xsl:when test="$input = 'emi'">
+                            <xsl:attribute name="title">FEI .emi file</xsl:attribute>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:attribute name="title">File extension</xsl:attribute>
+                        </xsl:otherwise>
+                    </xsl:choose>
                     <span class="badge-left badge list-record-badge">
                         <!-- count the number of dataset locations that end with this extension -->
                         <xsl:value-of select="count(//dataset/location[$input = substring(., string-length() - string-length($input) + 1)])"/>
@@ -1335,4 +1452,61 @@
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
+    
+    <xsl:template name="substring-after-last">
+        <xsl:param name="string"/>
+        <xsl:param name="char"/>
+        
+        <xsl:choose>
+            <xsl:when test="contains($string, $char)">
+                <xsl:call-template name="substring-after-last">
+                    <xsl:with-param name="string" select="substring-after($string, $char)"/>
+                    <xsl:with-param name="char" select="$char"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$string"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    
+    <xsl:template name="get-path-of-file">
+        <xsl:param name="absolute_filename"/>
+        <xsl:variable name="just-filename">
+            <xsl:call-template name="substring-after-last">
+                <xsl:with-param name="char">/</xsl:with-param>
+                <xsl:with-param name="string"><xsl:value-of select="$absolute_filename"/></xsl:with-param>
+            </xsl:call-template>
+        </xsl:variable>
+        
+        <xsl:value-of select="substring($absolute_filename, 0, string-length($absolute_filename) - string-length($just-filename))"/>
+    </xsl:template>
+    
+    <xsl:template name="help-tip">
+        <xsl:param name="tip-text"/>
+        <xsl:param name="tip-placement" select='"right"'></xsl:param>
+        <xsl:element name="sup">
+            <xsl:attribute name="class">help-tip</xsl:attribute>
+            <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+            <xsl:attribute name="data-placement"><xsl:value-of select="$tip-placement"/></xsl:attribute>
+            <xsl:attribute name="title"><xsl:value-of select="$tip-text"/></xsl:attribute>
+            <i class='fa fa-question-circle'/>
+        </xsl:element>
+    </xsl:template>
+    
+    <xsl:template name="get-calendar-link">
+        <xsl:param name="instrument"/>
+        <xsl:for-each select="document('')">
+            <xsl:value-of select="$sharepointBaseUrl"/>
+            <xsl:value-of select="key('lookup.instrument.url', $instrument)"/>calendar.aspx</xsl:for-each>
+    </xsl:template>
+    
+    <xsl:template name="get-calendar-event-link">
+        <xsl:param name="instrument"/>
+        <xsl:param name="event-id"></xsl:param>
+        <xsl:for-each select="document('')">
+            <xsl:value-of select="$sharepointBaseUrl"/>
+            <xsl:value-of select="key('lookup.instrument.url', $instrument)"/>DispForm.aspx?ID=<xsl:value-of select="$event-id"/></xsl:for-each>
+    </xsl:template>
+    
 </xsl:stylesheet>

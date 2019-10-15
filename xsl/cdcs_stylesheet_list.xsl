@@ -62,7 +62,12 @@
       </xsl:call-template>
     </xsl:variable>
     
-
+    <style>
+      .tooltip {
+      z-index: 20000;
+      position: fixed; 
+      }
+    </style>
     <div class='a-result'>
      <div>
        <xsl:element name="a">
@@ -83,8 +88,10 @@
        </xsl:element>
        <xsl:text> </xsl:text>
        <span class="badge list-record-badge yellow-badge"><xsl:value-of select="summary/instrument"/></span>
-       <span class="badge list-record-badge"><xsl:value-of select="count(//dataset)"/> data
-         files</span><i class="fa fa-cubes" style="margin-left:0.75em; font-size: small;"/><span style="font-size: small;"><xsl:text>: </xsl:text></span>
+       <span class="badge list-record-badge">
+         <xsl:value-of select="count(//dataset)"/> data files in <xsl:value-of select="count(//acquisitionActivity)"/> activites </span>
+        <i class="fa fa-cubes filetypes-icon" style="margin-left:0.75em; font-size: small;"
+            data-toggle="tooltip" data-placement="top" title="Filetypes present in record"/><span style="font-size: small;"><xsl:text>: </xsl:text></span>
        <xsl:call-template name="extensions-to-badges">
          <xsl:with-param name="input"><xsl:value-of select="$unique-extensions"/></xsl:with-param>
        </xsl:call-template>
@@ -132,6 +139,11 @@
             $('.a-result').click(function() {
               window.location = $(this).find('a').attr('href');
               return false;
+            });
+            
+            $( document ).ready(function() {
+              $('.filetypes-icon[data-toggle="tooltip"]').tooltip(
+              {container:'body'}); // toggle all tooltips with default
             });
             ]]>
       </script>
@@ -333,6 +345,25 @@
       </xsl:when>
       <xsl:otherwise>
         <span style="white-space:nowrap;">
+          <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+          <xsl:attribute name="data-placement">bottom</xsl:attribute>
+          <xsl:choose>
+            <xsl:when test="$input = 'dm3'">
+              <xsl:attribute name="title">Gatan DigitalMicrograph file</xsl:attribute>
+            </xsl:when>
+            <xsl:when test="$input = 'tif'">
+              <xsl:attribute name="title">Tiff-format image</xsl:attribute>
+            </xsl:when>
+            <xsl:when test="$input = 'ser'">
+              <xsl:attribute name="title">FEI .ser file</xsl:attribute>
+            </xsl:when>
+            <xsl:when test="$input = 'emi'">
+              <xsl:attribute name="title">FEI .emi file</xsl:attribute>
+            </xsl:when>
+            <xsl:otherwise>
+              <xsl:attribute name="title">File extension</xsl:attribute>
+            </xsl:otherwise>
+          </xsl:choose>
           <span class="badge-left badge list-record-badge">
             <!-- count the number of dataset locations that end with this extension -->
             <xsl:value-of select="count(//dataset/location[$input = substring(., string-length() - string-length($input) + 1)])"/>
