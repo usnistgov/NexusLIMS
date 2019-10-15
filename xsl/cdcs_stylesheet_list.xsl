@@ -84,7 +84,7 @@
        <xsl:text> </xsl:text>
        <span class="badge list-record-badge yellow-badge"><xsl:value-of select="summary/instrument"/></span>
        <span class="badge list-record-badge"><xsl:value-of select="count(//dataset)"/> data
-         files: </span>
+         files</span><i class="fa fa-cubes" style="margin-left:0.75em; font-size: small;"/><span style="font-size: small;"><xsl:text>: </xsl:text></span>
        <xsl:call-template name="extensions-to-badges">
          <xsl:with-param name="input"><xsl:value-of select="$unique-extensions"/></xsl:with-param>
        </xsl:call-template>

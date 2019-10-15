@@ -7,17 +7,67 @@
     <xsl:variable name="datasetBaseUrl">http://***REMOVED***/mmfnexus/</xsl:variable>
     <xsl:variable name="previewBaseUrl">http://***REMOVED***/nexusLIMS/mmfnexus/</xsl:variable>
 
+    <xsl:variable name="month-num-dictionary">
+        <month month-number="01">January</month>
+        <month month-number="02">February</month>
+        <month month-number="03">March</month>
+        <month month-number="04">April</month>
+        <month month-number="05">May</month>
+        <month month-number="06">June</month>
+        <month month-number="07">July</month>
+        <month month-number="08">August</month>
+        <month month-number="09">September</month>
+        <month month-number="10">October</month>
+        <month month-number="11">November</month>
+        <month month-number="12">December</month>
+    </xsl:variable>
+    <xsl:key name="lookup.date.month" match="month" use="@month-number"/>
+
     <xsl:template match="/">
         <xsl:apply-templates select="/nx:Experiment"/>
     </xsl:template>
     <xsl:template match="nx:Experiment">
+        <xsl:variable name="reservation-date-part">
+            <xsl:call-template name="tokenize-select">
+                <xsl:with-param name="text" select="summary/reservationStart"/>
+                <xsl:with-param name="delim">T</xsl:with-param>
+                <xsl:with-param name="i" select="1"/>
+            </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="firstfile-date-part">
+            <xsl:call-template name="tokenize-select">
+                <xsl:with-param name="text" select="acquisitionActivity[1]/startTime"/>
+                <xsl:with-param name="delim">T</xsl:with-param>
+                <xsl:with-param name="i" select="1"/>
+            </xsl:call-template>
+        </xsl:variable>
+        <xsl:variable name="title">
+            <xsl:value-of select="title"/>
+        </xsl:variable>
+        <xsl:variable name="extension-strings">
+            <xsl:for-each select="//dataset/location">
+                <xsl:call-template name="get-file-extension">
+                    <xsl:with-param name="path">
+                        <xsl:value-of select="."/>
+                    </xsl:with-param>
+                </xsl:call-template>
+            </xsl:for-each>
+        </xsl:variable>
+        <xsl:variable name="unique-extensions">
+            <xsl:call-template name="dedup-list">
+                <xsl:with-param name="input">
+                    <xsl:value-of select="$extension-strings"/>
+                </xsl:with-param>
+            </xsl:call-template>
+        </xsl:variable>
       <div>        
         <!-- ============ CSS Styling ============ --> 
         <style>
-            .main_body, .sidenav { /* Set the font style for the page */
-                font-family: "Lato", sans-serif;
-                overflow-x: hidden;
+            .main, .sidebar { /* Set the font style for the page */
+                /*font-family: "Lato", sans-serif;*/
             }
+            
+           
 
             /* Link colors */
             a:link {
@@ -74,87 +124,85 @@
                 pointer-events: none;
             }
             
-            .sidenav { /* Parameters for the sidebar */
-                width: 170px;
-                position: fixed;
-                max-height: 100%;
-                z-index: auto;
-                overflow-x: hidden;
-                overflow-y: scroll;
-
-                /* Hide scrollbars (see https://stackoverflow.com/a/49278385/1435788) */
-                overflow-y: scroll;
-                scrollbar-width: none; /* Firefox */
-                -ms-overflow-style: none;  /* IE 10+ */
+            /* Hide for mobile, show later */
+            .sidebar {
+              display: block;
+              position: fixed;
+              left: -400px;
+              width: 180px;
+              font-size: 14px;
+              transition: all 0.5s ease-in-out 0s;
+              height: 90vh;
+            }
+            @media (min-width: 768px) {
+                .sidebar {
+                     position: fixed;
+                     top: 5em;
+                     bottom: 0;
+                     left: 0;
+                     z-index: 1000;
+                     display: block;
+                     padding: 20px;
+                     overflow-x: visible;
+                     overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+                     /* border-right: 1px solid #eee; */
+                }
+            }
+            
+            .sidebar.side-expanded {
+                left: 0;
+                padding: 20px;
+                background-color: white;
+                z-index: 100;
+                border: 1px solid #eee;
             }
 
-            .sidenav {
+            .sidebar {
                 visibility: hidden; /* Make hidden, to be revealed when jQuery is done paginating results */    
             }
 
-            .sidenav::-webkit-scrollbar { /* WebKit */
+            .sidebar::-webkit-scrollbar { /* WebKit */
                 width: 0px;
             }
             
             /* Parameters for the acquisition activity links and headers within the sidebar */
-            .sidenav a, .sidenav th { 
+            .sidebar a, .sidebar h1 { 
                 text-decoration: none;
-                font-size: 16px;
                 font-weight: bold;
             }
 
-            /* for sidenav table paginator */
-            .sidenav .cdatatableDetails {
-                float: left;
-                margin: 0 1em;
+            .sidebar .pagination > li > a, .pagination > li > span {
+                padding: 6px 10px;
             }
 
-            .sidenav div.dataTables_paginate {
+            /* for sidenav table paginator */
+            .sidebar .cdatatableDetails {
+                float: left;
+                margin: 0 0.5em;
+            }
+
+            .sidebar div.dataTables_paginate {
                 text-align: center !important;
             }
             
-            .sidenav div { /* Parameters for other text found in the sidebar (e.g. start time) */
-                font-size: 11px;
+            .sidebar div { /* Parameters for other text found in the sidebar (e.g. start time) */
+                font-size: 12px;
             }
 
-            #close-accords-btn, #open-accords-btn {
-                margin: 1em auto;
+            #close-accords-btn, #open-accords-btn, #to-top-btn {
+                margin: 0.5em auto;
                 display: block;
                 width: 100%;
+                font-size: 12px;
+                z-index: 101;
             }
 
             #to-top-btn { /* Parameters for the button which jumps to the top of the page when clicked */
-                display: block;
                 visibility: hidden; /* Set button to hidden on default so that it will appear when the page is scrolled */
                 opacity: 0;
-                cursor: pointer;
-                margin: 0px auto;
-                width: 100%;
                 transition: visibility 0.25s linear, opacity 0.25s linear;
-
-                /* Use bootstrap formatting instead */
-                <!-- background-color: #3865a3;
-                border: none;
-                outline: none;
-                color: white; 
-                padding: 15px 20px;
-                border-radius: 3px;
-                font-size: 14px; -->
             }
-            
-            <!-- #to-top-btn:hover { /* Changes the color of the button when hovered over */
-                background-color: #5e7ca3;
-            } -->
-            
-            /* Set up 2 divided columns to separate setup parameters and the corresponding image gallery */
-            .row {
-                display: flex;
-            }
-
-            .column {
-                flex: 50%;
-            }
-            
+     
             .slide {
                 display: none;
             }
@@ -204,6 +252,7 @@
             .aa_header_row {
                 /* width: 95%; */
                 margin-bottom: .5em;
+                margin-top: -35px;
             }
 
             .accordion { /* Parameters for accordions used to hide parameter / metadata tables */
@@ -286,17 +335,39 @@
                 cursor: pointer;
             }
             
-            .main_body { /* Set parameters for the rest of the page in order to adjust for the sidebar being there */
-                margin-left: 10em; /* Same width as the sidebar + left position in px */
-                padding: 0px 10px;
+            /*
+            * Main content
+            */
+            
+            .main {
+                padding: 20px;
+                transition: padding 0.5s ease-in-out 0s;
+                padding-top: 5px;
             }
+            @media (min-width: 768px) {
+            .main {
+                padding-right: 40px;
+                padding-left: 220px; /* 180 + 40 */
+            }
+            }
+            .main .page-header {
+                margin-top: 0;
+                border-bottom: none;`
+            }
+            
 
-            .main_body h1 {
+            .main h1 {
                 font-size: 1.5em;
             }
 
-            .main_body h3 {
+            .main h3 {
                 font-size: 1.1em;
+            }
+            
+            table#summary-table > tbody > tr > * {
+                border: 0;
+                padding: 1px;
+                line-height: 1.25;
             }
 
             table.preview-and-table {
@@ -327,20 +398,20 @@
             }
 
             /* Fix for margins getting messed up inside the AA panels */
-            .main_body .dataTables_wrapper .row {
+            .main .dataTables_wrapper .row {
                 margin: 0;
                 display: flex;
                 align-items: center;
                 margin-top: 0.5em;
             }
-            .main_body .dataTables_wrapper .row > * {
+            .main .dataTables_wrapper .row > * {
                 padding: 0;
             }
-            .main_body .dataTables_wrapper ul.pagination > li > a {
+            .main .dataTables_wrapper ul.pagination > li > a {
                 padding: 0px 8px;
             }
 
-            .main_body .dataTables_wrapper label {
+            .main .dataTables_wrapper label {
                 font-size: smaller;
             }
 
@@ -366,6 +437,14 @@
                 margin-left: -200px;
                 animation: spinner 1.5s ease infinite;
             }
+            
+            @media screen and (max-width: 680px) {
+            #loading img {
+                width: 200px;
+                margin-top: -100px;
+                margin-left:-100px;
+            }
+            }
 
             @keyframes spinner {
             to {transform: rotate(360deg);}
@@ -375,7 +454,80 @@
                 visibility: hidden;
                 opacity: 0;
             }
+            
+            /* Fix spacing between components */
+            .main .row {
+            }
 
+            .motivation-text, #session_info_column {
+                margin-top: -40px;
+            }
+            @media screen and (max-width: 1680px) {
+            .motivation-text, #session_info_column {
+                margin-top: -35px;
+            }
+            }
+            @media screen and (max-width: 1280px) {
+            .motivation-text, #session_info_column {
+            margin-top: -25px;
+            }
+            }
+            @media screen and (max-width: 980px) {
+            .motivation-text, #session_info_column {
+            margin-top: -20px;
+            }
+            }
+            @media screen and (max-width: 736px) {
+            .motivation-text, #session_info_column {
+            margin-top: -15px;
+            }
+            }
+            @media screen and (max-width: 480px) {
+            .motivation-text, #session_info_column {
+            margin-top: -10px;
+            margin-right: 50px;
+            }
+            .experimenter-and-date {
+            margin-right: 50px;
+            }
+            #top-button-div {
+            margin-right: 50px;
+            }
+            }
+            .tooltip {
+                z-index: 20000;
+                position: fixed; 
+            }
+            .sidebar-btn-tooltip {
+                top: 69px !important;
+            }
+            .sidebar-btn-tooltip .tooltip-arrow{
+                top: 50% !important;
+            }
+            @media screen and (max-width: 768px) {
+            #edit-record-btn, #previous-page-btn {
+                font-size: 10px;
+            }
+            }
+            #sidebar-btn {
+                visibility: hidden;
+                opacity: 0;
+                position: fixed;
+                top: 69px;
+                left: 20px;
+                font-size: 20px;
+                transition: opacity 0.5s ease-in-out 0s;
+                }
+            @media screen and (max-width: 768px) {
+            #sidebar-btn {
+                visibility: visible;
+                opacity: 1;
+            }
+            }
+            
+            .slideshow-col {
+                padding: 0;
+            }
         </style>
 
         <div id="loading">
@@ -384,246 +536,303 @@
 
         <!-- ============= Main Generation of the Page ============= -->
         <!-- Add sidebar to the page -->
-        <div class="xslt_render">
-        <div class="sidenav">
+        <div class="sidebar">
             <table id="nav-table" class="table table-condensed table-hover">
-            <!-- Procedurally generate unique id numbers which relate each acquisition event to its position on
-                the webpage such that it will jump there when the link is clicked -->
-            <thead>
-                <tr><th>Record contents:</th></tr>
-            </thead>
-            <tbody>
-            <xsl:for-each select="acquisitionActivity">
-                <tr><td>
-                <a class="link" href="#{generate-id(current())}">
-                    Activity <xsl:value-of select="@seqno+1"/>
-                </a>
-                <div><xsl:value-of select="setup/param[@name='Mode']"/></div>
-                </td></tr>
-            </xsl:for-each>
-            </tbody>
-            </table>
-
-            <button id="open-accords-btn" class="btn btn-default" onclick="openAccords()">
-                <i class="fa fa-plus-square-o"></i> Expand All Panels
-            </button>
-            
-            <button id="close-accords-btn" class="btn btn-default" onclick="closeAccords()">
-                <i class="fa fa-minus-square-o"></i> Collapse All Panels
-            </button>
-
-                    <!-- Create floating button in bottom right which jumps to the top of the page when clicked -->
-            <button id="to-top-btn" type="button" class="btn btn-primary" value="Top" onclick="toTop()">
-                <i class="fa fa-arrow-up"></i> Scroll to Top
-            </button>
-        </div>
+                <!-- Procedurally generate unique id numbers which relate each acquisition event to its position on
+                    the webpage such that it will jump there when the link is clicked -->
+                <thead>
+                    <tr><th>Explore record:</th></tr>
+                </thead>
+                <tbody>
+                <xsl:for-each select="acquisitionActivity">
+                    <tr><td>
+                    <a class="link" href="#{generate-id(current())}">
+                        Activity <xsl:value-of select="@seqno+1"/>
+                    </a>
+                    <div><xsl:value-of select="setup/param[@name='Mode']"/></div>
+                    </td></tr>
+                </xsl:for-each>
+                </tbody>
+                </table>
     
-        <div class="main_body">                        
-            <!-- Display the experiment title and experimenter at the top of the page -->
-            <h1 id="record-title">
-                <xsl:value-of select="title"/>
-            </h1>
-            <h3 id="record-experimenter">
-                <xsl:value-of select="summary/experimenter"/>
-            </h3>
-            
-            <div class="row">
-                <div class="column" id="session_info_column">
-                    <h3 id="res-info-header">Reservation Information:</h3>
-                    <!-- Display summary information (date, time, instrument, and id) -->
-
-                    <table class="table table-striped table-hover table-bordered" 
-                           style="border-collapse:collapse;width:80%;">
-                        <tr>
-                            <th align="left" class="parameter-name">Motivation: </th>
-                            <td align="left"><xsl:value-of select="summary/motivation"/></td>
-                        </tr>
-                        <tr>
-                            <th align="left" class="parameter-name">Instrument: </th>
-                            <td align="left"><xsl:value-of select="summary/instrument"/></td>
-                        </tr>
-                        <tr>
-                            <th align="left" class="parameter-name">Date: </th>
-                            <td align="left">
-                                <xsl:call-template name="tokenize-select">
-                                    <xsl:with-param name="text" select="summary/reservationStart"/>
-                                    <xsl:with-param name="delim">T</xsl:with-param>
-                                    <xsl:with-param name="i" select="1"/>
-                                </xsl:call-template>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th align="left" class="parameter-name">Start Time: </th>
-                            <td align="left">
-                                <xsl:call-template name="tokenize-select">
-                                    <xsl:with-param name="text" select="summary/reservationStart"/>
-                                    <xsl:with-param name="delim">T</xsl:with-param>
-                                    <xsl:with-param name="i" select="2"/>
-                                </xsl:call-template>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th align="left" class="parameter-name">End Time: </th>
-                            <td align="left">
-                                <xsl:call-template name="tokenize-select">
-                                    <xsl:with-param name="text" select="summary/reservationEnd"/>
-                                    <xsl:with-param name="delim">T</xsl:with-param>
-                                    <xsl:with-param name="i" select="2"/>
-                                </xsl:call-template>
-                            </td>
-                        </tr>
-                        <tr>
-                            <th align="left" class="parameter-name">Session ID: </th>
-                            <td align="left"><xsl:value-of select="id"/></td>
-                        </tr>
-                    </table>
-
-                    <!-- Display information about the sample -->  
-                    <h3>Sample Information:</h3>
-
-                    <table class="table table-striped table-hover table-bordered" 
-                           style="border-collapse:collapse;width:80%;">
-                        <tr>
-                            <th align="left" class="parameter-name">Sample name: </th>
-                            <td align="left"> <xsl:value-of select="sample/name"/></td>
-                        </tr>
-                        <tr>
-                            <th align="left" class="parameter-name">Sample ID: </th>
-                            <td align="left"><xsl:value-of select="acquisitionActivity[@seqno=1]/sampleID"/></td>
-                        </tr>
-                        <tr>
-                            <th align="left" class="parameter-name">Description: </th>
-                            <td align="left"><xsl:value-of select="sample/description"/></td>
-                        </tr>
-                    </table>
-                </div>
+                <button id="open-accords-btn" class="btn btn-default" onclick="openAccords()">
+                    <i class="fa fa-plus-square-o"></i> Expand All Panels
+                </button>
                 
-                <!-- Image gallery showing images from every dataset of the session -->
-                <div class="column">
-                    <div class="slideshow-container" id="img_gallery">
-                        <xsl:for-each select="//dataset">
-                            <div class="slide">
-                                <img class="nx-img"><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute></img>
-                                <div class="text"><xsl:value-of select="position()"/> / <xsl:value-of select="count(//dataset)" /></div>
-                            </div>
-                        </xsl:for-each>
-                        <a class="gal-prev" onclick="plusSlide(-1)">&lt;</a>
-                        <a class="gal-next" onclick="plusSlide(1)">&gt;</a>
-                    </div>
+                <button id="close-accords-btn" class="btn btn-default" onclick="closeAccords()">
+                    <i class="fa fa-minus-square-o"></i> Collapse All Panels
+                </button>
+    
+                <!-- Create button which jumps to the top of the page when clicked -->
+                <button id="to-top-btn" type="button" class="btn btn-primary" value="Top" onclick="toTop()">
+                    <i class="fa fa-arrow-up"></i> Scroll to Top
+                </button>
+        </div>
+          <div id="sidebar-btn" data-toggle="tooltip" data-placement="right" 
+              title="Click to explore record contents">
+             <a><i class="fa fa-toggle-right"></i></a>
+         </div>
+    
+          <div class="main col-md-push-2" style="padding: 0;" id="top-button-div">
+              <button id="edit-record-btn" type="button" class="btn btn-default pull-right"
+                  data-toggle="tooltip" data-placement="top" 
+                  title="Manually edit the contents of this record">
+                  <i class="fa fa-file-text"></i> Edit this record
+              </button>
+              <button id="previous-page-btn" type="button" class="btn btn-default pull-right"
+                  >
+                  <i class="fa fa-arrow-left"></i> Back to previous
+              </button>
+          </div>
+    
+            <div class="main col-sm-pull-10" id="main-column">                        
+                
+                <div id='summary-info'>
+                    <span class="list-record-title page-header">
+                        <i class="fa fa-file-text results-icon"/>
+                        <xsl:choose>
+                            <xsl:when test="$title = 'No matching calendar event found'">
+                                <xsl:text>Untitled experiment</xsl:text>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="$title"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </span>
+                    <br/>
+                    <span class="badge list-record-badge yellow-badge"><xsl:value-of select="summary/instrument"/></span>
+                    <span class="badge list-record-badge"><xsl:value-of select="count(//dataset)"/> data
+                        files</span><i class="fa fa-cubes" style="margin-left:0.75em; font-size: small;"/><span style="font-size: small;"><xsl:text>: </xsl:text></span>
+                    <xsl:call-template name="extensions-to-badges">
+                        <xsl:with-param name="input"><xsl:value-of select="$unique-extensions"/></xsl:with-param>
+                    </xsl:call-template>
                 </div>
-            </div>
-            <hr/>
-            <!-- Loop through each acquisition activity -->
-            <xsl:for-each select="acquisitionActivity">
-                <div class="container-fluid">
-                    <div class="row aa_header_row">
-                        <div class="col-md-6">
-                            <!-- Generate name id which corresponds to the link associated with the acquisition activity --> 
-                            <a name="{generate-id(current())}" class="aa_header">
-                                <b>Acquisition Activity <xsl:value-of select="@seqno+1"/></b>
-                            </a>
-                            <div style="font-size:15px">Activity mode: <i><xsl:value-of select="setup/param[@name='Mode']"/></i></div>
+                <div class="row">
+                        <div class="experimenter-and-date">
+                            <span class="list-record-experimenter">
+                                <xsl:choose>
+                                    <xsl:when test="summary/experimenter">
+                                        <xsl:value-of select="summary/experimenter"/>
+                                    </xsl:when>
+                                    <xsl:otherwise>Unknown experimenter</xsl:otherwise>
+                                </xsl:choose>
+                            </span>
+                            <xsl:text> - </xsl:text>
+                            <span class="list-record-date">
+                                <i>
+                                    <xsl:choose>
+                                        <xsl:when test="$reservation-date-part != ''">
+                                            <xsl:call-template name="localize-date">
+                                                <xsl:with-param name="date">
+                                                    <xsl:value-of select="$reservation-date-part"/>
+                                                </xsl:with-param>
+                                            </xsl:call-template>
+                                        </xsl:when>
+                                        <xsl:when test="$firstfile-date-part != ''">
+                                            <xsl:call-template name="localize-date">
+                                                <xsl:with-param name="date">
+                                                    <xsl:value-of select="$firstfile-date-part"/>
+                                                </xsl:with-param>
+                                            </xsl:call-template>
+                                            <span style="font-size:small; font-style:italic;"> (taken from file timestamps)</span>
+                                        </xsl:when>
+                                        <xsl:otherwise>Unknown date</xsl:otherwise>
+                                    </xsl:choose>
+                                </i>
+                            </span>
                         </div>
-                        <div class="col-md-2 col-md-offset-4" style="margin-right: 4%;">
-                            <button id="{generate-id(current())}-btn" class="btn btn-success pull-right"
-                                    onclick="toggleAA('{generate-id(current())}-btn')">
-                            <i class="fa fa-plus-square-o"></i> Expand Activity</button>
-                        </div>
-                    </div>
                 </div>
-
-                <!-- Create accordion which contains acquisition activity setup parameters -->
-                <button class="accordion" style="font-weight:bold;font-size:19px;">Activity Parameters</button>
-                <div class="panel">
-                    <!-- Generate the table with setup conditions for each acquisition activity -->
-                    <table class="table table-condensed table-hover meta-table compact" border="1" style="">
-                        <thead>
-                        <tr>
-                            <th>Setup Parameter</th>
-                            <th>Value</th>
-                        </tr>
-                        </thead>
-                        <tbody>
+                <div class="row">
+                        <div class="motivation-text">
+                            <span style="font-style:italic;">Motivation: </span><xsl:value-of select="summary/motivation"/>
+                        </div>
+                </div>            
+                <div class="row">    
+                    <div class="col-md-6" id="session_info_column">
+                        <h3 id="res-info-header">Session Summary:</h3>
+                        <!-- Display summary information (date, time, instrument, and id) -->
+    
+                        <table class="table table-condensed" id="summary-table" 
+                               style="border-collapse:collapse;width:80%;">
                             <tr>
-                            <td><b>Start time</b></td>
-                                <td>
+                                <th align="left" class="col-sm-3 parameter-name">Date: </th>
+                                <td align="left" class="col-sm-9">
                                     <xsl:call-template name="tokenize-select">
-                                        <xsl:with-param name="text" select="startTime"/>
+                                        <xsl:with-param name="text" select="summary/reservationStart"/>
+                                        <xsl:with-param name="delim">T</xsl:with-param>
+                                        <xsl:with-param name="i" select="1"/>
+                                    </xsl:call-template>
+                                </td>
+                            </tr>
+                            <tr>
+                                <th align="left" class="col-sm-3 parameter-name">Start Time: </th>
+                                <td align="left" class="col-sm-9">
+                                    <xsl:call-template name="tokenize-select">
+                                        <xsl:with-param name="text" select="summary/reservationStart"/>
                                         <xsl:with-param name="delim">T</xsl:with-param>
                                         <xsl:with-param name="i" select="2"/>
                                     </xsl:call-template>
                                 </td>
                             </tr>
-                        <!-- Loop through each setup value under the 'param' heading -->
-                        <xsl:for-each select="setup/param">
-                            <xsl:sort select="@name"/>
                             <tr>
-                                <!-- Populate setup table with parameter name and value -->
-                                <td><b><xsl:value-of select="@name"/></b></td>
-                                <td><xsl:value-of select="current()"/></td>
+                                <th align="left" class="col-sm-3 parameter-name">End Time: </th>
+                                <td align="justify" class="col-sm-9">
+                                    <xsl:call-template name="tokenize-select">
+                                        <xsl:with-param name="text" select="summary/reservationEnd"/>
+                                        <xsl:with-param name="delim">T</xsl:with-param>
+                                        <xsl:with-param name="i" select="2"/>
+                                    </xsl:call-template>
+                                </td>
                             </tr>
-                        </xsl:for-each>
-                        </tbody>
-                    </table>                        
-                </div>
-                
-                <!-- Generate metadata table for each image dataset taken for respective acquisition activities -->
-                <xsl:for-each select="dataset">
-                    <!-- Generate unique modal box for each dataset which contains the corresponding image, accessed via a button -->
-                    <div id="#{generate-id(current())}" class="modal">
-                        <div class="modal-content">
-                            <span class="close" onclick="closeModal('#{generate-id(current())}')">X</span>
-                            <img class="nx-img"><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute></img>
-                        </div>
-                    </div>
-                    
-                    <!-- Create accordion which contains metadata for each image dataset -->
-                    <button class="accordion"><b><xsl:value-of select="@type"/>: <xsl:value-of select="name"/></b></button>
-                    <div class="panel">
-                        <form><xsl:attribute name="action"><xsl:value-of select="$datasetBaseUrl"/><xsl:value-of select="location"/></xsl:attribute>
-                            <button class="btn btn-default" style="display:block; margin: 2em auto;" type="submit">Download original data</button>
-                        </form>
-                        <table class="preview-and-table">
-                        <tr>
-                            <td>
-                                <a><xsl:attribute name="href"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute>
-                                    <img width="400" height="400" class="dataset-preview-img"><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute></img>
-                                </a>
-                            </td>
+                            <tr>
+                                <th align="left" class="col-sm-3 parameter-name">Session ID: </th>
+                                <td align="justify" class="col-sm-9"><xsl:value-of select="id"/></td>
+                            </tr>
+                            <tr>
+                                <th align="left" class="col-sm-3 parameter-name">Sample name: </th>
+                                <td align="justify" class="col-sm-9"> <xsl:value-of select="sample/name"/></td>
+                            </tr>
+                            <tr>
+                                <th align="left" class="col-sm-3 parameter-name">Sample ID: </th>
+                                <td align="justify" class="col-sm-9"><xsl:value-of select="acquisitionActivity[@seqno=1]/sampleID"/></td>
+                            </tr>
                             <xsl:choose>
-                                <xsl:when test="meta"> <!-- Checks whether there are parameters and only creates a table if there is -->
-                                    <td>
-                                        <table class="table table-condensed table-hover meta-table compact" border="1" style="width:100%; border-collapse:collapse;">
-                                            <thead>
-                                            <tr bgcolor="#3a65a2" color='white'>
-                                                <th>Parameter</th>
-                                                <th>Value</th>
-                                            </tr>
-                                            </thead>
-                                           <!-- Loop through each metadata parameter -->
-                                           <tbody>
-                                           <xsl:for-each select="meta">
-                                               <xsl:sort select="@name"/>
-                                               <tr>
-                                                   <!-- Populate table values with the metadata name and value -->
-                                                   <td><b><xsl:value-of select="@name"/></b></td>
-                                                   <td><xsl:value-of select="current()"/></td>
-                                               </tr>
-                                           </xsl:for-each>
-                                           </tbody>
-                                       </table>
-                                   </td>
+                                <xsl:when test="sample/description/text()">
+                                    <tr>
+                                        <th align="left" class="col-sm-6 parameter-name">Description: </th>
+                                        <td align="justify"><xsl:value-of select="sample/description"/></td>
+                                    </tr>
                                 </xsl:when>
-                                <xsl:otherwise/>
+                                <xsl:otherwise></xsl:otherwise>
                             </xsl:choose>
-                        </tr>
                         </table>
                     </div>
+                    
+                    <!-- Image gallery showing images from every dataset of the session -->
+                    <div class="col-md-6 slideshow-col">
+                        <div id="img_gallery">
+                            <xsl:for-each select="//dataset">
+                                <div class="slide">
+                                    <img class="nx-img"><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute></img>
+                                    <div class="text"><xsl:value-of select="position()"/> / <xsl:value-of select="count(//dataset)" /></div>
+                                </div>
+                            </xsl:for-each>
+                            <a class="gal-prev" onclick="plusSlide(-1)">&lt;</a>
+                            <a class="gal-next" onclick="plusSlide(1)">&gt;</a>
+                        </div>
+                    </div>
+                </div>
+                <hr/>
+                <!-- Loop through each acquisition activity -->
+                <xsl:for-each select="acquisitionActivity">
+                    <div class="container-fluid">
+                        <div class="row aa_header_row">
+                            <div class="col-md-6">
+                                <!-- Generate name id which corresponds to the link associated with the acquisition activity --> 
+                                <a name="{generate-id(current())}" class="aa_header">
+                                    <b>Experiment activity <xsl:value-of select="@seqno+1"/></b>
+                                </a>
+                                <div style="font-size:15px">Instrument mode: <i><xsl:value-of select="setup/param[@name='Mode']"/></i></div>
+                            </div>
+                            <div class="col-md-2 col-md-offset-4" style="margin-right: 4%;">
+                                <button id="{generate-id(current())}-btn" class="btn btn-success pull-right"
+                                        onclick="toggleAA('{generate-id(current())}-btn')">
+                                <i class="fa fa-plus-square-o"></i> Expand Activity</button>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <!-- Create accordion which contains acquisition activity setup parameters -->
+                    <button class="accordion" style="font-weight:bold;font-size:19px;">Activity Parameters</button>
+                    <div class="panel">
+                        <!-- Generate the table with setup conditions for each acquisition activity -->
+                        <table class="table table-condensed table-hover meta-table compact" border="1" style="">
+                            <thead>
+                            <tr>
+                                <th>Setup Parameter</th>
+                                <th>Value</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                <td><b>Start time</b></td>
+                                    <td>
+                                        <xsl:call-template name="tokenize-select">
+                                            <xsl:with-param name="text" select="startTime"/>
+                                            <xsl:with-param name="delim">T</xsl:with-param>
+                                            <xsl:with-param name="i" select="2"/>
+                                        </xsl:call-template>
+                                    </td>
+                                </tr>
+                            <!-- Loop through each setup value under the 'param' heading -->
+                            <xsl:for-each select="setup/param">
+                                <xsl:sort select="@name"/>
+                                <tr>
+                                    <!-- Populate setup table with parameter name and value -->
+                                    <td><b><xsl:value-of select="@name"/></b></td>
+                                    <td><xsl:value-of select="current()"/></td>
+                                </tr>
+                            </xsl:for-each>
+                            </tbody>
+                        </table>                        
+                    </div>
+                    
+                    <!-- Generate metadata table for each image dataset taken for respective acquisition activities -->
+                    <xsl:for-each select="dataset">
+                        <!-- Generate unique modal box for each dataset which contains the corresponding image, accessed via a button -->
+                        <div id="#{generate-id(current())}" class="modal">
+                            <div class="modal-content">
+                                <span class="close" onclick="closeModal('#{generate-id(current())}')">X</span>
+                                <img class="nx-img"><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute></img>
+                            </div>
+                        </div>
+                        
+                        <!-- Create accordion which contains metadata for each image dataset -->
+                        <button class="accordion"><b><xsl:value-of select="@type"/>: <xsl:value-of select="name"/></b></button>
+                        <div class="panel">
+                            <form><xsl:attribute name="action"><xsl:value-of select="$datasetBaseUrl"/><xsl:value-of select="location"/></xsl:attribute>
+                                <button class="btn btn-default" style="display:block; margin: 2em auto;" type="submit">Download original data</button>
+                            </form>
+                            <table class="preview-and-table">
+                            <tr>
+                                <td>
+                                    <a><xsl:attribute name="href"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute>
+                                        <img width="400" height="400" class="dataset-preview-img"><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute></img>
+                                    </a>
+                                </td>
+                                <xsl:choose>
+                                    <xsl:when test="meta"> <!-- Checks whether there are parameters and only creates a table if there is -->
+                                        <td>
+                                            <table class="table table-condensed table-hover meta-table compact" border="1" style="width:100%; border-collapse:collapse;">
+                                                <thead>
+                                                <tr bgcolor="#3a65a2" color='white'>
+                                                    <th>Parameter</th>
+                                                    <th>Value</th>
+                                                </tr>
+                                                </thead>
+                                               <!-- Loop through each metadata parameter -->
+                                               <tbody>
+                                               <xsl:for-each select="meta">
+                                                   <xsl:sort select="@name"/>
+                                                   <tr>
+                                                       <!-- Populate table values with the metadata name and value -->
+                                                       <td><b><xsl:value-of select="@name"/></b></td>
+                                                       <td><xsl:value-of select="current()"/></td>
+                                                   </tr>
+                                               </xsl:for-each>
+                                               </tbody>
+                                           </table>
+                                       </td>
+                                    </xsl:when>
+                                    <xsl:otherwise/>
+                                </xsl:choose>
+                            </tr>
+                            </table>
+                        </div>
+                    </xsl:for-each>
+                    <br/>
                 </xsl:for-each>
-                <br/>
-            </xsl:for-each>
-        </div>
-        </div>
+            </div>
 
         <!-- Javascript which supports some capabilities on the generated page -->
         <script language="javascript">
@@ -638,7 +847,7 @@
             window.onscroll = function() {showButtonOnScroll()};
             
             function showButtonOnScroll() {
-                var header_pos = $('#record-experimenter').first().position()['top'];
+                var header_pos = $('.list-record-experimenter').first().position()['top'];
                 if (document.body.scrollTop > header_pos || document.documentElement.scrollTop > header_pos) {
                     document.getElementById("to-top-btn").style.visibility = "visible";
                     document.getElementById("to-top-btn").style.opacity = 1;
@@ -853,21 +1062,21 @@
                                             .on('click', function(){
                                             var info = navTable.page.info();
                                                 $('.cdatatableDetails').remove();
-                                                $('.sidenav .paginate_button.next').before($('<span>',{
+                                                $('.sidebar .paginate_button.next').before($('<span>',{
                                                 'text':' Page '+ (info.page+1) +' of '+info.pages + ' ',
                                                 class:'cdatatableDetails'
                                                 }));
-
+                                            $('.sidebar .pagination').first().addClass('vertical-align');
                                             });    
                                             $('.paginate_button.previous', this.api().table().container())          
                                             .on('click', function(){
                                             var info = navTable.page.info();
                                                 $('.cdatatableDetails').remove();
-                                                $('.sidenav .paginate_button.next').before($('<span>',{
+                                                $('.sidebar .paginate_button.next').before($('<span>',{
                                                 'text':'Page '+ (info.page+1) +' of '+info.pages,
                                                 class:'cdatatableDetails'
                                                 }));
-
+                                                $('.sidebar .pagination').first().addClass('vertical-align');
                                             }); 
                                     },
                                     ordering: false,
@@ -875,10 +1084,12 @@
                                 });
                 
                 var info = navTable.page.info();
-                $('.sidenav .paginate_button.next').before($('<span>',{
+                $('.sidebar .paginate_button.next').before($('<span>',{
                     'text':' Page '+ (info.page+1) +' of '+info.pages + ' ' ,
                     class:'cdatatableDetails'
                 }));
+                $('.sidebar .pagination').first().addClass('vertical-align');
+
 
                 // Make acquisition activity metadata tables DataTables
                 $('.meta-table').each(function() {
@@ -905,18 +1116,58 @@
                 });
 
                 // Make visible:
-                $('.sidenav').first().css('visibility', 'visible');
+                $('.sidebar').first().css('visibility', 'visible');
 
                 $('#loading').fadeOut('slow');
                 
-                document.getElementsByClassName('xslt_render')[0].style.visibility = "visible";
-                document.getElementsByClassName('xslt_render')[0].style.opacity = 1;
+                //document.getElementById('xslt_render').style.visibility = "visible";
+                //document.getElementById('xslt_render').style.opacity = 1;
                 
             });
 
             ]]>
         </script>
       </div>
+    </xsl:template>
+
+    <!--
+      - Format a date given in yyyy-mm-dd format to a text-based format
+      - e.g. "2019-10-04" becomes "October 4, 2019"
+      - @param date   the date to parse
+      -->
+    <xsl:template name="localize-date">
+        <xsl:param name="date"/>
+        <xsl:variable name="month-num">
+            <xsl:call-template name="tokenize-select">
+                <xsl:with-param name="text">
+                    <xsl:value-of select="$date"/>
+                </xsl:with-param>
+                <xsl:with-param name="delim" select="'-'"/>
+                <xsl:with-param name="i" select="2"/>
+            </xsl:call-template>
+        </xsl:variable>
+        
+        <!-- The 'for-each document' bit is required because keys only work in the context of the current
+                 document in XSLT 1.0 (see https://stackoverflow.com/a/35327827/1435788) -->
+        <xsl:for-each select="document('')">
+            <xsl:value-of select="key('lookup.date.month', $month-num)"/>
+        </xsl:for-each>
+        <xsl:text> </xsl:text>
+        <xsl:call-template name="tokenize-select">
+            <xsl:with-param name="text">
+                <xsl:value-of select="$date"/>
+            </xsl:with-param>
+            <xsl:with-param name="delim" select="'-'"/>
+            <xsl:with-param name="i" select="3"/>
+        </xsl:call-template>
+        <xsl:text>, </xsl:text>
+        <xsl:call-template name="tokenize-select">
+            <xsl:with-param name="text">
+                <xsl:value-of select="$date"/>
+            </xsl:with-param>
+            <xsl:with-param name="delim" select="'-'"/>
+            <xsl:with-param name="i" select="1"/>
+        </xsl:call-template>
     </xsl:template>
 
     <!--
@@ -962,5 +1213,126 @@
         </xsl:otherwise>
         
       </xsl:choose>
+    </xsl:template>
+    
+    <xsl:template name="get-file-extension">
+        <xsl:param name="path"/>
+        <xsl:choose>
+            <xsl:when test="contains($path, '/')">
+                <xsl:call-template name="get-file-extension">
+                    <xsl:with-param name="path" select="substring-after($path, '/')"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:when test="contains($path, '.')">
+                <xsl:call-template name="TEMP">
+                    <xsl:with-param name="x" select="substring-after($path, '.')"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:text>No extension</xsl:text>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    
+    <xsl:template name="TEMP">
+        <xsl:param name="x"/>
+        
+        <xsl:choose>
+            <xsl:when test="contains($x, '.')">
+                <xsl:call-template name="TEMP">
+                    <xsl:with-param name="x" select="substring-after($x, '.')"/>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:element name="ext">
+                    <xsl:value-of select="$x"/><xsl:text> </xsl:text>
+                </xsl:element>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    
+    <xsl:template name="dedup-list">
+        <!-- Cribbed from https://www.oxygenxml.com/archives/xsl-list/200412/msg00888.html -->
+        <xsl:param name="input"/>
+        <xsl:param name="to-keep"/>
+        <xsl:choose>
+            <!-- Our string contains a space, so there are more values to process -->
+            <xsl:when test="contains($input, ' ')">
+                <!-- Value to test is substring-before -->
+                <xsl:variable name="firstWord" select="substring-before($input, ' ')"/>
+                
+                <xsl:choose>
+                    <xsl:when test="not(contains($to-keep, $firstWord))">
+                        <xsl:variable name="newString">
+                            <xsl:choose>
+                                <xsl:when test="string-length($to-keep) = 0">
+                                    <xsl:value-of select="$firstWord"/>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    <xsl:value-of select="$to-keep"/>
+                                    <xsl:text> </xsl:text>
+                                    <xsl:value-of select="$firstWord"/>
+                                </xsl:otherwise>
+                            </xsl:choose>
+                        </xsl:variable>
+                        <xsl:call-template name="dedup-list">
+                            <xsl:with-param name="input" select="substring-after($input, ' ')"/>
+                            <xsl:with-param name="to-keep" select="$newString"/>
+                        </xsl:call-template>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:call-template name="dedup-list">
+                            <xsl:with-param name="input" select="substring-after($input, ' ')"/>
+                            <xsl:with-param name="to-keep" select="$to-keep"/>
+                        </xsl:call-template>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:choose>
+                    <xsl:when test="string-length($to-keep) = 0">
+                        <xsl:value-of select="$input"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:choose>
+                            <xsl:when test="contains($to-keep, $input)">
+                                <xsl:value-of select="$to-keep"/>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="$to-keep"/>
+                                <xsl:text> </xsl:text>
+                                <xsl:value-of select="$input"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
+                    </xsl:otherwise>
+                </xsl:choose>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+    
+    <xsl:template name="extensions-to-badges">
+        <xsl:param name="input"/>
+        <xsl:choose>
+            <!-- Our string contains a space, so there are more values to process -->
+            <xsl:when test="contains($input, ' ')">
+                <xsl:call-template name="extensions-to-badges">
+                    <xsl:with-param name="input" select="substring-before($input, ' ')"></xsl:with-param>
+                </xsl:call-template>
+                <xsl:call-template name="extensions-to-badges">
+                    <xsl:with-param name="input" select="substring-after($input, ' ')"></xsl:with-param>
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <span style="white-space:nowrap;">
+                    <span class="badge-left badge list-record-badge">
+                        <!-- count the number of dataset locations that end with this extension -->
+                        <xsl:value-of select="count(//dataset/location[$input = substring(., string-length() - string-length($input) + 1)])"/>
+                    </span>
+                    <span class="badge-right badge list-record-badge">
+                        <xsl:value-of select="$input"/>
+                    </span>
+                </span>
+            </xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
 </xsl:stylesheet>
