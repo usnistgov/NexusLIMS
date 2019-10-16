@@ -579,7 +579,7 @@
                     <a class="link" href="#{generate-id(current())}">
                         Activity <xsl:value-of select="@seqno+1"/>
                     </a>
-                    <div><xsl:value-of select="setup/param[@name='Mode']"/></div>
+                        <div><xsl:call-template name="parse-instrument-mode"></xsl:call-template></div>
                     </td></tr>
                 </xsl:for-each>
                 </tbody>
@@ -795,17 +795,18 @@
                     <div class="col-md-6 slideshow-col">
                         <div id="img_gallery">
                             <xsl:for-each select="//dataset">
+                                <xsl:variable name="aa_num" select="count(../preceding-sibling::acquisitionActivity) + 1"/>
                                 <figure class="slide">
                                     <img class="nx-img"><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute></img>
                                     <figcaption class="nx-caption">
                                         Dataset <xsl:value-of select="position()"/> of <xsl:value-of select="count(//dataset)" />
                                         <br/>
-                                        Activity <xsl:value-of select="count(../preceding-sibling::acquisitionActivity) + 1"/> of <xsl:value-of select="count(//acquisitionActivity)"/>
+                                        Activity <xsl:value-of select="$aa_num"/> of <xsl:value-of select="count(//acquisitionActivity)"/>
                                         <xsl:text> </xsl:text>
                                         <sup>
                                             <a  href="#{generate-id(..)}" 
                                             data-toggle='tooltip' data-placement='bottom'
-                                            title='Jump to activity in record'><i class='fa fa-link'/></a>
+                                            title='Jump to activity {$aa_num} in record'><i class='fa fa-link'/></a>
                                         </sup>
                                     </figcaption>
                                 </figure>
@@ -830,9 +831,13 @@
                                 <a name="{generate-id(current())}" class="aa_header">
                                     <b>Experiment activity <xsl:value-of select="@seqno+1"/></b>
                                 </a>
-                                <div style="font-size:15px">Instrument mode: <i><xsl:value-of select="setup/param[@name='Mode']"/></i></div>
+                                <div style="font-size:15px">Instrument mode: 
+                                    <i>
+                                        <xsl:call-template name="parse-instrument-mode"></xsl:call-template>
+                                    </i>
+                                </div>
                             </div>
-                            <div class="col-md-2 col-md-offset-4" style="margin-right: 4%;">
+                            <div class="col-md-2 col-md-offset-4">
                                 <button id="{generate-id(current())}-btn" class="btn btn-success pull-right"
                                         onclick="toggleAA('{generate-id(current())}-btn')">
                                 <i class="fa fa-plus-square-o"></i> Expand Activity</button>
@@ -1507,6 +1512,19 @@
         <xsl:for-each select="document('')">
             <xsl:value-of select="$sharepointBaseUrl"/>
             <xsl:value-of select="key('lookup.instrument.url', $instrument)"/>DispForm.aspx?ID=<xsl:value-of select="$event-id"/></xsl:for-each>
+    </xsl:template>
+    
+    <xsl:template name="parse-instrument-mode">
+        <xsl:choose>
+            <xsl:when test="contains(setup/param[@name='Mode'], 'TEM')">TEM<xsl:text> </xsl:text></xsl:when>
+            <xsl:when test="contains(setup/param[@name='Mode'], 'SEM')">SEM<xsl:text> </xsl:text></xsl:when>
+            <xsl:otherwise></xsl:otherwise>
+        </xsl:choose>
+        <xsl:choose>
+            <xsl:when test="contains(setup/param[@name='Mode'], 'Diffraction')">Diffraction</xsl:when>
+            <xsl:when test="contains(setup/param[@name='Mode'], 'Image')">Imaging</xsl:when>
+            <xsl:otherwise><xsl:value-of select="setup/param[@name='Mode']"/></xsl:otherwise>
+        </xsl:choose>
     </xsl:template>
     
 </xsl:stylesheet>
