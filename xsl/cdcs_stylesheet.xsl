@@ -574,6 +574,10 @@
             .help-tip:hover {
                 color: #aaa;
             }
+            .no-cal-warning {
+                color: #a94442;
+                font-style: italic;
+            }
             
         </style>
 
@@ -641,6 +645,7 @@
                         <xsl:choose>
                             <xsl:when test="$title = 'No matching calendar event found'">
                                 <xsl:text>Untitled experiment</xsl:text>
+                                <span class='no-cal-warning'> (No matching calendar event found)</span>
                             </xsl:when>
                             <xsl:otherwise>
                                 <xsl:value-of select="$title"/>
@@ -649,16 +654,24 @@
                     </span>
                     <br/>
                     <span class="badge list-record-badge yellow-badge">
-                        <xsl:element name="a">
-                            <xsl:attribute name="href">
-                                <xsl:call-template name="get-calendar-link">
-                                    <xsl:with-param name="instrument" select="summary/instrument"></xsl:with-param>
-                                </xsl:call-template></xsl:attribute>
-                            <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
-                            <xsl:attribute name="data-placement">bottom</xsl:attribute> 
-                            <xsl:attribute name="title">Click to view this instrument on the Sharepoint calendar</xsl:attribute>
-                            <xsl:value-of select="summary/instrument"/>
-                        </xsl:element>
+                        <xsl:choose>
+                            <xsl:when test="summary/instrument/text()">
+                                <xsl:element name="a">
+                                    <xsl:attribute name="href">
+                                        <xsl:call-template name="get-calendar-link">
+                                            <xsl:with-param name="instrument" select="summary/instrument"></xsl:with-param>
+                                        </xsl:call-template></xsl:attribute>
+                                    <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                                    <xsl:attribute name="data-placement">bottom</xsl:attribute> 
+                                    <xsl:attribute name="title">Click to view this instrument on the Sharepoint calendar</xsl:attribute>
+                                    <xsl:value-of select="summary/instrument"/>
+                                </xsl:element>
+                            </xsl:when>
+                            <xsl:otherwise>
+                                Unknown instrument
+                            </xsl:otherwise>
+                        </xsl:choose>
+                        
                     </span>
                     <span class="badge list-record-badge">
                         <xsl:element name="a">

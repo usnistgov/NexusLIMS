@@ -142,7 +142,7 @@
             });
             
             $( document ).ready(function() {
-              $('.filetypes-icon[data-toggle="tooltip"]').tooltip(
+              $('[data-toggle="tooltip"]').tooltip(
               {container:'body'}); // toggle all tooltips with default
             });
             ]]>
