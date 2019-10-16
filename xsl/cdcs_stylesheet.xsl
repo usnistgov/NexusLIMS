@@ -409,16 +409,19 @@
                 font-size: 0.9em;
             }
 
-            table.meta-table {
+            table.meta-table, 
+            table.aa-table {
                 border-collapse: collapse;
 
             }
 
-            table.meta-table td, table.meta-table th {
+            table.meta-table td, table.meta-table th, 
+            table.aa-table td, table.aa-table th {
                 padding: 0.3em;
             }
 
-            table.meta-table th {
+            table.meta-table th, 
+            table.aa-table th {
                 background-color: #3a65a2;
                 border-color: black;
                 color: white;
@@ -549,6 +552,10 @@
                 -ms-user-select: none;
                 user-select: none;
                 transition: opacity 0.25s linear;
+                white-space: pre-wrap;
+            }
+            .tooltip-inner {
+                white-space: pre-wrap;
             }
             .sidebar-btn-tooltip {
                 top: 69px !important;
@@ -790,10 +797,7 @@
                     <div class="col-md-6" id="session_info_column">
                         <h3 id="res-info-header">Session Summary 
                         <xsl:call-template name="help-tip">
-                            <xsl:with-param name="tip-text">
-                                Summary information is extracted from the Sharepoint calendar 
-                                reservation associated with this record
-                            </xsl:with-param>
+                            <xsl:with-param name="tip-text">Summary information is extracted from the Sharepoint calendar reservation associated with this record</xsl:with-param>
                         </xsl:call-template></h3>
                         <!-- Display summary information (date, time, instrument, and id) -->
     
@@ -910,20 +914,108 @@
                 <!-- Loop through each acquisition activity -->
                 <xsl:for-each select="acquisitionActivity">
                     <div class="row aa_header_row">
-                        <div class="col-md-6">
-                            <!-- Generate name id which corresponds to the link associated with the acquisition activity --> 
-                            <a class="aa_anchor" name="{generate-id(current())}"/>
-                            <span class="aa_header"><b>Experiment activity <xsl:value-of select="@seqno+1"/></b><xsl:text> </xsl:text></span>
-                            
-                            <a href='javascript:void(0)' onclick="$(this).blur(); openModal('{generate-id(current())}-modal')"
-                               data-toggle='tooltip' data-placement='right'
-                               title="Click to view this activity's setup parameters">
-                               <i class='fa fa-tasks fa-border param-button'/>
-                            </a>
-                            <div style="font-size:15px">Instrument mode: 
-                                <i>
-                                    <xsl:call-template name="parse-instrument-mode"></xsl:call-template>
-                                </i>
+                        <div class="col-md-12">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <!-- Generate name id which corresponds to the link associated with the acquisition activity --> 
+                                    <a class="aa_anchor" name="{generate-id(current())}"/>
+                                    <span class="aa_header"><b>Experiment activity <xsl:value-of select="@seqno+1"/></b><xsl:text> </xsl:text></span>
+                                    
+                                    <a href='javascript:void(0)' onclick="$(this).blur(); openModal('{generate-id(current())}-modal')"
+                                       data-toggle='tooltip' data-placement='right'
+                                       title="Click to view this activity's setup parameters">
+                                       <i class='fa fa-tasks fa-border param-button'/>
+                                    </a>
+                                    <div style="font-size:15px">Instrument mode: 
+                                        <i>
+                                            <xsl:call-template name="parse-instrument-mode"></xsl:call-template>
+                                        </i>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <!-- preview image column -->
+                                <div class="col-xs-4">
+                                    <img class="nx-img"><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="dataset[1]/preview"/></xsl:attribute></img>
+                                </div>
+                                
+                                <!-- dataset listing column -->
+                                <div class="col-xs-8">
+                                    <table class="table table-condensed table-hover aa-table compact" border="1" style="width:100%; border-collapse:collapse;">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    Dataset Name
+                                                    <xsl:call-template name="help-tip">
+                                                        <xsl:with-param name="tip-placement">top</xsl:with-param>
+                                                        <xsl:with-param name="tip-text">The name given to the dataset (typically the filename)</xsl:with-param>
+                                                    </xsl:call-template>
+                                                </th>
+                                                <th>
+                                                    Type
+                                                    <xsl:call-template name="help-tip">
+                                                        <xsl:with-param name="tip-placement">top</xsl:with-param>
+                                                        <xsl:with-param name="tip-text">A label indicating the data type of this dataset (taken from a controlled list)</xsl:with-param>
+                                                    </xsl:call-template>
+                                                </th>
+                                                <th>
+                                                    Role
+                                                    <xsl:call-template name="help-tip">
+                                                        <xsl:with-param name="tip-placement">top</xsl:with-param>
+                                                        <xsl:with-param name="tip-text">A label indicating the experimental role of this dataset (taken from a controlled list)</xsl:with-param>
+                                                    </xsl:call-template>
+                                                </th>
+                                                <xsl:choose>
+                                                    <xsl:when test="dataset/format">
+                                                        <th>
+                                                            Format
+                                                            <xsl:call-template name="help-tip">
+                                                                <xsl:with-param name="tip-placement">top</xsl:with-param>
+                                                                <xsl:with-param name="tip-text">A string (can be a MIME type) indicating the format of the dataset (e.g. TIFF, DICOM, Excel)</xsl:with-param>
+                                                            </xsl:call-template>
+                                                        </th>
+                                                    </xsl:when>
+                                                </xsl:choose>
+                                                <th><!-- metadata link --></th>
+                                                <th><!-- download link --></th>
+                                            </tr>
+                                        </thead>
+                                        <!-- Loop through each dataset -->
+                                        <tbody>
+                                            <xsl:for-each select="dataset">
+                                                <tr>
+                                                    <!-- Populate table values with the metadata name and value -->
+                                                    <td><xsl:value-of select="name"/></td>
+                                                    <td><xsl:value-of select="@type"/></td>
+                                                    <td><xsl:value-of select="@role"/></td>
+                                                    <xsl:choose>
+                                                        <xsl:when test="../dataset/format">
+                                                            <td><xsl:value-of select="format"/></td>
+                                                        </xsl:when>
+                                                    </xsl:choose>
+                                                    <td><a href='javascript:void(0)' onclick="$(this).blur(); openModal('{generate-id(current())}-modal')"
+                                                        data-toggle='tooltip' data-placement='right'
+                                                        title="Click to view this dataset's unique metadata">
+                                                        <i class='fa fa-tasks fa-border param-button'/>
+                                                    </a></td>
+                                                    <td>
+                                                        <xsl:element name='a'>
+                                                            <xsl:attribute name="href"><xsl:value-of select="$datasetBaseUrl"/><xsl:value-of select="location"/></xsl:attribute>
+                                                            <xsl:attribute name="onclick">
+                                                                $(this).blur()
+                                                            </xsl:attribute>
+                                                            <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                                                            <xsl:attribute name="data-placement">right</xsl:attribute>
+                                                            <xsl:attribute name="data-html">true</xsl:attribute>
+                                                            <xsl:attribute name="title">Click to download &#013;<xsl:value-of select='name'/></xsl:attribute>
+                                                            <i class='fa fa-download fa-border param-button'/>
+                                                        </xsl:element>
+                                                    </td>
+                                                </tr>
+                                            </xsl:for-each>
+                                        </tbody>
+                                    </table>
+                                </div>
                             </div>
                         </div>
                         <!-- Generate unique modal box for each AA which contains the setup params, accessed via a button -->
@@ -996,7 +1088,7 @@
                         <!-- Create accordion which contains metadata for each image dataset -->
                         <button class="accordion"><b><xsl:value-of select="@type"/>: <xsl:value-of select="name"/></b></button>
                         <div class="panel">
-                            <form><xsl:attribute name="action"><xsl:value-of select="$datasetBaseUrl"/><xsl:value-of select="location"/></xsl:attribute>
+                            <form><xsl:attribute name="action"></xsl:attribute>
                                 <button class="btn btn-default" style="display:block; margin: 2em auto;" type="submit">Download original data</button>
                             </form>
                             <table class="preview-and-table">
@@ -1338,7 +1430,7 @@
                 $('.sidebar .pagination').first().addClass('vertical-align');
 
 
-                // Make acquisition activity metadata tables DataTables
+                // Make dataset metadata tables DataTables
                 $('.meta-table').each(function() {
                     $(this).DataTable({
                         destroy: true,
@@ -1359,6 +1451,30 @@
                         responsive: true,
                         ordering: false,
                         dom: "<'row'<'col-sm-4'f><'col-sm-8'p>><'row't>"
+                    });
+                });
+                
+                // Make AA filelist tables DataTables
+                $('.aa-table').each(function() {
+                    $(this).DataTable({
+                        destroy: true,
+                        pagingType: "simple_numbers",
+                        info: false,
+                        ordering: false,
+                        processing: true,
+                        searching: true,
+                        lengthChange: false,
+                        pageLength: 5,
+                        language: {
+                            paginate: {
+                                previous: "<i class='fa fa-angle-double-left'></i>",
+                                next: "<i class='fa fa-angle-double-right'></i>"
+                            }
+                        },
+                        select: 'single',
+                        responsive: true,
+                        ordering: false,
+                        dom: "<'row't><'row'<'col-xs-6 pull-right'p>>"
                     });
                 });
 
