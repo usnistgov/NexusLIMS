@@ -643,13 +643,14 @@
                 </tbody>
                 </table>
     
+                <!--
                 <button id="open-accords-btn" class="btn btn-default" onclick="openAccords()">
                     <i class="fa fa-plus-square-o"></i> Expand All Panels
                 </button>
                 
                 <button id="close-accords-btn" class="btn btn-default" onclick="closeAccords()">
                     <i class="fa fa-minus-square-o"></i> Collapse All Panels
-                </button>
+                </button>-->
     
                 <!-- Create button which jumps to the top of the page when clicked -->
                 <button id="to-top-btn" type="button" class="btn btn-primary" value="Top" onclick="toTop()">
@@ -949,7 +950,14 @@
                                             <table class="table table-condensed table-hover meta-table compact" border="1" style="">
                                                 <thead>
                                                     <tr>
-                                                        <th>Setup Parameter</th>
+                                                        <th>Setup Parameter
+                                                        <xsl:call-template name="help-tip">
+                                                            <xsl:with-param name="tip-placement">right</xsl:with-param>
+                                                            <xsl:with-param name="tip-text">
+                                                                Setup parameters are defined as those metadata values that are common between
+                                                                all datasets within a given activity
+                                                            </xsl:with-param>
+                                                        </xsl:call-template></th>
                                                         <th>Value</th>
                                                     </tr>
                                                 </thead>
