@@ -108,13 +108,6 @@
                 background-color: #ccc;
             }
             
-            img.nx-img {
-                max-width: 100%;
-                margin-left: auto; /* Center justify images */
-                margin-right: auto;
-                display: block;
-            }
-            
             th,td {
                 font-size: 14px;
             }
@@ -130,7 +123,7 @@
                 color: black;
             }
 
-            /* makes it so link does not get hidden behind the header */
+            /* makes it so link does not get hidden behind the header 
             .aa_header::before { 
                 display: block; 
                 content: " "; 
@@ -138,7 +131,7 @@
                 height: 4.5em; 
                 visibility: hidden; 
                 pointer-events: none;
-            }
+                }*/
             
             /* Hide for mobile, show later */
             .sidebar {
@@ -228,31 +221,48 @@
                 margin: auto;
                 margin-bottom: 2em;
             }
-            
-            .gal-prev, .gal-next { /* Parameters for the 'next' and 'prev' buttons on the slideshow gallery */
-                cursor: pointer;
-                position: absolute;
-                top: 45%;
-                width: auto;
-                padding: 16px;
-                margin-top: -22px;
-                color: white;
-                font-weight: bold;
-                font-size: 18px;
-                transition: 0.6s ease;
-                border-radius: 3px 0px 0px 3px;
-                user-select: none;
-                background-color: rgba(0,0,0,0.4);
+          
+            img.nx-img {
+               max-width: 100%;
+               margin-left: auto; /* Center justify images */
+               margin-right: auto;
+               display: block;
             }
             
-            .gal-next { /*Have the 'next' button appear on the right of the slideshow gallery */
-                right: 0;
-                border-radius: 0px 3px 3px 0px;
+            .gal-nav { /* Parameters for the 'next' and 'prev' buttons on the slideshow gallery */
+
+            }
+            
+            div#img_gallery { /* make entire gallery unselectable to prevent highlighting when clicking nav buttons */
+              -webkit-touch-callout: none;
+              -webkit-user-select: none;
+              -khtml-user-select: none;
+              -moz-user-select: none;
+              -ms-user-select: none;
+              user-select: none;
+            }
+            
+            div#img_gallery .fa-stack-2x{
+                color: #aaa;
+                transition: color 0.25s linear;
+            }
+            
+            div#img_gallery:hover .fa-stack-2x {
+                color: #337ab7;
+            }
+            
+            div#img_gallery .fa-stack:hover .fa-stack-2x {
+                color: #23527c;
             }
             
             .gal-prev:hover, .gal-next:hover { /* Have a background appear when the prev/next buttons are hovered over */
-                background-color: rgba(145,145,145,0.8);
-                color: white;
+            }
+            
+            .nx-caption .row {
+                margin: 0;
+            }
+            .nx-caption .row > * {
+                padding: 0;
             }
 
             .nx-caption { /* Parameters for the caption text displayed in the image gallery */
@@ -514,6 +524,13 @@
             .tooltip {
                 z-index: 20000;
                 position: fixed; 
+                -webkit-touch-callout: none;
+                -webkit-user-select: none;
+                -khtml-user-select: none;
+                -moz-user-select: none;
+                -ms-user-select: none;
+                user-select: none;
+                transition: opacity 0.25s linear;
             }
             .sidebar-btn-tooltip {
                 top: 69px !important;
@@ -799,24 +816,39 @@
                                 <figure class="slide">
                                     <img class="nx-img"><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute></img>
                                     <figcaption class="nx-caption">
-                                        Dataset <xsl:value-of select="position()"/> of <xsl:value-of select="count(//dataset)" />
-                                        <br/>
-                                        Activity <xsl:value-of select="$aa_num"/> of <xsl:value-of select="count(//acquisitionActivity)"/>
-                                        <xsl:text> </xsl:text>
-                                        <sup>
-                                            <a  href="#{generate-id(..)}" 
-                                            data-toggle='tooltip' data-placement='bottom'
-                                            title='Jump to activity {$aa_num} in record'><i class='fa fa-link'/></a>
-                                        </sup>
+                                        <div class="row">
+                                            <div class="col-xs-offset-1 col-xs-1" style="margin-top:0.2em;">
+                                            <a  class="gal-nav" onclick="plusSlide(-1); disable_gallery_tooltips();"
+                                                data-toggle="tooltip" data-placement="left" 
+                                                title="The left/right arrow keys can also be used to navigate the image gallery">
+                                                <span class="fa-stack fa-lg">
+                                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                                    <i class="fa fa-long-arrow-left fa-stack-1x fa-inverse"></i>
+                                                </span>
+                                            </a></div>
+                                            <div class="col-xs-8">
+                                            <span>Dataset <xsl:value-of select="position()"/> of <xsl:value-of select="count(//dataset)" /></span>
+                                            <br/>
+                                            <span style="margin-left:0.9em;">Activity <xsl:value-of select="$aa_num"/> of <xsl:value-of select="count(//acquisitionActivity)"/></span>
+                                            <xsl:text> </xsl:text>
+                                            <sup>
+                                                <a  href="#{generate-id(..)}" 
+                                                    data-toggle='tooltip' data-placement='bottom'
+                                                    title='Jump to activity {$aa_num} in record'><i class='fa fa-link'/></a>
+                                            </sup></div>
+                                            <div class='col-xs-1' style="margin-top:0.2em;">
+                                                <a  class="gal-nav" onclick="plusSlide(1); disable_gallery_tooltips();"
+                                                data-toggle="tooltip" data-placement="right" 
+                                                title="The left/right arrow keys can also be used to navigate the image gallery">
+                                                <span class="fa-stack fa-lg">
+                                                    <i class="fa fa-circle fa-stack-2x"></i>
+                                                    <i class="fa fa-long-arrow-right fa-stack-1x fa-inverse"></i>
+                                                </span>
+                                            </a></div>
+                                        </div>
                                     </figcaption>
                                 </figure>
                             </xsl:for-each>
-                            <a  class="gal-prev" onclick="plusSlide(-1)"
-                                data-toggle="tooltip" data-placement="left" 
-                                title="The left/right arrow keys can also be used to navigate the image gallery">&lt;</a>
-                            <a  class="gal-next" onclick="plusSlide(1)"
-                                data-toggle="tooltip" data-placement="right" 
-                                title="The left/right arrow keys can also be used to navigate the image gallery">&gt;</a>
                         </div>
                     </div>
                 </div>
@@ -1105,6 +1137,11 @@
                 slide.innerHTML = image + source;
                 
                 document.getElementById("img_gallery").appendChild(slide);
+            }
+            
+            // Function to disable gallery tooltips
+            function disable_gallery_tooltips() {
+                $('#img_gallery a.gal-nav[data-toggle=tooltip]').tooltip('disable');
             }
 
             // Key handlers
