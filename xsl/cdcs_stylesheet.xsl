@@ -83,7 +83,9 @@
                 /*font-family: "Lato", sans-serif;*/
             }
             
-           
+            #nav { /* Make sure top nav does not get overlayed */
+                z-index: 100000 !important;
+            }
 
             /* Link colors */
             a:link {
@@ -123,15 +125,13 @@
                 color: black;
             }
 
-            /* makes it so link does not get hidden behind the header 
-            .aa_header::before { 
-                display: block; 
-                content: " "; 
-                margin-top: -5.5em; 
-                height: 4.5em; 
+            /* makes it so link does not get hidden behind the header */ 
+            a.aa_anchor { 
+                display: block;
+                position: relative;
+                top: -3.5em;
                 visibility: hidden; 
-                pointer-events: none;
-                }*/
+            }
             
             /* Hide for mobile, show later */
             .sidebar {
@@ -327,9 +327,9 @@
             }
             
             .modal { /* Parameters for modal boxes */
-                display: none;
+                display: block;
                 position: fixed;
-                z-index: 1;
+                z-index: 1001;
                 padding-top: 100px;
                 left: 0;
                 top: 0;
@@ -337,6 +337,9 @@
                 height: 100%;
                 overflow: auto;
                 background-color: rgba(209,203,203,0.7);
+                transition: all 0.25s linear;
+                visibility: hidden;
+                opacity: 0;
             }
             
             .modal-content { /* Parameters for content within modal boxes */
@@ -347,15 +350,15 @@
                 width: 80%;
             }
             
-            .close { /* Parameters for 'X' used to close the modal box */
+            .close-modal { /* Parameters for 'X' used to close the modal box */
                 color: #000;
                 float: right;
                 font-size: 28px;
                 font-weight: bold;
             }
             
-            .close:hover, /* Changes color of close button and cursor type when hovering over it */
-                .close:focus {
+            .close-modal:hover, /* Changes color of close button and cursor type when hovering over it */
+                .close-modal:focus {
                 color: #525252;
                 text-decoration: none;
                 cursor: pointer;
@@ -408,6 +411,7 @@
 
             table.meta-table {
                 border-collapse: collapse;
+
             }
 
             table.meta-table td, table.meta-table th {
@@ -424,22 +428,36 @@
                 font-weight: bold;
             }
 
-            /* Fix for margins getting messed up inside the AA panels */
+/* Fix for margins getting messed up inside the AA panels */ 
             .main .dataTables_wrapper .row {
                 margin: 0;
-                display: flex;
+                /*display: flex;*/
                 align-items: center;
                 margin-top: 0.5em;
-            }
+                }
             .main .dataTables_wrapper .row > * {
                 padding: 0;
             }
             .main .dataTables_wrapper ul.pagination > li > a {
                 padding: 0px 8px;
-            }
+                }
 
             .main .dataTables_wrapper label {
                 font-size: smaller;
+            }
+            
+            .modal div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+                margin-left: 1em;
+                white-space: nowrap;
+            }
+            
+            .modal table{
+              margin: 0 auto;
+              width: 100% !important;
+              clear: both;
+              border-collapse: collapse;
+              table-layout: fixed;
+              word-wrap: break-word;
             }
 
             /* For loading screen */
@@ -578,6 +596,25 @@
                 color: #a94442;
                 font-style: italic;
             }
+            .sup-link {
+                font-size: 0.5em; 
+                top: -1em;
+            }
+            
+            i.param-button {
+                margin-left: 0.5em; 
+                font-size: medium;
+                color: #aaa;
+                border: solid 0.1em #eee;
+                transition: color 0.25s linear, border 0.25s linear, background 0.25s linear;
+            }
+            i.param-button:hover {
+               margin-left: 0.5em; 
+               font-size: medium;
+               color: #5e7ca3;
+               border: solid 0.1em #999;
+               background: #eee;
+            }
             
         </style>
 
@@ -715,17 +752,19 @@
                                                     <xsl:value-of select="$reservation-date-part"/>
                                                 </xsl:with-param>
                                             </xsl:call-template>
-                                            <xsl:element name="a">
+                                            <xsl:text> </xsl:text>
+                                            <sup class="sup-link"
+                                                data-toggle='tooltip' data-placement='right'
+                                                title='Click to view associated record on the Sharepoint calendar'>
+                                                <xsl:element name="a">
                                                 <xsl:attribute name="href">
                                                     <xsl:call-template name="get-calendar-event-link">
                                                         <xsl:with-param name="instrument" select="summary/instrument"></xsl:with-param>
                                                         <xsl:with-param name="event-id" select="id"></xsl:with-param>
                                                     </xsl:call-template>
                                                 </xsl:attribute><xsl:text> </xsl:text>
-                                                <sup style='font-size: 0.5em; top: -1em;'
-                                                     data-toggle='tooltip' data-placement='right'
-                                                     title='Click to view associated record on the Sharepoint calendar'><i class='fa fa-calendar'/></sup>
-                                            </xsl:element>
+                                                <i class='fa fa-calendar'/>
+                                                </xsl:element></sup>
                                         </xsl:when>
                                         <xsl:when test="$firstfile-date-part != ''">
                                             <xsl:call-template name="localize-date">
@@ -760,8 +799,8 @@
                         <table class="table table-condensed" id="summary-table" 
                                style="border-collapse:collapse;width:80%;">
                             <tr>
-                                <th align="left" class="col-sm-3 parameter-name">Date: </th>
-                                <td align="left" class="col-sm-9">
+                                <th align="left" class="col-sm-4 parameter-name">Date: </th>
+                                <td align="left" class="col-sm-8">
                                     <xsl:call-template name="tokenize-select">
                                         <xsl:with-param name="text" select="summary/reservationStart"/>
                                         <xsl:with-param name="delim">T</xsl:with-param>
@@ -770,8 +809,8 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th align="left" class="col-sm-3 parameter-name">Start Time: </th>
-                                <td align="left" class="col-sm-9">
+                                <th align="left" class="col-sm-4 parameter-name">Start Time: </th>
+                                <td align="left" class="col-sm-8">
                                     <xsl:call-template name="tokenize-select">
                                         <xsl:with-param name="text" select="summary/reservationStart"/>
                                         <xsl:with-param name="delim">T</xsl:with-param>
@@ -780,8 +819,8 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th align="left" class="col-sm-3 parameter-name">End Time: </th>
-                                <td align="justify" class="col-sm-9">
+                                <th align="left" class="col-sm-4 parameter-name">End Time: </th>
+                                <td align="justify" class="col-sm-8">
                                     <xsl:call-template name="tokenize-select">
                                         <xsl:with-param name="text" select="summary/reservationEnd"/>
                                         <xsl:with-param name="delim">T</xsl:with-param>
@@ -790,24 +829,24 @@
                                 </td>
                             </tr>
                             <tr>
-                                <th align="left" class="col-sm-3 parameter-name">Session ID:<xsl:text> </xsl:text>
+                                <th align="left" class="col-sm-4 parameter-name">Session ID:<xsl:text> </xsl:text>
                                     <xsl:call-template name="help-tip">
                                         <xsl:with-param name="tip-placement">right</xsl:with-param>
                                         <xsl:with-param name="tip-text">ID from this instrument's Sharepoint calendar listing</xsl:with-param>
                                     </xsl:call-template></th>
-                                <td align="justify" class="col-sm-9"><xsl:value-of select="id"/></td>
+                                <td align="justify" class="col-sm-8"><xsl:value-of select="id"/></td>
                             </tr>
                             <tr>
-                                <th align="left" class="col-sm-3 parameter-name">Sample name: </th>
-                                <td align="left" class="col-sm-9"> <xsl:value-of select="sample/name"/></td>
+                                <th align="left" class="col-sm-4 parameter-name">Sample name: </th>
+                                <td align="left" class="col-sm-8"> <xsl:value-of select="sample/name"/></td>
                             </tr>
                             <tr>
-                                <th align="left" class="col-sm-3 parameter-name">Sample ID:<xsl:text> </xsl:text>
+                                <th align="left" class="col-sm-4 parameter-name">Sample ID:<xsl:text> </xsl:text>
                                     <xsl:call-template name="help-tip">
                                         <xsl:with-param name="tip-placement">right</xsl:with-param>
                                         <xsl:with-param name="tip-text">Automatically generated random ID (for now)</xsl:with-param>
                                     </xsl:call-template></th>
-                                <td align="justify" class="col-sm-9"><xsl:value-of select="acquisitionActivity[@seqno=1]/sampleID"/></td>
+                                <td align="justify" class="col-sm-8"><xsl:value-of select="acquisitionActivity[@seqno=1]/sampleID"/></td>
                             </tr>
                             <xsl:choose>
                                 <xsl:when test="sample/description/text()">
@@ -869,72 +908,83 @@
                 
                 <!-- Loop through each acquisition activity -->
                 <xsl:for-each select="acquisitionActivity">
-                    <div class="container-fluid">
-                        <div class="row aa_header_row">
-                            <div class="col-md-6">
-                                <!-- Generate name id which corresponds to the link associated with the acquisition activity --> 
-                                <a name="{generate-id(current())}" class="aa_header">
-                                    <b>Experiment activity <xsl:value-of select="@seqno+1"/></b>
-                                </a>
-                                <div style="font-size:15px">Instrument mode: 
-                                    <i>
-                                        <xsl:call-template name="parse-instrument-mode"></xsl:call-template>
-                                    </i>
-                                </div>
-                            </div>
-                            <div class="col-md-2 col-md-offset-4">
-                                <button id="{generate-id(current())}-btn" class="btn btn-success pull-right"
-                                        onclick="toggleAA('{generate-id(current())}-btn')">
-                                <i class="fa fa-plus-square-o"></i> Expand Activity</button>
+                    <div class="row aa_header_row">
+                        <div class="col-md-6">
+                            <!-- Generate name id which corresponds to the link associated with the acquisition activity --> 
+                            <a class="aa_anchor" name="{generate-id(current())}"/>
+                            <span class="aa_header"><b>Experiment activity <xsl:value-of select="@seqno+1"/></b><xsl:text> </xsl:text></span>
+                            
+                            <a href='javascript:void(0)' onclick="$(this).blur(); openModal('{generate-id(current())}-modal')"
+                               data-toggle='tooltip' data-placement='right'
+                               title="Click to view this activity's setup parameters">
+                               <i class='fa fa-tasks fa-border param-button'/>
+                            </a>
+                            <div style="font-size:15px">Instrument mode: 
+                                <i>
+                                    <xsl:call-template name="parse-instrument-mode"></xsl:call-template>
+                                </i>
                             </div>
                         </div>
-                    </div>
-    
-                    <!-- Create accordion which contains acquisition activity setup parameters -->
-                    <button class="accordion" style="font-weight:bold;font-size:19px;">Activity Parameters</button>
-                    <div class="panel">
-                        <!-- Generate the table with setup conditions for each acquisition activity -->
-                        <table class="table table-condensed table-hover meta-table compact" border="1" style="">
-                            <thead>
-                            <tr>
-                                <th>Setup Parameter</th>
-                                <th>Value</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                <td><b>Start time</b></td>
-                                    <td>
-                                        <xsl:call-template name="tokenize-select">
-                                            <xsl:with-param name="text" select="startTime"/>
-                                            <xsl:with-param name="delim">T</xsl:with-param>
-                                            <xsl:with-param name="i" select="2"/>
-                                        </xsl:call-template>
-                                    </td>
-                                </tr>
-                            <!-- Loop through each setup value under the 'param' heading -->
-                            <xsl:for-each select="setup/param">
-                                <xsl:sort select="@name"/>
-                                <tr>
-                                    <!-- Populate setup table with parameter name and value -->
-                                    <td><b><xsl:value-of select="@name"/></b></td>
-                                    <td><xsl:value-of select="current()"/></td>
-                                </tr>
-                            </xsl:for-each>
-                            </tbody>
-                        </table>                        
+                        <!-- Generate unique modal box for each AA which contains the setup params, accessed via a button -->
+                        <div id="{generate-id(current())}-modal" class="modal">
+                            <div class="modal-content">
+                                <div class="container-fluid">
+                                    <div class="row">
+                                        <div class="col-xs-11">
+                                            <b>Experiment activity <xsl:value-of select="@seqno+1"/></b><br/>
+                                            <div style="font-size:15px">Instrument mode: 
+                                                <i>
+                                                    <xsl:call-template name="parse-instrument-mode"></xsl:call-template>
+                                                </i>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="col-xs-1">
+                                            <i class="close-modal fa fa-close" onclick="closeModal('{generate-id(current())}-modal')"/>
+                                        </div> 
+                                    </div>
+                                    <div class="row">
+                                        <div class='col-xs-12' style="padding-top: 10px;">
+                                            <!-- Generate the table with setup conditions for each acquisition activity -->
+                                            <table class="table table-condensed table-hover meta-table compact" border="1" style="">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Setup Parameter</th>
+                                                        <th>Value</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr>
+                                                        <td><b>Start time</b></td>
+                                                        <td>
+                                                            <xsl:call-template name="tokenize-select">
+                                                                <xsl:with-param name="text" select="startTime"/>
+                                                                <xsl:with-param name="delim">T</xsl:with-param>
+                                                                <xsl:with-param name="i" select="2"/>
+                                                            </xsl:call-template>
+                                                        </td>
+                                                    </tr>
+                                                    <!-- Loop through each setup value under the 'param' heading -->
+                                                    <xsl:for-each select="setup/param">
+                                                        <xsl:sort select="@name"/>
+                                                        <tr>
+                                                            <!-- Populate setup table with parameter name and value -->
+                                                            <td><b><xsl:value-of select="@name"/></b></td>
+                                                            <td><xsl:value-of select="current()"/></td>
+                                                        </tr>
+                                                    </xsl:for-each>
+                                                </tbody>
+                                            </table>   
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
                     <!-- Generate metadata table for each image dataset taken for respective acquisition activities -->
                     <xsl:for-each select="dataset">
-                        <!-- Generate unique modal box for each dataset which contains the corresponding image, accessed via a button -->
-                        <div id="#{generate-id(current())}" class="modal">
-                            <div class="modal-content">
-                                <span class="close" onclick="closeModal('#{generate-id(current())}')">X</span>
-                                <img class="nx-img"><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute></img>
-                            </div>
-                        </div>
-                        
+                       
                         <!-- Create accordion which contains metadata for each image dataset -->
                         <button class="accordion"><b><xsl:value-of select="@type"/>: <xsl:value-of select="name"/></b></button>
                         <div class="panel">
@@ -1008,14 +1058,50 @@
 
             //Function to open a modal box with id 'name' and prevent scrolling while the box is open
             function openModal(name){
-                document.getElementById(name).style.display = "block";
-                document.body.style.overflow = "hidden"
+                var modal = document.getElementById(name); 
+                modal.style.opacity = 1;
+                modal.style.visibility = "visible";
+                document.body.style.overflowY = "hidden";
+                document.body.style.paddingRight = getScrollbarWidth() + "px"; // Hack to prevent page jumping when hiding scrollbar
+                
+                window.onclick = function(event) {
+                    // console.log(event.target);
+                    if (event.target == modal) {
+                        closeModal(name);
+                    }
+                };
             }
 
             //Function to close a modal box with id 'name' and re-allow page scrolling
             function closeModal(name){
-                document.getElementById(name).style.display = "none";
-                document.body.style.overflow = "scroll"
+                var modal = document.getElementById(name); 
+                modal.style.opacity = 0;
+                modal.style.visibility = "hidden";
+                document.body.style.overflowY = "scroll"
+                document.body.style.paddingRight = 0; // Hack to prevent page jumping when hiding scrollbar                
+            }
+            
+            // Function to get width of scrollbar for padding offset above 
+            // (from https://stackoverflow.com/a/13382873/1435788)
+            function getScrollbarWidth() {
+              // Creating invisible container
+              const outer = document.createElement('div');
+              outer.style.visibility = 'hidden';
+              outer.style.overflow = 'scroll'; // forcing scrollbar to appear
+              outer.style.msOverflowStyle = 'scrollbar'; // needed for WinJS apps
+              document.body.appendChild(outer);
+            
+              // Creating inner element and placing it in the container
+              const inner = document.createElement('div');
+              outer.appendChild(inner);
+            
+              // Calculating difference between container's full width and the child width
+              const scrollbarWidth = (outer.offsetWidth - inner.offsetWidth);
+            
+              // Removing temporary elements from the DOM
+              outer.parentNode.removeChild(outer);
+            
+              return scrollbarWidth;
             }
             
             //Handler for accordions used to hide parameter and metadata tables
@@ -1264,7 +1350,7 @@
                         select: 'single',
                         responsive: true,
                         ordering: false,
-                        dom: "<'row'<'col-sm-4'f><'col-sm-8'p>>t"
+                        dom: "<'row'<'col-sm-4'f><'col-sm-8'p>><'row't>"
                     });
                 });
 
