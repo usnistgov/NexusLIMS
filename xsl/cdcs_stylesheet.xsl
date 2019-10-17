@@ -79,6 +79,11 @@
       <div style="width:95%;">        
         <!-- ============ CSS Styling ============ --> 
         <style>
+            .scrollDisabled { /* class to prevent scrolling when modal is shown */
+                position: fixed; 
+                overflow-y:scroll;
+            }
+            
             .main, .sidebar { /* Set the font style for the page */
                 /*font-family: "Lato", sans-serif;*/
             }
@@ -140,6 +145,9 @@
               left: -400px;
               width: 180px;
               font-size: 14px;
+              -webkit-transition: all 0.5s ease-in-out 0s;
+              -moz-transition: all 0.5s ease-in-out 0s;
+              -o-transition: all 0.5s ease-in-out 0s;
               transition: all 0.5s ease-in-out 0s;
               height: 90vh;
             }
@@ -209,6 +217,9 @@
             #to-top-btn { /* Parameters for the button which jumps to the top of the page when clicked */
                 visibility: hidden; /* Set button to hidden on default so that it will appear when the page is scrolled */
                 opacity: 0;
+                -webkit-transition: visibility 0.25s linear, opacity 0.25s linear;
+                -moz-transition: visibility 0.25s linear, opacity 0.25s linear;
+                -o-transition: visibility 0.25s linear, opacity 0.25s linear;
                 transition: visibility 0.25s linear, opacity 0.25s linear;
             }
      
@@ -229,6 +240,10 @@
                display: block;
             }
             
+            img.nx-img.aa-img {
+                
+            }
+            
             .gal-nav { /* Parameters for the 'next' and 'prev' buttons on the slideshow gallery */
 
             }
@@ -244,6 +259,9 @@
             
             div#img_gallery .fa-stack-2x{
                 color: #aaa;
+                -webkit-transition: color 0.25s linear;
+                -moz-transition: color 0.25s linear;
+                -o-transition: color 0.25s linear;
                 transition: color 0.25s linear;
             }
             
@@ -291,6 +309,9 @@
                 text-align: left;
                 outline: none;
                 font-size: 15px;
+                -webkit-transition: 0.4s;
+                -moz-transition: 0.4s;
+                -o-transition: 0.4s;
                 transition: 0.4s;
             }
             
@@ -314,6 +335,9 @@
                 background-color: white;
                 max-height: 0;
                 overflow: hidden;
+                -webkit-transition: max-height 0.2s ease-out; 
+                -moz-transition: max-height 0.2s ease-out; 
+                -o-transition: max-height 0.2s ease-out;
                 transition: max-height 0.2s ease-out;
                 width: 95%;
             }
@@ -337,6 +361,9 @@
                 height: 100%;
                 overflow: auto;
                 background-color: rgba(209,203,203,0.7);
+                -webkit-transition: all 0.25s linear;
+                -moz-transition: all 0.25s linear;
+                -o-transition: all 0.25s linear;
                 transition: all 0.25s linear;
                 visibility: hidden;
                 opacity: 0;
@@ -370,6 +397,9 @@
             
             .main {
                 padding: 20px;
+                -webkit-transition: padding 0.5s ease-in-out 0s;
+                -moz-transition: padding 0.5s ease-in-out 0s;
+                -o-transition: padding 0.5s ease-in-out 0s;
                 transition: padding 0.5s ease-in-out 0s;
                 padding-top: 5px;
             }
@@ -470,7 +500,7 @@
                 position: fixed;
                 top: 0;
                 left: 0;
-                z-index: 100;
+                z-index: 500;
                 width: 100vw;
                 height: 100vh;
                 background: #f7f7f7 url(static/img/bg01.png);
@@ -543,7 +573,7 @@
             }
             }
             .tooltip {
-                z-index: 20000;
+                z-index: 100001;
                 position: fixed; 
                 -webkit-touch-callout: none;
                 -webkit-user-select: none;
@@ -551,6 +581,9 @@
                 -moz-user-select: none;
                 -ms-user-select: none;
                 user-select: none;
+                -webkit-transition: opacity 0.25s linear;
+                -moz-transition: opacity 0.25s linear;
+                -o-transition: opacity 0.25s linear;
                 transition: opacity 0.25s linear;
                 white-space: pre-wrap;
             }
@@ -575,6 +608,9 @@
                 top: 69px;
                 left: 20px;
                 font-size: 20px;
+                -webkit-transition: opacity 0.5s ease-in-out 0s;
+                -moz-transition: opacity 0.5s ease-in-out 0s;
+                -o-transition: opacity 0.5s ease-in-out 0s;
                 transition: opacity 0.5s ease-in-out 0s;
                 z-index: 50;
                 }
@@ -613,6 +649,9 @@
                 font-size: medium;
                 color: #aaa;
                 border: solid 0.1em #eee;
+                -webkit-transition: color 0.25s linear, border 0.25s linear, background 0.25s linear;
+                -moz-transition: color 0.25s linear, border 0.25s linear, background 0.25s linear;
+                -o-transition: color 0.25s linear, border 0.25s linear, background 0.25s linear;
                 transition: color 0.25s linear, border 0.25s linear, background 0.25s linear;
             }
             i.param-button:hover {
@@ -738,6 +777,7 @@
                        data-toggle="tooltip" data-placement="bottom" title="Filetypes present in record"/><span style="font-size: small;"><xsl:text>: </xsl:text></span>
                     <xsl:call-template name="extensions-to-badges">
                         <xsl:with-param name="input"><xsl:value-of select="$unique-extensions"/></xsl:with-param>
+                        <xsl:with-param name="global-count">true</xsl:with-param>
                     </xsl:call-template>
                 </div>
                 <div class="row">
@@ -931,12 +971,36 @@
                                             <xsl:call-template name="parse-instrument-mode"></xsl:call-template>
                                         </i>
                                     </div>
+                                    <span class="badge list-record-badge">
+                                        <xsl:value-of select="count(dataset)"/> data files
+                                    </span>
+                                    <xsl:variable name="this-aa-extension-strings">
+                                        <xsl:for-each select="./dataset/location">
+                                            <xsl:call-template name="get-file-extension">
+                                                <xsl:with-param name="path">
+                                                    <xsl:value-of select="."/>
+                                                </xsl:with-param>
+                                            </xsl:call-template>
+                                        </xsl:for-each>
+                                    </xsl:variable>
+                                    <xsl:variable name="this-aa-unique-extensions">
+                                        <xsl:call-template name="dedup-list">
+                                            <xsl:with-param name="input">
+                                                <xsl:value-of select="$this-aa-extension-strings"/>
+                                            </xsl:with-param>
+                                        </xsl:call-template>
+                                    </xsl:variable>
+                                    <i class="fa fa-cubes" style="margin-left:0.75em; font-size: small;"
+                                        data-toggle="tooltip" data-placement="bottom" title="Filetypes present in this activity"/><span style="font-size: small;"><xsl:text>: </xsl:text></span>
+                                    <xsl:call-template name="extensions-to-badges">
+                                        <xsl:with-param name="input"><xsl:value-of select="$this-aa-unique-extensions"/></xsl:with-param>
+                                    </xsl:call-template>
                                 </div>
                             </div>
                             <div class="row">
                                 <!-- preview image column -->
                                 <div class="col-xs-4">
-                                    <img class="nx-img"><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="dataset[1]/preview"/></xsl:attribute></img>
+                                    <img class="nx-img aa-img"><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="dataset[1]/preview"/></xsl:attribute></img>
                                 </div>
                                 
                                 <!-- dataset listing column -->
@@ -993,11 +1057,64 @@
                                                             <td><xsl:value-of select="format"/></td>
                                                         </xsl:when>
                                                     </xsl:choose>
-                                                    <td><a href='javascript:void(0)' onclick="$(this).blur(); openModal('{generate-id(current())}-modal')"
+                                                    <td>
+                                                        <a href='javascript:void(0)' onclick="$(this).blur(); openModal('{generate-id(current())}-modal')"
                                                         data-toggle='tooltip' data-placement='right'
                                                         title="Click to view this dataset's unique metadata">
-                                                        <i class='fa fa-tasks fa-border param-button'/>
-                                                    </a></td>
+                                                            <i class='fa fa-tasks fa-border param-button'/>
+                                                        </a>
+                                                        <div id="{generate-id(current())}-modal" class="modal">
+                                                            <div class="modal-content">
+                                                                <div class="container-fluid">
+                                                                    <div class="row">
+                                                                        <div class="col-xs-11">
+                                                                            <b><xsl:value-of select="name"/></b><br/>
+                                                                            <xsl:choose>
+                                                                                <xsl:when test="description/text()">
+                                                                                    <div style="font-size:15px">Dataset description: 
+                                                                                        <i>
+                                                                                            <xsl:value-of select="description"/>
+                                                                                        </i>
+                                                                                    </div>
+                                                                                </xsl:when>
+                                                                            </xsl:choose>
+                                                                        </div>
+                                                                        
+                                                                        <div class="col-xs-1">
+                                                                            <i class="close-modal fa fa-close" onclick="closeModal('{generate-id(current())}-modal')"/>
+                                                                        </div> 
+                                                                    </div>
+                                                                    <div class="row">
+                                                                        <div class='col-xs-12' style="padding-top: 10px;">
+                                                                            <!-- Generate the table with setup conditions for each acquisition activity -->
+                                                                            <table class="table table-condensed table-hover meta-table compact" border="1" style="">
+                                                                                <thead>
+                                                                                    <tr>
+                                                                                        <th>Metadata Parameter
+                                                                                            <xsl:call-template name="help-tip">
+                                                                                                <xsl:with-param name="tip-placement">right</xsl:with-param>
+                                                                                                <xsl:with-param name="tip-text">The following metadata values are those (within an activity) that are unique to each dataset</xsl:with-param>
+                                                                                            </xsl:call-template></th>
+                                                                                        <th>Value</th>
+                                                                                    </tr>
+                                                                                </thead>
+                                                                                <tbody>
+                                                                                    <xsl:for-each select="meta">
+                                                                                        <xsl:sort select="@name"/>
+                                                                                        <tr>
+                                                                                            <!-- Populate table values with the metadata name and value -->
+                                                                                            <td><b><xsl:value-of select="@name"/></b></td>
+                                                                                            <td><xsl:value-of select="current()"/></td>
+                                                                                        </tr>
+                                                                                    </xsl:for-each>
+                                                                                </tbody>
+                                                                            </table>   
+                                                                        </div>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </td>
                                                     <td>
                                                         <xsl:element name='a'>
                                                             <xsl:attribute name="href"><xsl:value-of select="$datasetBaseUrl"/><xsl:value-of select="location"/></xsl:attribute>
@@ -1045,10 +1162,7 @@
                                                         <th>Setup Parameter
                                                         <xsl:call-template name="help-tip">
                                                             <xsl:with-param name="tip-placement">right</xsl:with-param>
-                                                            <xsl:with-param name="tip-text">
-                                                                Setup parameters are defined as those metadata values that are common between
-                                                                all datasets within a given activity
-                                                            </xsl:with-param>
+                                                            <xsl:with-param name="tip-text">Setup parameters are defined as those metadata values that are common between all datasets within a given activity</xsl:with-param>
                                                         </xsl:call-template></th>
                                                         <th>Value</th>
                                                     </tr>
@@ -1082,52 +1196,6 @@
                         </div>
                     </div>
                     
-                    <!-- Generate metadata table for each image dataset taken for respective acquisition activities -->
-                    <xsl:for-each select="dataset">
-                       
-                        <!-- Create accordion which contains metadata for each image dataset -->
-                        <button class="accordion"><b><xsl:value-of select="@type"/>: <xsl:value-of select="name"/></b></button>
-                        <div class="panel">
-                            <form><xsl:attribute name="action"></xsl:attribute>
-                                <button class="btn btn-default" style="display:block; margin: 2em auto;" type="submit">Download original data</button>
-                            </form>
-                            <table class="preview-and-table">
-                            <tr>
-                                <td>
-                                    <a><xsl:attribute name="href"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute>
-                                        <img width="400" height="400" class="dataset-preview-img"><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute></img>
-                                    </a>
-                                </td>
-                                <xsl:choose>
-                                    <xsl:when test="meta"> <!-- Checks whether there are parameters and only creates a table if there is -->
-                                        <td>
-                                            <table class="table table-condensed table-hover meta-table compact" border="1" style="width:100%; border-collapse:collapse;">
-                                                <thead>
-                                                <tr bgcolor="#3a65a2" color='white'>
-                                                    <th>Parameter</th>
-                                                    <th>Value</th>
-                                                </tr>
-                                                </thead>
-                                               <!-- Loop through each metadata parameter -->
-                                               <tbody>
-                                               <xsl:for-each select="meta">
-                                                   <xsl:sort select="@name"/>
-                                                   <tr>
-                                                       <!-- Populate table values with the metadata name and value -->
-                                                       <td><b><xsl:value-of select="@name"/></b></td>
-                                                       <td><xsl:value-of select="current()"/></td>
-                                                   </tr>
-                                               </xsl:for-each>
-                                               </tbody>
-                                           </table>
-                                       </td>
-                                    </xsl:when>
-                                    <xsl:otherwise/>
-                                </xsl:choose>
-                            </tr>
-                            </table>
-                        </div>
-                    </xsl:for-each>
                     <br/>
                 </xsl:for-each>
             </div>
@@ -1135,6 +1203,37 @@
         <!-- Javascript which supports some capabilities on the generated page -->
         <script language="javascript">
             <![CDATA[
+            
+            // Functions to enable/disable scrolling and add appropriate classes
+            var $body = $('body'),
+                scrollDisabled = false,
+                scrollTop;
+                
+            function scrollDisable() {
+                if (scrollDisabled) {
+                    return;
+                }
+           
+                scrollTop = $(window).scrollTop();
+           
+                $body.addClass('scrollDisabled').css({
+                   top: -1 * scrollTop
+                });
+           
+                scrollDisabled = true;
+            }
+
+            function scrollEnable() {
+                if (!scrollDisabled) {
+                    return;
+                }
+            
+                $body.removeClass('scrollDisabled');
+                $(window).scrollTop(scrollTop);
+            
+                scrollDisabled = false;
+            }
+            
             //Function which scrolls to the top of the page
             function toTop(){
                 document.body.scrollTop = document.documentElement.scrollTop = 0;
@@ -1161,8 +1260,8 @@
                 var modal = document.getElementById(name); 
                 modal.style.opacity = 1;
                 modal.style.visibility = "visible";
-                document.body.style.overflowY = "hidden";
-                document.body.style.paddingRight = getScrollbarWidth() + "px"; // Hack to prevent page jumping when hiding scrollbar
+                
+                scrollDisable();
                 
                 window.onclick = function(event) {
                     // console.log(event.target);
@@ -1177,8 +1276,8 @@
                 var modal = document.getElementById(name); 
                 modal.style.opacity = 0;
                 modal.style.visibility = "hidden";
-                document.body.style.overflowY = "scroll"
-                document.body.style.paddingRight = 0; // Hack to prevent page jumping when hiding scrollbar                
+                
+                scrollEnable();                
             }
             
             // Function to get width of scrollbar for padding offset above 
@@ -1454,6 +1553,10 @@
                     });
                 });
                 
+//                $('.aa-table').each(function() {
+//                    padRows($(this), 5);
+//                });
+                
                 // Make AA filelist tables DataTables
                 $('.aa-table').each(function() {
                     $(this).DataTable({
@@ -1474,9 +1577,32 @@
                         select: 'single',
                         responsive: true,
                         ordering: false,
-                        dom: "<'row't><'row'<'col-xs-6 pull-right'p>>"
+                        dom: "<'row'<'col-xs-6 pull-right'p>><'row't>",
                     });
                 });
+                
+                // adapted from http://live.datatables.net/patejija/14/edit
+                function padRows(obj, targetRows) {
+                    var tableRows = obj.find('> tbody > tr'); // grab the existing data rows immediately under this table (so ignoring nested modal tables)
+                    var numberNeeded = targetRows - tableRows.length % targetRows; // how many blank rows are needed to fill up to targetRows
+                    var lastRow = tableRows.last(); // cache the last data row
+                    var lastRowCells = lastRow.children('td'); // how many visible columns are there?
+                    var cellString;
+                    
+                    /* Iterate through the number of blank rows needed, building a string that will
+                     * be used for the HTML of each row. Another iterator inside creates the desired
+                     * number of columns, adding the sorting class to the appropriate TD.
+                     */
+                    for (i=0; i < numberNeeded; i++) {
+                        cellString = "";
+                        for (j=0; j < lastRowCells.length; j++) {
+                            cellString += '<td>&nbsp;</td>';
+                        }
+ 
+                        // Add the TR and its contents to the DOM
+                        lastRow.after('<tr>'+cellString+'</tr>');
+                    }
+                }
 
                 // Make visible:
                 $('.sidebar').first().css('visibility', 'visible');
@@ -1675,14 +1801,17 @@
     
     <xsl:template name="extensions-to-badges">
         <xsl:param name="input"/>
+        <xsl:param name="global-count" select="'false'"/>
         <xsl:choose>
             <!-- Our string contains a space, so there are more values to process -->
             <xsl:when test="contains($input, ' ')">
                 <xsl:call-template name="extensions-to-badges">
                     <xsl:with-param name="input" select="substring-before($input, ' ')"></xsl:with-param>
+                    <xsl:with-param name="global-count" select="$global-count"/>
                 </xsl:call-template>
                 <xsl:call-template name="extensions-to-badges">
                     <xsl:with-param name="input" select="substring-after($input, ' ')"></xsl:with-param>
+                    <xsl:with-param name="global-count" select="$global-count"/>
                 </xsl:call-template>
             </xsl:when>
             <xsl:otherwise>
@@ -1708,7 +1837,14 @@
                     </xsl:choose>
                     <span class="badge-left badge list-record-badge">
                         <!-- count the number of dataset locations that end with this extension -->
-                        <xsl:value-of select="count(//dataset/location[$input = substring(., string-length() - string-length($input) + 1)])"/>
+                        <xsl:choose>
+                            <xsl:when test="$global-count = 'true'">
+                                <xsl:value-of select="count(//dataset/location[$input = substring(., string-length() - string-length($input) + 1)])"/>                                
+                            </xsl:when>
+                            <xsl:otherwise>
+                                <xsl:value-of select="count(dataset/location[$input = substring(., string-length() - string-length($input) + 1)])"/>
+                            </xsl:otherwise>
+                        </xsl:choose>
                     </span>
                     <span class="badge-right badge list-record-badge">
                         <xsl:value-of select="$input"/>
