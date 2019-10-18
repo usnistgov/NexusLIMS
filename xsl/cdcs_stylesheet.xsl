@@ -677,7 +677,7 @@
                 font-size: 14px;
             }
             .pager-col {
-                padding-top: 10px;
+                padding-top: 20px;
             }
             .aa-img-col {
                 padding-top: 10px;
