@@ -241,8 +241,13 @@
             }
             
             img.nx-img.aa-img {
-                
+                display: block;
             }
+            
+            img.nx-img.aa-img.hidden {
+                display: none;
+            }
+            
             
             .gal-nav { /* Parameters for the 'next' and 'prev' buttons on the slideshow gallery */
 
@@ -662,6 +667,24 @@
                background: #eee;
             }
             
+            .row.vertical-align {
+                display: flex;
+                align-items: center;
+                width: 100%;
+            }
+            
+            .dataTables_paginate {
+                font-size: 14px;
+            }
+            .pager-col {
+                padding-top: 10px;
+            }
+            .aa-img-col {
+                padding-top: 10px;
+            }
+            .aa_header_row > .col-md-12 {
+                padding-top: 10px;
+            }
         </style>
 
         <div id="loading">
@@ -711,7 +734,7 @@
           <div class="main col-md-push-2" style="padding: 0;" id="top-button-div">
               <button id="edit-record-btn" type="button" class="btn btn-default pull-right"
                   data-toggle="tooltip" data-placement="top" 
-                  title="Manually edit the contents of this record">
+                  title="Manually edit the contents of this record (login required)">
                   <i class="fa fa-file-text"></i> Edit this record
               </button>
               <button id="previous-page-btn" type="button" class="btn btn-default pull-right"
@@ -770,7 +793,7 @@
                             <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
                             <xsl:attribute name="data-placement">bottom</xsl:attribute> 
                             <xsl:attribute name="title">Click to view file listing of this record in the browser</xsl:attribute>
-                            <xsl:value-of select="count(//dataset)"/> data files in <xsl:value-of select="count(//acquisitionActivity)"/> activites 
+                            <xsl:value-of select="count(//dataset)"/> data file<xsl:if test="count(//dataset)>1">s</xsl:if> in <xsl:value-of select="count(//acquisitionActivity)"/> activites 
                         </xsl:element>
                     </span>
                     <i class="fa fa-cubes" style="margin-left:0.75em; font-size: small;"
@@ -972,7 +995,7 @@
                                         </i>
                                     </div>
                                     <span class="badge list-record-badge">
-                                        <xsl:value-of select="count(dataset)"/> data files
+                                        <xsl:value-of select="count(dataset)"/> data file<xsl:if test="count(dataset) > 1">s</xsl:if>
                                     </span>
                                     <xsl:variable name="this-aa-extension-strings">
                                         <xsl:for-each select="./dataset/location">
@@ -997,14 +1020,20 @@
                                     </xsl:call-template>
                                 </div>
                             </div>
-                            <div class="row">
+                            <div class="row vertical-align aa-content-row">
                                 <!-- preview image column -->
-                                <div class="col-xs-4">
-                                    <img class="nx-img aa-img"><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="dataset[1]/preview"/></xsl:attribute></img>
+                                <div class="col-xs-4 aa-img-col">
+                                    <!-- likely better to load and hide each image first rather than change img src dynamically -->
+                                    <xsl:for-each select="dataset[1]">
+                                        <img class="nx-img aa-img visible" id="{generate-id()}-aa-img"><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute></img>        
+                                    </xsl:for-each>
+                                    <xsl:for-each select="dataset[position() > 1]">
+                                        <img class="nx-img aa-img hidden" id="{generate-id()}-aa-img"><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute></img>
+                                    </xsl:for-each>                                    
                                 </div>
                                 
                                 <!-- dataset listing column -->
-                                <div class="col-xs-8">
+                                <div class="col-xs-8 aa-table-col">
                                     <table class="table table-condensed table-hover aa-table compact" border="1" style="width:100%; border-collapse:collapse;">
                                         <thead>
                                             <tr>
@@ -1047,9 +1076,12 @@
                                         <!-- Loop through each dataset -->
                                         <tbody>
                                             <xsl:for-each select="dataset">
-                                                <tr>
+                                                <tr img-id="{generate-id()}-aa-img">
                                                     <!-- Populate table values with the metadata name and value -->
-                                                    <td><xsl:value-of select="name"/></td>
+                                                    <!-- generate a dataset id that matches preview image as an attribute on the first column for accessing later via JS -->
+                                                    <xsl:element name="td">
+                                                        <xsl:value-of select="name"/>
+                                                    </xsl:element>
                                                     <td><xsl:value-of select="@type"/></td>
                                                     <td><xsl:value-of select="@role"/></td>
                                                     <xsl:choose>
@@ -1058,6 +1090,7 @@
                                                         </xsl:when>
                                                     </xsl:choose>
                                                     <td>
+                                                        <!-- Modal content inside of table, since it needs to be in the context of this dataset -->
                                                         <a href='javascript:void(0)' onclick="$(this).blur(); openModal('{generate-id(current())}-modal')"
                                                         data-toggle='tooltip' data-placement='right'
                                                         title="Click to view this dataset's unique metadata">
@@ -1134,6 +1167,9 @@
                                     </table>
                                 </div>
                             </div>
+                            <div class='row dt_paginate_container vertical-align'>
+                                <!-- this row exists just to hold the pagination controls for the table above, moved here via JS -->
+                            </div>
                         </div>
                         <!-- Generate unique modal box for each AA which contains the setup params, accessed via a button -->
                         <div id="{generate-id(current())}-modal" class="modal">
@@ -1195,8 +1231,6 @@
                             </div>
                         </div>
                     </div>
-                    
-                    <br/>
                 </xsl:for-each>
             </div>
 
@@ -1553,13 +1587,9 @@
                     });
                 });
                 
-//                $('.aa-table').each(function() {
-//                    padRows($(this), 5);
-//                });
-                
                 // Make AA filelist tables DataTables
                 $('.aa-table').each(function() {
-                    $(this).DataTable({
+                    var this_table = $(this).DataTable({
                         destroy: true,
                         pagingType: "simple_numbers",
                         info: false,
@@ -1577,41 +1607,38 @@
                         select: 'single',
                         responsive: true,
                         ordering: false,
-                        dom: "<'row'<'col-xs-6 pull-right'p>><'row't>",
+                        dom: "<'row table-row't><'row pager-row'<'col-xs-12 pager-col text-right'p>>",
                     });
+                    
+                    // controls to reveal appropriate image on row hover
+                    $(this).on('mouseenter', '> tbody > tr', function() {
+                        // get the id of the correct image by looking at the row's img-id attribute
+                        var this_rows_img = $(this).first().attr('img-id');
+                        // the image we want to show is the one with that id
+                        var img_to_show = $('#' + this_rows_img);
+                        // get any img that have the visible class (so we can hide them)
+                        var img_to_hide = img_to_show.siblings('.aa-img.visible');
+                        // show/hide by adding and removing appropriate classes
+                        img_to_hide.addClass('hidden');
+                        img_to_hide.removeClass('visible');
+                        img_to_show.addClass('visible');
+                        img_to_show.removeClass('hidden');
+                    });
+                    
+                    var new_container = $(this).closest('.aa-content-row').next('.dt_paginate_container');
+                    var to_move = $(this).closest('.table-row').next('.pager-row').find('.pager-col');
+                    //debugger;
+                    new_container.append(to_move);
+                    //debugger;
+                    
                 });
                 
-                // adapted from http://live.datatables.net/patejija/14/edit
-                function padRows(obj, targetRows) {
-                    var tableRows = obj.find('> tbody > tr'); // grab the existing data rows immediately under this table (so ignoring nested modal tables)
-                    var numberNeeded = targetRows - tableRows.length % targetRows; // how many blank rows are needed to fill up to targetRows
-                    var lastRow = tableRows.last(); // cache the last data row
-                    var lastRowCells = lastRow.children('td'); // how many visible columns are there?
-                    var cellString;
-                    
-                    /* Iterate through the number of blank rows needed, building a string that will
-                     * be used for the HTML of each row. Another iterator inside creates the desired
-                     * number of columns, adding the sorting class to the appropriate TD.
-                     */
-                    for (i=0; i < numberNeeded; i++) {
-                        cellString = "";
-                        for (j=0; j < lastRowCells.length; j++) {
-                            cellString += '<td>&nbsp;</td>';
-                        }
- 
-                        // Add the TR and its contents to the DOM
-                        lastRow.after('<tr>'+cellString+'</tr>');
-                    }
-                }
-
-                // Make visible:
+                
+                // Make sidebar visible after everything is done loading:
                 $('.sidebar').first().css('visibility', 'visible');
 
-                $('#loading').fadeOut('slow');
-                
-                //document.getElementById('xslt_render').style.visibility = "visible";
-                //document.getElementById('xslt_render').style.opacity = 1;
-                
+                // Fade out the loading screen
+                $('#loading').fadeOut('slow');                
             });
 
             ]]>
