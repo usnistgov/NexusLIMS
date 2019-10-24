@@ -89,7 +89,10 @@
        <xsl:text> </xsl:text>
        <span class="badge list-record-badge yellow-badge"><xsl:value-of select="summary/instrument"/></span>
        <span class="badge list-record-badge">
-         <xsl:value-of select="count(//dataset)"/> data files in <xsl:value-of select="count(//acquisitionActivity)"/> activites </span>
+         <xsl:value-of select="count(//dataset)"/> data files in <xsl:value-of select="count(//acquisitionActivity)"/> activit<xsl:choose>
+           <xsl:when test="count(//acquisitionActivity) = 1">y</xsl:when>
+           <xsl:otherwise>ies</xsl:otherwise>
+         </xsl:choose> </span>
         <i class="fa fa-cubes filetypes-icon" style="margin-left:0.75em; font-size: small;"
             data-toggle="tooltip" data-placement="top" title="Filetypes present in record"/><span style="font-size: small;"><xsl:text>: </xsl:text></span>
        <xsl:call-template name="extensions-to-badges">
