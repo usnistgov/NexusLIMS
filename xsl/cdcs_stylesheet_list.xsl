@@ -4,9 +4,8 @@
   <xsl:output method="html" indent="yes" encoding="UTF-8"/>
 
   <xsl:param name="detail_url" select="'#'"/>
-  <xsl:variable name="datasetBaseUrl">http://***REMOVED***/mmfnexus/</xsl:variable>
-  <xsl:variable name="previewBaseUrl"
-    >http://***REMOVED***/nexusLIMS/mmfnexus/</xsl:variable>
+  <xsl:variable name="datasetBaseUrl">https://***REMOVED***/mmfnexus/</xsl:variable>
+  <xsl:variable name="previewBaseUrl">https://***REMOVED***/nexusLIMS/mmfnexus/</xsl:variable>
 
   <xsl:variable name="month-num-dictionary">
     <month month-number="01">January</month>

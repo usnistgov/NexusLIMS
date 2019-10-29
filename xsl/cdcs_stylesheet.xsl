@@ -4,8 +4,8 @@
     version="1.0">
     <xsl:output method="html" indent="yes" encoding="UTF-8"/>
 
-    <xsl:variable name="datasetBaseUrl">http://***REMOVED***/mmfnexus/</xsl:variable>
-    <xsl:variable name="previewBaseUrl">http://***REMOVED***/nexusLIMS/mmfnexus/</xsl:variable>
+    <xsl:variable name="datasetBaseUrl">https://***REMOVED***/mmfnexus/</xsl:variable>
+    <xsl:variable name="previewBaseUrl">https://***REMOVED***/nexusLIMS/mmfnexus/</xsl:variable>
     <xsl:variable name="sharepointBaseUrl">https://***REMOVED***/***REMOVED***/Lists/</xsl:variable>
 
     <xsl:variable name="month-num-dictionary">
@@ -1163,7 +1163,7 @@
                                                     </xsl:call-template>
                                                 </th>
                                                 <xsl:choose>
-                                                    <xsl:when test="dataset/format">
+                                                    <xsl:when test="dataset/format/text()">
                                                         <th>
                                                             Format
                                                             <xsl:call-template name="help-tip">
@@ -1189,8 +1189,8 @@
                                                     <td><xsl:value-of select="@type"/></td>
                                                     <td><xsl:value-of select="@role"/></td>
                                                     <xsl:choose>
-                                                        <xsl:when test="../dataset/format">
-                                                            <td><xsl:value-of select="format"/></td>
+                                                        <xsl:when test="../dataset/format/text()">
+                                                            <td><xsl:value-of select="format/text()"/></td>
                                                         </xsl:when>
                                                     </xsl:choose>
                                                     <td class='text-center'>
