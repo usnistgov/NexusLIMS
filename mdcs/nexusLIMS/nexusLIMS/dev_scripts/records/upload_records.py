@@ -53,6 +53,11 @@ if __name__ == '__main__':
                           verify=False)
     workspace_id = r.json()[0]['id']
 
+    endpoint = _urljoin(_cdcs_url, 'rest/template-version-manager/global')
+    r = _requests.request("GET", endpoint, auth=(username, password), 
+                          verify=False)
+    template_id = r.json()[0]['current']
+
     endpoint = _urljoin(_cdcs_url, 'rest/data/')
 
     for f in _tqdm(file_list):
@@ -60,7 +65,7 @@ if __name__ == '__main__':
             xml_content = xml_file.read()
 
         payload = {
-            'template': '5d69696b7774640033d96fd7',
+            'template': template_id,
             'title': _os.path.basename(f),
             'xml_content': xml_content
         }
