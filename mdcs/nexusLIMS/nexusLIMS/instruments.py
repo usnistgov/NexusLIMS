@@ -102,7 +102,7 @@ instrument_db = {
                     name='FEI-Helios-DB-636663',
                     schema_name='FEI Helios',
                     property_tag='636663',
-                    filestore_path=None),
+                    filestore_path='./Aphrodite'),
     'FEI-Quanta200-ESEM-633137':
         _Instrument(api_url=_get_api_url('FEIQuanta200Events'),
                     calendar_name='FEI Quanta200',
@@ -120,7 +120,7 @@ instrument_db = {
                     name='FEI-Titan-STEM-630901',
                     schema_name='FEI Titan STEM',
                     property_tag='630901',
-                    filestore_path=None),
+                    filestore_path='./643Titan'),
     'FEI-Titan-TEM-635816':
         _Instrument(api_url=_get_api_url('FEITitanTEMEvents'),
                     calendar_name='FEI Titan TEM',
@@ -138,7 +138,7 @@ instrument_db = {
                     name='Hitachi-S4700-SEM-606559',
                     schema_name='Hitachi S4700',
                     property_tag='606559',
-                    filestore_path=None),
+                    filestore_path='./Hitachi-S4700-SEM-606559'),
     'Hitachi-S5500-SEM-635262':
         _Instrument(api_url=_get_api_url('HitachiS5500Events'),
                     calendar_name='Hitachi-S5500',
@@ -147,7 +147,7 @@ instrument_db = {
                     name='Hitachi-S5500-SEM-635262',
                     schema_name='Hitachi S5500',
                     property_tag='635262',
-                    filestore_path=None),
+                    filestore_path='./S5500'),
     'JEOL-JEM3010-TEM-565989':
         _Instrument(api_url=_get_api_url('JEOLJEM3010Events'),
                     calendar_name='JEOL JEM3010',
@@ -174,7 +174,7 @@ instrument_db = {
                     name='Philips-CM30-TEM-540388',
                     schema_name='Philips CM30',
                     property_tag='540388',
-                    filestore_path=None),
+                    filestore_path='./Philips-CM30-TEM-540388'),
     'Philips-EM400-TEM-599910':
         _Instrument(api_url=_get_api_url('PhilipsEM400Events'),
                     calendar_name='Philips EM400',
@@ -183,5 +183,5 @@ instrument_db = {
                     name='Philips-EM400-TEM-599910',
                     schema_name='Philips EM400',
                     property_tag='599910',
-                    filestore_path=None)
+                    filestore_path='./EM400')
 }
