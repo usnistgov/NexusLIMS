@@ -33,11 +33,13 @@ import socket as _socket
 
 _mmf_nexus_paths = {'limsimages': '/data/smb/mmfnexus/',
                     '***REMOVED***': '/mnt/***REMOVED***/',
+                    'poole': '/mnt/***REMOVED***/',
                     '***REMOVED***': '***REMOVED***/mmfnexus/',
                     '***REMOVED***': ''}
 
 _nexuslims_paths = {'limsimages': '/data/smb/nexusLIMS/mmfnexus/',
                     '***REMOVED***': '/mnt/***REMOVED***/nexusLIMS/mmfnexus/',
+                    'poole': '/mnt/***REMOVED***/nexusLIMS/mmfnexus/',
                     '***REMOVED***': '***REMOVED***/nexusLIMS/mmfnexus/',
                     '***REMOVED***': ''}
 
