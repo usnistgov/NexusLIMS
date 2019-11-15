@@ -1,3 +1,22 @@
+/*             */
+/* Admonitions */
+/*             */
+
+.alert-info {
+    border-color: #b1dcec;
+    background-color: #d2eef9;
+    color: #494949;
+}
+
+.alert-info a {
+    color: #0080ff;
+}
+
+.alert-info .admonition-title {
+    font-variant: petite-caps;
+    font-style: italic;
+}
+
 /*               */
 /* Miscellaneous */
 /*               */

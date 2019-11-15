@@ -5,5 +5,6 @@
 
    Package Introduction <self>
    api
+   customizing_cdcs
 
 .. include:: README.rst
