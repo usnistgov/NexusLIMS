@@ -111,7 +111,7 @@ class Toplevel1:
         top.configure(highlightcolor="black")
 
         self.TLabel1 = ttk.Label(top)
-        self.TLabel1.place(relx=0.083, rely=0.056, height=100, width=250)
+        self.TLabel1.place(relx=0.143, rely=0.056, height=100, width=250)
         self.TLabel1.configure(background="#d9d9d9")
         self.TLabel1.configure(foreground="#000000")
         self.TLabel1.configure(font="-family {DejaVu Sans} -size 9")
@@ -129,7 +129,7 @@ class Toplevel1:
                 delay=0.25)
 
         self.TLabel2 = ttk.Label(top)
-        self.TLabel2.place(relx=0.083, rely=0.333, height=16, width=250)
+        self.TLabel2.place(relx=0.071, rely=0.333, height=16, width=300)
         self.TLabel2.configure(background="#d9d9d9")
         self.TLabel2.configure(foreground="#000000")
         self.TLabel2.configure(font="TkDefaultFont")
@@ -140,7 +140,7 @@ class Toplevel1:
         self.TLabel2.configure(text='''A new session has been started for''')
 
         self.TButton1 = ttk.Button(top)
-        self.TButton1.place(relx=0.333, rely=0.833, height=50, width=100)
+        self.TButton1.place(relx=0.357, rely=0.833, height=50, width=100)
         self.TButton1.configure(takefocus="")
         self.TButton1.configure(text='''End session''')
         tooltip_font = "TkDefaultFont"
@@ -149,7 +149,7 @@ class Toplevel1:
                 """Ending the session will close this window and trigger a record of the session to be built (don't click unless you're sure you've saved all your data!)""", delay=0.25)
 
         self.instrument_label = ttk.Label(top)
-        self.instrument_label.place(relx=0.083, rely=0.4, height=16, width=250)
+        self.instrument_label.place(relx=0.071, rely=0.411, height=16, width=300)
         self.instrument_label.configure(background="#d9d9d9")
         self.instrument_label.configure(foreground="#12649b")
         self.instrument_label.configure(font="TkDefaultFont")
@@ -161,7 +161,7 @@ class Toplevel1:
         self.instrument_label.configure(compound='center')
 
         self.TLabel3_2 = ttk.Label(top)
-        self.TLabel3_2.place(relx=0.083, rely=0.467, height=16, width=250)
+        self.TLabel3_2.place(relx=0.071, rely=0.478, height=16, width=300)
         self.TLabel3_2.configure(background="#d9d9d9")
         self.TLabel3_2.configure(foreground="#000000")
         self.TLabel3_2.configure(font="TkDefaultFont")
@@ -173,7 +173,7 @@ class Toplevel1:
         self.TLabel3_2.configure(compound='center')
 
         self.datetime_label = ttk.Label(top)
-        self.datetime_label.place(relx=0.083, rely=0.533, height=16, width=250)
+        self.datetime_label.place(relx=0.071, rely=0.544, height=16, width=300)
         self.datetime_label.configure(background="#d9d9d9")
         self.datetime_label.configure(foreground="#12649b")
         self.datetime_label.configure(font="TkDefaultFont")
@@ -185,7 +185,7 @@ class Toplevel1:
         self.datetime_label.configure(compound='center')
 
         self.TLabel3_3 = ttk.Label(top)
-        self.TLabel3_3.place(relx=0.083, rely=0.6, height=80, width=250)
+        self.TLabel3_3.place(relx=0.071, rely=0.6, height=80, width=300)
         self.TLabel3_3.configure(background="#d9d9d9")
         self.TLabel3_3.configure(foreground="#000000")
         self.TLabel3_3.configure(font="TkDefaultFont")
