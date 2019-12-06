@@ -26,14 +26,16 @@
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
 
+# Code has been update to work under Python 3.4 (32-bit) due to limitations of
+# the Windows XP-based microscope PCs. Using this version of Python with
+# pyinstaller 3.5 seems to work on the 642 Titan
+
 import sqlite3
-import sys
 import re
 import datetime
 import os
 import argparse
 import subprocess
-import time
 
 testing = False
 
@@ -60,9 +62,23 @@ def log(to_print, this_verbosity):
     """
     level_dict = {0: 'WARN', 1: 'INFO', 2: 'DEBUG'}
     if this_verbosity <= verbosity:
-        print(f'{datetime.datetime.now().isoformat()}'
-              f':{level_dict[this_verbosity]}: '
-              f'{to_print}')
+        print('{}'.format(datetime.datetime.now().isoformat()) +
+              ':{}: '.format(level_dict[this_verbosity]) +
+              '{}'.format(to_print))
+
+
+def run_cmd(cmd):
+    try:
+        p = subprocess.check_output(cmd,
+                                    shell=True,
+                                    stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as e:
+        p = e.output
+        log('command {} returned with error (code {}): {}'.format(
+            e.cmd.replace(password, '**************'),
+            e.returncode,
+            e.output), 0)
+    return p
 
 
 def get_computer_name():
@@ -72,39 +88,47 @@ def get_computer_name():
 def mount_network_share():
     # disconnect anything mounted at "N:/"
     log('unmounting existing N:', 2)
-    p = subprocess.run(r'net use N: /delete /y', shell=True,
-                       capture_output=True)
+    p = run_cmd(r'net use N: /delete /y')
+
     # Connect to shared drive, windows does not allow multiple connections to
     # the same server, but you can trick it by using IP address instead of
     # DNS name...
     log('getting ip of cfse', 2)
-    p = subprocess.run(r'nslookup ***REMOVED***', shell=True,
-                       capture_output=True)
-    ips = re.findall(ip_regex, str(p.stdout))
+    p = run_cmd(r'nslookup ***REMOVED***')
+    log('output of nslookup: {}'.format(str(p)), 2)
+    result = str(p).index('Name:')
+    ips = re.findall(ip_regex, str(p)[result:])
+
     if len(ips) == 1:
         ip = ips[0]
     else:
-        raise ConnectionError('Could not find IP of network share')
-    log(f'found ***REMOVED*** at {ip}', 2)
+        raise EnvironmentError('Could not find IP of network share')
+
+    log('found ***REMOVED*** at {}'.format(ip), 2)
     log('mounting N:', 2)
 
     # mounting requires a security policy:
     # https://support.microsoft.com/en-us/help/968264/error-message-when-you-
     # try-to-map-to-a-network-drive-of-a-dfs-share-by
-    mount_command = f'net use N: \\\\{ip}{db_path} ' + \
-                    f'/user:NIST\\***REMOVED*** ***************'
+    mount_command = 'net use N: \\\\{}{} '.format(ip, db_path) + \
+                    '/user:NIST\\***REMOVED*** {}'.format(password)
     if testing:
-        mount_command = f'net use N: \\\\{ip}{db_path} /user:NIST\\***REMOVED***'
+        mount_command = 'net use N: \\\\{}{} /user:NIST\\***REMOVED***'.format(ip,
+                                                                     db_path)
 
-    log(f'using "{mount_command}', 2)
-    p = subprocess.run(mount_command, shell=True, capture_output=True)
-    if p.stderr:
-        log(str(p.stderr), 0)
-        if '1312' in str(p.stderr):
+    log('using "{}'.format(mount_command).replace(password,
+                                                  '**************'), 2)
+    p = run_cmd(mount_command)
+
+    if 'error' in str(p):
+        if '1312' in str(p):
             log('Visit https://support.microsoft.com/en-us/help/968264/error-'
                 'message-when-you-try-to-map-to-a-network-drive-of-a-dfs'
                 '-share-by\n'
-                'to see how to allow mounting network drives as another user',
+                'to see how to allow mounting network drives as another user.'
+                '\n(You\'ll need to change '
+                'HKLM\\System\\CurrentControlSet\\Control\\Lsa'
+                '\\DisableDomanCreds to 0 in the registry)',
                 0)
         raise ConnectionError('Could not mount network share to access '
                               'database')
@@ -112,19 +136,19 @@ def mount_network_share():
 
 def umount_network_share():
     log('unmounting N:', 2)
-    p = subprocess.run(r'net use N: /del /y', shell=True, capture_output=True)
-    if p.stderr:
-        log(str(p.stderr), 0)
+    p = run_cmd(r'net use N: /del /y')
+    if 'error' in str(p):
+        log(str(p), 0)
 
 
 def get_instr_pid():
     # Get the instrument pid from the computer name of this computer
-    with sqlite3.connect(f"N:\\{db_name}") as con:
+    with sqlite3.connect("N:\\{}".format(db_name)) as con:
         res = con.execute('SELECT instrument_pid from instruments WHERE '
-                          f'computer_name is \'{get_computer_name()}\'')
+                          'computer_name is \'{}\''.format(get_computer_name()))
         instrument_pid = res.fetchone()[0]
-        log(f'Found instrument ID: {instrument_pid} using'
-            f' {get_computer_name()}', 1)
+        log('Found instrument ID: {} using'.format(instrument_pid) +
+            ' {}'.format(get_computer_name()), 1)
     return instrument_pid
 
 
@@ -147,65 +171,67 @@ def process_start(instrument_pid, user=None):
     """
     insert_statement = "INSERT INTO session_log (instrument, event_type" + \
                        (", user)" if user else ") ") + \
-                       f"VALUES ('{instrument_pid}', 'START'" + \
-                       (f", '{user}');" if user else ");")
+                       "VALUES ('{}', 'START'".format(instrument_pid) + \
+                       (", '{}');".format(user) if user else ");")
 
-    log(f'insert_statement: {insert_statement}', 2)
+    log('insert_statement: {}'.format(insert_statement), 2)
 
-    with sqlite3.connect(f"N:\\{db_name}") as con:
+    with sqlite3.connect("N:\\{}".format(db_name)) as con:
         _ = con.execute(insert_statement)
         res = con.execute('SELECT * FROM session_log WHERE '
                           'id_session_log = last_insert_rowid();')
         id_session_log = res.fetchone()
-        log(f'Inserted row {id_session_log}', 1)
+        log('Inserted row {}'.format(id_session_log), 1)
 
 
 def process_end(instrument_pid, user=None):
-    user_string = f"AND user='{user}'" if user else ''
+    user_string = "AND user='{}'".format(user) if user else ''
 
     insert_statement = "INSERT INTO session_log (instrument, event_type, " \
                        "record_status" + \
                        (", user) " if user else ") ") + \
-                       f"VALUES ('{instrument_pid}', 'END', 'TO_BE_BUILT'" + \
-                       (f", '{user}');" if user else ");")
+                       "VALUES ('{}', 'END', 'TO_BE_BUILT'".format(instrument_pid) + \
+                       (", '{}');".format(user) if user else ");")
 
     # Get the most recent 'START' entry for this instrument
-    get_last_start_id_query = f"SELECT id_session_log FROM session_log " \
-                              f"WHERE instrument = '{instrument_pid}' AND " \
-                              f"event_type = 'START' {user_string} AND " \
-                              f"record_status = 'WAITING_FOR_END'" \
-                              f"ORDER BY timestamp DESC " \
-                              f"LIMIT 1;"
-    log(f'query: {get_last_start_id_query}', 2)
-    with sqlite3.connect(f"N:\\{db_name}") as con:
-        log(f'insert_statement: {insert_statement}', 2)
+    get_last_start_id_query = "SELECT id_session_log FROM session_log " + \
+                              "WHERE instrument = '{}' AND ".format(
+                                  instrument_pid) + \
+                              "event_type = 'START' {} AND ".format(
+                                  user_string) + \
+                              "record_status = 'WAITING_FOR_END'" + \
+                              "ORDER BY timestamp DESC " + \
+                              "LIMIT 1;"
+    log('query: {}'.format(get_last_start_id_query), 2)
+    with sqlite3.connect("N:\\{}".format(db_name)) as con:
+        log('insert_statement: {}'.format(insert_statement), 2)
         _ = con.execute(insert_statement)
 
         res = con.execute('SELECT * FROM session_log WHERE '
                           'id_session_log = last_insert_rowid();')
         id_session_log = res.fetchone()
-        log(f'Inserted row {id_session_log}', 1)
+        log('Inserted row {}'.format(id_session_log), 1)
 
         res = con.execute(get_last_start_id_query)
         results = res.fetchall()
         if len(results) == 0:
             raise LookupError("No matching 'START' event found")
         last_start_id = results[-1][0]
-        log(f'SELECT instrument results: {last_start_id}', 2)
+        log('SELECT instrument results: {}'.format(last_start_id), 2)
 
-        res = con.execute(f"SELECT * FROM session_log WHERE "
-                          f"id_session_log = {last_start_id}")
-        log(f'Row to be updated: {res.fetchone()}', 1)
+        res = con.execute("SELECT * FROM session_log WHERE " +
+                          "id_session_log = {}".format(last_start_id))
+        log('Row to be updated: {}'.format(res.fetchone()), 1)
 
-        update_statement = f"UPDATE session_log SET " \
-                           f"record_status = 'TO_BE_BUILT' WHERE " \
-                           f"id_session_log = {last_start_id}"
+        update_statement = "UPDATE session_log SET " + \
+                           "record_status = 'TO_BE_BUILT' WHERE " + \
+                           "id_session_log = {}".format(last_start_id)
 
         _ = con.execute(update_statement)
 
-        res = con.execute(f"SELECT * FROM session_log WHERE "
-                          f"id_session_log = {last_start_id}")
-        log(f'Row after updating: {res.fetchone()}', 1)
+        res = con.execute("SELECT * FROM session_log WHERE " + \
+                          "id_session_log = {}".format(last_start_id))
+        log('Row after updating: {}'.format(res.fetchone()), 1)
 
 
 def cmdline_args():
@@ -241,7 +267,7 @@ if __name__ == '__main__':
     else:
         username = args.user
 
-    log(f'username is {username}', 1)
+    log('username is {}'.format(username), 1)
 
     log('running `mount_network_share()`', 2)
     mount_network_share()
@@ -256,10 +282,9 @@ if __name__ == '__main__':
     else:
         log('running `umount_network_share()`', 2)
         umount_network_share()
-        error_string = f"event_type must be either 'START' or" + \
-                       f" 'END'; '{args.event_type}' provided"
+        error_string = "event_type must be either 'START' or" + \
+                       " 'END'; '{}' provided".format(args.event_type)
         raise ValueError(error_string)
 
     log('running `umount_network_share()`', 2)
     umount_network_share()
-

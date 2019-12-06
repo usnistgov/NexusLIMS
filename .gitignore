@@ -11,6 +11,7 @@ gitlab_backup.log
 *credentials.ini
 .coverage
 .env
+.directory
 
 # dev files
 *.pyc
