@@ -22,8 +22,8 @@ pyz = PYZ(a.pure, a.zipped_data,
 exe = EXE(pyz,
           a.scripts,
           a.binaries + [
-              ('logo_bare.ico', 
-              'C:\\Users\\***REMOVED***\\git_repos\\NexusMicroscopyLIMS\\mdcs\\nexusLIMS\\nexusLIMS\\db\\logo_bare.ico', 
+              ('logo_bare_xp.ico', 
+              'C:\\Users\\***REMOVED***\\git_repos\\NexusMicroscopyLIMS\\mdcs\\nexusLIMS\\nexusLIMS\\db\\logo_bare_xp.ico', 
               'DATA'),
               ('logo_text_250x100.png',
               'C:\\Users\\***REMOVED***\\git_repos\\NexusMicroscopyLIMS\\mdcs\\nexusLIMS\\nexusLIMS\\db\\logo_text_250x100.png',
@@ -39,4 +39,4 @@ exe = EXE(pyz,
           upx_exclude=[],
           runtime_tmpdir=None,
           console=True, 
-          icon='logo_bare.ico')
+          icon='logo_bare_xp.ico')
