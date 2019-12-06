@@ -33,6 +33,9 @@
 #  in conjunction with Tcl version 8.6
 #    Dec 04, 2019 03:30:55 PM MST  platform: Linux
 
+# Generate .exe for this GUI with Pyinstaller v3.5 on Python 3.4.4 (32-bit) via:
+# C:\Python34-32\Scripts\pyinstaller.exe db_logger_gui.spec
+
 import sys
 import tkinter as tk
 import tkinter.ttk as ttk

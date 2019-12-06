@@ -1,4 +1,6 @@
 # -*- mode: python ; coding: utf-8 -*-
+# Run this file with Pyinstaller v3.5, on Python 3.4.4 (32-bit) via:
+# C:\Python34-32\Scripts\pyinstaller.exe db_logger_gui.spec
 
 block_cipher = None
 
