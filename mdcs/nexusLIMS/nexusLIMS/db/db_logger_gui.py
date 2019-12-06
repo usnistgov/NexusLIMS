@@ -34,18 +34,9 @@
 #    Dec 04, 2019 03:30:55 PM MST  platform: Linux
 
 import sys
-
-try:
-    import Tkinter as tk
-except ImportError:
-    import tkinter as tk
-
-try:
-    import ttk
-    py3 = False
-except ImportError:
-    import tkinter.ttk as ttk
-    py3 = True
+import tkinter as tk
+import tkinter.ttk as ttk
+py3 = True
 
 import db_logger_gui_support
 import os.path
@@ -84,6 +75,16 @@ def destroy_Toplevel1():
     w = None
 
 
+def resource_path(relative_path):
+    try:
+        # try to set the base_path to the pyinstaller temp dir (for when we're)
+        # running from a compiled .exe built with pyinstaller
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath('.')
+    
+    return os.path.join(base_path, relative_path)
+
 class Toplevel1:
     def __init__(self, top=None):
         """This class configures and populates the toplevel window.
@@ -103,22 +104,24 @@ class Toplevel1:
                        background=[('selected', _compcolor),
                                    ('active', _ana2color)])
 
-        top.geometry("300x450+538+141")
+        top.geometry("350x450+538+141")
         top.minsize(1, 1)
         top.maxsize(3840, 1170)
         top.resizable(0, 0)
         top.title("NexusLIMS Session Logger")
         top.configure(highlightcolor="black")
+        top.iconbitmap(bitmap=resource_path("logo_bare.ico"),
+                       default=resource_path("logo_bare.ico"))
 
         self.TLabel1 = ttk.Label(top)
         self.TLabel1.place(relx=0.143, rely=0.056, height=100, width=250)
-        self.TLabel1.configure(background="#d9d9d9")
+        # Use top['background'] so the widget's background matches the root window
+        self.TLabel1.configure(background=top['background'])
         self.TLabel1.configure(foreground="#000000")
         self.TLabel1.configure(font="-family {DejaVu Sans} -size 9")
         self.TLabel1.configure(relief="flat")
         self.TLabel1.configure(text='''Tlabel''')
-        photo_location = os.path.join(prog_location,
-                                      "../../../../files/logo_text_250x100.png")
+        photo_location = resource_path("logo_text_250x100.png")
         global _img0
         _img0 = tk.PhotoImage(file=photo_location)
         self.TLabel1.configure(image=_img0)
@@ -130,7 +133,7 @@ class Toplevel1:
 
         self.TLabel2 = ttk.Label(top)
         self.TLabel2.place(relx=0.071, rely=0.333, height=16, width=300)
-        self.TLabel2.configure(background="#d9d9d9")
+        self.TLabel2.configure(background=top['background'])
         self.TLabel2.configure(foreground="#000000")
         self.TLabel2.configure(font="TkDefaultFont")
         self.TLabel2.configure(relief="flat")
@@ -149,8 +152,8 @@ class Toplevel1:
                 """Ending the session will close this window and trigger a record of the session to be built (don't click unless you're sure you've saved all your data!)""", delay=0.25)
 
         self.instrument_label = ttk.Label(top)
-        self.instrument_label.place(relx=0.071, rely=0.411, height=16, width=300)
-        self.instrument_label.configure(background="#d9d9d9")
+        self.instrument_label.place(relx=0.071, rely=0.406, height=16, width=300)
+        self.instrument_label.configure(background=top['background'])
         self.instrument_label.configure(foreground="#12649b")
         self.instrument_label.configure(font="TkDefaultFont")
         self.instrument_label.configure(relief="flat")
@@ -161,8 +164,8 @@ class Toplevel1:
         self.instrument_label.configure(compound='center')
 
         self.TLabel3_2 = ttk.Label(top)
-        self.TLabel3_2.place(relx=0.071, rely=0.478, height=16, width=300)
-        self.TLabel3_2.configure(background="#d9d9d9")
+        self.TLabel3_2.place(relx=0.071, rely=0.473, height=16, width=300)
+        self.TLabel3_2.configure(background=top['background'])
         self.TLabel3_2.configure(foreground="#000000")
         self.TLabel3_2.configure(font="TkDefaultFont")
         self.TLabel3_2.configure(relief="flat")
@@ -173,8 +176,8 @@ class Toplevel1:
         self.TLabel3_2.configure(compound='center')
 
         self.datetime_label = ttk.Label(top)
-        self.datetime_label.place(relx=0.071, rely=0.544, height=16, width=300)
-        self.datetime_label.configure(background="#d9d9d9")
+        self.datetime_label.place(relx=0.071, rely=0.539, height=16, width=300)
+        self.datetime_label.configure(background=top['background'])
         self.datetime_label.configure(foreground="#12649b")
         self.datetime_label.configure(font="TkDefaultFont")
         self.datetime_label.configure(relief="flat")
@@ -186,7 +189,7 @@ class Toplevel1:
 
         self.TLabel3_3 = ttk.Label(top)
         self.TLabel3_3.place(relx=0.071, rely=0.6, height=80, width=300)
-        self.TLabel3_3.configure(background="#d9d9d9")
+        self.TLabel3_3.configure(background=top['background'])
         self.TLabel3_3.configure(foreground="#000000")
         self.TLabel3_3.configure(font="TkDefaultFont")
         self.TLabel3_3.configure(relief="flat")

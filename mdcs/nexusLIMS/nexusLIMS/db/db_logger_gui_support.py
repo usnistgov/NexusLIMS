@@ -33,18 +33,9 @@
 #    Dec 04, 2019 03:11:57 PM MST  platform: Linux
 
 import sys
-
-try:
-    import Tkinter as tk
-except ImportError:
-    import tkinter as tk
-
-try:
-    import ttk
-    py3 = False
-except ImportError:
-    import tkinter.ttk as ttk
-    py3 = True
+import tkinter as tk
+import tkinter.ttk as ttk
+py3 = True
 
 def init(top, gui, *args, **kwargs):
     global w, top_level, root
