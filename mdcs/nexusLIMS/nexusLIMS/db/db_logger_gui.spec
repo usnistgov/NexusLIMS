@@ -38,5 +38,5 @@ exe = EXE(pyz,
           upx=False,
           upx_exclude=[],
           runtime_tmpdir=None,
-          console=False, 
+          console=True, 
           icon='logo_bare.ico')
