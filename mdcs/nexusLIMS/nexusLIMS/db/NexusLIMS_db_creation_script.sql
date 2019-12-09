@@ -2,9 +2,10 @@
 -- Author:        Joshua Taillon
 -- Caption:       NexusLIMS DB
 -- Project:       Nexus Microscopy LIMS
+-- Changed:       2019-12-06 14:30
 -- Changed:       2019-10-31 16:50
 -- Created:       2019-10-30 14:21
-PRAGMA foreign_keys = OFF;
+PRAGMA foreign_keys = ON;
 
 -- Schema: nexuslims_db
 --   A database to hold information about the instruments and sessions logged in the Nexus Microscopy Facility
@@ -45,11 +46,15 @@ INSERT INTO "instruments"("instrument_pid","api_url","calendar_name","calendar_u
 INSERT INTO "instruments"("instrument_pid","api_url","calendar_name","calendar_url","location","schema_name","property_tag","filestore_path","computer_name","computer_ip","computer_mount") VALUES('JEOL-JSM7100-SEM-N102656', 'https://***REMOVED***/***REMOVED***/_vti_bin/ListData.svc/JEOLJSM7100Events', 'JEOL JSM7100', 'https://***REMOVED***/***REMOVED***/Lists/JEOL%20JSM7100%20Events/calendar.aspx', '***REMOVED***', 'JEOL JSM7100', 'N102656', './7100Jeol', NULL, NULL, NULL);
 INSERT INTO "instruments"("instrument_pid","api_url","calendar_name","calendar_url","location","schema_name","property_tag","filestore_path","computer_name","computer_ip","computer_mount") VALUES('Philips-CM30-TEM-540388', 'https://***REMOVED***/***REMOVED***/_vti_bin/ListData.svc/PhilipsCM30Events', 'Philips CM30', 'https://***REMOVED***/***REMOVED***/Lists/Philips%20CM30%20Events/calendar.aspx', 'Unknown', 'Philips CM30', '540388', './Philips-CM30-TEM-540388', NULL, NULL, NULL);
 INSERT INTO "instruments"("instrument_pid","api_url","calendar_name","calendar_url","location","schema_name","property_tag","filestore_path","computer_name","computer_ip","computer_mount") VALUES('Philips-EM400-TEM-599910', 'https://***REMOVED***/***REMOVED***/_vti_bin/ListData.svc/PhilipsEM400Events', 'Philips EM400', 'https://***REMOVED***/***REMOVED***/Lists/Philips%20EM400%20Events/calendar.aspx', '***REMOVED***', 'Philips EM400', '599910', './EM400', NULL, NULL, NULL);
+INSERT INTO "instruments"("instrument_pid","api_url","calendar_name","calendar_url","location","schema_name","property_tag","filestore_path","computer_name","computer_ip","computer_mount") VALUES('testsurface-CPU_P1111111', 'https://example.com/surface', 'Surface test instrument', 'https://example.com/surface', '2/2607', 'Surface test instrument', '***REMOVED***', './test_surface', '***REMOVED***', '***REMOVED***21', 'M:/');
+
+
 CREATE TABLE "nexuslims_db"."session_log"(
-  "id_session_log" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+  "id_session_log" INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, -- the auto-incrementing primary key identifier for this table (just a generic number)
+  "session_identifier" VARCHAR(36) NOT NULL,-- A UUID4 (36-character string) that is consistent among a single record's "START", "END", and "RECORD_GENERATION" events
   "instrument" VARCHAR(100) NOT NULL,-- The instrument associated with this session (foreign key reference to the 'instruments' table)
   "timestamp" DATETIME NOT NULL DEFAULT (strftime('%Y-%m-%dT%H:%M:%f', 'now', 'localtime')),-- The date and time of the logged event
-  "event_type" TEXT NOT NULL CHECK("event_type" IN('START', 'END')),-- The type of log for this session either "START" or "END"
+  "event_type" TEXT NOT NULL CHECK("event_type" IN('START', 'END', 'RECORD_GENERATION')),-- The type of log for this session either "START" or "END"
   "record_status" TEXT NOT NULL CHECK("record_status" IN('COMPLETED', 'WAITING_FOR_END', 'TO_BE_BUILT')) DEFAULT 'WAITING_FOR_END',-- The status of the record associated with this session. One of 'WAITING_FOR_END' (has a start event, but no end event), 'TO_BE_BUILT' (session has ended, but record not yet built), or 'COMPLETED' (record has been built)
   "user" VARCHAR(50),-- The NIST "short style" username associated with this session (if known)
   CONSTRAINT "id_session_log_UNIQUE"
