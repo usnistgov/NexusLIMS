@@ -3,10 +3,10 @@
 # C:\Python34-32\Scripts\pyinstaller.exe db_logger_gui.spec
 
 block_cipher = None
-
+options = [ ]
 
 a = Analysis(['db_logger_gui.py'],
-             pathex=['C:\\Users\\***REMOVED***\\git_repos\\NexusMicroscopyLIMS\\mdcs\\nexusLIMS\\nexusLIMS\\db'],
+             pathex=['Z:\\tmp\\db', 'M:\\db'],
              binaries=[],
              datas=[],
              hiddenimports=[],
@@ -19,15 +19,35 @@ a = Analysis(['db_logger_gui.py'],
              noarchive=False)
 pyz = PYZ(a.pure, a.zipped_data,
              cipher=block_cipher)
+
+import os
+on_vm = False
+if os.path.isfile('M:\\db\\logo_bare.png'):
+    on_vm = True
+
 exe = EXE(pyz,
           a.scripts,
+          options,
           a.binaries + [
-              ('logo_bare_xp.ico', 
-              'C:\\Users\\***REMOVED***\\git_repos\\NexusMicroscopyLIMS\\mdcs\\nexusLIMS\\nexusLIMS\\db\\logo_bare_xp.ico', 
+              ('logo_bare.png',
+              'M:\\db\\logo_bare.png' if on_vm else 'Z:\\tmp\\db\\logo_bare.png',
+              'DATA'),
+              ('logo_bare_xp.ico',
+              'M:\\db\\logo_bare_xp.ico' if on_vm else 'Z:\\tmp\\db\\logo_bare_xp.ico',
+              'DATA'),
+              ('copy.png',
+              'M:\\db\\copy.png' if on_vm else 'Z:\\tmp\\db\\copy.png',
+              'DATA'),
+              ('window-close.png',
+              'M:\\db\\window-close.png' if on_vm else 'Z:\\tmp\\db\\window-close.png',
+              'DATA'),
+              ('file.png',
+              'M:\\db\\file.png' if on_vm else 'Z:\\tmp\\db\\file.png',
               'DATA'),
               ('logo_text_250x100.png',
-              'C:\\Users\\***REMOVED***\\git_repos\\NexusMicroscopyLIMS\\mdcs\\nexusLIMS\\nexusLIMS\\db\\logo_text_250x100.png',
-              'DATA')],
+              'M:\\db\\logo_text_250x100.png' if on_vm else 'Z:\\tmp\\db\\logo_text_250x100.png',
+              'DATA')
+              ],
           a.zipfiles,
           a.datas,
           [],

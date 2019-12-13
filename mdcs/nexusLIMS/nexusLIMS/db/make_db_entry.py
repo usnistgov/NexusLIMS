@@ -36,6 +36,9 @@ import datetime
 import os
 import argparse
 import subprocess
+import time
+import sys
+import contextlib
 from uuid import uuid4
 
 
@@ -65,10 +68,13 @@ class DBSessionLogger:
         self.db_name = db_name
         self.user = user
         self.hostname = hostname
+        self.session_start_time = None
 
         if self.testing:
             # Values for testing from local machine
             self.db_path = '/mnt/***REMOVED***/'
+            # Make sure to mount cifs with nobrl option, or else sqlite will
+            # fail with a "Database is Locked" error
             self.password = None
             self.full_path = os.path.join(self.db_path, self.db_name)
             self.cpu_name = "***REMOVED***"
@@ -84,6 +90,7 @@ class DBSessionLogger:
 
         self.session_id = str(uuid4())
         self.instr_pid = None
+        self.instr_schema_name = None
 
     def log(self, to_print, this_verbosity):
         """
@@ -98,7 +105,7 @@ class DBSessionLogger:
         this_verbosity : int
             The verbosity level (higher is more verbose)
         """
-        level_dict = {0: 'WARN', 1: 'INFO', 2: 'DEBUG'}
+        level_dict = {-1: 'ERROR', 0: 'WARN', 1: 'INFO', 2: 'DEBUG'}
         str_to_log = '{}'.format(datetime.datetime.now().isoformat()) + \
                      ':{}: '.format(level_dict[this_verbosity]) + \
                      '{}'.format(to_print)
@@ -156,18 +163,17 @@ class DBSessionLogger:
         # The second line contains "pinging hostname [ip]..."
         ip = None
         have_ip = False
-        try:
-            ip_line = p.split('\r\n')[1]
-            ips = re.findall(DBSessionLogger.ip_regex, ip_line)
-            have_ip = True
-            if len(ips) == 1:
-                ip = ips[0]
-            else:
-                raise EnvironmentError('Could not find IP of network share in '
-                                       'output of nslookup command')
-            self.log('found ***REMOVED*** at {}'.format(ip), 2)
-        except ValueError as e:
-            self.log('nslookup command failed; using hostname instead', 0)
+
+        ip_line = p.split('\r\n')[1]
+        ips = re.findall(DBSessionLogger.ip_regex, ip_line)
+        have_ip = True
+        if len(ips) == 1:
+            ip = ips[0]
+        else:
+            self.log("Ping did not return a parsable IP", -1)
+            raise EnvironmentError('Could not find IP of network share in '
+                                   'output of ping command')
+        self.log('found ***REMOVED*** at {}'.format(ip), 2)
 
         mount_command = 'net use N: \\\\{}{} '.format(ip if have_ip else
                                                       self.hostname,
@@ -221,21 +227,25 @@ class DBSessionLogger:
             The PID for the instrument corresponding to this computer
         """
         # Get the instrument pid from the computer name of this computer
-        with sqlite3.connect(self.full_path) as con:
-            res = con.execute('SELECT instrument_pid from instruments WHERE '
-                              'computer_name is \'{}\''.format(self.cpu_name))
-            instrument_pid = res.fetchone()[0]
+        with contextlib.closing(sqlite3.connect(self.full_path)) as con:
+            with con as cur:
+                res = cur.execute('SELECT instrument_pid, schema_name '
+                                  'from instruments '
+                                  'WHERE '
+                                  'computer_name is '
+                                  '\'{}\''.format(self.cpu_name))
+                instrument_pid, instrument_schema_name = res.fetchone()
             self.log('Found instrument ID: {} using '.format(instrument_pid) +
                      '{}'.format(self.cpu_name), 1)
-        return instrument_pid
+        return instrument_pid, instrument_schema_name
 
-    def process_start(self):
+    def process_start(self, queue=None):
         """
         Insert a session `'START'` log for this computer's instrument
         """
         insert_statement = "INSERT INTO session_log (instrument, " \
                            " event_type, session_identifier" + \
-                           (", user)" if self.user else ") ") + \
+                           (", user) " if self.user else ") ") + \
                            "VALUES ('{}', 'START', ".format(self.instr_pid) + \
                            "'{}'".format(self.session_id) + \
                            (", '{}');".format(self.user) if self.user else ");")
@@ -243,15 +253,34 @@ class DBSessionLogger:
         self.log('insert_statement: {}'.format(insert_statement), 2)
 
         # Get last entered row with this session_id (to make sure it's correct)
-        with sqlite3.connect(self.full_path) as con:
-            _ = con.execute(insert_statement)
-            r = con.execute("SELECT * FROM session_log WHERE "
-                            "session_identifier='{}' ".format(self.session_id) +
-                            "AND event_type = 'START'"
-                            "ORDER BY timestamp DESC " +
-                            "LIMIT 1;")
-            id_session_log = r.fetchone()
+        with contextlib.closing(sqlite3.connect(self.full_path)) as con:
+            with con as cur:
+                try:
+                    _ = cur.execute(insert_statement)
+                    if queue:
+                        queue.put(('"START" session inserted into db', 3))
+                except Exception as e:
+                    if queue:
+                        queue.put(e)
+                    return
+            with con as cur:
+                try:
+                    r = cur.execute("SELECT * FROM session_log WHERE "
+                                    "session_identifier="
+                                    "'{}' ".format(self.session_id) +
+                                    "AND event_type = 'START'"
+                                    "ORDER BY timestamp DESC " +
+                                    "LIMIT 1;")
+                except Exception as e:
+                    if queue:
+                        queue.put(e)
+                    return
+                id_session_log = r.fetchone()
             self.log('Inserted row {}'.format(id_session_log), 1)
+            self.session_start_time = datetime.datetime.strptime(
+                id_session_log[3], "%Y-%m-%dT%H:%M:%S.%f")
+            if queue:
+                queue.put(('verified "START" session inserted into db', 4))
 
     def process_end(self):
         """
@@ -316,16 +345,38 @@ class DBSessionLogger:
 
             self.log('Row after updating: {}'.format(res.fetchone()), 1)
 
-    def callback_setup(self):
+    def db_logger_setup(self, queue=None):
         self.log('username is {}'.format(self.user), 1)
-        self.log('running `mount_network_share()`', 2)
-        self.mount_network_share()
+        try:
+            if sys.platform == 'win32':
+                self.log('running `mount_network_share()`', 2)
+                self.mount_network_share()
+            elif sys.platform == 'linux':
+                self.log('on linux; skipping `mount_network_share()`', 2)
+                self.log('sleeping for 2 seconds to simulate network lag', 2)
+                time.sleep(2)
+        except Exception as e:
+            queue.put(e)
+        if queue:
+            queue.put(('Mounted network share', 1))
         self.log('running `get_instr_pid()`', 2)
-        self.instr_pid = self.get_instr_pid()
+        self.instr_pid, self.instr_schema_name = self.get_instr_pid()
+        self.log('Found PID: {} and name: {}'.format(self.instr_pid,
+                                                     self.instr_schema_name), 2)
+        if queue:
+            queue.put(('Instrument PID found', 2))
 
-    def callback_teardown(self):
-        self.log('running `umount_network_share()`', 2)
-        self.umount_network_share()
+    def db_logger_teardown(self, queue=None):
+        if sys.platform == 'win32':
+            self.log('running `umount_network_share()`', 2)
+            self.umount_network_share()
+        elif sys.platform == 'linux':
+            self.log('on linux; skipping `umount_network_share()`', 2)
+            self.log('sleeping for 2 seconds to simulate network lag', 2)
+            time.sleep(2)
+        if queue:
+            queue.put(('Unmounted network share', 5))
+        self.log('Finished unmounting network share', 2)
 
 
 def cmdline_args():
@@ -363,9 +414,9 @@ def gui_start_callback(verbosity=2, testing=False):
                                 testing=testing,
                                 user=None if testing else
                                 os.environ['username'])
-    db_logger.callback_setup()
+    db_logger.db_logger_setup()
     db_logger.process_start()
-    db_logger.callback_teardown()
+    db_logger.db_logger_teardown()
 
     return db_logger
 
@@ -381,9 +432,9 @@ def gui_end_callback(db_logger):
         The session logger instance for this session (contains all the
         information about instrument, computer, session_id, etc.)
     """
-    db_logger.callback_setup()
+    db_logger.db_logger_setup()
     db_logger.process_end()
-    db_logger.callback_teardown()
+    db_logger.db_logger_teardown()
 
 
 # if __name__ == '__main__':
