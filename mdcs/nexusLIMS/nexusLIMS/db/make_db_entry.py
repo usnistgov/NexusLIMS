@@ -196,16 +196,16 @@ class DBSessionLogger:
 
         if 'error' in str(p):
             if '1312' in str(p):
-                self.log('Visit https://support.microsoft.com/en-us/help/'
-                         '968264/error-message-when-you-try-to-map-to-a-'
-                         'network-drive-of-a-dfs-share-by\n'
+                self.log('Visit https://bit.ly/38DvqVh\n'
                          'to see how to allow mounting network drives as '
                          'another user.\n'
                          '(You\'ll need to change HKLM\\System\\'
                          'CurrentControlSet\\Control\\Lsa\\DisableDomanCreds '
                          'to 0 in the registry)', 0)
             raise ConnectionError('Could not mount network share to access '
-                                  'database')
+                                  'database' + " (\"DisableDomanCreds\" "
+                                               "error)" if '1312' in str(p)
+                                               else "")
 
     def umount_network_share(self):
         """

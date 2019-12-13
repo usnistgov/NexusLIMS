@@ -616,10 +616,13 @@ if __name__ == "__main__":
         root = Tk()
         root.title('Error')
         message = "Only one instance of the NexusLIMS " + \
-                  "Session \nLogger can be run at one time. " + \
-                  "Please close \nthe existing window if " + \
-                  "you would like to start a \nnew session " \
+                  "Session Logger can be run at one time. " + \
+                  "Please close the existing window if " + \
+                  "you would like to start a new session " \
                   "and run the application again."
+        if sys.platform == 'win32':
+            message = message.replace('be run ', 'be run\n')
+            message = message.replace('like to ', 'like to\n')
         root.withdraw()
         messagebox.showerror(parent=root,
                              title="Error",
