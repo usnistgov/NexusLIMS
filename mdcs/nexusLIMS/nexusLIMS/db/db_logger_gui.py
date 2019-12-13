@@ -230,7 +230,7 @@ class MainApp(Tk):
                                             length=200,
                                             mode='determinate')
         self.loading_status_text = StringVar()
-        self.loading_status_text.set('Mounting network share...')
+        self.loading_status_text.set('Initiating session logger...')
         self.loading_status_Label = Label(self.setup_frame,
                                           foreground="#777",
                                           font='TkDefaultFont 8 italic',
@@ -336,9 +336,9 @@ class MainApp(Tk):
         self.after(100, self.watch_for_setup_result)
 
     def session_startup_worker(self):
-        self.db_logger.db_logger_setup(self.thread_queue)
-        self.db_logger.process_start(self.thread_queue)
-        self.db_logger.db_logger_teardown(self.thread_queue)
+        if self.db_logger.db_logger_setup(self.thread_queue):
+            if self.db_logger.process_start(self.thread_queue):
+                self.db_logger.db_logger_teardown(self.thread_queue)
 
     def watch_for_setup_result(self):
         """
@@ -348,6 +348,11 @@ class MainApp(Tk):
             # print(list(self.thread_queue.queue))
             res = self.thread_queue.get(0)
             if isinstance(res, Exception):
+                self.loading_pbar['value'] = 50
+                st = ttk.Style()
+                st.configure("red.Horizontal.TProgressbar",
+                             background='#990000')
+                self.loading_pbar.configure(style="red.Horizontal.TProgressbar")
                 messagebox.showerror(parent=self,
                                      title="Error",
                                      message="Error encountered during "
@@ -385,6 +390,13 @@ class MainApp(Tk):
 
         # activate the "end session" button
         self.end_button.configure(state=ACTIVE)
+
+    def on_closing(self):
+        if messagebox.askokcancel("Confirm exit", "Are you sure you want to "
+                                                  "exit? Any currently started "
+                                                  "sessions will be ended.",
+                                  icon='warning'):
+            self.destroy()
 
 
 class LogWindow(Toplevel):
@@ -472,18 +484,20 @@ class LogWindow(Toplevel):
         self.focus_force()
         if is_error:
             time_left = 5
-            self.close_button.configure(text='Close (5)',
-                                        state=DISABLED)
-            self.after(1000, lambda: self.close_button.configure(
-                text='Close (4)'))
-            self.after(2000, lambda: self.close_button.configure(
-                text='Close (3)'))
-            self.after(3000, lambda: self.close_button.configure(
-                text='Close (2)'))
-            self.after(4000, lambda: self.close_button.configure(
-                text='Close (1)'))
-            self.after(5000, lambda: self.close_button.configure(
-                text="Close", state=ACTIVE))
+            self.change_close_button(5, DISABLED)
+            self.after(1000, lambda: self.change_close_button(4))
+            self.after(2000, lambda: self.change_close_button(3))
+            self.after(3000, lambda: self.change_close_button(2))
+            self.after(4000, lambda: self.change_close_button(1))
+            self.after(5000, lambda: self.change_close_button(0, ACTIVE))
+
+    def change_close_button(self, num_to_show, state=DISABLED):
+        if num_to_show == 0:
+            self.close_button.configure(text='Close', state=state)
+        else:
+            self.close_button.configure(text='Close ({})'.format(
+                num_to_show), state=state)
+        self.close_button.grid(row=0, column=1, sticky=W, ipadx=10, padx=10)
 
     def copy_text_to_clipboard(self):
         text_content = self.text.get('1.0', 'end')
@@ -631,4 +645,5 @@ if __name__ == "__main__":
 
     screen_res = ScreenRes()
     root = MainApp(screen_res=screen_res)
+    root.protocol("WM_DELETE_WINDOW", root.on_closing)
     root.mainloop()

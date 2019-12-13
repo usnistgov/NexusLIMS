@@ -68,6 +68,7 @@ class DBSessionLogger:
         self.db_name = db_name
         self.user = user
         self.hostname = hostname
+        self.session_started = False
         self.session_start_time = None
 
         if self.testing:
@@ -96,7 +97,7 @@ class DBSessionLogger:
         """
         Log a message to the console, only printing if the given verbosity is
         equal to or lower than the global threshold. Also save it in this
-        instance's ``log`` attribute (regardless of verbosity)
+        instance's ``log_text`` attribute (regardless of verbosity)
 
         Parameters
         ----------
@@ -112,6 +113,21 @@ class DBSessionLogger:
         if this_verbosity <= self.verbosity:
             print(str_to_log)
         self.log_text += str_to_log + '\n'
+
+    def log_exception(self, e):
+        """
+        Log an exception to the console and the ``log_text``
+
+        Parameters
+        ----------
+        e : Exception
+        """
+        indent = " " * 34
+        template = indent + "Exception of type {0} occurred. Arguments:\n" + \
+                            indent + "{1!r}"
+        message = template.format(type(e).__name__, e.args)
+        print(message)
+        self.log_text += message + '\n'
 
     def run_cmd(self, cmd):
         """
@@ -242,6 +258,8 @@ class DBSessionLogger:
     def process_start(self, queue=None):
         """
         Insert a session `'START'` log for this computer's instrument
+
+        Returns True if successful, False if not
         """
         insert_statement = "INSERT INTO session_log (instrument, " \
                            " event_type, session_identifier" + \
@@ -257,12 +275,15 @@ class DBSessionLogger:
             with con as cur:
                 try:
                     _ = cur.execute(insert_statement)
+                    self.session_started = True
                     if queue:
                         queue.put(('"START" session inserted into db', 3))
                 except Exception as e:
                     if queue:
                         queue.put(e)
-                    return
+                    self.log("Error encountered while inserting \"START\" "
+                             "entry into database", -1)
+                    return False
             with con as cur:
                 try:
                     r = cur.execute("SELECT * FROM session_log WHERE "
@@ -274,13 +295,17 @@ class DBSessionLogger:
                 except Exception as e:
                     if queue:
                         queue.put(e)
-                    return
+                    self.log("Error encountered while verifying that session"
+                             "was started", -1)
+                    return False
                 id_session_log = r.fetchone()
-            self.log('Inserted row {}'.format(id_session_log), 1)
+            self.log('Verified insertion of row {}'.format(id_session_log), 1)
             self.session_start_time = datetime.datetime.strptime(
                 id_session_log[3], "%Y-%m-%dT%H:%M:%S.%f")
             if queue:
                 queue.put(('verified "START" session inserted into db', 4))
+
+            return True
 
     def process_end(self):
         """
@@ -357,26 +382,48 @@ class DBSessionLogger:
                 time.sleep(2)
         except Exception as e:
             queue.put(e)
+            self.log("Could not mount the network share holding the "
+                     "database. Details:", -1)
+            self.log_exception(e)
+            return False
         if queue:
             queue.put(('Mounted network share', 1))
         self.log('running `get_instr_pid()`', 2)
-        self.instr_pid, self.instr_schema_name = self.get_instr_pid()
+        try:
+            self.instr_pid, self.instr_schema_name = self.get_instr_pid()
+        except Exception as e:
+            queue.put(e)
+            self.log("Could not fetch instrument PID and name from database. "
+                     "Details:", -1)
+            self.log_exception(e)
+            return False
         self.log('Found PID: {} and name: {}'.format(self.instr_pid,
                                                      self.instr_schema_name), 2)
         if queue:
             queue.put(('Instrument PID found', 2))
 
+        return True
+
     def db_logger_teardown(self, queue=None):
-        if sys.platform == 'win32':
-            self.log('running `umount_network_share()`', 2)
-            self.umount_network_share()
-        elif sys.platform == 'linux':
-            self.log('on linux; skipping `umount_network_share()`', 2)
-            self.log('sleeping for 2 seconds to simulate network lag', 2)
-            time.sleep(2)
+        try:
+            if sys.platform == 'win32':
+                self.log('running `umount_network_share()`', 2)
+                self.umount_network_share()
+            elif sys.platform == 'linux':
+                self.log('on linux; skipping `umount_network_share()`', 2)
+                self.log('sleeping for 2 seconds to simulate network lag', 2)
+                time.sleep(2)
+        except Exception as e:
+            queue.put(e)
+            self.log("Could not unmount the network share holding the "
+                     "database. Details:", -1)
+            self.log_exception(e)
+            return False
         if queue:
             queue.put(('Unmounted network share', 5))
+
         self.log('Finished unmounting network share', 2)
+        return True
 
 
 def cmdline_args():
