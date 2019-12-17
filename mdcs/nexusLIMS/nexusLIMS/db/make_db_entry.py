@@ -40,6 +40,7 @@ import time
 import sys
 import contextlib
 from uuid import uuid4
+import queue
 
 
 class DBSessionLogger:
@@ -70,6 +71,9 @@ class DBSessionLogger:
         self.hostname = hostname
         self.session_started = False
         self.session_start_time = None
+        self.last_entry_type = None
+        self.last_session_id = None
+        self.progress_num = 0
 
         if self.testing:
             # Values for testing from local machine
@@ -128,6 +132,27 @@ class DBSessionLogger:
         message = template.format(type(e).__name__, e.args)
         print(message)
         self.log_text += message + '\n'
+
+    def check_exit_queue(self, thread_queue, exit_queue):
+        """
+        Check to see if a queue (``q``) has anything in it. If so,
+        immediately exit.
+
+        Parameters
+        ----------
+        thread_queue : queue.Queue
+        exit_queue : queue.Queue
+        """
+        if exit_queue is not None:
+            try:
+                res = exit_queue.get(0)
+                if res:
+                    self.log("Received termination signal from GUI thread", 0)
+                    thread_queue.put(ChildProcessError("Terminated from GUI "
+                                                       "thread"))
+                    sys.exit("Saw termination queue entry")
+            except queue.Empty:
+                pass
 
     def run_cmd(self, cmd):
         """
@@ -255,7 +280,91 @@ class DBSessionLogger:
                      '{}'.format(self.cpu_name), 1)
         return instrument_pid, instrument_schema_name
 
-    def process_start(self, queue=None):
+    def last_session_ended(self, thread_queue=None, exit_queue=None):
+        """
+        Check the database for this instrument to make sure that the last
+        entry in the db was an "END" (properly ended). If it's not, return
+        False so the GUI can query the user for additional input on how to
+        proceed.
+
+        Parameters
+        ----------
+        thread_queue : queue.Queue
+            Main queue for communication with the GUI
+        exit_queue : queue.Queue
+            Queue containing any errors so the GUI knows to exit as needed
+
+        Returns
+        -------
+        state_is_consistent : bool
+            If the database is consistent (i.e. the last log for this
+            instrument is an "END" log), return True. If not (it's a "START"
+            log), return False
+        """
+        try:
+            self.check_exit_queue(thread_queue, exit_queue)
+            if self.instr_pid is None:
+                raise AttributeError(
+                    "Instrument PID must be set before checking "
+                    "the database for any related sessions")
+        except Exception as e:
+            if thread_queue:
+                thread_queue.put(e)
+            self.log("Error encountered while checking that last record for "
+                     "this instrument was an \"END\" log", -1)
+            return False
+
+        # Get last inserted line for this instrument
+        query_statement = 'SELECT event_type, session_identifier ' \
+                          'FROM session_log WHERE ' \
+                          'instrument = "{}" '.format(self.instr_pid) + \
+                          'ORDER BY timestamp DESC LIMIT 1'
+
+        self.log('last_session_ended query: {}'.format(query_statement), 2)
+
+        self.check_exit_queue(thread_queue, exit_queue)
+        with contextlib.closing(sqlite3.connect(self.full_path)) as con:
+            with con as cur:
+                try:
+                    self.check_exit_queue(thread_queue, exit_queue)
+                    res = cur.execute(query_statement)
+                    self.last_entry_type, self.last_session_id = res.fetchone()
+                    if self.last_entry_type == "END":
+                        self.log('Verified database consistency for the '
+                                 '{}'.format(self.instr_schema_name), 1)
+                        if thread_queue:
+                            thread_queue.put(('Verified database consistency '
+                                              'for the {}'.format(
+                                                  self.instr_schema_name),
+                                              self.progress_num))
+                            self.progress_num += 1
+                        return True
+                    elif self.last_entry_type == "START":
+                        self.log('Database is inconsistent for the'
+                                 '{} '.format(self.instr_schema_name) +
+                                 '(last entry was a "START")', 0)
+                        if thread_queue:
+                            thread_queue.put(('Database is inconsistent!',
+                                              self.progress_num))
+                            self.progress_num += 1
+                        return False
+                    else:
+                        raise sqlite3.IntegrityError(
+                            "Last entry for the "
+                            "{} ".format(self.instr_schema_name) +
+                            "was neither \"START\" or \"END\" (value was "
+                            "\"{}\")".format(self.last_entry_type))
+                except Exception as e:
+                    if thread_queue:
+                        thread_queue.put(e)
+                    self.log("Error encountered while verifying "
+                             "database consistency for the "
+                             "{}".format(self.instr_schema_name), -1)
+                    self.log_exception(e)
+                    return False
+        pass
+
+    def process_start(self, thread_queue=None, exit_queue=None):
         """
         Insert a session `'START'` log for this computer's instrument
 
@@ -270,22 +379,27 @@ class DBSessionLogger:
 
         self.log('insert_statement: {}'.format(insert_statement), 2)
 
+        self.check_exit_queue(thread_queue, exit_queue)
         # Get last entered row with this session_id (to make sure it's correct)
         with contextlib.closing(sqlite3.connect(self.full_path)) as con:
             with con as cur:
                 try:
+                    self.check_exit_queue(thread_queue, exit_queue)
                     _ = cur.execute(insert_statement)
                     self.session_started = True
-                    if queue:
-                        queue.put(('"START" session inserted into db', 3))
+                    if thread_queue:
+                        thread_queue.put(('"START" session inserted into db',
+                                          self.progress_num))
+                        self.progress_num += 1
                 except Exception as e:
-                    if queue:
-                        queue.put(e)
+                    if thread_queue:
+                        thread_queue.put(e)
                     self.log("Error encountered while inserting \"START\" "
                              "entry into database", -1)
                     return False
             with con as cur:
                 try:
+                    self.check_exit_queue(thread_queue, exit_queue)
                     r = cur.execute("SELECT * FROM session_log WHERE "
                                     "session_identifier="
                                     "'{}' ".format(self.session_id) +
@@ -293,21 +407,24 @@ class DBSessionLogger:
                                     "ORDER BY timestamp DESC " +
                                     "LIMIT 1;")
                 except Exception as e:
-                    if queue:
-                        queue.put(e)
+                    if thread_queue:
+                        thread_queue.put(e)
                     self.log("Error encountered while verifying that session"
                              "was started", -1)
                     return False
                 id_session_log = r.fetchone()
+            self.check_exit_queue(thread_queue, exit_queue)
             self.log('Verified insertion of row {}'.format(id_session_log), 1)
             self.session_start_time = datetime.datetime.strptime(
                 id_session_log[3], "%Y-%m-%dT%H:%M:%S.%f")
-            if queue:
-                queue.put(('verified "START" session inserted into db', 4))
+            if thread_queue:
+                thread_queue.put(('Verified "START" session inserted into db',
+                                  self.progress_num))
+                self.progress_num += 1
 
             return True
 
-    def process_end(self):
+    def process_end(self, thread_queue=None, exit_queue=None):
         """
         Insert a session `'END'` log for this computer's instrument,
         and change the status of the corresponding `'START'` entry from
@@ -338,41 +455,109 @@ class DBSessionLogger:
         with sqlite3.connect(self.full_path) as con:
             self.log('Inserting END; insert_statement: {}'.format(
                 insert_statement), 2)
-            _ = con.execute(insert_statement)
+            try:
+                self.check_exit_queue(thread_queue, exit_queue)
+                _ = con.execute(insert_statement)
+                if thread_queue:
+                    thread_queue.put(('"END" session log inserted into db',
+                                      self.progress_num))
+                    self.progress_num += 1
+            except Exception as e:
+                if thread_queue:
+                    thread_queue.put(e)
+                self.log("Error encountered while insert \"END\" log for "
+                         "session", -1)
+                return False
 
-            res = con.execute('SELECT * FROM session_log WHERE '
-                              'id_session_log = last_insert_rowid();')
+            try:
+                self.check_exit_queue(thread_queue, exit_queue)
+                res = con.execute("SELECT * FROM session_log WHERE "
+                                  "session_identifier="
+                                  "'{}' ".format(self.session_id) +
+                                  "AND event_type = 'END'"
+                                  "ORDER BY timestamp DESC " +
+                                  "LIMIT 1;")
+            except Exception as e:
+                if thread_queue:
+                    thread_queue.put(e)
+                self.log("Error encountered while verifying that session"
+                         "was ended", -1)
+                return False
             id_session_log = res.fetchone()
             self.log('Inserted row {}'.format(id_session_log), 1)
+            if thread_queue:
+                thread_queue.put(('Verified "END" session inserted into db',
+                                  self.progress_num))
+                self.progress_num += 1
 
-            res = con.execute(get_last_start_id_query)
-            results = res.fetchall()
-            if len(results) == 0:
-                raise LookupError("No matching 'START' event found")
-            elif len(results) > 1:
-                raise LookupError("More than one 'START' event found with "
-                                  "session_identifier = "
-                                  "'{}'".format(self.session_id))
-            last_start_id = results[-1][0]
-            self.log('SELECT instrument results: {}'.format(last_start_id), 2)
+            try:
+                self.check_exit_queue(thread_queue, exit_queue)
+                res = con.execute(get_last_start_id_query)
+                results = res.fetchall()
+                if len(results) == 0:
+                    raise LookupError("No matching 'START' event found")
+                elif len(results) > 1:
+                    raise LookupError("More than one 'START' event found with "
+                                      "session_identifier = "
+                                      "'{}'".format(self.session_id))
+                last_start_id = results[-1][0]
+                self.log('SELECT instrument results: {}'.format(last_start_id),
+                         2)
+                if thread_queue:
+                    thread_queue.put(('Matching "START" session log found',
+                                      self.progress_num))
+                    self.progress_num += 1
+            except Exception as e:
+                if thread_queue:
+                    thread_queue.put(e)
+                self.log("Error encountered while getting matching \"START\" "
+                         "log", -1)
+                return False
 
-            # Update previous START event record status
-            res = con.execute("SELECT * FROM session_log WHERE " +
-                              "id_session_log = {}".format(last_start_id))
-            self.log('Row to be updated: {}'.format(res.fetchone()), 1)
-            update_statement = "UPDATE session_log SET " + \
-                               "record_status = 'TO_BE_BUILT' WHERE " + \
-                               "id_session_log = {}".format(last_start_id)
-            _ = con.execute(update_statement)
+            try:
+                # Update previous START event record status
+                self.check_exit_queue(thread_queue, exit_queue)
+                res = con.execute("SELECT * FROM session_log WHERE " +
+                                  "id_session_log = {}".format(last_start_id))
+                self.log('Row to be updated: {}'.format(res.fetchone()), 1)
+                if thread_queue:
+                    thread_queue.put(('Matching "START" session log found',
+                                      self.progress_num))
+                    self.progress_num += 1
+                update_statement = "UPDATE session_log SET " + \
+                                   "record_status = 'TO_BE_BUILT' WHERE " + \
+                                   "id_session_log = {}".format(last_start_id)
+                self.check_exit_queue(thread_queue, exit_queue)
+                _ = con.execute(update_statement)
+                if thread_queue:
+                    thread_queue.put(('Matching "START" session log\'s status '
+                                      'updated',
+                                      self.progress_num))
+                    self.progress_num += 1
 
-            res = con.execute("SELECT * FROM session_log WHERE " +
-                              "id_session_log = {}".format(last_start_id))
+                self.check_exit_queue(thread_queue, exit_queue)
+                res = con.execute("SELECT * FROM session_log WHERE " +
+                                  "id_session_log = {}".format(last_start_id))
+                if thread_queue:
+                    thread_queue.put(('Verified updated row',
+                                      self.progress_num))
+                    self.progress_num += 1
+            except Exception as e:
+                if thread_queue:
+                    thread_queue.put(e)
+                self.log("Error encountered while updating matching \"START\" "
+                         "log's status", -1)
+                return False
 
             self.log('Row after updating: {}'.format(res.fetchone()), 1)
+            self.log('Finished ending session {}'.format(self.session_id), 1)
 
-    def db_logger_setup(self, queue=None):
+            return True
+
+    def db_logger_setup(self, thread_queue=None, exit_queue=None):
         self.log('username is {}'.format(self.user), 1)
         try:
+            self.check_exit_queue(thread_queue, exit_queue)
             if sys.platform == 'win32':
                 self.log('running `mount_network_share()`', 2)
                 self.mount_network_share()
@@ -381,31 +566,40 @@ class DBSessionLogger:
                 self.log('sleeping for 2 seconds to simulate network lag', 2)
                 time.sleep(2)
         except Exception as e:
-            queue.put(e)
+            thread_queue.put(e)
             self.log("Could not mount the network share holding the "
                      "database. Details:", -1)
             self.log_exception(e)
             return False
-        if queue:
-            queue.put(('Mounted network share', 1))
+        if thread_queue:
+            self.progress_num = 1
+            thread_queue.put(('Mounted network share', self.progress_num))
+            self.progress_num += 1
         self.log('running `get_instr_pid()`', 2)
         try:
+            self.check_exit_queue(thread_queue, exit_queue)
             self.instr_pid, self.instr_schema_name = self.get_instr_pid()
         except Exception as e:
-            queue.put(e)
+            thread_queue.put(e)
             self.log("Could not fetch instrument PID and name from database. "
                      "Details:", -1)
             self.log_exception(e)
             return False
         self.log('Found PID: {} and name: {}'.format(self.instr_pid,
                                                      self.instr_schema_name), 2)
-        if queue:
-            queue.put(('Instrument PID found', 2))
+        if thread_queue:
+            thread_queue.put(('Instrument PID found', self.progress_num))
+            self.progress_num += 1
 
         return True
 
-    def db_logger_teardown(self, queue=None):
+    def db_logger_teardown(self, thread_queue=None, exit_queue=None):
         try:
+            if thread_queue:
+                thread_queue.put(('Unmounting the database network share',
+                                  self.progress_num))
+                self.progress_num += 1
+            self.check_exit_queue(thread_queue, exit_queue)
             if sys.platform == 'win32':
                 self.log('running `umount_network_share()`', 2)
                 self.umount_network_share()
@@ -414,13 +608,14 @@ class DBSessionLogger:
                 self.log('sleeping for 2 seconds to simulate network lag', 2)
                 time.sleep(2)
         except Exception as e:
-            queue.put(e)
+            thread_queue.put(e)
             self.log("Could not unmount the network share holding the "
                      "database. Details:", -1)
             self.log_exception(e)
             return False
-        if queue:
-            queue.put(('Unmounted network share', 5))
+        if thread_queue:
+            thread_queue.put(('Unmounted network share', self.progress_num))
+            self.progress_num += 1
 
         self.log('Finished unmounting network share', 2)
         return True

@@ -181,8 +181,14 @@ class MainApp(Tk):
                                             testing=testing,
                                             user=None if testing else
                                             os.environ['username'])
-        self.thread_queue = None
-        self.thread = None
+        self.startup_thread_queue = queue.Queue()
+        # a separate queue that will contain either nothing, or an instruction
+        # to exit (from the GUI to the make_db_entry code)
+        self.startup_thread_exit_queue = queue.Queue()
+        self.startup_thread = None
+        self.end_thread_queue = queue.Queue()
+        self.end_thread_exit_queue = queue.Queue()
+        self.end_thread = None
 
         self.screen_res = ScreenRes() if screen_res is None else screen_res
         self.style = ttk.Style()
@@ -292,6 +298,7 @@ class MainApp(Tk):
                                  padx=5, pady=5,
                                  state=DISABLED,
                                  compound=LEFT,
+                                 command=self.session_end,
                                  image=self.end_icon)
         ToolTip(self.end_button,
                 self.tooltip_font,
@@ -329,41 +336,43 @@ class MainApp(Tk):
         self.session_startup()
 
     def session_startup(self):
-        # do this in a separate thread (since it could take some time)
-        self.thread_queue = queue.Queue()
-        self.thread = threading.Thread(target=self.session_startup_worker)
-        self.thread.start()
-        self.after(100, self.watch_for_setup_result)
+        self.startup_thread = threading.Thread(
+            target=self.session_startup_worker)
+        self.startup_thread.start()
+        self.after(100, self.watch_for_startup_result)
 
     def session_startup_worker(self):
-        if self.db_logger.db_logger_setup(self.thread_queue):
-            if self.db_logger.process_start(self.thread_queue):
-                self.db_logger.db_logger_teardown(self.thread_queue)
+        if self.db_logger.db_logger_setup(
+                self.startup_thread_queue,
+                self.startup_thread_exit_queue):
+            if self.db_logger.last_session_ended(
+                    self.startup_thread_queue,
+                    self.startup_thread_exit_queue):
+                if self.db_logger.process_start(
+                        self.startup_thread_queue,
+                        self.startup_thread_exit_queue):
+                    self.db_logger.db_logger_teardown(
+                        self.startup_thread_queue,
+                        self.startup_thread_exit_queue)
+            else:
+                # we got an inconsistent state from the DB, so ask user
+                # what to do about it
+                response = HangingSessionDialog(self,
+                                                screen_res=screen_res).show()
+                print('Response is: {}'.format(response))
 
-    def watch_for_setup_result(self):
+    def watch_for_startup_result(self):
         """
         Check if there is something in the queue
         """
         try:
-            # print(list(self.thread_queue.queue))
-            res = self.thread_queue.get(0)
-            if isinstance(res, Exception):
-                self.loading_pbar['value'] = 50
-                st = ttk.Style()
-                st.configure("red.Horizontal.TProgressbar",
-                             background='#990000')
-                self.loading_pbar.configure(style="red.Horizontal.TProgressbar")
-                messagebox.showerror(parent=self,
-                                     title="Error",
-                                     message="Error encountered during "
-                                             "session setup: \n\n" +
-                                             str(res))
-                lw = LogWindow(screen_res, db_logger=self.db_logger,
-                               is_error=True)
-                lw.mainloop()
-            print('queue.res: {}'.format(res[0]))
-            self.loading_status_text.set(res[0] + '...')
-            self.loading_pbar['value'] = int(res[1] * 20)
+            # print(list(self.startup_thread_queue.queue))
+            res = self.startup_thread_queue.get(0)
+            self.show_error_if_needed(res)
+            # print('queue.res: {}'.format(res[0]))
+            self.loading_status_text.set(res[0] +
+                                         '...' if '!' not in res[0] else res[0])
+            self.loading_pbar['value'] = int(res[1]/7.0 * 100)
             self.update()
             if res[0] == 'Unmounted network share':
                 time.sleep(0.5)
@@ -372,9 +381,25 @@ class MainApp(Tk):
                     format_date(self.db_logger.session_start_time))
                 self.done_loading()
             else:
-                self.after(100, self.watch_for_setup_result)
+                self.after(100, self.watch_for_startup_result)
         except queue.Empty:
-            self.after(100, self.watch_for_setup_result)
+            self.after(100, self.watch_for_startup_result)
+
+    def show_error_if_needed(self, res):
+        if isinstance(res, Exception):
+            self.loading_pbar['value'] = 50
+            st = ttk.Style()
+            st.configure("red.Horizontal.TProgressbar",
+                         background='#990000')
+            self.loading_pbar.configure(style="red.Horizontal.TProgressbar")
+            messagebox.showerror(parent=self,
+                                 title="Error",
+                                 message="Error encountered during "
+                                         "session setup: \n\n" +
+                                         str(res))
+            lw = LogWindow(screen_res, db_logger=self.db_logger,
+                           is_error=True)
+            lw.mainloop()
 
     def done_loading(self):
         # Remove the setup_frame contents
@@ -391,12 +416,172 @@ class MainApp(Tk):
         # activate the "end session" button
         self.end_button.configure(state=ACTIVE)
 
+    def switch_gui_to_end(self):
+        # Remove the setup_frame contents
+        self.running_frame.grid_forget()
+
+        # grid the setup_frame contents again
+        self.setup_frame.grid(row=1, column=0)
+
+        # deactivate the "end session" button
+        self.end_button.configure(state=DISABLED)
+
+    def session_end(self):
+        # signal the startup thread to exit (if it's still running)
+        self.startup_thread_exit_queue.put(True)
+        # pass
+        # do this in a separate end_thread (since it could take some time)
+        if not self.db_logger.session_started:
+            messagebox.showinfo("No session started",
+                                "There was not a session started, so nothing "
+                                "will be done. The logger will now exit.",
+                                icon='warning')
+            self.destroy()
+        else:
+            print('Starting session_end thread')
+            self.end_thread = threading.Thread(target=self.session_end_worker)
+            self.end_thread.start()
+            self.loading_Label.configure(text="Please wait while the session "
+                                              "end is logged to the "
+                                              "database...\n(this window will "
+                                              "close when completed)")
+            self.switch_gui_to_end()
+            self.loading_pbar['value'] = 0
+            self.loading_status_text.set('Ending the session...')
+            self.after(100, self.watch_for_end_result)
+
+    def session_end_worker(self):
+        if self.db_logger.db_logger_setup(self.end_thread_queue,
+                                          self.end_thread_exit_queue):
+            if self.db_logger.process_end(self.end_thread_queue,
+                                          self.end_thread_exit_queue):
+                self.db_logger.db_logger_teardown(self.end_thread_queue,
+                                                  self.end_thread_exit_queue)
+
+    def watch_for_end_result(self):
+        """
+        Check if there is something in the queue
+        """
+        try:
+            # print(list(self.end_thread_queue.queue))
+            res = self.end_thread_queue.get(0)
+            self.show_error_if_needed(res)
+            # print('queue.res: {}'.format(res[0]))
+            self.loading_status_text.set(res[0] + '...')
+            self.loading_pbar['value'] = int(res[1]/10.0 * 100)
+            self.update()
+            if res[0] == 'Unmounted network share':
+                self.after(5000, self.destroy)
+                self.close_warning(5)
+                self.after(1000, lambda: self.close_warning(4))
+                self.after(2000, lambda: self.close_warning(3))
+                self.after(3000, lambda: self.close_warning(2))
+                self.after(4000, lambda: self.close_warning(1))
+                self.after(5000, lambda: self.close_warning(0))
+            else:
+                self.after(100, self.watch_for_end_result)
+        except queue.Empty:
+            self.after(100, self.watch_for_end_result)
+
+    def close_warning(self, num_to_show):
+        self.loading_status_text.set('Closing window in {} '
+                                     'seconds...'.format(num_to_show))
+
     def on_closing(self):
         if messagebox.askokcancel("Confirm exit", "Are you sure you want to "
                                                   "exit? Any currently started "
                                                   "sessions will be ended.",
                                   icon='warning'):
-            self.destroy()
+            self.session_end()
+
+
+class HangingSessionDialog(Toplevel):
+    def __init__(self, parent, screen_res=None):
+        self.response = StringVar()
+        self.screen_res = ScreenRes() if screen_res is None else screen_res
+        Toplevel.__init__(self, parent)
+        self.geometry(self.screen_res.get_center_geometry_string(350, 175))
+        self.grab_set()
+        self.title("Incomplete session warning")
+        self.protocol("WM_DELETE_WINDOW", self.destroy)
+
+        self.bell()
+
+        self.new_icon = PhotoImage(file=resource_path('file-plus.png'))
+        self.continue_icon = PhotoImage(file=resource_path(
+            'arrow-alt-circle-right.png'))
+        self.error_icon = PhotoImage(file=resource_path('error-icon.png'))
+
+        self.top_frame = Frame(self)
+        self.button_frame = Frame(self, padx=15, pady=10)
+        self.label_frame = Frame(self.top_frame)
+
+        self.top_label = Label(self.label_frame,
+                               text="Warning!",
+                               font=("TkDefaultFont", 12, "bold"),
+                               wraplength=250,
+                               anchor='w',
+                               justify='left',
+                               )
+        self.warn_label = Label(self.label_frame,
+                                wraplength=220,
+                                anchor='w',
+                                justify='left',
+                                text="An interrupted session was "
+                                     "found in the database for this "
+                                     "instrument. Would you like to continue "
+                                     "that existing session, or start a new "
+                                     "one?")
+
+        self.error_icon_label = ttk.Label(self.top_frame,
+                                          background=self['background'],
+                                          foreground="#000000",
+                                          relief="flat",
+                                          image=self.error_icon)
+
+        self.continue_button = Button(self.button_frame,
+                                      text='Continue',
+                                      command=self.click_continue,
+                                      padx=10, pady=5, width=80,
+                                      compound=LEFT,
+                                      image=self.continue_icon)
+        self.new_button = Button(self.button_frame,
+                                 text='New session',
+                                 command=self.click_new,
+                                 padx=10, pady=5, width=80,
+                                 compound=LEFT,
+                                 image=self.new_icon)
+
+        self.top_frame.grid(row=0, column=0)
+        self.error_icon_label.grid(column=0, row=0, padx=20, pady=25)
+        self.label_frame.grid(column=1, row=0, padx=0, pady=0)
+        self.top_label.grid(row=0, column=0, padx=10, pady=0, sticky=(W,S))
+        self.warn_label.grid(row=1, column=0, padx=10, pady=(5,0))
+
+        self.button_frame.grid(row=1, column=0,
+                               sticky=S, ipadx=10, ipady=5)
+        self.continue_button.grid(row=0, column=0, sticky=E, padx=15)
+        self.new_button.grid(row=0, column=1, sticky=W, padx=15)
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+
+        self.focus_force()
+        self.resizable(False, False)
+        self.transient(parent)
+
+    def show(self):
+        self.wm_deiconify()
+        self.focus_force()
+        self.wait_window()
+        return self.response.get()
+
+    def click_new(self):
+        self.response.set('new')
+        self.destroy()
+
+    def click_continue(self):
+        self.response.set('continue')
+        self.destroy()
 
 
 class LogWindow(Toplevel):
