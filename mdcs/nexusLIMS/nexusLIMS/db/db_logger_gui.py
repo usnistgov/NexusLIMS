@@ -8,6 +8,9 @@ import make_db_entry as db
 import threading
 import queue
 import pyperclip
+from uuid import uuid4
+from datetime import datetime
+import subprocess
 
 
 def check_singleton():
@@ -21,7 +24,6 @@ def check_singleton():
                     pinfo = proc.as_dict(attrs=['pid', 'name', 'username'])
                     if pinfo['name'] == 'db_logger_gui.exe':
                         db_logger_exe_count += 1
-                        # print(pinfo['pid'], pinfo['name'])
                 except psutil.NoSuchProcess:
                     pass
                 else:
@@ -60,7 +62,7 @@ def resource_path(relative_path):
     return pth
 
 
-def format_date(dt):
+def format_date(dt, with_newline=True):
     """
     Format a datetime object in our preferred format
 
@@ -73,44 +75,46 @@ def format_date(dt):
     datestring : str
         A datetime formatted in our preferred format
     """
-    datestring = dt.strftime("%a %b %d, %Y\n%I:%M:%S %p")
+    datestring = dt.strftime("%a %b %d, %Y" +
+                             ("\n" if with_newline else " at ") +
+                             "%I:%M:%S %p")
     return datestring
 
 
 class ScreenRes:
-    def __init__(self):
+    def __init__(self, db_logger):
         """
         When an instance of this class is created, the screen is queried for its
         dimensions. This is done once, so as to limit the number of calls to
         external programs.
+
+        Can provide a db_logger instance (from MainApp) if output should be
+        logged to the LogWindow
         """
         default_screen_dims = ('800', '600')
         try:
             if sys.platform == 'win32':
                 cmd = 'wmic path Win32_VideoController get ' + \
                       'CurrentHorizontalResolution, CurrentVerticalResolution'
-                # Tested working in Windows XP and Windows 10
-                screen_dims = tuple(
-                    map(int, os.popen(cmd).read().split()[-2::]))
-                print('INFO: Found "raw" Windows resolution of {}'.format(
-                    screen_dims))
+                output = db_logger.run_cmd(cmd).split()[-2::]
+                # Tested working in Windows XP and Windows 7/10
+                screen_dims = tuple(map(int, output))
+                db_logger.log('(SCREENRES) Found "raw" Windows resolution '
+                              'of {}'.format(screen_dims), 2)
 
                 # Get the DPI of the screen so we can adjust the resolution
                 cmd = r'reg query "HKCU\Control Panel\Desktop\WindowMetrics" ' \
                       r'/v AppliedDPI'
                 # pick off last value, which is DPI in hex, and convert to
                 # decimal:
-                try:
-                    dpi = int(os.popen(cmd).read().split()[-1], 16)
-                except Exception as e:
-                    print('WARNING: DPI detection did not work with error: '
-                          '{}'.format(e))
-                    dpi = 96
+                dpi = 96
+                dpi = int(db_logger.run_cmd(cmd).split()[-1], 16)
                 scale_factor = dpi / 96
                 screen_dims = tuple(int(dim/scale_factor)
                                     for dim in screen_dims)
-                print("INFO: Scale factor {}; Scaled ".format(scale_factor) +
-                      "resolution is {}".format(screen_dims))
+                db_logger.log("(SCREENRES) Found DPI of {}; ".format(dpi) +
+                              "Scale factor {}; Scaled ".format(scale_factor) +
+                              "resolution is {}".format(screen_dims), 2)
 
             elif sys.platform == 'linux':
                 cmd = 'xrandr'
@@ -118,14 +122,16 @@ class ScreenRes:
                 result = re.search(r'primary (\d+)x(\d+)', screen_dims)
                 screen_dims = result.groups() if result else default_screen_dims
                 screen_dims = tuple(map(int, screen_dims))
-                print('INFO: Found Linux resolution of {}'.format(
-                    screen_dims))
+                db_logger.log('(SCREENRES) Found Linux resolution of '
+                              '{}'.format(screen_dims), 2)
+
             else:
                 screen_dims = default_screen_dims
         except Exception as e:
-            print("WARNING: Caught exception when determining screen "
-                  "resolution: {}".format(e))
-            print("         Using default of {}".format(default_screen_dims))
+            db_logger.log("(SCREENRES) Caught exception when determining "
+                          "screen resolution: {}".format(e) + '\n' +
+                          " " * 34 + "Using default of "
+                          "{}".format(default_screen_dims), 0)
             screen_dims = default_screen_dims
         self.screen_dims = screen_dims
 
@@ -161,26 +167,23 @@ class ScreenRes:
 
 
 class MainApp(Tk):
-    def __init__(self, screen_res=None):
+    def __init__(self, db_logger, screen_res=None):
         """
         This class configures and populates the main toplevel window. ``top`` is
         the toplevel containing window.
 
         Parameters
         ----------
-        top : tkinter window
-            The top level containing window
+        db_logger : make_db_entry.DBSessionLogger
+            Instance of the database logger that actually does the
+            communication with the database
         screen_res : ScreenRes
             An instance of the screen resolution class to help determine where
             to place the window in the center of the screen
         """
         super(MainApp, self).__init__()
-        testing = sys.platform != 'win32'
-        print('INFO: Creating the session logger instance')
-        self.db_logger = db.DBSessionLogger(verbosity=2,
-                                            testing=testing,
-                                            user=None if testing else
-                                            os.environ['username'])
+        self.db_logger = db_logger
+        self.db_logger.log('(GUI) Creating the session logger instance', 1)
         self.startup_thread_queue = queue.Queue()
         # a separate queue that will contain either nothing, or an instruction
         # to exit (from the GUI to the make_db_entry code)
@@ -220,6 +223,7 @@ class MainApp(Tk):
                 self.tooltip_font,
                 'Brought to you by the NIST Office of Data and Informatics '
                 'and the Electron Microscopy Nexus',
+                header_msg='NexusLIMS',
                 delay=0.25)
 
         # Loading information that is hidden after session is established
@@ -235,6 +239,7 @@ class MainApp(Tk):
                                             orient=HORIZONTAL,
                                             length=200,
                                             mode='determinate')
+        self.loading_pbar_length = 7.0
         self.loading_status_text = StringVar()
         self.loading_status_text.set('Initiating session logger...')
         self.loading_status_Label = Label(self.setup_frame,
@@ -302,14 +307,15 @@ class MainApp(Tk):
                                  image=self.end_icon)
         ToolTip(self.end_button,
                 self.tooltip_font,
-                "Ending the session will close this window and trigger a record"
-                " of the session to be built (don't click unless you're sure "
-                "you've saved all your data!)", delay=0.25)
+                "Ending the session will close this window and start the record"
+                " building process (don't click unless you're sure you've "
+                "saved all your data to the network share!)",
+                header_msg='Warning!',
+                delay=0.00)
         self.log_icon = PhotoImage(file=resource_path('file.png'))
         self.log_button = Button(self.button_frame,
                                  text="Show debug log",
-                                 command=lambda: LogWindow(screen_res,
-                                                           self.db_logger),
+                                 command=lambda: LogWindow(parent=self),
                                  padx=5, pady=5,
                                  compound=LEFT,
                                  image=self.log_icon)
@@ -331,7 +337,7 @@ class MainApp(Tk):
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
         self.setup_frame.rowconfigure(0, weight=1)
-        print('INFO: Created the top level window')
+        self.db_logger.log('(GUI) Created the top level window', 1)
 
         self.session_startup()
 
@@ -339,12 +345,16 @@ class MainApp(Tk):
         self.startup_thread = threading.Thread(
             target=self.session_startup_worker)
         self.startup_thread.start()
+        self.loading_pbar_length = 7.0
         self.after(100, self.watch_for_startup_result)
 
     def session_startup_worker(self):
+        # each of these methods will return True if they succeed, and we only
+        # want to continue with each one if the last ones succeeded
         if self.db_logger.db_logger_setup(
                 self.startup_thread_queue,
                 self.startup_thread_exit_queue):
+            # Check to make sure that the last session was ended
             if self.db_logger.last_session_ended(
                     self.startup_thread_queue,
                     self.startup_thread_exit_queue):
@@ -358,30 +368,74 @@ class MainApp(Tk):
                 # we got an inconsistent state from the DB, so ask user
                 # what to do about it
                 response = HangingSessionDialog(self,
+                                                self.db_logger,
                                                 screen_res=screen_res).show()
-                print('Response is: {}'.format(response))
+                if response == 'new':
+                    # we need to end the existing session that was found
+                    # and then create a new one by changing the session_id to
+                    # a new UUID4 and running process_start
+                    self.loading_pbar_length = 13.0
+                    self.db_logger.session_id = self.db_logger.last_session_id
+                    self.db_logger.log('Chose to start a new session; '
+                                       'ending the existing session with id '
+                                       '{}'.format(self.db_logger.session_id),
+                                       1)
+                    if self.db_logger.process_end(
+                            self.startup_thread_queue,
+                            self.startup_thread_exit_queue):
+                        self.db_logger.session_id = str(uuid4())
+                        self.db_logger.log(
+                            'Starting a new session with new id '
+                            '{}'.format(self.db_logger.session_id), 1)
+                        if self.db_logger.process_start(
+                                self.startup_thread_queue,
+                                self.startup_thread_exit_queue):
+                            self.db_logger.db_logger_teardown(
+                                self.startup_thread_queue,
+                                self.startup_thread_exit_queue)
+                elif response == 'continue':
+                    # we set the session_id to the one that was previously
+                    # found (and set the time accordingly, and only run the
+                    # teardown instead of process_start
+                    self.loading_pbar_length = 5.0
+                    self.running_Label_1.configure(text='Continuing the last '
+                                                        'session for the')
+                    self.running_Label_2.configure(text=' started at ')
+                    self.db_logger.session_id = self.db_logger.last_session_id
+                    self.db_logger.log('Chose to continue the existing '
+                                       'session; setting the logger\'s '
+                                       'session_id to the existing value '
+                                       '{}'.format(self.db_logger.session_id),
+                                       1)
+                    self.db_logger.session_started = True
+                    self.db_logger.session_start_time = datetime.strptime(
+                        self.db_logger.last_session_ts, "%Y-%m-%dT%H:%M:%S.%f")
+                    self.db_logger.db_logger_teardown(
+                        self.startup_thread_queue,
+                        self.startup_thread_exit_queue)
 
     def watch_for_startup_result(self):
         """
         Check if there is something in the queue
         """
         try:
-            # print(list(self.startup_thread_queue.queue))
             res = self.startup_thread_queue.get(0)
             self.show_error_if_needed(res)
-            # print('queue.res: {}'.format(res[0]))
-            self.loading_status_text.set(res[0] +
-                                         '...' if '!' not in res[0] else res[0])
-            self.loading_pbar['value'] = int(res[1]/7.0 * 100)
-            self.update()
-            if res[0] == 'Unmounted network share':
-                time.sleep(0.5)
-                self.instr_string.set(self.db_logger.instr_schema_name)
-                self.datetime_string.set(
-                    format_date(self.db_logger.session_start_time))
-                self.done_loading()
-            else:
-                self.after(100, self.watch_for_startup_result)
+            if not isinstance(res, Exception):
+                self.loading_status_text.set(res[0] +
+                                             '...' if '!' not in res[0]
+                                             else res[0])
+                self.loading_pbar['value'] = int(res[1]/
+                                                 self.loading_pbar_length * 100)
+                self.update()
+                if res[0] == 'Unmounted network share':
+                    time.sleep(0.5)
+                    self.instr_string.set(self.db_logger.instr_schema_name)
+                    self.datetime_string.set(
+                        format_date(self.db_logger.session_start_time))
+                    self.done_loading()
+                else:
+                    self.after(100, self.watch_for_startup_result)
         except queue.Empty:
             self.after(100, self.watch_for_startup_result)
 
@@ -397,8 +451,7 @@ class MainApp(Tk):
                                  message="Error encountered during "
                                          "session setup: \n\n" +
                                          str(res))
-            lw = LogWindow(screen_res, db_logger=self.db_logger,
-                           is_error=True)
+            lw = LogWindow(parent=self, is_error=True)
             lw.mainloop()
 
     def done_loading(self):
@@ -433,12 +486,13 @@ class MainApp(Tk):
         # do this in a separate end_thread (since it could take some time)
         if not self.db_logger.session_started:
             messagebox.showinfo("No session started",
-                                "There was not a session started, so nothing "
-                                "will be done. The logger will now exit.",
+                                "A session was never started, so the logger "
+                                "will exit without sending a log to the "
+                                "database.",
                                 icon='warning')
             self.destroy()
         else:
-            print('Starting session_end thread')
+            self.db_logger.log('(GUI) Starting session_end thread', 2)
             self.end_thread = threading.Thread(target=self.session_end_worker)
             self.end_thread.start()
             self.loading_Label.configure(text="Please wait while the session "
@@ -446,6 +500,7 @@ class MainApp(Tk):
                                               "database...\n(this window will "
                                               "close when completed)")
             self.switch_gui_to_end()
+            self.loading_pbar_length = 10.0
             self.loading_pbar['value'] = 0
             self.loading_status_text.set('Ending the session...')
             self.after(100, self.watch_for_end_result)
@@ -463,21 +518,20 @@ class MainApp(Tk):
         Check if there is something in the queue
         """
         try:
-            # print(list(self.end_thread_queue.queue))
             res = self.end_thread_queue.get(0)
             self.show_error_if_needed(res)
-            # print('queue.res: {}'.format(res[0]))
             self.loading_status_text.set(res[0] + '...')
-            self.loading_pbar['value'] = int(res[1]/10.0 * 100)
+            self.loading_pbar['value'] = int(res[1]/self.loading_pbar_length *
+                                             100)
             self.update()
             if res[0] == 'Unmounted network share':
-                self.after(5000, self.destroy)
-                self.close_warning(5)
-                self.after(1000, lambda: self.close_warning(4))
-                self.after(2000, lambda: self.close_warning(3))
-                self.after(3000, lambda: self.close_warning(2))
-                self.after(4000, lambda: self.close_warning(1))
-                self.after(5000, lambda: self.close_warning(0))
+                self.after(3000, self.destroy)
+                self.close_warning(3)
+                self.after(1000, lambda: self.close_warning(2))
+                self.after(2000, lambda: self.close_warning(1))
+                self.after(3000, lambda: self.close_warning(0))
+                # self.after(4000, lambda: self.close_warning(1))
+                # self.after(5000, lambda: self.close_warning(0))
             else:
                 self.after(100, self.watch_for_end_result)
         except queue.Empty:
@@ -488,24 +542,181 @@ class MainApp(Tk):
                                      'seconds...'.format(num_to_show))
 
     def on_closing(self):
-        if messagebox.askokcancel("Confirm exit", "Are you sure you want to "
-                                                  "exit? Any currently started "
-                                                  "sessions will be ended.",
-                                  icon='warning'):
+        resp = PauseOrEndDialogue(self,
+                                  db_logger=self.db_logger,
+                                  screen_res=screen_res).show()
+        self.db_logger.log('(GUI) User clicked on window manager close button; '
+                           'asking for clarification', 2)
+        if resp == 'end':
+            self.db_logger.log('(GUI) Received end session signal from '
+                               'PauseOrEndDialogue', 1)
             self.session_end()
+        elif resp == 'pause':
+            self.db_logger.log('(GUI) Received pause session signal from '
+                               'PauseOrEndDialogue', 1)
+            self.destroy()
+        elif resp == 'cancel':
+            self.db_logger.log('(GUI) User clicked Cancel in '
+                               'PauseOrEndDialogue', 1)
+            pass
 
 
-class HangingSessionDialog(Toplevel):
-    def __init__(self, parent, screen_res=None):
+class PauseOrEndDialogue(Toplevel):
+    def __init__(self, parent, db_logger, screen_res=None):
+        self.tooltip_font = "TkDefaultFont"
         self.response = StringVar()
         self.screen_res = ScreenRes() if screen_res is None else screen_res
         Toplevel.__init__(self, parent)
-        self.geometry(self.screen_res.get_center_geometry_string(350, 175))
+        self.geometry(self.screen_res.get_center_geometry_string(400, 175))
+        self.grab_set()
+        self.title("Confirm exit")
+        self.protocol("WM_DELETE_WINDOW", self.destroy)
+
+        self.bell()
+
+        self.end_icon = PhotoImage(file=resource_path('window-close.png'))
+        self.pause_icon = PhotoImage(file=resource_path('pause.png'))
+        self.cancel_icon = PhotoImage(file=resource_path('arrow-alt-'
+                                                         'circle-left.png'))
+        self.error_icon = PhotoImage(file=resource_path('error-icon.png'))
+
+        self.top_frame = Frame(self)
+        self.button_frame = Frame(self, padx=15, pady=10)
+        self.label_frame = Frame(self.top_frame)
+
+        self.top_label = Label(self.label_frame,
+                               text="Are you sure?",
+                               font=("TkDefaultFont", 12, "bold"),
+                               wraplength=250,
+                               anchor='w',
+                               justify='left')
+
+        if db_logger.session_started:
+            msg = "Are you sure you want to exit? If so, please choose " \
+                  "whether to end the current session, or pause it so it may " \
+                  "be continued by running the Session Logger application " \
+                  "again. Click \"Cancel\" to return to the main screen."
+        else:
+            msg = "Are you sure you want to exit?\nPlease choose an option " \
+                  "below."
+
+        self.warn_label = Label(self.label_frame,
+                                wraplength=250,
+                                anchor='w',
+                                justify='left',
+                                text=msg)
+
+        self.error_icon_label = ttk.Label(self.top_frame,
+                                          background=self['background'],
+                                          foreground="#000000",
+                                          relief="flat",
+                                          image=self.error_icon)
+
+        if not db_logger.session_started:
+            end_text = "Exit logger"
+        else:
+            end_text = "End session"
+
+        self.end_button = Button(self.button_frame,
+                                 text=end_text,
+                                 command=self.click_end,
+                                 padx=10, pady=5, width=80,
+                                 compound=LEFT,
+                                 image=self.end_icon)
+        self.pause_button = Button(self.button_frame,
+                                   text='Pause session',
+                                   command=self.click_pause,
+                                   padx=10, pady=5, width=80,
+                                   compound=LEFT,
+                                   image=self.pause_icon)
+        self.cancel_button = Button(self.button_frame,
+                                    text='Cancel',
+                                    command=self.click_cancel,
+                                    padx=10, pady=5, width=80,
+                                    compound=LEFT,
+                                    image=self.cancel_icon)
+
+        self.top_frame.grid(row=0, column=0)
+        self.error_icon_label.grid(column=0, row=0, padx=20, pady=25)
+        self.label_frame.grid(column=1, row=0, padx=0, pady=0)
+        self.top_label.grid(row=0, column=0, padx=10, pady=0, sticky=(W,S))
+        self.warn_label.grid(row=1, column=0, padx=10, pady=(5,0))
+
+        self.button_frame.grid(row=1, column=0, ipadx=10, ipady=5)
+        self.end_button.grid(row=0, column=0,  padx=10)
+        if db_logger.session_started:
+            self.pause_button.grid(row=0, column=1, padx=10)
+        self.cancel_button.grid(row=0, column=2, padx=10)
+        self.columnconfigure(0, weight=1)
+        self.rowconfigure(0, weight=1)
+
+        self.focus_force()
+        self.resizable(False, False)
+        self.transient(parent)
+
+        if db_logger.session_started:
+            ToolTip(self.end_button,
+                    self.tooltip_font,
+                    "Ending the session will close this window and start the "
+                    "record building process (don't click unless you're sure "
+                    "you've saved all your data to the network share!)",
+                    header_msg='Warning!',
+                    delay=0.00)
+            ToolTip(self.pause_button,
+                    self.tooltip_font,
+                    "Pausing the session will leave the NexusLIMS database in "
+                    "an inconsistent state. Please only do this if you plan to "
+                    "immediately resume the session before another user uses "
+                    "the tool (such as if you need to reboot the computer). To "
+                    "resume the session, simply run this application again and "
+                    "you will be prompted whether to continue or start a new "
+                    "session.",
+                    header_msg='Warning!',
+                    delay=0.00)
+
+        self.protocol("WM_DELETE_WINDOW", self.click_close)
+
+    def show(self):
+        self.wm_deiconify()
+        self.focus_force()
+        self.wait_window()
+        return self.response.get()
+
+    def click_end(self):
+        self.response.set('end')
+        self.destroy()
+
+    def click_pause(self):
+        self.response.set('pause')
+        self.destroy()
+
+    def click_cancel(self):
+        self.response.set('cancel')
+        self.destroy()
+
+    def click_close(self):
+        self.click_cancel()
+
+
+class HangingSessionDialog(Toplevel):
+    def __init__(self, parent, db_logger, screen_res=None):
+        self.response = StringVar()
+        self.screen_res = ScreenRes() if screen_res is None else screen_res
+        Toplevel.__init__(self, parent)
+        self.geometry(self.screen_res.get_center_geometry_string(400, 175))
         self.grab_set()
         self.title("Incomplete session warning")
         self.protocol("WM_DELETE_WINDOW", self.destroy)
 
         self.bell()
+
+        if db_logger.last_session_ts is not None:
+            last_session_dt = datetime.strptime(db_logger.last_session_ts,
+                                                "%Y-%m-%dT%H:%M:%S.%f")
+            last_session_timestring = format_date(last_session_dt,
+                                                  with_newline=False)
+        else:
+            last_session_timestring = 'UNKNOWN'
 
         self.new_icon = PhotoImage(file=resource_path('file-plus.png'))
         self.continue_icon = PhotoImage(file=resource_path(
@@ -523,15 +734,19 @@ class HangingSessionDialog(Toplevel):
                                anchor='w',
                                justify='left',
                                )
+        msg = "An interrupted session was found in the database for this " \
+              "instrument (started on {}). ".format(last_session_timestring)
+
+        db_logger.log(msg, 0)
+
+        msg += "Would you like to continue that existing session, or end it " \
+               "and start a new one?"
+
         self.warn_label = Label(self.label_frame,
-                                wraplength=220,
+                                wraplength=250,
                                 anchor='w',
                                 justify='left',
-                                text="An interrupted session was "
-                                     "found in the database for this "
-                                     "instrument. Would you like to continue "
-                                     "that existing session, or start a new "
-                                     "one?")
+                                text=msg)
 
         self.error_icon_label = ttk.Label(self.top_frame,
                                           background=self['background'],
@@ -569,6 +784,8 @@ class HangingSessionDialog(Toplevel):
         self.resizable(False, False)
         self.transient(parent)
 
+        self.protocol("WM_DELETE_WINDOW", self.click_close)
+
     def show(self):
         self.wm_deiconify()
         self.focus_force()
@@ -583,25 +800,30 @@ class HangingSessionDialog(Toplevel):
         self.response.set('continue')
         self.destroy()
 
+    def click_close(self):
+        messagebox.showerror(parent=self,
+                             title="Error",
+                             message="Please choose to either continue the "
+                                     "existing session or start a new one")
+
 
 class LogWindow(Toplevel):
-    def __init__(self, screen_res=None, db_logger=None, is_error=False):
+    def __init__(self, parent, is_error=False):
         """
         Create and raise a window showing a text field that holds the session
         logger `log_text`
 
         Parameters
         ----------
-        screen_res : ScreenRes
-            An instance of the screen resolution class to help determine where
-            to place the window in the center of the screen
-        db_logger : make_db_entry.DBSessionLogger
-            The database logger, so we can access it's log_text
+        parent : MainApp
+            The MainApp (or other widget) this LogWindow is associated with
         is_error : bool
             If True, closing the log window will close the whole application
         """
-        self.screen_res = ScreenRes() if screen_res is None else screen_res
+        self.screen_res = parent.screen_res
         Toplevel.__init__(self, padx=3, pady=3)
+        self.transient(parent)
+        self.grab_set()
         self.tooltip_font = "TkDefaultFont"
         self.geometry(self.screen_res.get_center_geometry_string(450, 350))
         self.title('NexusLIMS Session Logger Log')
@@ -617,7 +839,7 @@ class LogWindow(Toplevel):
                          "log information to ***REMOVED*** for assistance \n"
                          "----------------------------------------------------"
                          "\n\n" +
-                         db_logger.log_text)
+                         parent.db_logger.log_text)
 
         self.s_v = ttk.Scrollbar(self,
                                  orient=VERTICAL,
@@ -650,6 +872,10 @@ class LogWindow(Toplevel):
                                    lambda: sys.exit(1),
                                    padx=10, pady=5, width=60,
                                    compound=LEFT, image=self.close_icon)
+        # Make close window button do same thing as regular close button
+        self.protocol("WM_DELETE_WINDOW",
+                      self.destroy if not is_error else lambda: sys.exit(1))
+
         ToolTip(self.close_button,
                 self.tooltip_font,
                 "Close this window" if not is_error else
@@ -702,7 +928,7 @@ class ToolTip(Toplevel):
     """
 
     def __init__(self, wdgt, tooltip_font, msg=None, msgFunc=None,
-                 delay=1, follow=True):
+                 header_msg=None, delay=1, follow=True):
         """
         Initialize the ToolTip
 
@@ -733,18 +959,35 @@ class ToolTip(Toplevel):
 
         # The msgVar will contain the text displayed by the ToolTip
         self.msgVar = StringVar()
+        self.header_msgVar = StringVar()
         if msg is None:
             self.msgVar.set('No message provided')
         else:
             self.msgVar.set(msg)
+        if header_msg is None:
+            self.header_msgVar.set('')
+        else:
+            self.header_msgVar.set(header_msg)
         self.msgFunc = msgFunc
         self.delay = delay
         self.follow = follow
         self.visible = 0
         self.lastMotion = 0
-        # The text of the ToolTip is displayed in a Message widget
-        Message(self, textvariable=self.msgVar, bg='#FFFFDD',
-                font=tooltip_font, aspect=1000).grid()
+
+        if header_msg is not None:
+            hdr_wdgt = Message(self, textvariable=self.header_msgVar,
+                               bg='#FFFFDD', font=(tooltip_font, 8, 'bold'),
+                               aspect=1000, justify='left', anchor=W, pady=0)
+            msg_wdgt = Message(self, textvariable=self.msgVar, bg='#FFFFDD',
+                               font=tooltip_font, aspect=1000, pady=0)
+
+            hdr_wdgt.grid(row=0, sticky=(W, E, S), pady=(0,0))
+            msg_wdgt.grid(row=1)
+
+        else:
+            # The text of the ToolTip is displayed in a Message widget
+            Message(self, textvariable=self.msgVar, bg='#FFFFDD',
+                    font=tooltip_font, aspect=1000).grid()
 
         # Add bindings to the widget.  This will NOT override
         # bindings that the widget already has
@@ -828,7 +1071,13 @@ if __name__ == "__main__":
                              message=message)
         sys.exit(0)
 
-    screen_res = ScreenRes()
-    root = MainApp(screen_res=screen_res)
+    # if we're on Linux, use the testing settings for debugging
+    testing = sys.platform != 'win32'
+    db_logger = db.DBSessionLogger(verbosity=2,
+                                   testing=testing,
+                                   user=None if testing else
+                                   os.environ['username'])
+    screen_res = ScreenRes(db_logger=db_logger)
+    root = MainApp(db_logger=db_logger, screen_res=screen_res)
     root.protocol("WM_DELETE_WINDOW", root.on_closing)
     root.mainloop()

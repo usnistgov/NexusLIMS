@@ -73,6 +73,8 @@ class DBSessionLogger:
         self.session_start_time = None
         self.last_entry_type = None
         self.last_session_id = None
+        self.last_session_row_number = None
+        self.last_session_ts = None
         self.progress_num = 0
 
         if self.testing:
@@ -84,8 +86,8 @@ class DBSessionLogger:
             self.full_path = os.path.join(self.db_path, self.db_name)
             self.cpu_name = "***REMOVED***"
             self.user = '***REMOVED***'
-            self.log('TEST: Using {} as path to db'.format(self.full_path), 2)
-            self.log('TEST: Using {} as cpu name'.format(self.cpu_name), 2)
+            self.log('(TEST) Using {} as path to db'.format(self.full_path), 2)
+            self.log('(TEST) Using {} as cpu name'.format(self.cpu_name), 2)
         else:
             # actual values to use in production
             self.db_path = '\\***REMOVED***\\nexuslims'
@@ -110,10 +112,10 @@ class DBSessionLogger:
         this_verbosity : int
             The verbosity level (higher is more verbose)
         """
-        level_dict = {-1: 'ERROR', 0: 'WARN', 1: 'INFO', 2: 'DEBUG'}
+        level_dict = {-1: 'ERROR', 0: ' WARN', 1: ' INFO', 2: 'DEBUG'}
         str_to_log = '{}'.format(datetime.datetime.now().isoformat()) + \
-                     ':{}: '.format(level_dict[this_verbosity]) + \
-                     '{}'.format(to_print)
+                     ':{}'.format(level_dict[this_verbosity]) + \
+                     ': {}'.format(to_print)
         if this_verbosity <= self.verbosity:
             print(str_to_log)
         self.log_text += str_to_log + '\n'
@@ -156,7 +158,11 @@ class DBSessionLogger:
 
     def run_cmd(self, cmd):
         """
-        Run a command using the subprocess module and return the output
+        Run a command using the subprocess module and return the output. Note
+        that because we want to run the eventual logger without a console
+        visible, we do not have access to the standard stdin, stdout,
+        and stderr, and these need to be redirected ``subprocess`` pipes,
+        accordingly.
 
         Parameters
         ----------
@@ -167,20 +173,27 @@ class DBSessionLogger:
 
         Returns
         -------
-        p : str
+        output : str
             The output of ``cmd``
         """
         try:
-            p = subprocess.check_output(cmd,
-                                        shell=True,
-                                        stderr=subprocess.STDOUT).decode()
+            # Redirect stderr to stdout, and then stdout and stdin to
+            # subprocess.PIP
+            p = subprocess.Popen(cmd,
+                                 shell=True,
+                                 stderr=subprocess.STDOUT,
+                                 stdout=subprocess.PIPE,
+                                 stdin=subprocess.PIPE)
+            p.stdin.close()
+            p.wait()
+            output = p.stdout.read().decode()
         except subprocess.CalledProcessError as e:
             p = e.output.decode()
             self.log('command {} returned with error (code {}): {}'.format(
                 e.cmd.replace(self.password, '**************'),
                 e.returncode,
                 e.output), 0)
-        return p
+        return output
 
     def mount_network_share(self):
         """
@@ -315,8 +328,8 @@ class DBSessionLogger:
             return False
 
         # Get last inserted line for this instrument
-        query_statement = 'SELECT event_type, session_identifier ' \
-                          'FROM session_log WHERE ' \
+        query_statement = 'SELECT event_type, session_identifier, ' \
+                          'id_session_log, timestamp FROM session_log WHERE ' \
                           'instrument = "{}" '.format(self.instr_pid) + \
                           'ORDER BY timestamp DESC LIMIT 1'
 
@@ -328,7 +341,15 @@ class DBSessionLogger:
                 try:
                     self.check_exit_queue(thread_queue, exit_queue)
                     res = cur.execute(query_statement)
-                    self.last_entry_type, self.last_session_id = res.fetchone()
+                    row = res.fetchone()
+                    if row is None:
+                        # If there is no result, this must be the first time
+                        # we're connecting to the database with this
+                        # instrument, so pretend the last session was "END"
+                        self.last_entry_type = "END"
+                    else:
+                        self.last_entry_type, self.last_session_id, \
+                        self.last_session_row_number, self.last_session_ts = row
                     if self.last_entry_type == "END":
                         self.log('Verified database consistency for the '
                                  '{}'.format(self.instr_schema_name), 1)
@@ -340,9 +361,11 @@ class DBSessionLogger:
                             self.progress_num += 1
                         return True
                     elif self.last_entry_type == "START":
-                        self.log('Database is inconsistent for the'
+                        self.log('Database is inconsistent for the '
                                  '{} '.format(self.instr_schema_name) +
-                                 '(last entry was a "START")', 0)
+                                 '(last entry [id_session_log = '
+                                 '{}]'.format(self.last_session_row_number) +
+                                 ' was a "START")', 0)
                         if thread_queue:
                             thread_queue.put(('Database is inconsistent!',
                                               self.progress_num))
