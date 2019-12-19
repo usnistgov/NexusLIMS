@@ -91,7 +91,13 @@ class DBSessionLogger:
         else:
             # actual values to use in production
             self.db_path = '\\***REMOVED***\\nexuslims'
-            self.password = os.environ['***REMOVED***']
+            try:
+                self.password = os.environ['***REMOVED***']
+            except KeyError as e:
+                self.log('Could not find environment variable '
+                         '"***REMOVED***"', -1)
+                self.log_exception(e)
+                self.password = e
             self.full_path = "N:\\{}".format(db_name)
             self.cpu_name = os.environ['COMPUTERNAME']
 
@@ -228,6 +234,11 @@ class DBSessionLogger:
             raise EnvironmentError('Could not find IP of network share in '
                                    'output of ping command')
         self.log('found ***REMOVED*** at {}'.format(ip), 2)
+
+        if isinstance(self.password, Exception):
+            raise EnvironmentError("***REMOVED*** environment variable is "
+                                   "not defined. Please contact "
+                                   "***REMOVED*** for assistance.")
 
         mount_command = 'net use N: \\\\{}{} '.format(ip if have_ip else
                                                       self.hostname,
