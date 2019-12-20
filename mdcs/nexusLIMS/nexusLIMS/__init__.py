@@ -30,6 +30,7 @@ from ._urls import calendar_root_url
 from ._urls import ldap_url
 
 import socket as _socket
+import os as _os
 
 _mmf_nexus_paths = {'limsimages': '/data/smb/mmfnexus/',
                     '***REMOVED***': '/mnt/***REMOVED***/',
@@ -45,3 +46,5 @@ _nexuslims_paths = {'limsimages': '/data/smb/nexusLIMS/mmfnexus/',
 
 mmf_nexus_root_path = _mmf_nexus_paths[_socket.gethostname()]
 nexuslims_root_path = _nexuslims_paths[_socket.gethostname()]
+nexuslims_db_path = _os.path.join(nexuslims_root_path, '..',
+                                  'nexuslims_db.sqlite')
