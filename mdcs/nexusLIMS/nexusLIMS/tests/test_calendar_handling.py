@@ -82,7 +82,14 @@ class TestCalendarHandling:
 
     @pytest.mark.parametrize('instrument', list(instrument_db.keys()))
     def test_downloading_valid_calendars(self, instrument):
-        sc.fetch_xml(instrument)
+        # Handle the two test instruments that we put into the database,
+        # which will raise an error because their url values are bogus
+        if instrument in ['testsurface-CPU_P1111111',
+                          'testVDI-VM-JAT-111222']:
+            with pytest.raises(requests.exceptions.ConnectionError):
+                sc.fetch_xml(instrument)
+        else:
+            sc.fetch_xml(instrument)
 
     def test_downloading_bad_calendar(self):
         with pytest.raises(KeyError):
@@ -149,7 +156,7 @@ class TestCalendarHandling:
             m.setenv('nexusLIMS_user', 'bad_user')
             with pytest.raises(AuthenticationError):
                 sc.fetch_xml(instrument=('FEI-Titan-TEM-635816',
-                                          'FEI-Quanta200-ESEM-633137'))
+                                         'FEI-Quanta200-ESEM-633137'))
 
     def test_fetch_xml_instrument_bogus(self, monkeypatch):
         with monkeypatch.context() as m:
