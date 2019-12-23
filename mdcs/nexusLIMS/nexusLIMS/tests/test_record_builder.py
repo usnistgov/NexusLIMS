@@ -3,18 +3,28 @@ from nexusLIMS import mmf_nexus_root_path as _mmf_nexus_root_path
 from nexusLIMS.builder import record_builder as _rb
 from lxml import etree as et
 from uuid import UUID as _UUID
+from datetime import datetime as _dt
 
 # TODO: Figure out a way to include test files without a large compressed file
 
 
 class TestRecordBuilder:
     def test_record_builder(self):
-        path_to_search = _os.path.join(_mmf_nexus_root_path, 'Titan/***REMOVED***/',
-                                       '181113 - ***REMOVED*** - '
-                                       '***REMOVED*** - Titan')
+        # path_to_search = _os.path.join(_mmf_nexus_root_path, 'Titan/***REMOVED***/',
+        #                                '181113 - ***REMOVED*** - '
+        #                                '***REMOVED*** - Titan')
+        path_to_search = _os.path.join(_mmf_nexus_root_path, 'Titan')
+
+        # This will come from the database, but hard code for now
+        starting_time = _dt(year=2018, month=11, day=13,
+                            hour=13, minute=00)          # 2019-11-13 11:00 AM
+        ending_time = _dt(year=2018, month=11, day=13,
+                          hour=15, minute=30)            # 2019-11-13  3:30 PM
 
         # Build the XML record and write it to a file
         filename = _rb.dump_record(path_to_search,
+                                   starting_time,
+                                   ending_time,
                                    filename=None,
                                    instrument='FEI-Titan-TEM-635816',
                                    date='2018-11-13',
@@ -47,7 +57,10 @@ class TestRecordBuilder:
 
     # TODO: Test acquisition activity contents
     def test_acq_builder(self):
-        path_to_search = _os.path.join(_mmf_nexus_root_path, 'Titan/***REMOVED***/',
-                                       '181113 - ***REMOVED*** - '
-                                       '***REMOVED*** - Titan')
-        _rb.build_acq_activities(path_to_search)
+        starting_time = _dt(year=2018, month=11, day=13,
+                            hour=13, minute=00)          # 2019-11-13 11:00 AM
+        ending_time = _dt(year=2018, month=11, day=13,
+                          hour=15, minute=30)            # 2019-11-13  3:30 PM
+
+        path_to_search = _os.path.join(_mmf_nexus_root_path, 'Titan')
+        _rb.build_acq_activities(path_to_search, starting_time, ending_time)

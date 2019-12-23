@@ -46,7 +46,7 @@ XSLT_PATH = _os.path.join(_os.path.dirname(__file__),
                           "cal_events_to_nx_record.xsl")
 
 
-def build_record(path, instrument, date, user):
+def build_record(path, dt_from, dt_to, instrument, date, user):
     """
     Construct an XML document conforming to the NexusLIMS schema from a
     directory containing microscopy data files. For calendar parsing,
@@ -55,7 +55,14 @@ def build_record(path, instrument, date, user):
     Parameters
     ----------
     path : str
-        A path containing dataset files to be processed
+        A path containing dataset files to be processed (usually the root
+        path where the given instrument stores data on the centralized storage)
+    dt_from : datetime.datetime
+        The starting timestamp that will be used to determine which files go
+        in this record
+    dt_to : datetime.datetime
+        The ending timestamp used to determine the last point in time for
+        which files should be associated with this record
     instrument : str
         As defined in :py:func:`~.sharepoint_calendar.get_events`
         One of ['msed_titan', 'quanta', 'jeol_sem', 'hitachi_sem',
@@ -120,14 +127,14 @@ def build_record(path, instrument, date, user):
     xml_record += str(output)
 
     _logger.info(f"Building acquisition activities for {path}")
-    xml_record += build_acq_activities(path=path)
+    xml_record += build_acq_activities(path=path, dt_from=dt_from, dt_to=dt_to)
 
     xml_record += "</nx:Experiment>"  # Add closing tag for root element.
 
     return xml_record
 
 
-def build_acq_activities(path):
+def build_acq_activities(path, dt_from, dt_to):
     """
     Build an XML string representation of each AcquisitionActivity for a
     single microscopy session. This includes setup parameters and metadata
@@ -143,6 +150,12 @@ def build_acq_activities(path):
     path : str
         A string file path which points to the file folder in which microscopy
         data is located.
+    dt_from : datetime.datetime
+        The starting timestamp that will be used to determine which files go
+        in this record
+    dt_to : datetime.datetime
+        The ending timestamp used to determine the last point in time for
+        which files should be associated with this record
 
     Returns
     -------
@@ -157,10 +170,15 @@ def build_acq_activities(path):
     _logging.getLogger('hyperspy.io_plugins.digital_micrograph').setLevel(
         _logging.WARNING)
 
-    files = _glob(_os.path.join(path, "**/*.dm3"), recursive=True)
+    files = _glob(_os.path.join(path, "**/*"), recursive=True)
+    files = [f for f in files if _os.path.isfile(f) and
+             dt_from.timestamp() < _os.path.getmtime(f) < dt_to.timestamp()]
 
     # sort files by modification time
     files.sort(key=_os.path.getmtime)
+
+    # remove all files but .dm3/.dm4 (for now)
+    files = [f for f in files if f.endswith('.dm3') or f.endswith('.dm4')]
 
     mtimes = [''] * len(files)
     modes = [''] * len(files)
@@ -253,6 +271,8 @@ def build_acq_activities(path):
 
 
 def dump_record(path,
+                dt_from,
+                dt_to,
                 filename=None,
                 instrument=None,
                 date=None,
@@ -267,6 +287,12 @@ def dump_record(path,
     path : str
         A string file path which points to the file location of the microscopy
         metadata
+    dt_from : datetime.datetime
+        The starting timestamp that will be used to determine which files go
+        in this record
+    dt_to : datetime.datetime
+        The ending timestamp used to determine the last point in time for
+        which files should be associated with this record
     filename : None or str
         The filename of the dumped xml file to write. If none, a d
     instrument : str
@@ -291,7 +317,8 @@ def dump_record(path,
                    (f'_{user}' if user else '') + '.xml'
     _pathlib.Path(_os.path.dirname(filename)).mkdir(parents=True, exist_ok=True)
     with open(filename, 'w') as f:
-        text = build_record(path=path, instrument=instrument,
+        text = build_record(path=path, dt_from=dt_from,
+                            dt_to=dt_to, instrument=instrument,
                             date=date, user=user)
         f.write(text)
     return filename
