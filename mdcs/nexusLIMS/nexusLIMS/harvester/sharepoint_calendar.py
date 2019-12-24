@@ -32,12 +32,14 @@ import os as _os
 import re as _re
 import logging as _logging
 import requests as _requests
+import urllib as _urllib
 
 import nexusLIMS
 from requests_ntlm import HttpNtlmAuth as _HttpNtlmAuth
 from dateparser import parse as _dp_parse
 import ldap3 as _ldap3
 from datetime import datetime as _datetime
+from datetime import timedelta as _timedelta
 from configparser import ConfigParser as _ConfigParser
 from nexusLIMS.instruments import instrument_db as _instr_db
 from nexusLIMS.utils import parse_xml as _parse_xml
@@ -60,65 +62,65 @@ class AuthenticationError(Exception):
 
 
 # TODO: we need a class here that represents one entry from the calendar
-class CalendarEvent:
-    """
-     A representation of a single calendar event returned from the SharePoint
-     API
-
-     Instances of this class correspond to AcquisitionActivity nodes in the
-     `NexusLIMS schema <https://data.nist.gov/od/dm/nexus/experiment/v1.0>`_
-
-     Attributes
-     ----------
-     start : datetime.datetime
-         The start point of this AcquisitionActivity
-     end : datetime.datetime
-         The end point of this AcquisitionActivity
-     mode : str
-         The microscope mode for this AcquisitionActivity (i.e. 'IMAGING',
-         'DIFFRACTION', 'SCANNING', etc.)
-     unique_params : set
-         A set of dictionary keys that comprises all unique metadata keys
-         contained within the files of this AcquisitionActivity
-     setup_params : dict
-         A dictionary containing metadata about the data that is shared
-         amongst all data files in this AcquisitionActivity
-     unique_meta : list
-         A list of dictionaries (one for each file in this
-         AcquisitionActivity) containing metadata key-value pairs that are
-         unique to each file in ``files`` (i.e. those that could not be moved
-         into ``setup_params`)
-     files : list
-         A list of filenames belonging to this AcquisitionActivity
-     sigs : list
-         A list of *lazy* (to minimize loading times) HyperSpy signals in this
-         AcquisitionActivity. HyperSpy is used to facilitate metadata reading
-     meta : list
-         A list of dictionaries containing the "important" metadata for each
-         signal/file in ``sigs`` and ``files``
-     """
-
-    def __init__(self,
-                 start=_datetime.now(),
-                 end=_datetime.now(),
-                 mode='',
-                 unique_params=None,
-                 setup_params=None,
-                 unique_meta=None,
-                 files=None,
-                 sigs=None,
-                 meta=None):
-
-        self.start = start
-        self.end = end
-        self.mode = mode
-        self.unique_params = set() if unique_params is None else unique_params
-        self.setup_params = setup_params
-        self.unique_meta = unique_meta
-        self.files = [] if files is None else files
-        self.sigs = [] if sigs is None else sigs
-        self.meta = [] if meta is None else meta
-
+# class CalendarEvent:
+#     """
+#      A representation of a single calendar event returned from the SharePoint
+#      API
+#
+#      Instances of this class correspond to AcquisitionActivity nodes in the
+#      `NexusLIMS schema <https://data.nist.gov/od/dm/nexus/experiment/v1.0>`_
+#
+#      Attributes
+#      ----------
+#      start : datetime.datetime
+#          The start point of this AcquisitionActivity
+#      end : datetime.datetime
+#          The end point of this AcquisitionActivity
+#      mode : str
+#          The microscope mode for this AcquisitionActivity (i.e. 'IMAGING',
+#          'DIFFRACTION', 'SCANNING', etc.)
+#      unique_params : set
+#          A set of dictionary keys that comprises all unique metadata keys
+#          contained within the files of this AcquisitionActivity
+#      setup_params : dict
+#          A dictionary containing metadata about the data that is shared
+#          amongst all data files in this AcquisitionActivity
+#      unique_meta : list
+#          A list of dictionaries (one for each file in this
+#          AcquisitionActivity) containing metadata key-value pairs that are
+#          unique to each file in ``files`` (i.e. those that could not be moved
+#          into ``setup_params`)
+#      files : list
+#          A list of filenames belonging to this AcquisitionActivity
+#      sigs : list
+#          A list of *lazy* (to minimize loading times) HyperSpy signals in this
+#          AcquisitionActivity. HyperSpy is used to facilitate metadata reading
+#      meta : list
+#          A list of dictionaries containing the "important" metadata for each
+#          signal/file in ``sigs`` and ``files``
+#      """
+#
+#     def __init__(self,
+#                  start=_datetime.now(),
+#                  end=_datetime.now(),
+#                  mode='',
+#                  unique_params=None,
+#                  setup_params=None,
+#                  unique_meta=None,
+#                  files=None,
+#                  sigs=None,
+#                  meta=None):
+#
+#         self.start = start
+#         self.end = end
+#         self.mode = mode
+#         self.unique_params = set() if unique_params is None else unique_params
+#         self.setup_params = setup_params
+#         self.unique_meta = unique_meta
+#         self.files = [] if files is None else files
+#         self.sigs = [] if sigs is None else sigs
+#         self.meta = [] if meta is None else meta
+#
 
 def get_div_and_group(username):
     """
@@ -209,7 +211,7 @@ def get_auth(filename="credentials.ini"):
     return auth 
 
 
-def fetch_xml(instrument=None):
+def fetch_xml(instrument=None, date=None):
     """
     Get the XML responses from the Nexus Sharepoint calendar for one,
     multiple, or all instruments.
@@ -220,6 +222,10 @@ def fetch_xml(instrument=None):
         As defined in :py:func:`~.get_events`
         One or more of {},
         or None. If None, events from all instruments will be returned.
+    date : str or None
+        If provided, fetch only events from a particular day (to limit the
+        number of events that need to be returned). ``date`` string must be
+        formatted as YYYY-MM-DD.
 
     Returns
     -------
@@ -255,6 +261,14 @@ def fetch_xml(instrument=None):
 
     for i, instr in enumerate(inst_to_fetch):
         instr_url = instr.api_url + '?$expand=CreatedBy'
+
+        if date:
+            dt = _datetime.strptime(date, '%Y-%m-%d')
+            datestr_1 = date
+            datestr_2 = (dt + _timedelta(days=1)).strftime('%Y-%m-%d')
+            instr_url += f"&$filter=EndTime ge DateTime'{datestr_1}' and " \
+                         f"EndTime lt DateTime'{datestr_2}'"
+
         _logger.info("Fetching Nexus calendar events from {}".format(instr_url))
         r = _nexus_req(instr_url, _requests.get)
         _logger.info("  {} -- {} -- response: {}".format(instr.name,
@@ -350,7 +364,7 @@ def get_events(instrument=None,
             date = None
 
     output = ''
-    xml_strings = fetch_xml(instrument)
+    xml_strings = fetch_xml(instrument, date=date)
 
     if not division and not group and user:
         _logging.info('Querying LDAP for division and group info')

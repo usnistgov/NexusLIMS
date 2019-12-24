@@ -55,7 +55,7 @@
       <xsl:value-of select="$user"/>
     </xsl:element>
     <xsl:element name="title">
-      <xsl:value-of select="content/m:properties/d:Title"/>
+      <xsl:value-of select="content/m:properties/d:TitleOfExperiment"/>
     </xsl:element>
     <xsl:element name="instrument">
       <!-- Get name of the instrument (in SharePoint) by going up from entry and -->
