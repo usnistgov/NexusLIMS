@@ -17,8 +17,8 @@ requests = "*"
 requests-ntlm = "*"
 ntlm-auth = "*"
 dateparser = "*"
-hyperspy = "*"
 ldap3 = "*"
+hyperspy = {editable = true,git = "https://github.com/***REMOVED***/hyperspy.git",ref = "BUGFIX_dm3_reader"}
 
 [requires]
 python_version = "3.7"
