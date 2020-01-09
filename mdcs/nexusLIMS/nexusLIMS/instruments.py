@@ -147,3 +147,34 @@ class Instrument:
 
 
 instrument_db = _get_instrument_db()
+
+
+def get_instr_from_filepath(path):
+    """
+    Using the NexusLIMS database, get an instrument object by a given path.
+
+    Parameters
+    ----------
+    path : str
+        A path (relative or absolute) to a file saved in the central
+        filestore that will be used to search for a matching instrument
+
+    Returns
+    -------
+    instrument : Instrument or None
+        An `_Instrument` instance matching the path, or None if no match was
+        found
+
+    Examples
+    --------
+    >>> inst = get_instr_from_filepath('/mnt/***REMOVED***/Titan/***REMOVED***/' +
+    ...                                '***REMOVED***/' +
+    ...                                '***REMOVED***/4_330mm.dm3')
+    >>> str(inst)
+    'FEI-Titan-TEM-635816 in ***REMOVED***'
+    """
+    for k, v in instrument_db.items():
+        if _is_subpath(path, _os.path.join(_mmf_path, v.filestore_path)):
+            return v
+
+    return None
