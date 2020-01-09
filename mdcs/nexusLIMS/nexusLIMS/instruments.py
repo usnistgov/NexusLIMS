@@ -26,9 +26,12 @@
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
 
-from nexusLIMS import nexuslims_db_path
-import sqlite3
-import contextlib
+from nexusLIMS import nexuslims_db_path as _nx_path
+from nexusLIMS import mmf_nexus_root_path as _mmf_path
+from nexusLIMS.utils import is_subpath as _is_subpath
+import sqlite3 as _sql3
+import contextlib as _contextlib
+import os as _os
 
 
 def _get_instrument_db():
@@ -39,15 +42,15 @@ def _get_instrument_db():
     Returns
     -------
     instrument_db : dict
-        A dictionary of `_Instrument` instances that describe all the
+        A dictionary of `Instrument` instances that describe all the
         instruments that were found in the ``instruments`` table of the
         NexusLIMS database
     """
     query = "SELECT * from instruments"
     # use contextlib to auto-close the connection and database cursors
-    with contextlib.closing(sqlite3.connect(nexuslims_db_path)) as conn:
+    with _contextlib.closing(_sql3.connect(_nx_path)) as conn:
         with conn:  # auto-commits
-            with contextlib.closing(conn.cursor()) as cursor:  # auto-closes
+            with _contextlib.closing(conn.cursor()) as cursor:  # auto-closes
                 results = cursor.execute(query).fetchall()
                 col_names = list(map(lambda x: x[0], cursor.description))
 
@@ -59,26 +62,45 @@ def _get_instrument_db():
 
         key = this_dict.pop('instrument_pid')
         this_dict['name'] = key
-        instr_db[key] = _Instrument(**this_dict)
+        instr_db[key] = Instrument(**this_dict)
 
     return instr_db
 
 
-class _Instrument:
+class Instrument:
     """
     A simple object to hold information about an instrument in the Microscopy
-    Nexus facility
+    Nexus facility, fetched from the external NexusLIMS database
 
-    Attributes
+    Parameters
     ----------
     api_url : str or None
+        The calendar API url for this instrument
     calendar_name : str or None
+        The "user-friendly" name of the calendar for this instrument as
+        displayed on the sharepoint resource (e.g. "FEI Titan TEM")
     calendar_url : str or None
+        The URL to this instrument's web-accessible calendar on the
+        sharepoint resource
     location : str or None
+        The physical location of this instrument (building and room number)
     name : str or None
+        The unique identifier for an instrument in the Nexus Microscopy facility
     schema_name : str or None
+        The name of instrument as defined in the Nexus Microscopy schema and
+        displayed in the records
     property_tag : str or None
+        The NIST property tag for this instrument
     filestore_path : str or None
+        The path (relative to the Nexus facility root) on the central file
+        storage where this instrument stores its data
+    computer_name : str or None
+        The name of the 'support PC' connected to this instrument
+    computer_ip : str or None
+        The REN IP address of the 'support PC' connected to this instrument
+    computer_mount : str or None
+        The full path where the files are saved on the 'support PC' for the
+        instrument (e.g. 'M:/')
     """
     def __init__(self,
                  api_url=None,
@@ -108,17 +130,17 @@ class _Instrument:
         self.computer_mount = computer_mount
 
     def __repr__(self):
-        return f'Nexus Instrument: {self.name}\n' \
-               f'API url: {self.api_url}\n' \
-               f'Calendar name: {self.calendar_name}\n' \
-               f'Calendar url: {self.calendar_url}\n' \
-               f'Schema name: {self.schema_name}\n' \
-               f'Location: {self.location}\n' \
-               f'Property tag: {self.property_tag}\n' \
-               f'Filestore path: {self.filestore_path}\n' \
-               f'Computer IP: {self.computer_ip}\n ' \
-               f'Computer name: {self.computer_name}\n ' \
-               f'Computer mount: {self.computer_mount}\n'
+        return f'Nexus Instrument:\t{self.name}\n' \
+               f'API url:\t\t{self.api_url}\n' \
+               f'Calendar name:\t\t{self.calendar_name}\n' \
+               f'Calendar url:\t\t{self.calendar_url}\n' \
+               f'Schema name:\t\t{self.schema_name}\n' \
+               f'Location:\t\t{self.location}\n' \
+               f'Property tag:\t\t{self.property_tag}\n' \
+               f'Filestore path:\t\t{self.filestore_path}\n' \
+               f'Computer IP:\t\t{self.computer_ip}\n' \
+               f'Computer name:\t\t{self.computer_name}\n' \
+               f'Computer mount:\t\t{self.computer_mount}\n'
 
     def __str__(self):
         return f'{self.name}' + f' in {self.location}' if self.location else ''

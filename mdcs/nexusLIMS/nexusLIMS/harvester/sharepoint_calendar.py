@@ -245,7 +245,7 @@ def fetch_xml(instrument=None, date=None):
     # https://***REMOVED***nexuslims/NexusMicroscopyLIMS/wikis/Sharepoint-Calendar-Information
 
     # Parse instrument parameter input, leaving inst_to_fetch as list of
-    # nexuslims.instruments._Instrument objects
+    # nexuslims.instruments.Instrument objects
     if instrument is None:
         inst_to_fetch = list(_instr_db.values())
     elif isinstance(instrument, str):

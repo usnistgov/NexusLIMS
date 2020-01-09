@@ -53,9 +53,11 @@ def process_tecnai_microscope_info(microscope_info, delimiter=u'\u2028'):
         The string of data obtained from the original_metadata.ImageList.\
         TagGroup0.ImageTags.Tecnai.Microscope_Info leaf of the metadata tree
         obtained when loading a .dm3 file as a HyperSpy signal
-    delimiter : unicode str
-        The value used to split the ``microscope_info`` string. Should not need
-        to be provided, but specified as a parameter for flexibility
+    delimiter : str
+        The value (a unicode string) used to split the ``microscope_info``
+        string. Should not need to be provided (this value is hard-coded in
+        DigitalMicrograph), but specified as a parameter for future
+        flexibility
 
     Returns
     -------
@@ -214,7 +216,8 @@ def get_dm3_metadata(filename):
     """
     Returns the metadata (as a dict) from a .dm3 file saved by the Gatan's
     Digital Micrograph in the Nexus Microscopy Facility, with some
-    non-relevant information stripped out
+    non-relevant information stripped out, and instrument specific metadata
+    parsed and added by one of the instrument-specific parsers.
 
     Parameters
     ----------
@@ -223,8 +226,9 @@ def get_dm3_metadata(filename):
 
     Returns
     -------
-    metadata : dict
-        The metadata of interest extracted from the file
+    metadata : dict or None
+        The metadata of interest extracted from the file. If None, the file
+        could not be opened
     """
     # We do lazy loading so we don't actually read the data from the disk to
     # save time and memory.

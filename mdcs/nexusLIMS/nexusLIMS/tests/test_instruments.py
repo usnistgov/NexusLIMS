@@ -26,7 +26,7 @@
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
 
-from nexusLIMS.instruments import _Instrument
+from nexusLIMS.instruments import Instrument
 
 
 class TestInstruments:
@@ -48,7 +48,7 @@ class TestInstruments:
                                'Philips-EM400-TEM-599910']
         for i in instruments_to_test:
             assert i in instrument_db
-            assert isinstance(instrument_db[i], _Instrument)
+            assert isinstance(instrument_db[i], Instrument)
 
         assert 'some_random_instrument' not in instrument_db
 
@@ -67,14 +67,14 @@ class TestInstruments:
 
         assert \
             repr(instrument_db['FEI-Titan-TEM-635816']) == \
-            'Nexus Instrument: FEI-Titan-TEM-635816\n' + \
-            f'API url: {api_url}\n' + \
-            'Calendar name: FEI Titan TEM\n' + \
-            f'Calendar url: {cal_url}\n' + \
-            'Schema name: FEI Titan TEM\n' \
-            'Location: ***REMOVED***\n' \
-            'Property tag: 635816\n' \
-            'Filestore path: ./Titan\n' \
-            'Computer IP: ***REMOVED***\n ' \
-            'Computer name: ***REMOVED***\n ' \
-            'Computer mount: M:/\n'
+            'Nexus Instrument:\tFEI-Titan-TEM-635816\n' + \
+            f'API url:\t\t{api_url}\n' + \
+            'Calendar name:\t\tFEI Titan TEM\n' + \
+            f'Calendar url:\t\t{cal_url}\n' + \
+            'Schema name:\t\tFEI Titan TEM\n' \
+            'Location:\t\t***REMOVED***\n' \
+            'Property tag:\t\t635816\n' \
+            'Filestore path:\t\t./Titan\n' \
+            'Computer IP:\t\t***REMOVED***\n' \
+            'Computer name:\t\t***REMOVED***\n' \
+            'Computer mount:\t\tM:/\n'

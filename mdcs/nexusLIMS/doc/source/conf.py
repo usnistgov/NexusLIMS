@@ -16,6 +16,7 @@ import shutil
 sys.path.insert(0, os.path.abspath('../../'))
 import nexusLIMS.version
 from datetime import datetime
+from glob import glob
 
 # -- Project information -----------------------------------------------------
 
@@ -89,9 +90,10 @@ exclude_patterns = [
     'Thumbs.db',
     '.DS_Store',
     'build',
-    'api/nexusLIMS.rst',
+#    'api/nexusLIMS.rst',
     'api/nexusLIMS.version.rst',
-    'README.rst'
+    'README.rst',
+    'dev_scripts'
 ]
 
 # Keep warnings as “system message” paragraphs in the built documents.
@@ -211,11 +213,26 @@ def run_apidoc(_):
     output_path = os.path.join(cur_dir, 'api')
     shutil.rmtree(output_path, ignore_errors=True)
     modules = os.path.normpath(os.path.join(cur_dir, "../../nexusLIMS"))
-    main(['-f', '-M', '-T', '-o', output_path, modules])
+    to_exclude = list(glob(os.path.join(modules, 'dev_scripts') + '/**/*',
+                           recursive=True))
+    # to_exclude += [os.path.join(modules, 'builder')]
+    main(['-f', '-M', '-T', '-d', '-1', '-o', output_path, modules] +
+         to_exclude)
+
+
+# lines from intersphinx to ignore during api-doc autogeneration (so we don't
+# get useless warning messages while the docs are being built
+nitpick_ignore = [('py:class', 'function'),
+                  ('py:class', 'optional')]
+
+
+def skip(app, what, name, obj, would_skip, options):
+    if name == "__init__":
+        return False
+    return would_skip
 
 
 def setup(app):
+    # app.connect("autodoc-skip-member", skip)
     app.connect('builder-inited', run_apidoc)
     app.add_stylesheet("custom-styles.css")
-
-

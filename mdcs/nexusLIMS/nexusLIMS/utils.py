@@ -41,7 +41,7 @@ def parse_xml(xml, xslt_file, **kwargs):
         A string containing XML, such as that returned by :py:func:`~.fetch_xml`
     xslt_file : str
         Path to the XSLT file to use for transformation
-    **kwargs : dict (optional)
+    **kwargs : dict, optional
         Other keyword arguments are passed as parameters to the XSLT
         transformer. ``None`` values are converted to an empty string.
     Returns
@@ -73,7 +73,7 @@ def parse_xml(xml, xslt_file, **kwargs):
     return simplified_dom
 
 
-def nexus_req(url, func, **kwargs):
+def nexus_req(url, fn, **kwargs):
     """
     A helper method that wraps a function from :py:mod:`requests`, but adds a
     local certificate authority chain to validate the SharePoint server's
@@ -83,12 +83,12 @@ def nexus_req(url, func, **kwargs):
     ----------
     url : str
         The URL to fetch
-    func : func
+    fn : function
         The function from the ``requests`` library to use (e.g.
         :py:func:`~requests.get`, :py:func:`~requests.put`,
         :py:func:`~requests.post`, etc.)
-    **kwargs : dict (optional)
-        Other keyword arguments are passed along to the ``func``
+    **kwargs : dict, optional
+        Other keyword arguments are passed along to the ``fn``
 
     Returns
     -------
@@ -104,7 +104,7 @@ def nexus_req(url, func, **kwargs):
             lines = our_cert.readlines()
         tmp.writelines(lines)
         tmp.seek(0)
-        r = func(url, auth=get_auth(), verify=tmp.name, **kwargs)
+        r = fn(url, auth=get_auth(), verify=tmp.name, **kwargs)
 
     return r
 

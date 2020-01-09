@@ -50,7 +50,7 @@ def read_metadata(sig):
 
     Parameters
     ----------
-    sig : HyperSpy signal
+    sig : :py:class:`hyperspy.signal.BaseSignal`
         The signal for which to parse the metadata
 
     Returns
@@ -151,7 +151,7 @@ class AcquisitionActivity:
     Instances of this class correspond to AcquisitionActivity nodes in the
     `NexusLIMS schema <https://data.nist.gov/od/dm/nexus/experiment/v1.0>`_
 
-    Attributes
+    Parameters
     ----------
     start : datetime.datetime
         The start point of this AcquisitionActivity
@@ -174,10 +174,12 @@ class AcquisitionActivity:
     files : list
         A list of filenames belonging to this AcquisitionActivity
     previews : list
-        A list of filenames pointing to the previews for each file in ``files``
+        A list of filenames pointing to the previews for each file in
+        ``files``
     sigs : list
-        A list of *lazy* (to minimize loading times) HyperSpy signals in this
-        AcquisitionActivity. HyperSpy is used to facilitate metadata reading
+        A list of *lazy* (to minimize loading times) HyperSpy signals in
+        this AcquisitionActivity. HyperSpy is used to facilitate metadata
+        reading
     meta : list
         A list of dictionaries containing the "important" metadata for each
         signal/file in ``sigs`` and ``files``
@@ -282,8 +284,8 @@ class AcquisitionActivity:
 
         Parameters
         ----------
-        values_to_search : iterable type
-            A list (or tuple, set, or other iterable) containing values to
+        values_to_search : list
+            A list (or tuple, set, or other iterable type) containing values to
             search for in the metadata dictionary list. If None (default), all
             values contained in any file will be searched.
         """
@@ -428,17 +430,6 @@ class AcquisitionActivity:
             activity_xml += f'{INDENT*3}<param name="{pk}">' \
                           f'{pv}</param>{line_ending}'
         activity_xml += f'{INDENT*2}</setup>{line_ending}'
-
-        # DONE: Remove example notes entry for production
-        #      This is a temporary output for example records
-        # activity_xml += f'{INDENT*2}<notes source="ELN">{line_ending}'
-        # activity_xml += f'{INDENT*3}<entry xsi:type="nx:TextEntry">{line_ending}'
-        # activity_xml += f'{INDENT*4}<p>This is an example note entry for ' \
-        #                 f'an acquisitionActivity</p>' \
-        #                 f'<p>Its text representation in Python is ' \
-        #                 f'"{self}"</p>{line_ending}'
-        # activity_xml += f'{INDENT*3}</entry>{line_ending}'
-        # activity_xml += f'{INDENT*2}</notes>{line_ending}'
 
         # This is kind of a temporary hack until I figure out a better solution
         # TODO: fix determination of dataset types

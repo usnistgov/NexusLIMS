@@ -294,7 +294,8 @@ def dump_record(path,
         The ending timestamp used to determine the last point in time for
         which files should be associated with this record
     filename : None or str
-        The filename of the dumped xml file to write. If none, a d
+        The filename of the dumped xml file to write. If None, a default name
+        will be generated from the other parameters
     instrument : str
         A string which corresponds to the type of microscope used to generate
         the data to be dumped
