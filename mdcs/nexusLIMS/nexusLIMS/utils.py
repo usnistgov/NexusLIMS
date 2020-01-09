@@ -29,6 +29,7 @@
 from lxml import etree as _etree
 import certifi as _certifi
 import tempfile as _tempfile
+import os as _os
 
 
 def parse_xml(xml, xslt_file, **kwargs):
@@ -109,3 +110,156 @@ def nexus_req(url, fn, **kwargs):
     return r
 
 
+def is_subpath(path, of_paths):
+    """
+    Helper function to determine if a given path is a "subpath" of a set of
+    paths. Useful to help determine which instrument a given file comes from,
+    given the instruments ``filestore_path`` and the path of the file to test.
+
+    Parameters
+    ----------
+    path : str
+        The path of the file (or directory) to test. This will usually be the
+        absolute path to a file on the local filesystem (to be compared using
+        the host-specific ``mmf_nexus_root_path``.
+    of_paths : str or list
+        The "higher-level" path to test against (or list thereof). In typical
+        use, this will be a path joined of an instruments ``filestore_path``
+        with the root-level ``mmf_nexus_root_path``
+
+    Returns
+    -------
+    result : bool
+        Whether or not path is a subpath of one of the directories in of_paths
+
+    Examples
+    --------
+    >>> is_subpath('/mnt/***REMOVED***/Titan/***REMOVED***/190628 - Aaron ' +
+    ...            'Training/***REMOVED***/4_330mm.dm3',
+    ...            os.path.join(_mmf_path, titan.filestore_path))
+    True
+    """
+    if isinstance(of_paths, str):
+        of_paths = [of_paths]
+    abs_of_paths = [_os.path.abspath(of_path) for of_path in of_paths]
+
+    result = any(_os.path.abspath(path).startswith(subpath)
+                 for subpath in abs_of_paths)
+
+    return result
+
+
+def get_nested_dict_value(nested_dict, value, prepath=()):
+    """
+    Use a recursive method to find a value in a dictionary of dictionaries
+    (such as the metadata dictionaries we receive from the file parsers).
+    Cribbed from: https://stackoverflow.com/a/22171182/1435788
+
+    Parameters
+    ----------
+    nested_dict : dict
+        Dictionary to search
+    value : object
+        Value to search for
+    prepath : tuple
+        "path" to prepend to the search to limit the search to only part of
+        the dictionary
+
+    Returns
+    -------
+    path : tuple or None
+        The "path" through the dictionary (expressed as a tuple of keys) where
+        value was found. If None, the value was not found in the dictionary.
+    """
+    for k, v in nested_dict.items():
+        path = prepath + (k,)
+        if v == value:                                   # found value
+            return path
+        elif hasattr(v, 'items'):                        # v is a dict
+            p = get_nested_dict_value(v, value, path)    # recursive call
+            if p is not None:
+                return p
+
+
+def get_nested_dict_key(nested_dict, key_to_find, prepath=()):
+    """
+    Use a recursive method to find a key in a dictionary of dictionaries
+    (such as the metadata dictionaries we receive from the file parsers).
+    Cribbed from: https://stackoverflow.com/a/22171182/1435788
+
+    Parameters
+    ----------
+    nested_dict : dict
+        Dictionary to search
+    key_to_find : object
+        Value to search for
+    prepath : tuple
+        "path" to prepend to the search to limit the search to only part of
+        the dictionary
+
+    Returns
+    -------
+    path : tuple or None
+        The "path" through the dictionary (expressed as a tuple of keys) where
+        value was found. If None, the value was not found in the dictionary.
+    """
+    for k, v in nested_dict.items():
+        path = prepath + (k,)
+        if k == key_to_find:                                 # found key
+            return path
+        elif hasattr(v, 'items'):                            # v is a dict
+            p = get_nested_dict_key(v, key_to_find, path)    # recursive call
+            if p is not None:
+                return p
+
+
+def get_nested_dict_value_by_path(nest_dict, path):
+    """
+    Get the value from within a nested dictionary structure by traversing into
+    the dictionary as deep as that path found and returning that value
+
+    Parameters
+    ----------
+    nest_dict : dict
+        A dictionary of dictionaries that is to be queried
+    path : tuple
+        A tuple (or other iterable type) that specifies the subsequent keys
+        needed to get to a a value within `nest_dict`
+
+    Returns
+    -------
+    value : object
+        The value at the path within the nested dictionary
+    """
+    sub_dict = nest_dict
+    for key in path:
+        if key in sub_dict:
+            sub_dict = sub_dict[key]
+        else:
+            sub_dict = None
+
+    return sub_dict
+
+
+def set_nested_dict_value(nest_dict, path, value):
+    """
+    Set a value within a nested dictionary structure by traversing into
+    the dictionary as deep as that path found and changing it to `value`.
+    Cribbed from https://stackoverflow.com/a/13688108/1435788
+
+    Parameters
+    ----------
+    nest_dict : dict
+        A dictionary of dictionaries that is to be queried
+    path : tuple
+        A tuple (or other iterable type) that specifies the subsequent keys
+        needed to get to a a value within `nest_dict`
+
+    Returns
+    -------
+    value : object
+        The value at the path within the nested dictionary
+    """
+    for key in path[:-1]:
+        nest_dict = nest_dict.setdefault(key, {})
+    nest_dict[path[-1]] = value
