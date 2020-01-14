@@ -228,15 +228,16 @@ def get_nested_dict_value_by_path(nest_dict, path):
 
     Returns
     -------
-    value : object
-        The value at the path within the nested dictionary
+    value : object or str
+        The value at the path within the nested dictionary; if there's no
+        value there, return the string `"not found"`
     """
     sub_dict = nest_dict
     for key in path:
         if key in sub_dict:
             sub_dict = sub_dict[key]
         else:
-            sub_dict = None
+            sub_dict = 'not found'
 
     return sub_dict
 
@@ -254,6 +255,8 @@ def set_nested_dict_value(nest_dict, path, value):
     path : tuple
         A tuple (or other iterable type) that specifies the subsequent keys
         needed to get to a a value within `nest_dict`
+    value : object
+        The value which will be given to the path in the nested dictionary
 
     Returns
     -------
@@ -263,3 +266,32 @@ def set_nested_dict_value(nest_dict, path, value):
     for key in path[:-1]:
         nest_dict = nest_dict.setdefault(key, {})
     nest_dict[path[-1]] = value
+
+
+def try_getting_dict_value(d, key):
+    """
+    This method will try to get a value from a dictionary (potentially
+    nested) and fail silently if the value is not found, returning None.
+
+    Parameters
+    ----------
+    d : dict
+        The dictionary from which to get a value
+    key : str or tuple
+        The key to query, or if an iterable container type (tuple, list,
+        etc.) is given, the path into a nested dictionary to follow
+
+    Returns
+    -------
+    val : object or str
+        The value of the dictionary specified by `key`. If the dictionary
+        does not have a key, returns the string `"not found"` without raising an
+        error
+    """
+    try:
+        if isinstance(key, str):
+            return d[key]
+        elif hasattr(key, '__iter__'):
+            return get_nested_dict_value_by_path(d, key)
+    except (KeyError, TypeError) as e:
+        return 'not found'
