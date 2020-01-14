@@ -71,7 +71,7 @@
         <xsl:value-of select="link/m:inline/entry/content/m:properties/d:Name"/>
       </xsl:element>
       <xsl:element name="email">
-        <xsl:value-of select="link/m:inline/entry/content/m:properties/d:WorkEMail"/>
+        <xsl:value-of select="link/m:inline/entry/content/m:properties/d:WorkEmail"/>
       </xsl:element>
       <xsl:element name="phone">
         <xsl:value-of select="link/m:inline/entry/content/m:properties/d:WorkPhone"/>

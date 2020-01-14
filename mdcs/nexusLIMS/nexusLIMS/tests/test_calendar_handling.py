@@ -325,14 +325,15 @@ class TestCalendarHandling:
             ('eventId', '501')])
 
         user = parsed_docs['date_and_user'].find('event/user')
+        link_idx = instrument_db['FEI-Titan-TEM-635816'].api_url.rfind('/')
+        lnk_base = instrument_db['FEI-Titan-TEM-635816'].api_url[:link_idx]
         user_dict = OrderedDict([
             ('userName', '***REMOVED***'),
             ('name', '***REMOVED*** (Fed)'),
             ('email', '***REMOVED***'),
             ('phone', '***REMOVED***'),
             ('office', '***REMOVED***'),
-            ('link', 'https://***REMOVED***/***REMOVED***/'
-                     '_vti_bin/ListData.svc/UserInformationList(224)'),
+            ('link', f'{lnk_base}/UserInformationList(224)'),
             ('userId', '224')])
 
         for k, v in tag_dict.items():
