@@ -30,7 +30,7 @@ from lxml import etree as _etree
 import certifi as _certifi
 import tempfile as _tempfile
 import os as _os
-
+import json as _json
 
 def parse_xml(xml, xslt_file, **kwargs):
     """
@@ -295,3 +295,19 @@ def try_getting_dict_value(d, key):
             return get_nested_dict_value_by_path(d, key)
     except (KeyError, TypeError) as e:
         return 'not found'
+
+
+class SortedDictEncoder(_json.JSONEncoder):
+    """
+    A class override for the json dump methods that will sort dictionaries
+    before serializing them to json for better output
+
+    Taken from https://stackoverflow.com/a/24077013/1435788
+    """
+    def encode(self, obj):
+        def sort_dicts(item):
+            if isinstance(item, dict):
+                return {k: sort_dicts(v) for k, v in item.items()}
+            else:
+                return item
+        return super(SortedDictEncoder, self).encode(sort_dicts(obj))

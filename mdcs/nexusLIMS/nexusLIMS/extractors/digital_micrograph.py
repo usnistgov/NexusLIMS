@@ -32,6 +32,8 @@ import re as _re
 import logging as _logging
 import shutil as _shutil
 import tarfile as _tarfile
+import numpy as _np
+from datetime import datetime as _dt
 
 from hyperspy.io import load as _hs_load
 from hyperspy.exceptions import *
@@ -69,9 +71,10 @@ def parse_643_titan(mdict):
         files originating from this microscope with "important" values contained
         under the ``nx_meta`` key at the root level
     """
-    # Currently, the 643 Titan does not add any metadata items that need to
-    # be processed differently than the "default" dm3 tags, so for now this
-    # method does nothing
+    # The 643 Titan will likely have session info defined, but it may not be
+    # accurate, so add it to the warning list
+    for m in ['Detector', 'Operator', 'Specimen']:
+        mdict['nx_meta']['warnings'].append([m])
     return mdict
 
 
@@ -143,11 +146,11 @@ def parse_642_titan(mdict):
         'Dif_Strength': 'Diffraction Lens Strength',
         'Image_Shift_x': 'Image Shift X',
         'Image_Shift_y': 'Image Shift Y',
-        'Stage_Position_x': ['Stage Position', 'Stage X'],
-        'Stage_Position_y': ['Stage Position', 'Stage Y'],
-        'Stage_Position_z': ['Stage Position', 'Stage Z'],
-        'Stage_Position_theta': ['Stage Position', 'Stage θ'],
-        'Stage_Position_phi': ['Stage Position', 'Stage φ'],
+        'Stage_Position_x': ['Stage Position', 'X'],
+        'Stage_Position_y': ['Stage Position', 'Y'],
+        'Stage_Position_z': ['Stage Position', 'Z'],
+        'Stage_Position_theta': ['Stage Position', 'θ'],
+        'Stage_Position_phi': ['Stage Position', 'φ'],
         'C1_Aperture': 'C1 Aperture',
         'C2_Aperture': 'C2 Aperture',
         'Obj_Aperture': 'Objective Aperture',
@@ -292,8 +295,12 @@ def parse_dm3_microscope_info(mdict):
         # the "facility-wide" set values that do not have any meaning:
         if val != 'not found' and val not in ['DO NOT EDIT', 'DO NOT ENTER'] \
                 and val != []:
+            # change output of "Stage Position" to unicode characters
             if 'Stage Position' in m:
-                m[-1] = m[-1].replace('Alpha', 'α').replace('Beta', 'β')
+                m[-1] = m[-1].replace(
+                                'Alpha', 'α').replace(
+                                'Beta', 'β').replace(
+                                'Stage ', '')
             _set_nest_dict_val(mdict, ['nx_meta'] + m, val)
 
     # General "session info" .dm3 tags (sometimes this information is stored
@@ -354,6 +361,24 @@ def parse_dm3_microscope_info(mdict):
     if val != 'not found':
         _set_nest_dict_val(mdict, ['nx_meta', 'GMS Version'], val)
 
+    # Get camera binning:
+    val = _try_get_dict_val(mdict, pre_path +
+                            ['Acquisition', 'Parameters',
+                             'High Level', 'Binning'])
+    if val != 'not found':
+        _set_nest_dict_val(mdict, ['nx_meta', 'Binning (Horizontal)'], val[0])
+        _set_nest_dict_val(mdict, ['nx_meta', 'Binning (Vertical)'], val[1])
+
+    # Get image processing:
+    #   ImageTags.Acquisition.Parameters["High Level"].Processing will be
+    #   something like "Gain normalized" - not just for EELS so move this to
+    #   general
+    val = _try_get_dict_val(mdict, pre_path + ['Acquisition', 'Parameters',
+                                               'High Level', 'Processing'])
+    if val != 'not found':
+        _set_nest_dict_val(mdict, ['nx_meta', 'Camera/Detector Processing'],
+                           val)
+
     return mdict
 
 
@@ -413,6 +438,75 @@ def parse_dm3_eels_info(mdict):
                                    ["Spectrometer " + m[0]],
                                    val)
 
+    # Process known tags under "processing":
+    #   ImageTags.Processing will be a list of things done (in multiple
+    #   TagGroups) - things like Compute thickness, etc.
+    val = _try_get_dict_val(mdict, pre_path + ['Processing'])
+    if val != 'not found' and isinstance(val, dict):
+        # if val is a dict, then there were processing steps applied
+        eels_ops = []
+        for k, v in val.items():
+            # k will be TagGroup0, TagGroup1, etc.
+            # v will be dictionaries specifying the process step
+            # AlignSIByPeak, DataPicker, SpectrumCalibrate,
+            # Compute Thickness, Background Removal, Signal Integration
+            op = v['Operation']
+            param = v['Parameters']
+            if op == 'AlignSIByPeak':
+                eels_ops.append('Aligned parent SI By Peak')
+            elif op == 'Background Removal':
+                val = _try_get_dict_val(param, ['Model'])
+                if val != 'not found':
+                    _set_nest_dict_val(mdict,
+                                       ['nx_meta', 'EELS',
+                                        'Background Removal Model'], val)
+                eels_ops.append(op)
+            elif op == 'SpectrumCalibrate':
+                eels_ops.append('Calibrated Post-acquisition')
+            elif op == 'Compute Thickness':
+                mdict = _process_thickness_metadata(mdict, pre_path + ['EELS'])
+                eels_ops.append(op)
+            elif op == 'DataPicker':
+                eels_ops.append('Extracted from SI')
+            elif op == 'Signal Integration':
+                eels_ops.append(op)
+        if eels_ops:
+            # remove duplicates (convert to set) and sort alphabetically:
+            _set_nest_dict_val(mdict,
+                               ['nx_meta', 'EELS',
+                                'Processing Steps'],
+                               ', '.join(sorted(set(eels_ops))))
+
+    return mdict
+
+
+def _process_thickness_metadata(mdict, base):
+    abs_thick = _try_get_dict_val(mdict, base
+                                  + ['Thickness', 'Absolute',
+                                     'Measurement'])
+    abs_units = _try_get_dict_val(mdict, base
+                                  + ['Thickness', 'Absolute',
+                                     'Units'])
+    abs_mfp = _try_get_dict_val(mdict, base
+                                + ['Thickness', 'Absolute',
+                                   'Mean Free Path'])
+    rel_thick = _try_get_dict_val(mdict, base
+                                  + ['Thickness', 'Relative',
+                                     'Measurement'])
+    if abs_thick != 'not found':
+        _set_nest_dict_val(mdict, ['nx_meta', 'EELS',
+                                   f'Thickness (absolute) ['
+                                   f'{abs_units}]'],
+                           abs_thick)
+    if abs_mfp != 'not found':
+        _set_nest_dict_val(mdict, ['nx_meta', 'EELS',
+                                   'Thickness (absolute) mean '
+                                   'free path'], abs_mfp[0])
+    if rel_thick != 'not found':
+        _set_nest_dict_val(mdict, ['nx_meta', 'EELS',
+                                   'Thickness (relative) [t/λ]'],
+                           rel_thick)
+
     return mdict
 
 
@@ -420,7 +514,9 @@ def parse_dm3_eds_info(mdict):
     """
     Parses metadata from the DigitalMicrograph tag structure that concerns any
     EDS acquisition or spectrometer settings, placing it in an ``EDS``
-    dictionary underneath the root-level ``nx_meta`` node.
+    dictionary underneath the root-level ``nx_meta`` node. Metadata values
+    that are commonly incorrect or may be placeholders are specified in a
+    list under the ``nx_meta.warnings`` node.
 
     Parameters
     ----------
@@ -433,7 +529,6 @@ def parse_dm3_eds_info(mdict):
         The metadata dictionary with all the "EDS-specific" metadata
         added as sub-node under the ``nx_meta`` root level dictionary
     """
-    # TODO: actually implement EDS
     pre_path = get_pre_path(mdict)
 
     # EELS .dm3 tags of interest:
@@ -467,6 +562,138 @@ def parse_dm3_eds_info(mdict):
             # add last value of each parameter to the "EDS" sub-tree of nx_meta
             _set_nest_dict_val(mdict, ['nx_meta', 'EDS'] +
                                [m[-1] if len(m) > 1 else m[0]], val)
+
+    # test to see if the SI attribute is present in the metadata dictionary.
+    # If so, then some of the relevant EDS values are located there, rather
+    # than in the root-level EDS tag (all of the EDS.Acquisition tags from
+    # above)
+    if _try_get_dict_val(mdict, pre_path + ['SI']) != 'not found':
+        for m in [['Acquisition', 'Continuous Mode'],
+                  ['Acquisition', 'Count Rate Unit'],
+                  ['Acquisition', 'Dispersion (eV)'],
+                  ['Acquisition', 'Energy Cutoff (V)'],
+                  ['Acquisition', 'Exposure (s)']]:
+            val = _try_get_dict_val(mdict, pre_path + ['SI'] + m)
+            if val != 'not found':
+                # add last value of each parameter to the "EDS" sub-tree of
+                # nx_meta
+                _set_nest_dict_val(mdict, ['nx_meta', 'EDS'] + [m[-1]], val)
+        # for an SI EDS dataset, set "Live time", "Real time" and "Count rate"
+        # to the averages stored in the ImageList.TagGroup0.ImageTags.EDS.Images
+        # values
+        im_dict = _try_get_dict_val(mdict, pre_path + ['EDS', 'Images'])
+        if isinstance(im_dict, dict):
+            for k, v in im_dict.items():
+                if k in mdict['nx_meta']['EDS']:
+                    del mdict['nx_meta']['EDS'][k]
+                # this should work for 2D (spectrum image) as well as 1D
+                # (linescan) datasets since DM saves this information as a 1D
+                # list regardless of original data shape
+                avg_val = _np.array(v).mean()
+                _set_nest_dict_val(mdict,
+                                   ['nx_meta', 'EDS'] + [f'{k} (SI Average)'],
+                                   avg_val)
+
+    # Add the .dm3 EDS values to the warnings list, since they might not be
+    # accurate
+    for m in [['Count rate'],
+              ['Detector Info', 'Active layer'],
+              ['Detector Info', 'Azimuthal angle'],
+              ['Detector Info', 'Dead layer'],
+              ['Detector Info', 'Detector type'],
+              ['Detector Info', 'Elevation angle'],
+              ['Detector Info', 'Fano'],
+              ['Detector Info', 'Gold layer'],
+              ['Detector Info', 'Incidence angle'],
+              ['Detector Info', 'Solid angle'],
+              ['Detector Info', 'Stage tilt'],
+              ['Detector Info', 'Window thickness'],
+              ['Detector Info', 'Window type'],
+              ['Detector Info', 'Zero fwhm'],
+              ['Live time'],
+              ['Real time']]:
+        if _try_get_dict_val(mdict, base + m) != 'not found':
+            mdict['nx_meta']['warnings'].append(['EDS'] + m)
+
+    return mdict
+
+
+def parse_dm3_spectrum_image_info(mdict):
+    """
+    Parses metadata from the DigitalMicrograph tag structure that concerns any
+    spectrum imaging information (from the "SI" tag) and places it in a
+    "Spectrum Imaging" dictionary underneath the root-level ``nx_meta`` node.
+    Metadata values that are commonly incorrect or may be placeholders are
+    specified in a list under the ``nx_meta.warnings`` node.
+
+    Parameters
+    ----------
+    mdict : dict
+        A metadata dictionary as returned by :py:meth:`get_dm3_metadata`
+
+    Returns
+    -------
+    mdict : dict
+        The metadata dictionary with all the "EDS-specific" metadata
+        added as sub-node under the ``nx_meta`` root level dictionary
+    """
+    pre_path = get_pre_path(mdict)
+
+    # Spectrum imaging .dm3 tags of interest:
+    base = pre_path + ['SI']
+
+    for m_in, m_out in \
+            [(['Acquisition', 'Pixel time (s)'], ['Pixel time (s)']),
+             (['Acquisition', 'SI Application Mode', 'Name'], ['Scan Mode']),
+             (['Acquisition', 'Spatial Sampling', 'Height (pixels)'],
+              ['Spatial Sampling (Vertical)']),
+             (['Acquisition', 'Spatial Sampling', 'Width (pixels)'],
+              ['Spatial Sampling (Horizontal)']),
+             (['Acquisition', 'Scan Options', 'Sub-pixel sampling'],
+              ['Sub-pixel Sampling Factor'])]:
+        val = _try_get_dict_val(mdict, base + m_in)
+        # only add the value to this list if we found it, and it's not
+        # one of the "facility-wide" set values that do not have any meaning:
+        if val != 'not found':
+            # add last value of each parameter to the "EDS" sub-tree of nx_meta
+            _set_nest_dict_val(mdict, ['nx_meta', 'Spectrum Imaging'] + m_out,
+                               val)
+
+    # Check spatial drift correction separately:
+    drift_per_val = _try_get_dict_val(mdict,
+                                      base + ['Acquisition',
+                                              'Artefact Correction',
+                                              'Spatial Drift', 'Periodicity'])
+    drift_unit_val = _try_get_dict_val(mdict,
+                                       base + ['Acquisition',
+                                               'Artefact Correction',
+                                               'Spatial Drift', 'Units'])
+    if drift_per_val != 'not found' and drift_unit_val != 'not found':
+        val_to_set = f"Spatial drift correction every {drift_per_val} " \
+                     f"{drift_unit_val}"
+        # make sure statement looks gramatically correct
+        if drift_per_val == 1:
+            val_to_set = val_to_set.replace('(s)', '')
+        else:
+            val_to_set = val_to_set.replace('(s)', 's')
+        # fix for "seconds(s)" (***REMOVED***...)
+        if val_to_set[-2:] == 'ss':
+            val_to_set = val_to_set[:-1]
+        _set_nest_dict_val(mdict,
+                           ['nx_meta', 'Spectrum Imaging',
+                            'Artefact Correction'],
+                           val_to_set)
+
+    # Calculate acquisition duration:
+    start_val = _try_get_dict_val(mdict, base + ['Acquisition', 'Start time'])
+    end_val = _try_get_dict_val(mdict, base + ['Acquisition', 'End time'])
+    if start_val != 'not found' and end_val != 'not found':
+        start_dt = _dt.strptime(start_val, '%I:%M:%S %p')
+        end_dt = _dt.strptime(end_val, '%I:%M:%S %p')
+        duration = (end_dt - start_dt).seconds
+        _set_nest_dict_val(mdict,
+                           ['nx_meta', 'Spectrum Imaging',
+                            'Acquisition Duration (s)'], duration)
 
     return mdict
 
@@ -680,7 +907,8 @@ def get_dm3_metadata(filename):
         for i in range(len(s)):
             m_list[i] = s[i].original_metadata
     else:
-        m_list = [s.original_metadata]
+        s = [s]
+        m_list = [s[0].original_metadata]
 
     for i, m_tree in enumerate(m_list):
         # Important trees:
@@ -735,11 +963,14 @@ def get_dm3_metadata(filename):
         # if we found the instrument, then store the name as string, else None
         instr_name = instr.name if instr is not None else None
         m_list[i]['nx_meta'] = {}
+        m_list[i]['nx_meta']['Data Dimensions'] = str(s[i].data.shape)
         m_list[i]['nx_meta']['Instrument ID'] = instr_name
+        m_list[i]['nx_meta']['warnings'] = []
         m_list[i] = m_tree.as_dictionary()
         m_list[i] = parse_dm3_microscope_info(m_list[i])
         m_list[i] = parse_dm3_eels_info(m_list[i])
         m_list[i] = parse_dm3_eds_info(m_list[i])
+        m_list[i] = parse_dm3_spectrum_image_info(m_list[i])
 
         # if the instrument name is None, this check will be false, otherwise
         # look for the instrument in our list of instrument-specific parsers:
