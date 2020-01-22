@@ -54,6 +54,119 @@ from struct import error as _struct_error
 _logger = _logging.getLogger(__name__)
 
 
+def get_dm3_metadata(filename):
+    """
+    Returns the metadata (as a dict) from a .dm3 file saved by the Gatan's
+    Digital Micrograph in the Nexus Microscopy Facility, with some
+    non-relevant information stripped out, and instrument specific metadata
+    parsed and added by one of the instrument-specific parsers.
+
+    Parameters
+    ----------
+    filename : str
+        path to a .dm3 file saved by Gatan's Digital Micrograph
+
+    Returns
+    -------
+    metadata : dict or None
+        The metadata of interest extracted from the file. If None, the file
+        could not be opened
+    """
+    # We do lazy loading so we don't actually read the data from the disk to
+    # save time and memory.
+    try:
+        s = _hs_load(filename, lazy=True)
+    except (DM3DataTypeError, DM3FileVersionError, DM3TagError,
+            DM3TagIDError, DM3TagTypeError, _struct_error) as e:
+        _logger.warning(f'File reader could not open {filename}, received '
+                        f'exception: {e.__repr__()}')
+        return None
+
+    if isinstance(s, list):
+        # s is a list, rather than a single signal
+        m_list = [{}] * len(s)
+        for i in range(len(s)):
+            m_list[i] = s[i].original_metadata
+    else:
+        s = [s]
+        m_list = [s[0].original_metadata]
+
+    for i, m_tree in enumerate(m_list):
+        # Important trees:
+        #   DocumentObjectList
+        #     Contains information about the display of the information,
+        #     including bits about annotations that are included on top of the
+        #     image data, the CLUT (color look-up table), data min/max.
+        #
+        #   ImageList
+        #     Contains the actual image information
+
+        # Remove the trees that are not of interest:
+        for t in ['ApplicationBounds', 'LayoutType', 'DocumentTags',
+                  'HasWindowPosition', 'ImageSourceList',  'Image_Behavior',
+                  'InImageMode', 'MinVersionList', 'NextDocumentObjectID',
+                  'PageSetup', 'Page_Behavior', 'SentinelList', 'Thumbnails',
+                  'WindowPosition', 'root']:
+            m_tree = _remove_dtb_element(m_tree, t)
+
+        # Within the DocumentObjectList tree, we really only care about the
+        # AnnotationGroupList for each TagGroup, so go into each TagGroup and
+        # delete everything but that...
+        # NB: the hyperspy DictionaryTreeBrowser __iter__ function returns each
+        #   tree element as a tuple containing the tree name and the actual
+        #   tree, so we loop through the tag names by taking the first part
+        #   of the tuple:
+        for tg_name, tg in m_tree.DocumentObjectList:
+            # tg_name should be 'TagGroup0', 'TagGroup1', etc.
+            keys = tg.keys()
+            # we want to keep this, so remove from the list to loop through
+            if 'AnnotationGroupList' in keys:
+                keys.remove('AnnotationGroupList')
+            for k in keys:
+                # k should be in ['AnnotationType', 'BackgroundColor',
+                # 'BackgroundMode', 'FillMode', etc.]
+                m_tree = _remove_dtb_element(m_tree, 'DocumentObjectList.'
+                                                     '{}.{}'.format(tg_name, k))
+
+        for tg_name, tg in m_tree.ImageList:
+            # tg_name should be 'TagGroup0', 'TagGroup1', etc.
+            keys = tg.keys()
+            # We want to keep 'ImageTags' and 'Name', so remove from list
+            keys.remove('ImageTags')
+            keys.remove('Name')
+            for k in keys:
+                # k should be in ['ImageData', 'UniqueID']
+                m_tree = _remove_dtb_element(m_tree, 'ImageList.'
+                                                     '{}.{}'.format(tg_name, k))
+
+        # Get the instrument object associated with this file
+        instr = _get_instr(filename)
+        # if we found the instrument, then store the name as string, else None
+        instr_name = instr.name if instr is not None else None
+        m_list[i]['nx_meta'] = {}
+        m_list[i]['nx_meta']['Data Dimensions'] = str(s[i].data.shape)
+        m_list[i]['nx_meta']['Instrument ID'] = instr_name
+        m_list[i]['nx_meta']['warnings'] = []
+        m_list[i] = m_tree.as_dictionary()
+        m_list[i] = parse_dm3_microscope_info(m_list[i])
+        m_list[i] = parse_dm3_eels_info(m_list[i])
+        m_list[i] = parse_dm3_eds_info(m_list[i])
+        m_list[i] = parse_dm3_spectrum_image_info(m_list[i])
+
+        # if the instrument name is None, this check will be false, otherwise
+        # look for the instrument in our list of instrument-specific parsers:
+        if instr_name in _instr_specific_parsers.keys():
+            m_list[i] = _instr_specific_parsers[instr_name](m_list[i])
+
+    if len(m_list) == 1:
+        return m_list[0]
+    else:
+        m_list_dict = {}
+        for i in range(len(m_list)):
+            m_list_dict[f'Signal {i}'] = m_list[i]
+        return m_list_dict
+
+
 def parse_643_titan(mdict):
     """
     Add/adjust metadata specific to the 643 FEI Titan
@@ -871,119 +984,6 @@ def process_tecnai_microscope_info(microscope_info, delimiter=u'\u2028'):
         _logger.info('Filter settings not found in Tecnai microscope info')
 
     return info_dict
-
-
-def get_dm3_metadata(filename):
-    """
-    Returns the metadata (as a dict) from a .dm3 file saved by the Gatan's
-    Digital Micrograph in the Nexus Microscopy Facility, with some
-    non-relevant information stripped out, and instrument specific metadata
-    parsed and added by one of the instrument-specific parsers.
-
-    Parameters
-    ----------
-    filename : str
-        path to a .dm3 file saved by Gatan's Digital Micrograph
-
-    Returns
-    -------
-    metadata : dict or None
-        The metadata of interest extracted from the file. If None, the file
-        could not be opened
-    """
-    # We do lazy loading so we don't actually read the data from the disk to
-    # save time and memory.
-    try:
-        s = _hs_load(filename, lazy=True)
-    except (DM3DataTypeError, DM3FileVersionError, DM3TagError,
-            DM3TagIDError, DM3TagTypeError, _struct_error) as e:
-        _logger.warning(f'File reader could not open {filename}, received '
-                        f'exception: {e.__repr__()}')
-        return None
-
-    if isinstance(s, list):
-        # s is a list, rather than a single signal
-        m_list = [{}] * len(s)
-        for i in range(len(s)):
-            m_list[i] = s[i].original_metadata
-    else:
-        s = [s]
-        m_list = [s[0].original_metadata]
-
-    for i, m_tree in enumerate(m_list):
-        # Important trees:
-        #   DocumentObjectList
-        #     Contains information about the display of the information,
-        #     including bits about annotations that are included on top of the
-        #     image data, the CLUT (color look-up table), data min/max.
-        #
-        #   ImageList
-        #     Contains the actual image information
-
-        # Remove the trees that are not of interest:
-        for t in ['ApplicationBounds', 'LayoutType', 'DocumentTags',
-                  'HasWindowPosition', 'ImageSourceList',  'Image_Behavior',
-                  'InImageMode', 'MinVersionList', 'NextDocumentObjectID',
-                  'PageSetup', 'Page_Behavior', 'SentinelList', 'Thumbnails',
-                  'WindowPosition', 'root']:
-            m_tree = _remove_dtb_element(m_tree, t)
-
-        # Within the DocumentObjectList tree, we really only care about the
-        # AnnotationGroupList for each TagGroup, so go into each TagGroup and
-        # delete everything but that...
-        # NB: the hyperspy DictionaryTreeBrowser __iter__ function returns each
-        #   tree element as a tuple containing the tree name and the actual
-        #   tree, so we loop through the tag names by taking the first part
-        #   of the tuple:
-        for tg_name, tg in m_tree.DocumentObjectList:
-            # tg_name should be 'TagGroup0', 'TagGroup1', etc.
-            keys = tg.keys()
-            # we want to keep this, so remove from the list to loop through
-            if 'AnnotationGroupList' in keys:
-                keys.remove('AnnotationGroupList')
-            for k in keys:
-                # k should be in ['AnnotationType', 'BackgroundColor',
-                # 'BackgroundMode', 'FillMode', etc.]
-                m_tree = _remove_dtb_element(m_tree, 'DocumentObjectList.'
-                                                     '{}.{}'.format(tg_name, k))
-
-        for tg_name, tg in m_tree.ImageList:
-            # tg_name should be 'TagGroup0', 'TagGroup1', etc.
-            keys = tg.keys()
-            # We want to keep 'ImageTags' and 'Name', so remove from list
-            keys.remove('ImageTags')
-            keys.remove('Name')
-            for k in keys:
-                # k should be in ['ImageData', 'UniqueID']
-                m_tree = _remove_dtb_element(m_tree, 'ImageList.'
-                                                     '{}.{}'.format(tg_name, k))
-
-        # Get the instrument object associated with this file
-        instr = _get_instr(filename)
-        # if we found the instrument, then store the name as string, else None
-        instr_name = instr.name if instr is not None else None
-        m_list[i]['nx_meta'] = {}
-        m_list[i]['nx_meta']['Data Dimensions'] = str(s[i].data.shape)
-        m_list[i]['nx_meta']['Instrument ID'] = instr_name
-        m_list[i]['nx_meta']['warnings'] = []
-        m_list[i] = m_tree.as_dictionary()
-        m_list[i] = parse_dm3_microscope_info(m_list[i])
-        m_list[i] = parse_dm3_eels_info(m_list[i])
-        m_list[i] = parse_dm3_eds_info(m_list[i])
-        m_list[i] = parse_dm3_spectrum_image_info(m_list[i])
-
-        # if the instrument name is None, this check will be false, otherwise
-        # look for the instrument in our list of instrument-specific parsers:
-        if instr_name in _instr_specific_parsers.keys():
-            m_list[i] = _instr_specific_parsers[instr_name](m_list[i])
-
-    if len(m_list) == 1:
-        return m_list[0]
-    else:
-        m_list_dict = {}
-        for i in range(len(m_list)):
-            m_list_dict[f'Signal {i}'] = m_list[i]
-        return m_list_dict
 
 
 def _remove_dtb_element(tree, path):
