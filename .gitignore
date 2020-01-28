@@ -19,6 +19,7 @@ gitlab_backup.log
 .vscode
 test_data/
 **/doc/build
+**/db_logger_gui/build
 mdcs/nexusLIMS/doc/source/api/*.rst
 _coverage_output
 
