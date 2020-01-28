@@ -8,9 +8,11 @@ import pathlib as _pathlib
 from .quanta_tif import get_quanta_metadata
 from .digital_micrograph import get_dm3_metadata
 from .thumbnail_generator import sig_to_thumbnail as _s2thumb
+from .thumbnail_generator import down_sample_image as _down_sample
 from nexusLIMS import mmf_nexus_root_path as _mmf_path
 from nexusLIMS import nexuslims_root_path as _nx_path
 from nexusLIMS.utils import SortedDictEncoder
+from nexusLIMS.instruments import get_instr_from_filepath as _get_instr
 import hyperspy.api_nogui as _hs
 import logging as _logging
 
@@ -71,26 +73,43 @@ def parse_metadata(fname, write_output=True, generate_preview=True,
 
         if generate_preview:
             preview_fname = fname.replace(_mmf_path, _nx_path) + '.thumb.png'
-            s = _hs.load(fname, lazy=True)
+            if extension == 'tif':
+                instr = _get_instr(fname)
+                instr_name = instr.name if instr is not None else None
+                if instr_name == 'FEI-Quanta200-ESEM-633137':
+                    # we know the output size we want for the Quanta
+                    output_size = (512, 471)
+                    _down_sample(fname,
+                                 out_path=preview_fname,
+                                 output_size=output_size)
+                else:
+                    factor = 2
+                    _down_sample(fname,
+                                 out_path=preview_fname,
+                                 factor=factor)
 
-            # If s is a list of signals, use just the first one for our purposes
-            if isinstance(s, list):
-                num_sigs = len(s)
-                fname = s[0].metadata.General.original_filename
-                s = s[0]
-                s.metadata.General.title = \
-                    s.metadata.General.title + \
-                    f' (1 of {num_sigs} total signals in file "{fname}")'
+            else:
+                s = _hs.load(fname, lazy=True)
 
-            # only generate the preview if it doesn't exist, or overwrite
-            # parameter is explicitly provided
-            if not _os.path.isfile(preview_fname) or overwrite:
-                _logger.info(f'Generating preview: {preview_fname}')
-                # Create the directory for the thumbnail, if needed
-                _pathlib.Path(_os.path.dirname(preview_fname)).mkdir(
-                    parents=True, exist_ok=True)
-                # Generate the thumbnail
-                s.compute(progressbar=False)
-                _s2thumb(s, out_path=preview_fname)
+                # If s is a list of signals, use just the first one for
+                # our purposes
+                if isinstance(s, list):
+                    num_sigs = len(s)
+                    fname = s[0].metadata.General.original_filename
+                    s = s[0]
+                    s.metadata.General.title = \
+                        s.metadata.General.title + \
+                        f' (1 of {num_sigs} total signals in file "{fname}")'
+
+                # only generate the preview if it doesn't exist, or overwrite
+                # parameter is explicitly provided
+                if not _os.path.isfile(preview_fname) or overwrite:
+                    _logger.info(f'Generating preview: {preview_fname}')
+                    # Create the directory for the thumbnail, if needed
+                    _pathlib.Path(_os.path.dirname(preview_fname)).mkdir(
+                        parents=True, exist_ok=True)
+                    # Generate the thumbnail
+                    s.compute(progressbar=False)
+                    _s2thumb(s, out_path=preview_fname)
 
     return nx_meta

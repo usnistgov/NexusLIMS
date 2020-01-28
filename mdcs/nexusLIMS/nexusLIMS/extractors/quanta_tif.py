@@ -224,7 +224,7 @@ def parse_nx_meta(mdict):
 
     # parse chamber pressure
     ch_pres_val = _try_get_dict_val(mdict, ['Vacuum', 'ChPressure'])
-    if ch_pres_val != 'not found':
+    if ch_pres_val != 'not found' and ch_pres_val != '':
         # keep track of original digits so we don't propagate float errors
         try:
             ch_pres_val = _Decimal(ch_pres_val)

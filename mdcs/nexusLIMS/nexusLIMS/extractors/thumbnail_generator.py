@@ -39,6 +39,8 @@ import matplotlib.pyplot as _plt
 from matplotlib.offsetbox import AnchoredOffsetbox as _AOb
 from matplotlib.offsetbox import OffsetImage as _OIm
 from matplotlib.transforms import Bbox as _Bbox
+from PIL import Image as _PILImage
+from PIL.Image import LANCZOS as _LANCZOS
 
 _dir_path = _os.path.dirname(_os.path.realpath(__file__))
 
@@ -392,3 +394,48 @@ def sig_to_thumbnail(s, out_path, dpi=92):
             ax.figure.dpi_scale_trans.inverted())
 
         f.savefig(out_path, bbox_inches=extent, dpi=300)
+
+
+def down_sample_image(fname, out_path, output_size=None, factor=None):
+    """
+    Load an image file from disk, down-sample it to the requested dpi, and save.
+    Sometimes the data doesn't need to be loaded as a HyperSpy signal,
+    and it's better just to down-sample existing image data (such as for .tif
+    files created by the Quanta SEM).
+
+    Parameters
+    ----------
+    fname : str
+        The filepath that will be resized. All formats supported by
+        :py:meth:`PIL.Image.open` can be used
+    out_path : str
+        A path to the desired thumbnail filename. All formats supported by
+        :py:meth:`PIL.Image.save` can be used.
+    output_size : tuple
+        A tuple of ints specifying the width and height of the output image.
+        Either this argument or ``factor`` should be provided (not both).
+    factor : int
+        The multiple of the image size to reduce by (i.e. a value of 2
+        results in an image that is 50% of each original dimension). Either
+        this argument or ``output_size`` should be provided (not both).
+    """
+    if output_size is None and factor is None:
+        raise ValueError('One of output_size or factor must be provided')
+    if output_size is not None and factor is not None:
+        raise ValueError('Only one of output_size or factor should be provided')
+
+    im = _PILImage.open(fname)
+    size = im.size
+
+    if output_size is not None:
+        resized = output_size
+    else:
+        resized = tuple([s//factor for s in size])
+
+    # if im.mode not in ['RGB', 'RGBA', 'CMYK', 'YCbCr', 'LAB', 'HSV']:
+    #     im = im.convert('I')    # convert to 8-bit
+    if 'I' in im.mode:
+        im = im.point(lambda i: i * (1. / 256)).convert('L')
+
+    im.thumbnail(resized, resample=_LANCZOS)
+    im.save(out_path)
