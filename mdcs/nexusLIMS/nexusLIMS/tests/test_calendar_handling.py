@@ -82,12 +82,13 @@ class TestCalendarHandling:
 
         return raw_doc, parsed_docs
 
-    @pytest.mark.parametrize('instrument', list(instrument_db.keys()))
+    @pytest.mark.parametrize('instrument', list(instrument_db.values()),
+                             ids=list(instrument_db.keys()))
     def test_downloading_valid_calendars(self, instrument):
         # Handle the two test instruments that we put into the database,
         # which will raise an error because their url values are bogus
-        if instrument in ['testsurface-CPU_P1111111',
-                          'testVDI-VM-JAT-111222']:
+        if instrument.name in ['testsurface-CPU_P1111111',
+                               'testVDI-VM-JAT-111222']:
             with pytest.raises(requests.exceptions.ConnectionError):
                 sc.fetch_xml(instrument)
         else:
@@ -95,8 +96,8 @@ class TestCalendarHandling:
 
     def test_download_with_date(self):
         doc = etree.fromstring(
-            sc.fetch_xml(instrument='FEI-Titan-TEM-635816',
-                         date='2018-11-13')[0])
+            sc.fetch_xml(instrument=instrument_db['FEI-Titan-TEM-635816'],
+                         date='2018-11-13'))
         # This day should have one entry:
         assert len(doc.findall('entry')) == 1
 
@@ -108,7 +109,7 @@ class TestCalendarHandling:
         with monkeypatch.context() as m:
             m.setenv('nexusLIMS_user', 'bad_user')
             with pytest.raises(AuthenticationError):
-                sc.fetch_xml()
+                sc.fetch_xml(instrument_db['FEI-Titan-TEM-635816'])
 
     def test_absolute_path_to_credentials(self, monkeypatch):
         from nexusLIMS.harvester.sharepoint_calendar import get_auth
@@ -150,28 +151,20 @@ class TestCalendarHandling:
             # always returns a 404
             monkeypatch.setattr(requests, 'get', mock_get)
             with pytest.raises(requests.exceptions.ConnectionError):
-                sc.fetch_xml(None)
+                sc.fetch_xml(instrument_db['FEI-Titan-TEM-635816'])
 
     def test_fetch_xml_instrument_none(self, monkeypatch):
         with monkeypatch.context() as m:
             # use bad username so we don't get a response or lock miclims
             m.setenv('nexusLIMS_user', 'bad_user')
             with pytest.raises(AuthenticationError):
-                sc.fetch_xml(None)
-
-    def test_fetch_xml_instrument_tuple(self, monkeypatch):
-        with monkeypatch.context() as m:
-            # use bad username so we don't get a response or lock miclims
-            m.setenv('nexusLIMS_user', 'bad_user')
-            with pytest.raises(AuthenticationError):
-                sc.fetch_xml(instrument=('FEI-Titan-TEM-635816',
-                                         'FEI-Quanta200-ESEM-633137'))
+                sc.fetch_xml(instrument_db['FEI-Titan-TEM-635816'])
 
     def test_fetch_xml_instrument_bogus(self, monkeypatch):
         with monkeypatch.context() as m:
             # use bad username so we don't get a response or lock miclims
             m.setenv('nexusLIMS_user', 'bad_user')
-            with pytest.raises(AuthenticationError):
+            with pytest.raises(ValueError):
                 sc.fetch_xml(instrument=5)
 
     def test_dump_calendars(self, tmp_path):

@@ -35,7 +35,6 @@ from uuid import uuid4 as _uuid4
 from lxml import etree as _etree
 from datetime import datetime as _datetime
 from nexusLIMS.schemas.activity import AcquisitionActivity as _AcqAc
-from nexusLIMS.instruments import instrument_db as _instr_db
 from nexusLIMS.harvester import sharepoint_calendar as _sp_cal
 from nexusLIMS.utils import parse_xml as _parse_xml
 from glob import glob as _glob
@@ -63,11 +62,11 @@ def build_record(path, dt_from, dt_to, instrument, date, user):
     dt_to : datetime.datetime
         The ending timestamp used to determine the last point in time for
         which files should be associated with this record
-    instrument : str
-        As defined in :py:func:`~.sharepoint_calendar.get_events`
-        One of ['msed_titan', 'quanta', 'jeol_sem', 'hitachi_sem',
-        'jeol_tem', 'cm30', 'em400', 'hitachi_s5500', 'mmsd_titan',
-        'fei_helios_db']. Controls what calendar the events are fetched from.
+    instrument : :py:class:`~nexusLIMS.instruments.Instrument` or str
+        One of the NexusLIMS instruments contained in the
+        :py:attr:`~nexusLIMS.instruments.instrument_db` database.
+        Controls what instrument calendar is used to get events. If string,
+        should be one of the instrument PIDs from the Nexus facility.
     date : str or None
         A YYYY-MM-DD date string indicating the date from which events should
         be fetched (note: the start time of each entry is what will be
@@ -103,7 +102,7 @@ def build_record(path, dt_from, dt_to, instrument, date, user):
     xml_record += "xmlns:nx=\"" \
                   "https://data.nist.gov/od/dm/nexus/experiment/v1.0\">\n"
 
-    _logger.info(f"Getting calendar events with instrument: {instrument}, "
+    _logger.info(f"Getting calendar events with instrument: {instrument.name}, "
                  f"date: {date}, user: {user}")
     events_str = _sp_cal.get_events(instrument=instrument, date=date,
                                     user=user, wrap=True)
@@ -112,8 +111,8 @@ def build_record(path, dt_from, dt_to, instrument, date, user):
     #  assume the first record is the right one:
     # Apply XSLT to transform calendar events to single record format:
     output = _parse_xml(events_str, XSLT_PATH,
-                        instrument_PID=instrument,
-                        instrument_name=_instr_db[instrument].schema_name,
+                        instrument_PID=instrument.name,
+                        instrument_name=instrument.schema_name,
                         experiment_id=str(_uuid4()),
                         collaborator=None,
                         sample_id=str(_uuid4()))
@@ -296,9 +295,10 @@ def dump_record(path,
     filename : None or str
         The filename of the dumped xml file to write. If None, a default name
         will be generated from the other parameters
-    instrument : str
-        A string which corresponds to the type of microscope used to generate
-        the data to be dumped
+    instrument : :py:class:`~nexusLIMS.instruments.Instrument` or str
+        A NexusLIMS instrument which corresponds to the type of microscope
+        used to generate the data to be dumped. If string, should be one of
+        the instrument PIDs from the Nexus facility.
     date : str
         A string which corresponds to the event date from which events are going
         to be fetched from
@@ -313,7 +313,7 @@ def dump_record(path,
     """
     if filename is None:
         filename = 'compiled_record' + \
-                   (f'_{instrument}' if instrument else '') + \
+                   (f'_{instrument.name}' if instrument else '') + \
                    (f'_{date}' if date else '') + \
                    (f'_{user}' if user else '') + '.xml'
     _pathlib.Path(_os.path.dirname(filename)).mkdir(parents=True, exist_ok=True)

@@ -41,6 +41,7 @@ import ldap3 as _ldap3
 from datetime import datetime as _datetime
 from datetime import timedelta as _timedelta
 from configparser import ConfigParser as _ConfigParser
+from nexusLIMS.instruments import Instrument as _Instrument
 from nexusLIMS.instruments import instrument_db as _instr_db
 from nexusLIMS.utils import parse_xml as _parse_xml
 from nexusLIMS.utils import nexus_req as _nexus_req
@@ -211,17 +212,18 @@ def get_auth(filename="credentials.ini"):
     return auth 
 
 
-def fetch_xml(instrument=None, date=None):
+def fetch_xml(instrument, date=None):
     """
     Get the XML responses from the Nexus Sharepoint calendar for one,
     multiple, or all instruments.
 
     Parameters
     ----------
-    instrument : None, str, or list
-        As defined in :py:func:`~.get_events`
-        One or more of {},
-        or None. If None, events from all instruments will be returned.
+    instrument : :py:class:`~nexusLIMS.instruments.Instrument`
+        As defined in :py:func:`~.get_events`,
+        one of the NexusLIMS instruments contained in the
+        :py:attr:`~nexusLIMS.instruments.instrument_db` database.
+        Controls what instrument calendar is used to get events
     date : str or None
         If provided, fetch only events from a particular day (to limit the
         number of events that need to be returned). ``date`` string must be
@@ -233,10 +235,6 @@ def fetch_xml(instrument=None, date=None):
         A list of strings containing the XML calendar information for each
         instrument requested, stripped of the empty default namespace
     """
-    # DONE: parse instrument input and loop through to generate total output
-    #       [x] add logic for getting list of instruments to process
-    #       [x] concatenate XML output from each transform into single XML
-    #           document
 
     # Paths for Nexus Instruments that can be booked through sharepoint
     # Instrument names can be found at
@@ -246,59 +244,59 @@ def fetch_xml(instrument=None, date=None):
 
     # Parse instrument parameter input, leaving inst_to_fetch as list of
     # nexuslims.instruments.Instrument objects
-    if instrument is None:
-        inst_to_fetch = list(_instr_db.values())
-    elif isinstance(instrument, str):
-        inst_to_fetch = [_instr_db[instrument]]
-    elif hasattr(instrument, '__iter__'):
-        inst_to_fetch = [_instr_db[i] for i in instrument]
+    if isinstance(instrument, str):
+        # try to convert from instrument PID string to actual instrument
+        try:
+            instrument = _instr_db[instrument]
+        except ValueError:
+            raise ValueError('Entered instrument string "{}" could not be '
+                             'parsed'.format(instrument))
+    elif isinstance(instrument, _Instrument):
+        pass
     else:
-        _logger.warning('Entered instrument "{}" could not be parsed; '
-                        'reverting to None...'.format(instrument))
-        inst_to_fetch = list(_instr_db.values())
+        raise ValueError('Entered instrument '
+                         '"{}" could not be parsed'.format(instrument))
 
-    api_response = [''] * len(inst_to_fetch)
+    api_response = ''
 
-    for i, instr in enumerate(inst_to_fetch):
-        instr_url = instr.api_url + '?$expand=CreatedBy'
+    instr_url = instrument.api_url + '?$expand=CreatedBy'
 
-        if date:
-            dt = _datetime.strptime(date, '%Y-%m-%d')
-            datestr_1 = date
-            datestr_2 = (dt + _timedelta(days=1)).strftime('%Y-%m-%d')
-            instr_url += f"&$filter=EndTime ge DateTime'{datestr_1}' and " \
-                         f"EndTime lt DateTime'{datestr_2}'"
+    if date:
+        dt = _datetime.strptime(date, '%Y-%m-%d')
+        datestr_1 = date
+        datestr_2 = (dt + _timedelta(days=1)).strftime('%Y-%m-%d')
+        instr_url += f"&$filter=EndTime ge DateTime'{datestr_1}' and " \
+                     f"EndTime lt DateTime'{datestr_2}'"
 
-        _logger.info("Fetching Nexus calendar events from {}".format(instr_url))
-        r = _nexus_req(instr_url, _requests.get)
-        _logger.info("  {} -- {} -- response: {}".format(instr.name,
-                                                         instr_url,
-                                                         r.status_code))
+    _logger.info("Fetching Nexus calendar events from {}".format(instr_url))
+    r = _nexus_req(instr_url, _requests.get)
+    _logger.info("  {} -- {} -- response: {}".format(instrument.name,
+                                                     instr_url,
+                                                     r.status_code))
 
-        if r.status_code == 401:
-            # Authentication did not succeed and we received an *Unauthorized*
-            # response from the server
-            raise AuthenticationError('Could not authenticate to the Nexus '
-                                      'SharePoint Calendar. Please check the '
-                                      'credentials and try again.')
+    if r.status_code == 401:
+        # Authentication did not succeed and we received an *Unauthorized*
+        # response from the server
+        raise AuthenticationError('Could not authenticate to the Nexus '
+                                  'SharePoint Calendar. Please check the '
+                                  'credentials and try again.')
 
-        if r.status_code == 200:
-            # XML elements have a default namespace prefix (Atom format),
-            # but lxml does not like an empty prefix, so it is easiest to
-            # just sanitize the input and remove the namespaces as in
-            # https://stackoverflow.com/a/18160164/1435788:
-            xml = _re.sub(r'\sxmlns="[^"]+"', '', r.text, count=1)
+    if r.status_code == 200:
+        # XML elements have a default namespace prefix (Atom format),
+        # but lxml does not like an empty prefix, so it is easiest to
+        # just sanitize the input and remove the namespaces as in
+        # https://stackoverflow.com/a/18160164/1435788:
+        xml = _re.sub(r'\sxmlns="[^"]+"', '', r.text, count=1)
 
-            # API returns utf-8 encoding, so encode correctly
-            xml = bytes(xml, encoding='utf-8')
-            api_response[i] = xml
-        else:
-            raise _requests.exceptions.\
-                ConnectionError('Could not access Nexus SharePoint Calendar '
-                                'API at "{}"'.format(instr_url))
+        # API returns utf-8 encoding, so encode correctly
+        xml = bytes(xml, encoding='utf-8')
+        api_response = xml
+    else:
+        raise _requests.exceptions.\
+            ConnectionError('Could not access Nexus SharePoint Calendar '
+                            'API at "{}"'.format(instr_url))
 
     return api_response
-fetch_xml.__doc__ = fetch_xml.__doc__.format([str(k) for k in _instr_db.keys()])
 
 
 # DONE: split up fetching calendar from server and parsing XML response
@@ -314,9 +312,11 @@ def get_events(instrument=None,
 
     Parameters
     ----------
-    instrument : None, str, or list
-        One or more of {}, or ``None``. If ``None``, all instruments will be
-        returned.
+    instrument : :py:class:`~nexusLIMS.instruments.Instrument` or str
+        One of the NexusLIMS instruments contained in the
+        :py:attr:`~nexusLIMS.instruments.instrument_db` database.
+        Controls what instrument calendar is used to get events. If string,
+        value should be one of the instrument PIDs from the Nexus facility.
     date : None or str
         Either None or a YYYY-MM-DD date string indicating the date from
         which events should be fetched (note: the start time of each entry
@@ -364,26 +364,23 @@ def get_events(instrument=None,
             date = None
 
     output = ''
-    xml_strings = fetch_xml(instrument, date=date)
+    xml = fetch_xml(instrument, date=date)
 
     if not division and not group and user:
         _logging.info('Querying LDAP for division and group info')
         division, group = get_div_and_group(user)
 
-    for xml in xml_strings:
-        # parse the xml into a string, and then indent
-        output += INDENT + str(_parse_xml(xml, XSLT_PATH,
-                                          date=date, user=user,
-                                          division=division,
-                                          group=group)).replace('\n', '\n' +
-                                                                INDENT)
+    # parse the xml into a string, and then indent
+    output += INDENT + str(_parse_xml(xml, XSLT_PATH,
+                                      date=date, user=user,
+                                      division=division,
+                                      group=group)).replace('\n', '\n' +
+                                                            INDENT)
 
     if wrap:
         output = _wrap_events(output)
 
     return output
-get_events.__doc__ = get_events.__doc__.format([str(k) for k in
-                                               _instr_db.keys()])
 
 
 def _wrap_events(events_string):
@@ -423,9 +420,12 @@ def dump_calendars(instrument=None, user=None, date=None,
 
     Parameters
     ----------
-    instrument : None, str, or list
-        One or more of {}, or ``None``. If ``None``, all instruments will be
-        returned.
+    instrument : :py:class:`~nexusLIMS.instruments.Instrument` or str
+        One of the NexusLIMS instruments contained in the
+        :py:attr:`~nexusLIMS.instruments.instrument_db` database.
+        Controls what instrument calendar is used to get events. If value is
+        a string, it should be one of the instrument PIDs from the Nexus
+        facility
     date : None or str
         Either None or a YYYY-MM-DD date string indicating the date from
         which events should be fetched (note: the start time of each entry
@@ -455,5 +455,3 @@ def dump_calendars(instrument=None, user=None, date=None,
         text = get_events(instrument=instrument, date=date, user=user,
                           division=division, group=group, wrap=True)
         f.write(text)
-dump_calendars.__doc__ = dump_calendars.__doc__.format([str(k) for k in
-                                                       _instr_db.keys()])
