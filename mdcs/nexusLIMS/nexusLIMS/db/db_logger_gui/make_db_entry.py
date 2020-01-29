@@ -293,6 +293,8 @@ class DBSessionLogger:
         """
         # Get the instrument pid from the computer name of this computer
         with contextlib.closing(sqlite3.connect(self.full_path)) as con:
+            self.log('Looking in database for computer name matching '
+                     '{}'.format(self.cpu_name), 1)
             with con as cur:
                 res = cur.execute('SELECT instrument_pid, schema_name '
                                   'from instruments '
@@ -590,6 +592,7 @@ class DBSessionLogger:
 
     def db_logger_setup(self, thread_queue=None, exit_queue=None):
         self.log('username is {}'.format(self.user), 1)
+        self.log('computer name is {}'.format(self.cpu_name), 1)
         try:
             self.check_exit_queue(thread_queue, exit_queue)
             if sys.platform == 'win32':
