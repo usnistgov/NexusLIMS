@@ -269,7 +269,7 @@
            Experiment can belong.
       </xs:documentation>
     </xs:annotation>
-    
+
     <xs:sequence>
       <xs:element name="name" type="xs:token" minOccurs="0">
         <xs:annotation>
@@ -278,7 +278,7 @@
                </xs:documentation>
         </xs:annotation>
       </xs:element>
-  
+
       <xs:element name="division" type="xs:token" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
@@ -286,7 +286,7 @@
           </xs:documentation>
         </xs:annotation>
       </xs:element>
-      
+
       <xs:element name="group" type="xs:token" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
@@ -295,7 +295,7 @@
           </xs:documentation>
         </xs:annotation>
       </xs:element>
-      
+
       <xs:element name="project_id" type="xs:token" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
@@ -303,7 +303,7 @@
           </xs:documentation>
         </xs:annotation>
       </xs:element>
-      
+
       <xs:element name="ref" type="xs:anyURI" minOccurs="0">
         <xs:annotation>
           <xs:documentation>
@@ -754,6 +754,15 @@
               </xs:documentation>
           </xs:annotation>
         </xs:attribute>
+        <xs:attribute name="warning" type="boolean">
+          <xs:annotation>
+            <xs:documentation>
+                A marker to indicate that this parameter may not be reliable 
+                (an instrument may have not written it correctly, or it is commonly not
+                filled out properly, etc.)
+            </xs:documentation>
+          </xs:annotation>
+        </xs:attribute>
       </xs:extension>
     </xs:simpleContent>
 
@@ -785,7 +794,7 @@
           </xs:documentation>
         </xs:annotation>
       </xs:enumeration>
-      
+
       <xs:enumeration value="FEI Helios">
         <xs:annotation>
           <xs:documentation>
@@ -793,7 +802,7 @@
           </xs:documentation>
         </xs:annotation>
       </xs:enumeration>
-      
+
       <xs:enumeration value="FEI Quanta200">
         <xs:annotation>
           <xs:documentation>
@@ -801,7 +810,7 @@
           </xs:documentation>
         </xs:annotation>
       </xs:enumeration>
-      
+
       <xs:enumeration value="Hitachi S4700">
         <xs:annotation>
           <xs:documentation>
@@ -809,7 +818,7 @@
           </xs:documentation>
         </xs:annotation>
       </xs:enumeration>
-      
+
       <xs:enumeration value="Hitachi S5500">
         <xs:annotation>
           <xs:documentation>
@@ -817,7 +826,7 @@
           </xs:documentation>
         </xs:annotation>
       </xs:enumeration>
-      
+
       <xs:enumeration value="JEOL JEM3010">
         <xs:annotation>
           <xs:documentation>
@@ -825,7 +834,7 @@
           </xs:documentation>
         </xs:annotation>
       </xs:enumeration>
-      
+
       <xs:enumeration value="JEOL JSM7100">
         <xs:annotation>
           <xs:documentation>
@@ -833,7 +842,7 @@
           </xs:documentation>
         </xs:annotation>
       </xs:enumeration>
-      
+
       <xs:enumeration value="Philips EM400">
         <xs:annotation>
           <xs:documentation>
@@ -841,18 +850,18 @@
           </xs:documentation>
         </xs:annotation>
       </xs:enumeration>
-      
+
       <xs:enumeration value="Philips CM30">
         <xs:annotation>
           <xs:documentation>
             The Phillips CM30 transmission electron microscope
           </xs:documentation>
         </xs:annotation>
-      </xs:enumeration>      
+      </xs:enumeration>
 
     </xs:restriction>
   </xs:simpleType>
-  
+
   <xs:simpleType name="InstrumentPID">
     <xs:annotation>
       <xs:documentation>
@@ -862,9 +871,9 @@
         SharePoint calendar system.
       </xs:documentation>
     </xs:annotation>
-    
+
     <xs:restriction base="xs:token">
-      
+
       <xs:enumeration value="FEI-Titan-TEM-635816">
         <xs:annotation>
           <xs:documentation>
@@ -872,7 +881,7 @@
           </xs:documentation>
         </xs:annotation>
       </xs:enumeration>
-      
+
       <xs:enumeration value="FEI-Titan-STEM-630901">
         <xs:annotation>
           <xs:documentation>
@@ -880,7 +889,7 @@
           </xs:documentation>
         </xs:annotation>
       </xs:enumeration>
-      
+
       <xs:enumeration value="FEI-Helios-DB-636663">
         <xs:annotation>
           <xs:documentation>
@@ -888,7 +897,7 @@
           </xs:documentation>
         </xs:annotation>
       </xs:enumeration>
-      
+
       <xs:enumeration value="FEI-Quanta200-ESEM-633137">
         <xs:annotation>
           <xs:documentation>
@@ -896,7 +905,7 @@
           </xs:documentation>
         </xs:annotation>
       </xs:enumeration>
-      
+
       <xs:enumeration value="Hitachi-S4700-SEM-606559">
         <xs:annotation>
           <xs:documentation>
@@ -904,7 +913,7 @@
           </xs:documentation>
         </xs:annotation>
       </xs:enumeration>
-      
+
       <xs:enumeration value="Hitachi-S5500-SEM-635262">
         <xs:annotation>
           <xs:documentation>
@@ -936,14 +945,14 @@
           </xs:documentation>
         </xs:annotation>
       </xs:enumeration>
-      
+
       <xs:enumeration value="Philips-CM30-TEM-540388">
         <xs:annotation>
           <xs:documentation>
             The Phillips CM30 transmission electron microscope
           </xs:documentation>
         </xs:annotation>
-      </xs:enumeration>      
+      </xs:enumeration>
     </xs:restriction>
   </xs:simpleType>
 

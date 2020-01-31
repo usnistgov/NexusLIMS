@@ -32,11 +32,13 @@ import logging as _logging
 import hyperspy.api_nogui as _hs
 import pathlib as _pathlib
 from uuid import uuid4 as _uuid4
-from lxml import etree as _etree
 from datetime import datetime as _datetime
+from nexusLIMS import mmf_nexus_root_path as _mmf_path
 from nexusLIMS.schemas.activity import AcquisitionActivity as _AcqAc
 from nexusLIMS.harvester import sharepoint_calendar as _sp_cal
 from nexusLIMS.utils import parse_xml as _parse_xml
+from nexusLIMS.utils import find_files_by_mtime as _find_files
+from nexusLIMS.extractors import extension_reader_map as _ext
 from glob import glob as _glob
 from timeit import default_timer as _timer
 
@@ -45,7 +47,7 @@ XSLT_PATH = _os.path.join(_os.path.dirname(__file__),
                           "cal_events_to_nx_record.xsl")
 
 
-def build_record(path, dt_from, dt_to, instrument, date, user):
+def build_record(instrument, dt_from, dt_to, date, user):
     """
     Construct an XML document conforming to the NexusLIMS schema from a
     directory containing microscopy data files. For calendar parsing,
@@ -53,20 +55,16 @@ def build_record(path, dt_from, dt_to, instrument, date, user):
 
     Parameters
     ----------
-    path : str
-        A path containing dataset files to be processed (usually the root
-        path where the given instrument stores data on the centralized storage)
+    instrument : :py:class:`~nexusLIMS.instruments.Instrument`
+        One of the NexusLIMS instruments contained in the
+        :py:attr:`~nexusLIMS.instruments.instrument_db` database.
+        Controls what instrument calendar is used to get events.
     dt_from : datetime.datetime
         The starting timestamp that will be used to determine which files go
         in this record
     dt_to : datetime.datetime
         The ending timestamp used to determine the last point in time for
         which files should be associated with this record
-    instrument : :py:class:`~nexusLIMS.instruments.Instrument` or str
-        One of the NexusLIMS instruments contained in the
-        :py:attr:`~nexusLIMS.instruments.instrument_db` database.
-        Controls what instrument calendar is used to get events. If string,
-        should be one of the instrument PIDs from the Nexus facility.
     date : str or None
         A YYYY-MM-DD date string indicating the date from which events should
         be fetched (note: the start time of each entry is what will be
@@ -89,9 +87,9 @@ def build_record(path, dt_from, dt_to, instrument, date, user):
 
     xml_record = ''
 
+    # if an explicit date is not provided, use the start of the timespan
     if date is None:
-        date = _datetime.fromtimestamp(_os.path.getmtime(path)).strftime(
-            '%Y-%m-%d')
+        date = dt_from.strftime('%Y-%m-%d')
 
     # Insert XML prolog, XSLT reference, and namespaces.
     xml_record += "<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n"
@@ -125,15 +123,16 @@ def build_record(path, dt_from, dt_to, instrument, date, user):
 
     xml_record += str(output)
 
-    _logger.info(f"Building acquisition activities for {path}")
-    xml_record += build_acq_activities(path=path, dt_from=dt_from, dt_to=dt_to)
+    _logger.info(f"Building acquisition activities for timespan from "
+                 f"{dt_from.isoformat()} to {dt_to.isoformat()}")
+    xml_record += build_acq_activities(instrument, dt_from, dt_to)
 
     xml_record += "</nx:Experiment>"  # Add closing tag for root element.
 
     return xml_record
 
 
-def build_acq_activities(path, dt_from, dt_to):
+def build_acq_activities(instrument, dt_from, dt_to):
     """
     Build an XML string representation of each AcquisitionActivity for a
     single microscopy session. This includes setup parameters and metadata
@@ -146,9 +145,10 @@ def build_acq_activities(path, dt_from, dt_to):
 
     Parameters
     ----------
-    path : str
-        A string file path which points to the file folder in which microscopy
-        data is located.
+    instrument : :py:class:`~nexusLIMS.instruments.Instrument`
+        One of the NexusLIMS instruments contained in the
+        :py:attr:`~nexusLIMS.instruments.instrument_db` database.
+        Controls what instrument calendar is used to get events.
     dt_from : datetime.datetime
         The starting timestamp that will be used to determine which files go
         in this record
@@ -169,15 +169,17 @@ def build_acq_activities(path, dt_from, dt_to):
     _logging.getLogger('hyperspy.io_plugins.digital_micrograph').setLevel(
         _logging.WARNING)
 
-    files = _glob(_os.path.join(path, "**/*"), recursive=True)
-    files = [f for f in files if _os.path.isfile(f) and
-             dt_from.timestamp() < _os.path.getmtime(f) < dt_to.timestamp()]
+    start_timer = _timer()
+    path = _os.path.abspath(_os.path.join(_mmf_path, instrument.filestore_path))
+    _logger.info(f'Starting new file-finding in {path}')
+    files = _find_files(path, dt_from, dt_to)
+    end_timer = _timer()
+    _logger.info(f'Found {len(files)} files in'
+                 f' {end_timer - start_timer:.2f} seconds')
 
-    # sort files by modification time
-    files.sort(key=_os.path.getmtime)
-
-    # remove all files but .dm3/.dm4 (for now)
-    files = [f for f in files if f.endswith('.dm3') or f.endswith('.dm4')]
+    # remove all files but those supported by nexusLIMS.extractors
+    files = [f for f in files if _os.path.splitext(f)[1].strip('.') in
+             _ext.keys()]
 
     mtimes = [''] * len(files)
     modes = [''] * len(files)
@@ -269,11 +271,10 @@ def build_acq_activities(path, dt_from, dt_to):
     return acq_activities
 
 
-def dump_record(path,
+def dump_record(instrument,
                 dt_from,
                 dt_to,
                 filename=None,
-                instrument=None,
                 date=None,
                 user=None):
     """
@@ -283,9 +284,10 @@ def dump_record(path,
 
     Parameters
     ----------
-    path : str
-        A string file path which points to the file location of the microscopy
-        metadata
+    instrument : :py:class:`~nexusLIMS.instruments.Instrument`
+        One of the NexusLIMS instruments contained in the
+        :py:attr:`~nexusLIMS.instruments.instrument_db` database.
+        Controls what instrument calendar is used to get events.
     dt_from : datetime.datetime
         The starting timestamp that will be used to determine which files go
         in this record
@@ -295,10 +297,6 @@ def dump_record(path,
     filename : None or str
         The filename of the dumped xml file to write. If None, a default name
         will be generated from the other parameters
-    instrument : :py:class:`~nexusLIMS.instruments.Instrument` or str
-        A NexusLIMS instrument which corresponds to the type of microscope
-        used to generate the data to be dumped. If string, should be one of
-        the instrument PIDs from the Nexus facility.
     date : str
         A string which corresponds to the event date from which events are going
         to be fetched from
@@ -314,12 +312,11 @@ def dump_record(path,
     if filename is None:
         filename = 'compiled_record' + \
                    (f'_{instrument.name}' if instrument else '') + \
-                   (f'_{date}' if date else '') + \
+                   (f'_{date}' if date else dt_from.strftime('_%Y-%m-%d')) + \
                    (f'_{user}' if user else '') + '.xml'
     _pathlib.Path(_os.path.dirname(filename)).mkdir(parents=True, exist_ok=True)
     with open(filename, 'w') as f:
-        text = build_record(path=path, dt_from=dt_from,
-                            dt_to=dt_to, instrument=instrument,
+        text = build_record(instrument, dt_from, dt_to,
                             date=date, user=user)
         f.write(text)
     return filename

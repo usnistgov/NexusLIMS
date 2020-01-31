@@ -6,7 +6,7 @@
 
     <xsl:variable name="datasetBaseUrl">https://***REMOVED***/mmfnexus/</xsl:variable>
     <xsl:variable name="previewBaseUrl">https://***REMOVED***/nexusLIMS/mmfnexus/</xsl:variable>
-    <xsl:variable name="sharepointBaseUrl">https://***REMOVED***/***REMOVED***/Lists/</xsl:variable>
+    <xsl:variable name="sharepointBaseUrl">https://***REMOVED***/Div/msed/MSED-MMF/Lists/</xsl:variable>
 
     <xsl:variable name="month-num-dictionary">
         <month month-number="01">January</month>
@@ -234,6 +234,7 @@
             }
           
             img.nx-img {
+               max-height: 500px;
                max-width: 100%;
                margin-left: auto; /* Center justify images */
                margin-right: auto;
@@ -645,6 +646,18 @@
             .help-tip:hover {
                 color: #aaa;
             }
+            
+            .warning-tip {
+                color: #f5c636;
+            }
+            .warning-tip:hover {
+            
+            }
+            
+            td.has-warning {
+                color:  #a3a3a3;
+            }
+            
             .no-cal-warning {
                 color: #a94442;
                 font-style: italic;
@@ -1088,7 +1101,7 @@
                                     <a class="aa_anchor" name="{generate-id(current())}"/>
                                     <span class="aa_header"><b>Experiment activity <xsl:value-of select="@seqno+1"/></b><xsl:text> </xsl:text></span>
                                     
-                                    <a href='javascript:void(0)' onclick="$(this).blur(); openModal('{generate-id(current())}-modal')"
+                                    <a href='javascript:void(0)' onclick="$(this).blur(); openModal('{generate-id(current())}-modal');"
                                        data-toggle='tooltip' data-placement='right'
                                        title="Click to view this activity's setup parameters">
                                        <i class='fa fa-tasks fa-border param-button'/>
@@ -1195,7 +1208,7 @@
                                                     </xsl:choose>
                                                     <td class='text-center'>
                                                         <!-- Modal content inside of table, since it needs to be in the context of this dataset -->
-                                                        <a href='javascript:void(0)' onclick="$(this).blur(); openModal('{generate-id(current())}-modal')"
+                                                        <a href='javascript:void(0)' onclick="$(this).blur(); openModal('{generate-id(current())}-modal');"
                                                         data-toggle='tooltip' data-placement='right'
                                                         title="Click to view this dataset's unique metadata">
                                                             <i class='fa fa-tasks fa-border param-button' style='margin-left:0;'/>
@@ -1240,8 +1253,20 @@
                                                                                         <xsl:sort select="@name"/>
                                                                                         <tr>
                                                                                             <!-- Populate table values with the metadata name and value -->
-                                                                                            <td><b><xsl:value-of select="@name"/></b></td>
-                                                                                            <td><xsl:value-of select="current()"/></td>
+                                                                                            <td><b><xsl:value-of select="@name"/></b>
+                                                                                            <xsl:if test="@warning = 'true'"><xsl:text> </xsl:text>
+                                                                                                <xsl:call-template name="warning-tip">
+                                                                                                    <xsl:with-param name="tip-placement">right</xsl:with-param>
+                                                                                                    <xsl:with-param name="tip-text">This parameter is known to be unreliable, so use its value with caution</xsl:with-param>
+                                                                                                </xsl:call-template>
+                                                                                            </xsl:if>
+                                                                                            </td>
+                                                                                            <td>
+                                                                                                <xsl:attribute name="class">
+                                                                                                    <xsl:if test="@warning = 'true'">has-warning</xsl:if>
+                                                                                                </xsl:attribute>
+                                                                                                <xsl:value-of select="current()"/>
+                                                                                            </td>
                                                                                         </tr>
                                                                                     </xsl:for-each>
                                                                                 </tbody>
@@ -1323,8 +1348,19 @@
                                                         <xsl:sort select="@name"/>
                                                         <tr>
                                                             <!-- Populate setup table with parameter name and value -->
-                                                            <td><b><xsl:value-of select="@name"/></b></td>
-                                                            <td><xsl:value-of select="current()"/></td>
+                                                            <td><b><xsl:value-of select="@name"/></b>
+                                                            <xsl:if test="@warning = 'true'"><xsl:text> </xsl:text>
+                                                                <xsl:call-template name="warning-tip">
+                                                                    <xsl:with-param name="tip-placement">right</xsl:with-param>
+                                                                    <xsl:with-param name="tip-text">This parameter is known to be unreliable, so use its value with caution</xsl:with-param>
+                                                                </xsl:call-template>
+                                                            </xsl:if>
+                                                            </td>
+                                                            <td>
+                                                                <xsl:attribute name="class">
+                                                                    <xsl:if test="@warning = 'true'">has-warning</xsl:if>
+                                                                </xsl:attribute>
+                                                                <xsl:value-of select="current()"/></td>
                                                         </tr>
                                                     </xsl:for-each>
                                                 </tbody>
@@ -1579,6 +1615,11 @@
             function disable_gallery_tooltips() {
                 $('#img_gallery a.gal-nav[data-toggle=tooltip]').tooltip('disable');
             }
+            
+            function activate_metadata_tooltips(){
+                // activate tooltips (on demand)
+                $('table.meta-table [data-toggle="tooltip"]').tooltip({trigger: 'hover'}); 
+            }
 
             // Key handlers
             document.onkeydown = function(evt) {
@@ -1658,7 +1699,7 @@
                                     ordering: false,
                                     "dom": 'pt'
                                 });
-                
+                                
                 var info = navTable.page.info();
                 $('.sidebar .paginate_button.next').before($('<span>',{
                     'text':' Page '+ (info.page+1) +' of '+info.pages + ' ' ,
@@ -1687,7 +1728,13 @@
                         select: 'single',
                         responsive: true,
                         ordering: false,
-                        dom: "<'row'<'col-sm-4'f><'col-sm-8'p>><'row't>"
+                        dom: "<'row'<'col-sm-4'f><'col-sm-8'p>><'row't>",
+                        drawCallback: function(){
+                                        $('.paginate_button.next', this.api().table().container())          
+                                            .on('click', activate_metadata_tooltips());    
+                                            $('.paginate_button.previous', this.api().table().container())          
+                                            .on('click', activate_metadata_tooltips()); 
+                                    },
                     });
                 });
                 
@@ -1740,7 +1787,7 @@
                 
                 // Make sidebar visible after everything is done loading:
                 $('.sidebar').first().css('visibility', 'visible');
-
+                
                 // Fade out the loading screen
                 $('#loading').fadeOut('slow');                
             });
@@ -2026,6 +2073,18 @@
         </xsl:element>
     </xsl:template>
     
+    <xsl:template name="warning-tip">
+        <xsl:param name="tip-text"/>
+        <xsl:param name="tip-placement" select='"right"'></xsl:param>
+        <xsl:element name="sup">
+            <xsl:attribute name="class">warning-tip</xsl:attribute>
+            <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+            <xsl:attribute name="data-placement"><xsl:value-of select="$tip-placement"/></xsl:attribute>
+            <xsl:attribute name="title"><xsl:value-of select="$tip-text"/></xsl:attribute>
+            <i class='fa fa-exclamation-triangle'/>
+        </xsl:element>
+    </xsl:template>
+    
     <xsl:template name="get-calendar-link">
         <xsl:param name="instrument"/>
         <xsl:for-each select="document('')">
@@ -2045,11 +2104,13 @@
         <xsl:choose>
             <xsl:when test="contains(setup/param[@name='Mode'], 'TEM')">TEM<xsl:text> </xsl:text></xsl:when>
             <xsl:when test="contains(setup/param[@name='Mode'], 'SEM')">SEM<xsl:text> </xsl:text></xsl:when>
+            <xsl:when test="contains(setup/param[@name='Illumination Mode'], 'STEM')">STEM<xsl:text> </xsl:text></xsl:when>
             <xsl:otherwise></xsl:otherwise>
         </xsl:choose>
         <xsl:choose>
             <xsl:when test="contains(setup/param[@name='Mode'], 'Diffraction')">Diffraction</xsl:when>
             <xsl:when test="contains(setup/param[@name='Mode'], 'Image')">Imaging</xsl:when>
+            <xsl:when test="contains(setup/param[@name='Illumination Mode'], 'NANOPROBE')">Nanoprobe<xsl:text> </xsl:text></xsl:when>
             <xsl:otherwise><xsl:value-of select="setup/param[@name='Mode']"/></xsl:otherwise>
         </xsl:choose>
     </xsl:template>

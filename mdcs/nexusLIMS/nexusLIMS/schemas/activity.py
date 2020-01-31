@@ -30,13 +30,14 @@ import os as _os
 import pathlib as _pathlib
 import logging as _logging
 from datetime import datetime as _datetime
+from xml.sax.saxutils import escape, unescape
 import hyperspy.api_nogui as _hs
 from nexusLIMS.extractors.digital_micrograph import \
     process_tecnai_microscope_info as _tecnai
 from nexusLIMS import mmf_nexus_root_path as _mmf_path
 from nexusLIMS import nexuslims_root_path as _nx_path
-from nexusLIMS.extractors.thumbnail_generator import \
-    sig_to_thumbnail as _s2thumb
+from nexusLIMS.extractors import parse_metadata as _parse_metadata
+from nexusLIMS.extractors import flatten_dict as _flatten_dict
 
 _logger = _logging.getLogger(__name__)
 
@@ -183,6 +184,9 @@ class AcquisitionActivity:
     meta : list
         A list of dictionaries containing the "important" metadata for each
         signal/file in ``sigs`` and ``files``
+    warnings : list
+        A list of metadata values that may be untrustworthy because of the
+        software
     """
 
     def __init__(self,
@@ -195,7 +199,8 @@ class AcquisitionActivity:
                  files=None,
                  previews=None,
                  sigs=None,
-                 meta=None):
+                 meta=None,
+                 warnings=None):
         """
         Create a new AcquisitionActivity
         """
@@ -209,6 +214,7 @@ class AcquisitionActivity:
         self.previews = [] if previews is None else previews
         self.sigs = [] if sigs is None else sigs
         self.meta = [] if meta is None else meta
+        self.warnings = [] if warnings is None else warnings
 
     def __repr__(self):
         return f'{self.mode:<12} AcquisitionActivity; ' + \
@@ -229,34 +235,22 @@ class AcquisitionActivity:
             The file to be added to the file list
         """
         if _os.path.exists(fname):
-            s = _hs.load(fname, lazy=True)
             self.files.append(fname)
-            preview_fname = fname.replace(_mmf_path, _nx_path) + '.thumb.png'
-            # if preview does not exist yet, generate it and save to
-            # preview_fname
+            meta, preview_fname = _parse_metadata(fname,
+                                                  generate_preview=False)
 
-            # If s is a list of signals, use just the first one for our purposes
-            if isinstance(s, list):
-                num_sigs = len(s)
-                fname = s[0].metadata.General.original_filename
-                s = s[0]
-                s.metadata.General.title = s.metadata.General.title + \
-                                           f' (1 of {num_sigs} total signals ' \
-                                           f'in file "{fname}")'
-
-            if not _os.path.isfile(preview_fname):
-                _logger.info(f'Generating preview: {preview_fname}')
-                # Create the directory for the thumbnail, if needed
-                _pathlib.Path(_os.path.dirname(preview_fname)).mkdir(
-                    parents=True, exist_ok=True)
-                # Generate the thumbnail
-                s.compute(progressbar=False)
-                _s2thumb(s, out_path=preview_fname)
+            if meta is None:
+                # Something bad happened, so we need to alert the user
+                _logger.warning(f'Could not parse metadata of {fname}')
+                pass
             else:
-                _logger.info(f'Preview already exists: {preview_fname}')
-            self.previews.append(preview_fname)
-            self.sigs.append(s)
-            self.meta.append(read_metadata(s))
+                s = _hs.load(fname, lazy=True)
+                self.previews.append(preview_fname)
+                self.sigs.append(s)
+                self.meta.append(_flatten_dict(meta['nx_meta']))
+                # TODO: figure out if this is working...
+                self.warnings.append([' '.join(w)
+                                      for w in meta['nx_meta']['warnings']])
         else:
             raise FileNotFoundError(fname + ' was not found')
         _logger.debug(f'appended {fname} to files')
@@ -298,7 +292,6 @@ class AcquisitionActivity:
         if values_to_search is None:
             values_to_search = self.unique_params
 
-        # DONE: implement setup parameter determination
         # TODO: tests for setup parameter determination
         # m will be individual dictionaries, since meta is list of dicts
         i = 0
@@ -417,19 +410,29 @@ class AcquisitionActivity:
             header or namespace definitions)
         """
 
-        activity_xml = ''
+        aqAc_xml = ''
         INDENT = '  ' * indent_level
         line_ending = '\n'
 
-        activity_xml += f'{INDENT}<acquisitionActivity seqno="{seqno}">{line_ending}'
-        activity_xml += f'{INDENT*2}<startTime>{self.start.isoformat()}' \
+        aqAc_xml += f'{INDENT}<acquisitionActivity seqno="{seqno}">{line_ending}'
+        aqAc_xml += f'{INDENT*2}<startTime>{self.start.isoformat()}' \
                         f'</startTime>{line_ending}'
-        activity_xml += f'{INDENT*2}<sampleID>{sample_id}</sampleID>{line_ending}'
-        activity_xml += f'{INDENT*2}<setup>{line_ending}'
+        aqAc_xml += f'{INDENT*2}<sampleID>{sample_id}</sampleID>{line_ending}'
+        aqAc_xml += f'{INDENT*2}<setup>{line_ending}'
         for pk, pv in sorted(self.setup_params.items()):
-            activity_xml += f'{INDENT*3}<param name="{pk}">' \
-                          f'{pv}</param>{line_ending}'
-        activity_xml += f'{INDENT*2}</setup>{line_ending}'
+            # TODO: account for warnings here
+            if pk == 'warnings':
+                pass
+            else:
+                if isinstance(pv, str) and any(c in pv for c in '<&'):
+                    pv = escape(pv)
+                # for setup parameters, a key in the first dataset's warning
+                # list is the same as in all of them
+                pk_warning = pk in self.warnings[0]
+                aqAc_xml += f'{INDENT*3}<param name="{pk}"' + \
+                            (' warning="true">' if pk_warning else '>') + \
+                            f'{pv}</param>{line_ending}'
+        aqAc_xml += f'{INDENT*2}</setup>{line_ending}'
 
         # This is kind of a temporary hack until I figure out a better solution
         # TODO: fix determination of dataset types
@@ -437,33 +440,43 @@ class AcquisitionActivity:
             'IMAGING': 'Image',
             'DIFFRACTION': 'Diffraction'
         }
-        for f, m, um in zip(self.files, self.meta, self.unique_meta):
+        for f, m, um, w in zip(self.files, self.meta,
+                               self.unique_meta, self.warnings):
+            # escape any bad characters in the filename
+            if isinstance(f, str) and any(c in f for c in '<&'):
+                f = escape(f)
+
             # build path to thumbnail
             rel_fname = f.replace(_mmf_path, '')
             rel_thumb_name = f'{rel_fname}.thumb.png'
 
-            # f is string; um is a dictionary
-            activity_xml += f'{INDENT*2}<dataset ' \
-                            f'type="{mode_to_dataset_type_map[self.mode]}" ' \
-                            f'role="Experimental">{line_ending}'
-            activity_xml += f'{INDENT*3}<name>{_os.path.basename(f)}' \
-                            f'</name>{line_ending}'
-            activity_xml += f'{INDENT*3}<location>{rel_fname}' \
-                            f'</location>{line_ending}'
-            activity_xml += f'{INDENT*3}<preview>{rel_thumb_name}' \
-                            f'</preview>{line_ending}'
+            # f is string; um is a dictionary, w is a list
+            aqAc_xml += f'{INDENT*2}<dataset ' \
+                        f'type="{mode_to_dataset_type_map[self.mode]}" ' \
+                        f'role="Experimental">{line_ending}'
+            aqAc_xml += f'{INDENT*3}<name>{_os.path.basename(f)}' \
+                        f'</name>{line_ending}'
+            aqAc_xml += f'{INDENT*3}<location>{rel_fname}' \
+                        f'</location>{line_ending}'
+            aqAc_xml += f'{INDENT*3}<preview>{rel_thumb_name}' \
+                        f'</preview>{line_ending}'
             for meta_k, meta_v in sorted(um.items()):
-                activity_xml += f'{INDENT*3}<meta name="{meta_k}">' \
-                              f'{meta_v}</meta>{line_ending}'
-            activity_xml += f'{INDENT*2}</dataset>{line_ending}'
+                if meta_k == 'warnings':
+                    pass
+                else:
+                    if isinstance(meta_v, str) and \
+                            any(c in meta_v for c in '<&'):
+                        meta_v = escape(meta_v)
+                    meta_k_warning = meta_k in w
+                    aqAc_xml += f'{INDENT*3}<meta name="{meta_k}"' + \
+                                (' warning="true">' if
+                                 meta_k_warning else '>') + \
+                                f'{meta_v}</meta>{line_ending}'
+            aqAc_xml += f'{INDENT*2}</dataset>{line_ending}'
 
-        activity_xml += f'{INDENT}</acquisitionActivity>{line_ending}'
+        aqAc_xml += f'{INDENT}</acquisitionActivity>{line_ending}'
 
         if print_xml:
-            print(activity_xml)
+            print(aqAc_xml)
 
-        return activity_xml
-
-# TODO: need to build thumbnails for each dataset and save in right place
-#       (see notebook in /mnt/***REMOVED***/mmfnexus/Titan/***REMOVED***/181113 - AM 17-4
-#       - 1050C - ***REMOVED*** - Titan/2019-03-22 Exploring metadata.ipynb
+        return aqAc_xml

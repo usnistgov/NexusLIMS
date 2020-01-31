@@ -15,6 +15,7 @@ from nexusLIMS.utils import SortedDictEncoder
 from nexusLIMS.instruments import get_instr_from_filepath as _get_instr
 import hyperspy.api_nogui as _hs
 import logging as _logging
+import collections as _collections
 
 _logger = _logging.getLogger(__name__)
 
@@ -54,11 +55,15 @@ def parse_metadata(fname, write_output=True, generate_preview=True,
     nx_meta : dict or None
         The "relevant" metadata that is of use for NexusLIMS. If None,
         the file could not be opened
+    preview_fname : str or None
+        The file path of the generated preview image, or `None` if it was not
+        requested
     """
 
     extension = _os.path.splitext(fname)[1][1:]
 
     nx_meta = extension_reader_map[extension](fname)
+    preview_fname = None
 
     if nx_meta is not None:
         if write_output:
@@ -68,6 +73,7 @@ def parse_metadata(fname, write_output=True, generate_preview=True,
                 _pathlib.Path(_os.path.dirname(out_fname)).mkdir(parents=True,
                                                                  exist_ok=True)
                 with open(out_fname, 'w') as f:
+                    _logger.debug(f'Dumping metadata to {out_fname}')
                     _json.dump(nx_meta, f, sort_keys=True,
                                cls=SortedDictEncoder, indent=2)
 
@@ -111,5 +117,43 @@ def parse_metadata(fname, write_output=True, generate_preview=True,
                     # Generate the thumbnail
                     s.compute(progressbar=False)
                     _s2thumb(s, out_path=preview_fname)
+                else:
+                    _logger.info(f'Preview already exists: {preview_fname}')
 
-    return nx_meta
+    return nx_meta, preview_fname
+
+
+def flatten_dict(d, parent_key='', separator=' '):
+    """
+    Take a nested dictionary and flatten it into a single level, separating
+    the levels by a string as specified by `separator`
+
+    Cribbed from: https://stackoverflow.com/a/6027615/1435788
+
+    Parameters
+    ----------
+    d : dict
+        The dictionary to flatten
+    parent_key : str
+        The "root" key to add to add to the existing keys
+    separator : str
+        The string to use to separate values in the flattened keys (i.e.
+        {'a': {'b': 'c'}} would become {'a' + sep + 'b': 'c'})
+
+    Returns
+    -------
+    flattened_dict : str
+        The dictionary with depth one, with nested dictionaries flattened
+        into root-level keys
+    """
+    items = []
+    for k, v in d.items():
+        new_key = parent_key + separator + k if parent_key else k
+        if isinstance(v, _collections.MutableMapping):
+            items.extend(flatten_dict(v, new_key, separator=separator).items())
+        else:
+            items.append((new_key, v))
+
+    flattened_dict = dict(items)
+
+    return flattened_dict

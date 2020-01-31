@@ -30,6 +30,7 @@ from lxml import etree as _etree
 import certifi as _certifi
 import tempfile as _tempfile
 import os as _os
+from os.path import getmtime as _getmtime
 import json as _json
 
 def parse_xml(xml, xslt_file, **kwargs):
@@ -295,6 +296,83 @@ def try_getting_dict_value(d, key):
             return get_nested_dict_value_by_path(d, key)
     except (KeyError, TypeError) as e:
         return 'not found'
+
+
+def find_dirs_by_mtime(path, dt_from, dt_to):
+    """
+    Given two timestamps, find the directories under a path that were
+    last modified between the two
+
+    Parameters
+    ----------
+    path : str
+        The root path from which to start the search
+    dt_from : datetime.datetime
+        The "starting" point of the search timeframe
+    dt_to : datetime.datetime
+        The "ending" point of the search timeframe
+
+    Returns
+    -------
+    dirs : list
+        A list of the directories that have modification times within the
+        time range provided
+    """
+    dirs = []
+    # use os.walk and only inspect the directories for mtime (much fewer
+    # comparisons than looking at every file):
+    for dirpath, _, _ in _os.walk(path):
+        if dt_from.timestamp() < _getmtime(dirpath) < dt_to.timestamp():
+            dirs.append(dirpath)
+    return dirs
+
+
+def find_files_by_mtime(path, dt_from, dt_to):
+    """
+    Given two timestamps, find files under a path that were
+    last modified between the two. Works by first searching for directories
+    that match and then only looking in those directories (to speed things up).
+
+    Parameters
+    ----------
+    path : str
+        The root path from which to start the search
+    dt_from : datetime.datetime
+        The "starting" point of the search timeframe
+    dt_to : datetime.datetime
+        The "ending" point of the search timeframe
+
+    Returns
+    -------
+    files : list
+        A list of the files that have modification times within the
+        time range provided (sorted by modification time)
+    """
+    # find only the directories that have been modified between these two
+    # timestamps (should be much faster than inspecting all files)
+    dirs = find_dirs_by_mtime(path, dt_from, dt_to)
+
+    if len(dirs) == 0:
+        # we didn't find any directories in our time of interest (likely the
+        # case when looking at data that was collected before it started
+        # being saved to the centralized share; fallback to all directories
+        dirs = [path]
+
+    files = set()    # use a set here (faster and we won't have duplicates)
+    # for each of those directories, walk the file tree and inspect the
+    # actual files:
+    for d in dirs:
+        for dirpath, _, filenames in _os.walk(d):
+            for f in filenames:
+                fname = _os.path.abspath(_os.path.join(dirpath, f))
+                if dt_from.timestamp() < _getmtime(fname) < dt_to.timestamp():
+                    files.add(fname)
+
+    # convert the set to a list and sort my mtime
+    files = list(files)
+    files.sort(key=_getmtime)
+
+    return files
 
 
 class SortedDictEncoder(_json.JSONEncoder):

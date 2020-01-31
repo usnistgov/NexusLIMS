@@ -158,13 +158,16 @@ def get_dm3_metadata(filename):
         if instr_name in _instr_specific_parsers.keys():
             m_list[i] = _instr_specific_parsers[instr_name](m_list[i])
 
-    if len(m_list) == 1:
-        return m_list[0]
-    else:
-        m_list_dict = {}
-        for i in range(len(m_list)):
-            m_list_dict[f'Signal {i}'] = m_list[i]
-        return m_list_dict
+    # if len(m_list) == 1:
+    #     return m_list[0]
+    # else:
+    #     m_list_dict = {}
+    #     for i in range(len(m_list)):
+    #         m_list_dict[f'Signal {i}'] = m_list[i]
+    #     return m_list_dict
+
+    # return the first dictionary, which should contain the most information:
+    return m_list[0]
 
 
 def parse_643_titan(mdict):
@@ -268,15 +271,12 @@ def parse_642_titan(mdict):
         'C2_Aperture': 'C2 Aperture',
         'Obj_Aperture': 'Objective Aperture',
         'SA_Aperture': 'Selected Area Aperture',
-        ('Filter_Settings', 'Mode'): ['Tecnai Filter Settings', 'Mode'],
-        ('Filter_Settings', 'Dispersion'): ['Tecnai Filter Settings',
-                                            'Dispersion'],
-        ('Filter_Settings', 'Aperture'): ['Tecnai Filter Settings', 'Aperture'],
-        ('Filter_Settings', 'Prism_Shift'): ['Tecnai Filter Settings',
-                                             'Prism Shift'],
-        ('Filter_Settings', 'Drift_Tube'): ['Tecnai Filter Settings', 'Drift '
-                                                                      'Tube'],
-        ('Filter_Settings', 'Total_Energy_Loss'): ['Tecnai Filter Settings',
+        ('Filter_Settings', 'Mode'): ['Tecnai Filter', 'Mode'],
+        ('Filter_Settings', 'Dispersion'): ['Tecnai Filter', 'Dispersion'],
+        ('Filter_Settings', 'Aperture'): ['Tecnai Filter', 'Aperture'],
+        ('Filter_Settings', 'Prism_Shift'): ['Tecnai Filter', 'Prism Shift'],
+        ('Filter_Settings', 'Drift_Tube'): ['Tecnai Filter', 'Drift Tube'],
+        ('Filter_Settings', 'Total_Energy_Loss'): ['Tecnai Filter',
                                                    'Total Energy Loss'],
     }
 
@@ -726,7 +726,8 @@ def parse_dm3_eds_info(mdict):
               ['Live time'],
               ['Real time']]:
         if _try_get_dict_val(mdict, base + m) != 'not found':
-            mdict['nx_meta']['warnings'].append(['EDS'] + m)
+            mdict['nx_meta']['warnings'].append(['EDS'] +
+                                                [m[-1] if len(m) > 1 else m[0]])
 
     return mdict
 
