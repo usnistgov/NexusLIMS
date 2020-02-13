@@ -112,7 +112,7 @@ def cluster_filelist_mtimes(filelist):
                  {'bandwidth': bandwidths}, cv=_loo(), n_jobs=-1)
     grid.fit(m_array)
     bw = grid.best_params_['bandwidth']
-    _logger.info(f'Using bandwidth of {bw} minutes for KDE')
+    _logger.info(f'Using bandwidth of {bw:.3f} minutes for KDE')
 
     # Calculate AcquisitionActivity boundaries by "clustering" the timestamps
     # using KDE using KDTree nearest neighbor estimates, and the previously

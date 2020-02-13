@@ -177,6 +177,35 @@ def _project_image_stack(s, num=5, dpi=92, v_shear=0.3, h_scale=0.3):
     return output
 
 
+def _pad_to_square(im_path, new_width=500):
+    """
+    Helper method to pad an image saved on disk to a square with size
+    ``width x width``. This ensures consistent display on the front-end web
+    page. Increasing the size of a dimension is done by padding with empty
+    space. The original image is overwritten.
+
+    Method adapted from:
+    https://jdhao.github.io/2017/11/06/resize-image-to-square-with-padding/
+
+    Parameters
+    ----------
+    im_path : str
+        The path to the image that should be resized/padded
+    new_width : int
+        Desired output width/height of the image (in pixels)
+    """
+    im = _PILImage.open(im_path)
+    old_size = im.size    # old_size[0] is in (width, height) format
+    ratio = float(new_width) / max(old_size)
+    new_size = tuple([int(x * ratio) for x in old_size])
+    im = im.resize(new_size, _PILImage.ANTIALIAS)
+
+    new_im = _PILImage.new("RGBA", (new_width, new_width))
+    new_im.paste(im, ((new_width - new_size[0]) // 2,
+                      (new_width - new_size[1]) // 2))
+    new_im.save(im_path)
+
+
 def sig_to_thumbnail(s, out_path, dpi=92):
     """
     Generate a thumbnail of from an arbitrary HyperSpy signal. For a 2D
@@ -395,6 +424,9 @@ def sig_to_thumbnail(s, out_path, dpi=92):
 
         f.savefig(out_path, bbox_inches=extent, dpi=300)
 
+    # regardless of how figure was created, make sure it is 500x500
+    _pad_to_square(out_path, 500)
+
 
 def down_sample_image(fname, out_path, output_size=None, factor=None):
     """
@@ -439,3 +471,4 @@ def down_sample_image(fname, out_path, output_size=None, factor=None):
 
     im.thumbnail(resized, resample=_LANCZOS)
     im.save(out_path)
+    _pad_to_square(out_path, new_width=500)
