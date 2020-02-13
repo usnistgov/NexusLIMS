@@ -22,6 +22,22 @@
     <month month-number="12">December</month>
   </xsl:variable>
   <xsl:key name="lookup.date.month" match="month" use="@month-number"/>
+  
+  <!-- This lookup table assigns a color to each instrument's badge so they can be visually distinguished 
+       on the list page -->
+  <xsl:variable name="instr-color-dictionary">
+    <instr instr-PID="FEI-Titan-TEM-635816">#ff7f0e</instr>
+    <instr instr-PID="FEI-Titan-STEM-630901">#2ca02c</instr>
+    <instr instr-PID="FEI-Quanta200-ESEM-633137">#d62728</instr>
+    <instr instr-PID="JEOL-JEM3010-TEM-565989">#9467bd</instr>
+    <instr instr-PID="FEI-Helios-DB-636663">#8c564b</instr>
+    <instr instr-PID="Hitachi-S4700-SEM-606559">#e377c2</instr>
+    <instr instr-PID="Hitachi-S5500-SEM-635262">#17becf</instr>
+    <instr instr-PID="JEOL-JSM7100-SEM-N102656">#bcbd22</instr>
+    <instr instr-PID="Philips-EM400-TEM-599910">#bebada</instr>
+    <instr instr-PID="Philips-CM30-TEM-540388">#b3de69</instr>
+  </xsl:variable>
+  <xsl:key name="lookup.instr.color" match="instr" use="@instr-PID"/>
 
   <xsl:template match="/">
     <xsl:apply-templates select="/nx:Experiment"/>
@@ -86,7 +102,15 @@
          </span>
        </xsl:element>
        <xsl:text> </xsl:text>
-       <span class="badge list-record-badge yellow-badge"><xsl:value-of select="summary/instrument"/></span>
+       <xsl:variable name="instr-pid">
+         <xsl:value-of select="string(summary/instrument/@pid)"/>
+       </xsl:variable>
+       <span class="badge list-record-badge">
+         <xsl:attribute name="style">background-color:<xsl:for-each select="document('')">
+             <xsl:value-of select="key('lookup.instr.color', $instr-pid)"/>
+           </xsl:for-each> !important;</xsl:attribute>
+         <xsl:value-of select="summary/instrument"/>
+       </span>
        <span class="badge list-record-badge">
          <xsl:value-of select="count(//dataset)"/> data files in <xsl:value-of select="count(//acquisitionActivity)"/> activit<xsl:choose>
            <xsl:when test="count(//acquisitionActivity) = 1">y</xsl:when>
