@@ -35,6 +35,7 @@ from uuid import uuid4 as _uuid4
 from datetime import datetime as _datetime
 from nexusLIMS import mmf_nexus_root_path as _mmf_path
 from nexusLIMS.schemas.activity import AcquisitionActivity as _AcqAc
+from nexusLIMS.schemas.activity import cluster_filelist_mtimes
 from nexusLIMS.harvester import sharepoint_calendar as _sp_cal
 from nexusLIMS.utils import parse_xml as _parse_xml
 from nexusLIMS.utils import find_files_by_mtime as _find_files
@@ -181,80 +182,46 @@ def build_acq_activities(instrument, dt_from, dt_to):
     files = [f for f in files if _os.path.splitext(f)[1].strip('.') in
              _ext.keys()]
 
-    mtimes = [''] * len(files)
-    modes = [''] * len(files)
-    _logger.info(f'Loading files; getting mtime and modes for this activity')
-    start_timer = _timer()
-    failed_indices = []
-    for i, f in enumerate(files):
-        try:
-            mode = _hs.load(f, lazy=True).original_metadata.\
-                ImageList.TagGroup0.ImageTags.Microscope_Info.Imaging_Mode
-        # Could not get mode, so assume this one is same as last
-        except AttributeError as _:
-            mode = modes[i-1]
-        except Exception as _:
-            _logger.error(f'Could not load {f} --- skipping file')
-            failed_indices.append(i)
-            continue
-        mtimes[i] = _datetime.fromtimestamp(_os.path.getmtime(f)).isoformat()
-        modes[i] = mode
-        this_mtime = _datetime.fromtimestamp(
-            _os.path.getmtime(f)).strftime("%Y-%m-%d %H:%M:%S")
-        _logger.info(f'{this_mtime} --- {mode} --- {f}')
-    end_timer = _timer()
+    # get the timestamp boundaries of acquisition activities
+    aa_bounds = cluster_filelist_mtimes(files)
 
-    # If any files failed to load, remove their corresponding entries from
-    # the lists just generated:
-    if len(failed_indices) > 0:
-        # reverse indices so we remove from right side of list first to avoid
-        # changing the index of later on entries
-        failed_indices = failed_indices[::-1]
-        for idx in failed_indices:
-            _logger.warning(f'Removing {files[idx]} from list of files')
-            del files[idx]
-            del mtimes[idx]
-            del modes[idx]
+    # add the last file's modification time to the boundaries list to make
+    # the loop below easier to process
+    aa_bounds.append(_os.path.getmtime(files[-1]))
 
-    _logger.info(f'Loading files took {end_timer - start_timer:.2f} seconds')
+    activities = [None] * len(aa_bounds)
 
-    activities = []
+    i = 0
+    aa_idx = 0
+    while i < len(files):
+        f = files[i]
+        mtime = _os.path.getmtime(f)
 
-    for i, (f, t, m) in enumerate(zip(files, mtimes, modes)):
-        # set last_mode to this mode if this is the first iteration;
-        # otherwise set it to the last mode that we saw
-        last_mode = m if i == 0 else modes[i - 1]
+        # check this file's mtime, if it is less than this iteration's value
+        # in the AA bounds, then it belongs to this iteration's AA
+        # if not, then we should move to the next activity
+        if mtime <= aa_bounds[aa_idx]:
+            # if current activity index is None, we need to start a new AA:
+            if activities[aa_idx] is None:
+                start_time = _datetime.fromtimestamp(mtime)
+                activities[aa_idx] = _AcqAc(start=start_time)
 
-        # if this is the first iteration, start a new AcquisitionActivity and
-        # add it to the list of activities
-        if i == 0:
-            _logger.debug(t)
-            start_time = _datetime.fromisoformat(t)
-            aa = _AcqAc(start=start_time, mode=m)
-            activities.append(aa)
-
-        # if this file's mode is the same as the last, just add it to the
-        # current activity's file list
-        if m == last_mode:
-            _logger.info(f'Adding {f} to activity')
-            activities[-1].add_file(f)
-
-        # this file's mode is different, so it belongs to the next
-        # AcquisitionActivity. End the current AcquisitionActivity and create
-        # a new one with this file's information
+            # add this file to the AA
+            _logger.info(f'Adding file {i} {f.replace(_mmf_path,"")} to activity'
+                         f' {aa_idx}')
+            activities[aa_idx].add_file(f)
+            # assume this file is the last one in the activity (this will be
+            # true on the last iteration where mtime is <= to the
+            # aa_bounds value)
+            activities[aa_idx].end = _datetime.fromtimestamp(mtime)
+            i += 1
         else:
-            # AcquisitionActivity end time is previous mtime
-            activities[-1].end = _datetime.fromisoformat(mtimes[i - 1])
-            # New AcquisitionActivity start time is t
-            activities.append(_AcqAc(start=_datetime.fromisoformat(t), mode=m))
-            _logger.info(f'Adding {f} to activity')
-            activities[-1].add_file(f)
+            # this file's mtime is after the boundary and is thus part of the
+            # next activity, so increment AA counter and reprocess file (do
+            # not increment i)
+            aa_idx += 1
 
-        # We have reached the last file, so end the current activity
-        if i == len(files) - 1:
-            activities[-1].end = _datetime.fromisoformat(t)
-
-    acq_activities = ''
+    acq_activities_str = ''
     _logger.info('Finished detecting activities')
     sample_id = str(_uuid4())       # just a random string for now
     for i, a in enumerate(activities):
@@ -265,10 +232,10 @@ def build_acq_activities(instrument, dt_from, dt_to):
         _logger.info(f'Activity {i}: storing unique metadata values')
         a.store_unique_metadata()
 
-        acq_activities += a.as_xml(i, sample_id,
-                                   indent_level=1, print_xml=False)
+        acq_activities_str += a.as_xml(i, sample_id,
+                                       indent_level=1, print_xml=False)
 
-    return acq_activities
+    return acq_activities_str
 
 
 def dump_record(instrument,

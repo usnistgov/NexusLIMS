@@ -139,15 +139,19 @@ def get_dm3_metadata(filename):
                 m_tree = _remove_dtb_element(m_tree, 'ImageList.'
                                                      '{}.{}'.format(tg_name, k))
 
+        m_list[i] = m_tree.as_dictionary()
+
         # Get the instrument object associated with this file
         instr = _get_instr(filename)
         # if we found the instrument, then store the name as string, else None
         instr_name = instr.name if instr is not None else None
         m_list[i]['nx_meta'] = {}
+        m_list[i]['nx_meta']['fname'] = filename
+        # set type to Image by default
+        m_list[i]['nx_meta']['DatasetType'] = 'Image'
         m_list[i]['nx_meta']['Data Dimensions'] = str(s[i].data.shape)
         m_list[i]['nx_meta']['Instrument ID'] = instr_name
         m_list[i]['nx_meta']['warnings'] = []
-        m_list[i] = m_tree.as_dictionary()
         m_list[i] = parse_dm3_microscope_info(m_list[i])
         m_list[i] = parse_dm3_eels_info(m_list[i])
         m_list[i] = parse_dm3_eds_info(m_list[i])
@@ -157,6 +161,9 @@ def get_dm3_metadata(filename):
         # look for the instrument in our list of instrument-specific parsers:
         if instr_name in _instr_specific_parsers.keys():
             m_list[i] = _instr_specific_parsers[instr_name](m_list[i])
+
+        # we don't need to save the filename, it's just for internal processing
+        del m_list[i]['nx_meta']['fname']
 
     # if len(m_list) == 1:
     #     return m_list[0]
@@ -191,6 +198,13 @@ def parse_643_titan(mdict):
     # accurate, so add it to the warning list
     for m in ['Detector', 'Operator', 'Specimen']:
         mdict['nx_meta']['warnings'].append([m])
+
+    # the 643Titan sets the Imaging mode to "EFTEM DIFFRACTION" when an
+    # actual diffraction pattern is taken
+    if 'Imaging Mode' in mdict['nx_meta']:
+        if mdict['nx_meta']['Imaging Mode'] == 'EFTEM DIFFRACTION':
+            mdict['nx_meta']['DatasetType'] = 'Diffraction'
+
     return mdict
 
 
@@ -251,33 +265,39 @@ def parse_642_titan(mdict):
 
     term_mapping = {
         'Gun_Name': 'Gun Name',
-        'Extractor_Voltage': 'Extractor Voltage',
+        'Extractor_Voltage': 'Extractor Voltage (V)',
+        'Camera_Length': 'Camera Length (m)',
         'Gun_Lens_No': 'Gun Lens #',
-        'Emission_Current': 'Emission Current',
+        'Emission_Current': 'Emission Current (μA)',
         'Spot': 'Spot',
         'Mode': 'Tecnai Mode',
-        'C2_Strength': 'C2 Lens Strength',
-        'C3_Strength': 'C3 Lens Strength',
-        'Obj_Strength': 'Objective Lens Strength',
-        'Dif_Strength': 'Diffraction Lens Strength',
-        'Image_Shift_x': 'Image Shift X',
-        'Image_Shift_y': 'Image Shift Y',
-        'Stage_Position_x': ['Stage Position', 'X'],
-        'Stage_Position_y': ['Stage Position', 'Y'],
-        'Stage_Position_z': ['Stage Position', 'Z'],
-        'Stage_Position_theta': ['Stage Position', 'θ'],
-        'Stage_Position_phi': ['Stage Position', 'φ'],
-        'C1_Aperture': 'C1 Aperture',
-        'C2_Aperture': 'C2 Aperture',
-        'Obj_Aperture': 'Objective Aperture',
-        'SA_Aperture': 'Selected Area Aperture',
+        'Defocus': 'Defocus',
+        'C2_Strength': 'C2 Lens Strength (%)',
+        'C3_Strength': 'C3 Lens Strength (%)',
+        'Obj_Strength': 'Objective Lens Strength (%)',
+        'Dif_Strength': 'Diffraction Lens Strength (%)',
+        'Microscope_Name': 'Tecnai Microscope Name',
+        'User': 'Tecnai User',
+        'Image_Shift_x': 'Image Shift X (μm)',
+        'Image_Shift_y': 'Image Shift Y (μm)',
+        'Stage_Position_x': ['Stage Position', 'X (μm)'],
+        'Stage_Position_y': ['Stage Position', 'Y (μm)'],
+        'Stage_Position_z': ['Stage Position', 'Z (μm)'],
+        'Stage_Position_theta': ['Stage Position', 'θ (°)'],
+        'Stage_Position_phi': ['Stage Position', 'φ (°)'],
+        'C1_Aperture': 'C1 Aperture (μm)',
+        'C2_Aperture': 'C2 Aperture (μm)',
+        'Obj_Aperture': 'Objective Aperture (μm)',
+        'SA_Aperture': 'Selected Area Aperture (μm)',
         ('Filter_Settings', 'Mode'): ['Tecnai Filter', 'Mode'],
-        ('Filter_Settings', 'Dispersion'): ['Tecnai Filter', 'Dispersion'],
-        ('Filter_Settings', 'Aperture'): ['Tecnai Filter', 'Aperture'],
-        ('Filter_Settings', 'Prism_Shift'): ['Tecnai Filter', 'Prism Shift'],
-        ('Filter_Settings', 'Drift_Tube'): ['Tecnai Filter', 'Drift Tube'],
+        ('Filter_Settings', 'Dispersion'): ['Tecnai Filter',
+                                            'Dispersion (eV/channel)'],
+        ('Filter_Settings', 'Aperture'): ['Tecnai Filter', 'Aperture (mm)'],
+        ('Filter_Settings', 'Prism_Shift'): ['Tecnai Filter',
+                                             'Prism Shift (eV)'],
+        ('Filter_Settings', 'Drift_Tube'): ['Tecnai Filter', 'Drift Tube (eV)'],
         ('Filter_Settings', 'Total_Energy_Loss'): ['Tecnai Filter',
-                                                   'Total Energy Loss'],
+                                                   'Total Energy Loss (eV)'],
     }
 
     for in_term in term_mapping.keys():
@@ -299,6 +319,20 @@ def parse_642_titan(mdict):
     if val != 'not found' and \
             val != 'Specimen information is not available yet':
         _set_nest_dict_val(mdict, ['nx_meta', 'Specimen'], val)
+
+    # If `Tecnai Mode` is `STEM nP SA Zoom Diffraction`, it's diffraction
+    if 'Tecnai Mode' in mdict['nx_meta'] and \
+            mdict['nx_meta']['Tecnai Mode'] == 'STEM nP SA Zoom Diffraction':
+        _logger.info('Detected file as Diffraction type based on "Tecnai '
+                     'Mode" == "STEM nP SA Zoom Diffraction"')
+        mdict['nx_meta']['DatasetType'] = 'Diffraction'
+
+    # also, if `Operation Mode` is `DIFFRACTION`, it's diffraction
+    elif 'Operation Mode' in mdict['nx_meta'] and \
+            mdict['nx_meta']['Operation Mode'] == 'DIFFRACTION':
+        _logger.info('Detected file as Diffraction type based on "Operation '
+                     'Mode" == "DIFFRACTION"')
+        mdict['nx_meta']['DatasetType'] = 'Diffraction'
 
     return mdict
 
@@ -323,6 +357,18 @@ def parse_642_jeol(mdict):
     # Currently, the Stroboscope does not add any metadata items that need to
     # be processed differently than the "default" dm3 tags (and it barely has
     # any metadata anyway), so this method does not need to do anything
+
+    # To try to detect diffraction pattern, we will check the file name
+    # against commonly used terms for saving diffraction patterns (not even
+    # close to perfect, but at least it's something)
+    for s in ['Diff', 'SAED', 'DP']:
+        if s.lower() in mdict['nx_meta']['fname'] or \
+                s.upper() in mdict['nx_meta']['fname'] or \
+                s in mdict['nx_meta']['fname']:
+            _logger.info(f'Detected file as Diffraction type based on "{s}" in '
+                         f'the filename')
+            mdict['nx_meta']['DatasetType'] = 'Diffraction'
+
     return mdict
 
 
@@ -590,6 +636,12 @@ def parse_dm3_eels_info(mdict):
                                 'Processing Steps'],
                                ', '.join(sorted(set(eels_ops))))
 
+    # Set the dataset type to Spectrum if any EELS tags were added
+    if 'EELS' in mdict['nx_meta']:
+        _logger.info('Detected file as Spectrum type based on presence of '
+                     'EELS metadata')
+        mdict['nx_meta']['DatasetType'] = 'Spectrum'
+
     return mdict
 
 
@@ -729,6 +781,12 @@ def parse_dm3_eds_info(mdict):
             mdict['nx_meta']['warnings'].append(['EDS'] +
                                                 [m[-1] if len(m) > 1 else m[0]])
 
+    # Set the dataset type to Spectrum if any EDS tags were added
+    if 'EDS' in mdict['nx_meta']:
+        _logger.info('Detected file as Spectrum type based on presence of '
+                     'EDS metadata')
+        mdict['nx_meta']['DatasetType'] = 'Spectrum'
+
     return mdict
 
 
@@ -808,6 +866,16 @@ def parse_dm3_spectrum_image_info(mdict):
         _set_nest_dict_val(mdict,
                            ['nx_meta', 'Spectrum Imaging',
                             'Acquisition Duration (s)'], duration)
+
+    # Set the dataset type to SpectrumImage if it is already a Spectrum (
+    # otherwise it's just a STEM image) and any Spectrum Imaging tags were
+    # added
+    if 'Spectrum Imaging' in mdict['nx_meta']:
+        if mdict['nx_meta']['DatasetType'] == 'Spectrum':
+            _logger.info('Detected file as SpectrumImage type based on '
+                         'presence of spectral metadata and spectrum imaging '
+                         'info')
+            mdict['nx_meta']['DatasetType'] = 'SpectrumImage'
 
     return mdict
 
@@ -1009,7 +1077,7 @@ def _remove_dtb_element(tree, path):
         exec('del {}'.format(to_del))
     except AttributeError as _:
         # Log the failure and continue
-        _logger.info('_remove_dtb_element: Could not find {}'.format(to_del))
+        _logger.debug('_remove_dtb_element: Could not find {}'.format(to_del))
 
     return tree
 

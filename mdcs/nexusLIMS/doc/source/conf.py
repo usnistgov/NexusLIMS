@@ -62,7 +62,7 @@ pygments_style = 'sphinx'
 add_function_parentheses = True
 # master_doc = 'index'
 
-intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
+intersphinx_mapping = {'python': ('https://docs.python.org/3.7/', None),
                        'dateparser': (
                            'https://dateparser.readthedocs.io/en/latest/',
                            None),
@@ -72,7 +72,10 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
                            'https://docs.scipy.org/doc/numpy/', None),
                        'matplotlib': ('https://matplotlib.org/', None),
                        'requests': (
-                           'https://2.python-requests.org/en/master', None)
+                           'https://2.python-requests.org/en/master', None),
+                       'PIL': (
+                           'https://pillow.readthedocs.io/en/3.1.x/',
+                           None)
                        }
 
 import sphinx_bootstrap_theme
@@ -223,7 +226,8 @@ def run_apidoc(_):
 # lines from intersphinx to ignore during api-doc autogeneration (so we don't
 # get useless warning messages while the docs are being built
 nitpick_ignore = [('py:class', 'function'),
-                  ('py:class', 'optional')]
+                  ('py:class', 'optional'),
+                  ('py:class', 'json.encoder.JSONEncoder')]
 
 
 def skip(app, what, name, obj, would_skip, options):

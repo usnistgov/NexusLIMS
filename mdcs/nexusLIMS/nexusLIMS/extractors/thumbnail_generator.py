@@ -407,10 +407,10 @@ def down_sample_image(fname, out_path, output_size=None, factor=None):
     ----------
     fname : str
         The filepath that will be resized. All formats supported by
-        :py:meth:`PIL.Image.open` can be used
+        :py:func:`PIL.Image.open` can be used
     out_path : str
         A path to the desired thumbnail filename. All formats supported by
-        :py:meth:`PIL.Image.save` can be used.
+        :py:meth:`PIL.Image.Image.save` can be used.
     output_size : tuple
         A tuple of ints specifying the width and height of the output image.
         Either this argument or ``factor`` should be provided (not both).

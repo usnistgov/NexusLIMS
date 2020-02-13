@@ -98,3 +98,8 @@ div.toctree-wrapper > p.caption > span.caption-text {
     margin-top: 20px;
     margin-bottom: 10px;
 }
+
+/* Hide value of the instrument_db attribute */
+dt#nexusLIMS\.instruments\.instrument_db > em {
+    display: none;
+}

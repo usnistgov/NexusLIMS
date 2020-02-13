@@ -147,6 +147,12 @@ class Instrument:
 
 
 instrument_db = _get_instrument_db()
+"""
+dict: A dictionary of :py:class:`~nexusLIMS.instruments.Instrument` objects.
+
+Each object in this dictionary represents an instrument detected in the 
+NexusLIMS remote database.
+"""
 
 
 def get_instr_from_filepath(path):

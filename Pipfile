@@ -19,6 +19,7 @@ ntlm-auth = "*"
 dateparser = "*"
 ldap3 = "*"
 hyperspy = {editable = true,git = "https://github.com/hyperspy/hyperspy.git",ref = "RELEASE_next_patch"}
+scikit-learn = "*"
 
 [requires]
 python_version = "3.7"

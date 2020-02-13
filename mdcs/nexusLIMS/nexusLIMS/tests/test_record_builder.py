@@ -11,6 +11,17 @@ from datetime import datetime as _dt
 
 
 class TestRecordBuilder:
+    def test_643_***REMOVED***(self):
+        starting_time = _dt.fromisoformat('2019-11-10T05:10:00')
+        ending_time = _dt.fromisoformat('2019-11-10T10:29:17')
+        # Build the XML record and write it to a file
+        filename = _rb.dump_record(instrument_db['FEI-Titan-STEM-630901'],
+                                   starting_time,
+                                   ending_time,
+                                   filename=None,
+                                   date='2019-11-10',
+                                   user='***REMOVED***')
+
     def test_record_builder(self):
 
         # This will come from the database, but hard code for now

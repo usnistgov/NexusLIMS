@@ -32,6 +32,11 @@ import tempfile as _tempfile
 import os as _os
 from os.path import getmtime as _getmtime
 import json as _json
+import logging as _logging
+
+_logger = _logging.getLogger(__name__)
+_logger.setLevel(_logging.INFO)
+
 
 def parse_xml(xml, xslt_file, **kwargs):
     """
@@ -321,6 +326,8 @@ def find_dirs_by_mtime(path, dt_from, dt_to):
     dirs = []
     # use os.walk and only inspect the directories for mtime (much fewer
     # comparisons than looking at every file):
+    _logger.info(f'Finding directories modified between {dt_from.isoformat()} '
+                 f'and {dt_to.isoformat()}')
     for dirpath, _, _ in _os.walk(path):
         if dt_from.timestamp() < _getmtime(dirpath) < dt_to.timestamp():
             dirs.append(dirpath)
@@ -356,6 +363,8 @@ def find_files_by_mtime(path, dt_from, dt_to):
         # we didn't find any directories in our time of interest (likely the
         # case when looking at data that was collected before it started
         # being saved to the centralized share; fallback to all directories
+        _logger.info('Could not find directories modified in time span, '
+                     'so searching all directories')
         dirs = [path]
 
     files = set()    # use a set here (faster and we won't have duplicates)

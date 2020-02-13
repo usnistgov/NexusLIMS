@@ -30,8 +30,17 @@ import os as _os
 import pathlib as _pathlib
 import logging as _logging
 from datetime import datetime as _datetime
+import math as _math
 from xml.sax.saxutils import escape, unescape
+from timeit import default_timer as _timer
+
 import hyperspy.api_nogui as _hs
+import numpy as _np
+from sklearn.neighbors import KernelDensity as _KernelDensity
+from scipy.signal import argrelextrema as _argrelextrema
+from sklearn.model_selection import GridSearchCV as _grid
+from sklearn.model_selection import LeaveOneOut as _loo
+
 from nexusLIMS.extractors.digital_micrograph import \
     process_tecnai_microscope_info as _tecnai
 from nexusLIMS import mmf_nexus_root_path as _mmf_path
@@ -40,108 +49,87 @@ from nexusLIMS.extractors import parse_metadata as _parse_metadata
 from nexusLIMS.extractors import flatten_dict as _flatten_dict
 
 _logger = _logging.getLogger(__name__)
+_logger.setLevel(_logging.INFO)
 
 
-# TODO: Metadata parsing will require different method for each instrument
-def read_metadata(sig):
+def cluster_filelist_mtimes(filelist):
     """
-    For a signal like that contained in ``self.sigs``, parse the
-    "important" metadata, so it can be compared to find common values
-    that will be defined as AcquisitionActivity parameters
+    Perform a statistical clustering of the timestamps (`mtime` values) of a
+    list of files to find "relatively" large gaps in acquisition time. The
+    definition of `relatively` depends on the context of the entire list of
+    files. For example, if many files are simultaneously acquired,
+    the "inter-file" time spacing between these will be very small (near zero),
+    meaning even fairly short gaps between files may be important.
+    Conversely, if files are saved every 30 seconds or so, the tolerance for
+    a "large gap" will need to be correspondingly larger.
+
+    The approach this method uses is to detect minima in the
+    `Kernel Density Estimation`_ (KDE) of the file modification times. To
+    determine the optimal bandwidth parameter to use in KDE, a `grid search`_
+    over possible appropriate bandwidths is performed, using `Leave One Out`_
+    cross-validation. This approach allows the method to determine the
+    important gaps in file acquisition times with sensitivity controlled by
+    the distribution of the data itself, rather than a pre-supposed optimum.
+    The KDE minima approach was suggested `here`_.
+
+    .. _Kernel Density Estimation: https://scikit-learn.org/stable/modules/density.html#kernel-density
+    .. _grid search: https://scikit-learn.org/stable/modules/grid_search.html#grid-search
+    .. _Leave One Out: https://scikit-learn.org/stable/modules/cross_validation.html#leave-one-out-loo
+    .. _here: https://stackoverflow.com/a/35151947/1435788
+
 
     Parameters
     ----------
-    sig : :py:class:`hyperspy.signal.BaseSignal`
-        The signal for which to parse the metadata
+    filelist : list
+        The files (as a list) whose timestamps will be interrogated to find
+        "relatively" large gaps in acquisition time (as a means to find the
+        breaks between discrete Acquisition Activities)
 
     Returns
     -------
-    m : dict
-        A dictionary containing all the "important" metadata from the given
-        signal
-
-    Notes
-    -----
-
-    Currently, the following tags are considered "important", but this will
-    be modified for different instrument, file types, etc.:
-
-    - General .dm3 tags (not guaranteed to be present):
-        - ``ImageTags.Microscope_Info.Indicated_Magnification``
-        - ``ImageTags.Microscope_Info.Actual_Magnification``
-        - ``ImageTags.Microscope_Info.Csmm``
-        - ``ImageTags.Microscope_Info.STEM_Camera_Length``
-        - ``ImageTags.Microscope_Info.Voltage``
-
-    - Tecnai info:
-        - ``ImageTags.Tecnai.Microscope_Info['Gun_Name']``
-        - ``ImageTags.Tecnai.Microscope_Info['Extractor_Voltage']``
-        - ``ImageTags.Tecnai.Microscope_Info['Gun_Lens_No']``
-        - ``ImageTags.Tecnai.Microscope_Info['Emission_Current']``
-        - ``ImageTags.Tecnai.Microscope_Info['Spot']``
-        - ``ImageTags.Tecnai.Microscope_Info['Mode']``
-        - C2, C3, Obj, Dif lens strength:
-            - ``ImageTags.Tecnai.Microscope_Info['C2_Strength', 'C3_Strength', 'Obj_Strength', 'Dif_Strength']``
-        - ``ImageTags.Tecnai.Microscope_Info['Image_Shift_x'/'Image_Shift_y'])``
-        - ``ImageTags.Tecnai.Microscope_Info['Stage_Position_x' (y/z/theta/phi)]``
-        - C1/C2/Objective/SA aperture sizes:
-            - ``ImageTags.Tecnai.Microscope_Info['(C1/C2/Obj/SA)_Aperture']``
-        - ``ImageTags.Tecnai.Microscope_Info['Filter_Settings']['Mode']``
-        - ``ImageTags.Tecnai.Microscope_Info['Filter_Settings']['Dispersion']``
-        - ``ImageTags.Tecnai.Microscope_Info['Filter_Settings']['Aperture']``
-        - ``ImageTags.Tecnai.Microscope_Info['Filter_Settings']['Prism_Shift']``
-        - ``ImageTags.Tecnai.Microscope_Info['Filter_Settings']['Drift_Tube']``
-        - ``ImageTags.Tecnai.Microscope_Info['Filter_Settings']['Total_Energy_Loss']``
+    aa_boundaries : list
+        A list of the `mtime` values that represent boundaries between
+        discrete Acquisition Activities
     """
-    m = {}
-    # Obviously will need to be changed for non-dm3 data and other
-    # instruments
-    ImageTags = sig.original_metadata.ImageList.TagGroup0.ImageTags
-    try:
-        tecnai_info = _tecnai(ImageTags.Tecnai.Microscope_Info)
-    except AttributeError: tecnai_info = None  # Not a tecnai image
-    try:
-        m['Indicated_Magnification'] = \
-            ImageTags.Microscope_Info.Indicated_Magnification
-    except AttributeError: pass
-    try:
-        m['Actual_Magnification'] = \
-            ImageTags.Microscope_Info.Actual_Magnification
-    except AttributeError: pass
-    try:
-        m['Csmm'] = ImageTags.Microscope_Info.Csmm
-    except AttributeError: pass
-    try:
-        m['STEM_Camera_Length'] = \
-            ImageTags.Microscope_Info.STEM_Camera_Length
-    except AttributeError: pass
-    try:
-        m['Voltage'] = ImageTags.Microscope_Info.Voltage
-    except AttributeError: pass
+    _logger.info('Starting clustering of file mtimes')
+    start_timer = _timer()
+    mtimes = [_os.path.getmtime(f) for f in filelist]
+    m_array = _np.array(mtimes).reshape(-1, 1)
 
-    if tecnai_info:
-        for k in ['Gun_Name', 'Extractor_Voltage', 'Gun_Lens_No',
-                  'Camera_Length', 'Emission_Current', 'Spot', 'Mode',
-                  'C2_Strength', 'C3_Strength', 'Obj_Strength', 'Dif_Strength',
-                  'Image_Shift_x', 'Image_Shift_y', 'Stage_Position_x',
-                  'Stage_Position_y', 'Stage_Position_z',
-                  'Stage_Position_theta', 'Stage_Position_phi',
-                  'C1_Aperture', 'C2_Aperture', 'Obj_Aperture',
-                  'SA_Aperture']:
-            try:
-                m[k] = tecnai_info[k]
-            except KeyError:
-                _logger.info(f'Tecnai.Microscope_Info.{k}' +
-                             ' not found in the metadata dictionary')
-        for k in ['Mode', 'Dispersion', 'Aperture', 'Prism_Shift',
-                  'Drift_Tube', 'Total_Energy_Loss']:
-            try:
-                m[f'Filter.{k}'] = tecnai_info['Filter_Settings'][k]
-            except KeyError:
-                _logger.info(f'Filter_Settings.{k} not found' +
-                             ' in the metadata dictionary')
+    # mtime_diff is a discrete differentiation to find the time gap between
+    # sequential files
+    mtime_diff = [j - i for i, j in zip(mtimes[:-1], mtimes[1:])]
 
-    return m
+    # Bandwidth to use is uncertain, so do a grid search over possible values
+    # from smallest to largest sequential mtime difference (logarithmically
+    # biased towards smaller values). we do cross-validation using the Leave
+    # One Out strategy and using the total log-likelihood from the KDE as
+    # the score to maximize (goodness of fit)
+    bandwidths = 10 ** _np.linspace(_math.log(min(mtime_diff)),
+                                    _math.log(max(mtime_diff)), 35)
+    _logger.info('KDE bandwidth grid search')
+    grid = _grid(_KernelDensity(kernel='gaussian'),
+                 {'bandwidth': bandwidths}, cv=_loo(), n_jobs=-1)
+    grid.fit(m_array)
+    bw = grid.best_params_['bandwidth']
+    _logger.info(f'Using bandwidth of {bw} minutes for KDE')
+
+    # Calculate AcquisitionActivity boundaries by "clustering" the timestamps
+    # using KDE using KDTree nearest neighbor estimates, and the previously
+    # identified "optimal" bandwidth
+    kde = _KernelDensity(kernel='gaussian',
+                         bandwidth=bw)
+    kde = kde.fit(m_array)
+    s = _np.linspace(m_array.min(), m_array.max(), num=len(mtimes)*10)
+    e = kde.score_samples(s.reshape(-1, 1))
+
+    mins = _argrelextrema(e, _np.less)[0]      # the minima indices
+    aa_boundaries = [s[m] for m in mins]     # the minima mtime values
+    end_timer = _timer()
+    _logger.info(f'Detected {len(aa_boundaries) + 1} activities in '
+                 f'{end_timer - start_timer:.2f} seconds')
+
+    return aa_boundaries
 
 
 # TODO: tests for all of AcquisitionActivity
@@ -226,8 +214,9 @@ class AcquisitionActivity:
 
     def add_file(self, fname):
         """
-        Add a file to this activity's file list, read it into a Signal,
-        and read its metadata
+        Add a file to this activity's file list, parse its metadata (storing
+        a flattened copy of it to this activity), generate a preview
+        thumbnail, get the file's type, and a lazy HyperSpy signal
 
         Parameters
         ----------
@@ -237,7 +226,7 @@ class AcquisitionActivity:
         if _os.path.exists(fname):
             self.files.append(fname)
             meta, preview_fname = _parse_metadata(fname,
-                                                  generate_preview=False)
+                                                  generate_preview=True)
 
             if meta is None:
                 # Something bad happened, so we need to alert the user
@@ -248,7 +237,6 @@ class AcquisitionActivity:
                 self.previews.append(preview_fname)
                 self.sigs.append(s)
                 self.meta.append(_flatten_dict(meta['nx_meta']))
-                # TODO: figure out if this is working...
                 self.warnings.append([' '.join(w)
                                       for w in meta['nx_meta']['warnings']])
         else:
@@ -420,8 +408,8 @@ class AcquisitionActivity:
         aqAc_xml += f'{INDENT*2}<sampleID>{sample_id}</sampleID>{line_ending}'
         aqAc_xml += f'{INDENT*2}<setup>{line_ending}'
         for pk, pv in sorted(self.setup_params.items()):
-            # TODO: account for warnings here
-            if pk == 'warnings':
+            # metadata values to skip in XML output
+            if pk in ['warnings', 'DatasetType']:
                 pass
             else:
                 if isinstance(pv, str) and any(c in pv for c in '<&'):
@@ -434,12 +422,6 @@ class AcquisitionActivity:
                             f'{pv}</param>{line_ending}'
         aqAc_xml += f'{INDENT*2}</setup>{line_ending}'
 
-        # This is kind of a temporary hack until I figure out a better solution
-        # TODO: fix determination of dataset types
-        mode_to_dataset_type_map = {
-            'IMAGING': 'Image',
-            'DIFFRACTION': 'Diffraction'
-        }
         for f, m, um, w in zip(self.files, self.meta,
                                self.unique_meta, self.warnings):
             # escape any bad characters in the filename
@@ -452,7 +434,7 @@ class AcquisitionActivity:
 
             # f is string; um is a dictionary, w is a list
             aqAc_xml += f'{INDENT*2}<dataset ' \
-                        f'type="{mode_to_dataset_type_map[self.mode]}" ' \
+                        f'type="{m["DatasetType"]}" ' \
                         f'role="Experimental">{line_ending}'
             aqAc_xml += f'{INDENT*3}<name>{_os.path.basename(f)}' \
                         f'</name>{line_ending}'
@@ -461,7 +443,7 @@ class AcquisitionActivity:
             aqAc_xml += f'{INDENT*3}<preview>{rel_thumb_name}' \
                         f'</preview>{line_ending}'
             for meta_k, meta_v in sorted(um.items()):
-                if meta_k == 'warnings':
+                if meta_k in ['warnings', 'DatasetType']:
                     pass
                 else:
                     if isinstance(meta_v, str) and \
