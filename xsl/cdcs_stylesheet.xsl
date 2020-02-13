@@ -1220,7 +1220,13 @@
                                                     <xsl:element name="td">
                                                         <xsl:value-of select="name"/>
                                                     </xsl:element>
-                                                    <td><xsl:value-of select="@type"/></td>
+                                                    <xsl:variable name="dataset-type">
+                                                        <xsl:choose>
+                                                            <xsl:when test="string(@type) = 'SpectrumImage'">Spectrum Image</xsl:when>
+                                                            <xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
+                                                        </xsl:choose>
+                                                    </xsl:variable>
+                                                    <td><xsl:value-of select="$dataset-type"/></td>
                                                     <td><xsl:value-of select="@role"/></td>
                                                     <xsl:choose>
                                                         <xsl:when test="../dataset/format/text()">
