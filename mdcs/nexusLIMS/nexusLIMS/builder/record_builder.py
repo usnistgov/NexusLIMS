@@ -118,9 +118,13 @@ def build_record(instrument, dt_from, dt_to, date, user):
 
     # No calendar events were found
     if str(output) == '':
-        output = '<title>No matching calendar event found</title>\n' + \
+        output = f'<title>Experiment on the {instrument.schema_name}' \
+                 f' on {dt_from.strftime("%A %b. %d, %Y")}</title>\n' + \
                  '<id/>\n' + \
-                 '<summary/>'
+                 '<summary>\n' + \
+                 f'    <instrument pid="{instrument.name}">' \
+                 f'{instrument.schema_name}</instrument>\n' + \
+                 '</summary>\n'
 
     xml_record += str(output)
 

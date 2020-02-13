@@ -11,7 +11,26 @@ from datetime import datetime as _dt
 
 
 class TestRecordBuilder:
-    def test_643_***REMOVED***(self):
+    def test_643_1(self):
+        starting_time = _dt.fromisoformat('2020-01-21T14:18:58.393')
+        ending_time = _dt.fromisoformat('2020-01-21T16:42:54.211')
+        # Build the XML record and write it to a file
+        filename = _rb.dump_record(instrument_db['FEI-Titan-STEM-630901'],
+                                   starting_time,
+                                   ending_time,
+                                   filename=None)
+
+    def test_642_***REMOVED***_with_cal(self):
+        starting_time = _dt.fromisoformat('2020-01-28T09:18:52.093')
+        ending_time = _dt.fromisoformat('2020-01-29T10:20:41.484')
+        # Build the XML record and write it to a file
+        filename = _rb.dump_record(instrument_db['FEI-Titan-TEM-635816'],
+                                   starting_time,
+                                   ending_time,
+                                   filename=None,
+                                   user='***REMOVED***')
+
+    def test_643_***REMOVED***_EELS_no_cal(self):
         starting_time = _dt.fromisoformat('2019-11-10T05:10:00')
         ending_time = _dt.fromisoformat('2019-11-10T10:29:17')
         # Build the XML record and write it to a file
