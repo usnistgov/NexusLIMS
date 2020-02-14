@@ -384,17 +384,6 @@ def find_files_by_mtime(path, dt_from, dt_to):
     return files
 
 
-class SortedDictEncoder(_json.JSONEncoder):
-    """
-    A class override for the json dump methods that will sort dictionaries
-    before serializing them to json for better output
-
-    Taken from https://stackoverflow.com/a/24077013/1435788
-    """
-    def encode(self, obj):
-        def sort_dicts(item):
-            if isinstance(item, dict):
-                return {k: sort_dicts(v) for k, v in item.items()}
-            else:
-                return item
-        return super(SortedDictEncoder, self).encode(sort_dicts(obj))
+def _sort_dict(item):
+    return {k: _sort_dict(v) if isinstance(v, dict) else v
+            for k, v in sorted(item.items())}

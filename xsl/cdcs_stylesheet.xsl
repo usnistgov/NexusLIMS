@@ -1236,10 +1236,24 @@
                                                     <td class='text-center'>
                                                         <!-- Modal content inside of table, since it needs to be in the context of this dataset -->
                                                         <a href='javascript:void(0)' onclick="$(this).blur(); openModal('{generate-id(current())}-modal');"
-                                                        data-toggle='tooltip' data-placement='right'
+                                                        data-toggle='tooltip' data-placement='left'
                                                         title="Click to view this dataset's unique metadata">
                                                             <i class='fa fa-tasks fa-border param-button' style='margin-left:0;'/>
                                                         </a>
+                                                        <xsl:variable name="json-tmp"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:variable>
+                                                        <xsl:variable name="json-location"><xsl:value-of select="substring-before($json-tmp, '.thumb.png')"/>.json</xsl:variable>
+                                                        <xsl:element name='a'>
+                                                            <xsl:attribute name="href"><xsl:value-of select="$json-location"/></xsl:attribute>
+                                                            <xsl:attribute name="onclick">
+                                                                $(this).blur()
+                                                            </xsl:attribute>
+                                                            <xsl:attribute name="target">_blank</xsl:attribute>
+                                                            <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                                                            <xsl:attribute name="data-placement">right</xsl:attribute>
+                                                            <xsl:attribute name="data-html">true</xsl:attribute>
+                                                            <xsl:attribute name="title">Click to download this dataset's metadata in JSON format</xsl:attribute>
+                                                            <i class='fa fa-download fa-border param-button' style='margin-left:0;'/>
+                                                        </xsl:element>
                                                         <div id="{generate-id(current())}-modal" class="modal">
                                                             <div class="modal-content">
                                                                 <div class="container-fluid">

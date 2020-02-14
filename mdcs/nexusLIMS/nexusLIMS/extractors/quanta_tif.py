@@ -32,9 +32,7 @@ from decimal import Decimal as _Decimal
 from decimal import InvalidOperation as _invalidOp
 
 from nexusLIMS.instruments import get_instr_from_filepath as _get_instr
-from nexusLIMS.utils import get_nested_dict_key as _get_nest_dict_key
-from nexusLIMS.utils import get_nested_dict_value_by_path as \
-    _get_nest_dict_val_by_path
+from nexusLIMS.utils import _sort_dict
 from nexusLIMS.utils import set_nested_dict_value as _set_nest_dict_val
 from nexusLIMS.utils import try_getting_dict_value as _try_get_dict_val
 
@@ -91,6 +89,9 @@ def get_quanta_metadata(filename):
     mdict['nx_meta']['warnings'] = []
 
     mdict = parse_nx_meta(mdict)
+
+    # sort the nx_meta dictionary (recursively) for nicer display
+    mdict['nx_meta'] = _sort_dict(mdict['nx_meta'])
 
     return mdict
 

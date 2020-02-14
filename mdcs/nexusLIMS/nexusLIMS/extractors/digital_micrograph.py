@@ -47,6 +47,7 @@ from nexusLIMS.utils import get_nested_dict_value_by_path as \
     _get_nest_dict_val_by_path
 from nexusLIMS.utils import set_nested_dict_value as _set_nest_dict_val
 from nexusLIMS.utils import try_getting_dict_value as _try_get_dict_val
+from nexusLIMS.utils import _sort_dict
 
 from struct import error as _struct_error
 
@@ -164,6 +165,10 @@ def get_dm3_metadata(filename):
 
         # we don't need to save the filename, it's just for internal processing
         del m_list[i]['nx_meta']['fname']
+
+        # sort the nx_meta dictionary (recursively) for nicer display
+        m_list[i]['nx_meta'] = _sort_dict(m_list[i]['nx_meta'])
+
 
     # if len(m_list) == 1:
     #     return m_list[0]

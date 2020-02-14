@@ -11,7 +11,6 @@ from .thumbnail_generator import sig_to_thumbnail as _s2thumb
 from .thumbnail_generator import down_sample_image as _down_sample
 from nexusLIMS import mmf_nexus_root_path as _mmf_path
 from nexusLIMS import nexuslims_root_path as _nx_path
-from nexusLIMS.utils import SortedDictEncoder
 from nexusLIMS.instruments import get_instr_from_filepath as _get_instr
 import hyperspy.api_nogui as _hs
 import logging as _logging
@@ -76,10 +75,16 @@ def parse_metadata(fname, write_output=True, generate_preview=True,
                 # Create the directory for the metadata file, if needed
                 _pathlib.Path(_os.path.dirname(out_fname)).mkdir(parents=True,
                                                                  exist_ok=True)
+                # Make sure that the nx_meta dict comes first in the json output
+                out_dict = {'nx_meta': nx_meta['nx_meta']}
+                for k, v in nx_meta.items():
+                    if k == 'nx_meta':
+                        pass
+                    else:
+                        out_dict[k] = v
                 with open(out_fname, 'w') as f:
                     _logger.debug(f'Dumping metadata to {out_fname}')
-                    _json.dump(nx_meta, f, sort_keys=True,
-                               cls=SortedDictEncoder, indent=2)
+                    _json.dump(out_dict, f, sort_keys=False, indent=2)
 
         if generate_preview:
             preview_fname = fname.replace(_mmf_path, _nx_path) + '.thumb.png'
