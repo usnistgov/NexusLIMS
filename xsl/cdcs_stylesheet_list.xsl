@@ -155,10 +155,14 @@
          </i>
        </span>
      </div>
-     <div class="motivation-text">
-       <span style="font-style:italic;">Motivation: </span><xsl:value-of select="summary/motivation"/>
-     </div>
-      
+      <xsl:choose>
+        <xsl:when test="summary/motivation/text()">
+          <div class="motivation-text">
+            <span style="font-style:italic;">Motivation: </span><xsl:value-of select="summary/motivation"/>
+          </div>
+        </xsl:when>
+      </xsl:choose>
+     
       <!-- Javascript which supports some capabilities on the generated page -->
       <script language="javascript">
         <![CDATA[
