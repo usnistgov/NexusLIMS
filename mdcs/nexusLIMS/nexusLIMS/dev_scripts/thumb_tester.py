@@ -28,6 +28,8 @@
 import numpy as np
 from nexusLIMS.extractors.thumbnail_generator import sig_to_thumbnail
 import hyperspy.api as hs
+from nexusLIMS import mmf_nexus_root_path as _mmf_path
+import os
 
 extension = '.png'
 dpi = 100
@@ -100,7 +102,35 @@ def other_signals():
     sig_to_thumbnail(s, f'***REMOVED***tmp/9-more_dimensions{extension}', dpi=dpi)
 
 
+def survey_image():
+    # test a survey image from 643 Titan
+    fname = os.path.join(_mmf_path,
+                         '643Titan/***REMOVED***/191113 - Reactor Sample FIB Specimen '
+                         '- EELS Maps - 643 Titan/SI 01/'
+                         'SI Survey Image (active).dm3')
+    out_fname = fname.replace('mmfnexus', 'nexusLIMS/mmfnexus')
+    sig_to_thumbnail(hs.load(fname), f'{out_fname}.thumb.png', dpi=dpi)
+
+    # Test a survey image from 642 Titan
+    fname = os.path.join(_mmf_path,
+                         'Titan/v***REMOVED***/1***REMOVED*** Si membrane '
+                         '***REMOVED***/***REMOVED*** Si '
+                         '***REMOVED*** SI21 '
+                         'lw19corner ADF4 Survey Image.dm3')
+    out_fname = fname.replace('mmfnexus', 'nexusLIMS/mmfnexus')
+    sig_to_thumbnail(hs.load(fname), f'{out_fname}.thumb.png', dpi=dpi)
+
+    # Test a non-survey image with annotations:
+    fname = os.path.join(_mmf_path,
+                         'Titan/***REMOVED***/***REMOVED*** 6hr 750C - '
+                         'number4 - ***REMOVED*** - Titan/02 - 30um obj - 8100x.dm3')
+    out_fname = fname.replace('mmfnexus', 'nexusLIMS/mmfnexus')
+    sig_to_thumbnail(hs.load(fname), f'{out_fname}.thumb.png', dpi=dpi)
+
+
 if __name__ == '__main__':
-    oned_signals()
-    twod_signals()
-    other_signals()
+    # oned_signals()
+    # twod_signals()
+    # other_signals()
+
+    survey_image()

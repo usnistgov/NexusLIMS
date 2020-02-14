@@ -29,6 +29,7 @@
 import numpy as _np
 import tempfile as _tmp
 import hyperspy.api as _hsapi
+from hyperspy.drawing.marker import dict2marker as _dict2marker
 import os as _os
 import textwrap as _textwrap
 import matplotlib as _mpl
@@ -41,7 +42,10 @@ from matplotlib.offsetbox import OffsetImage as _OIm
 from matplotlib.transforms import Bbox as _Bbox
 from PIL import Image as _PILImage
 from PIL.Image import LANCZOS as _LANCZOS
+import logging as _logging
 
+_logger = _logging.getLogger(__name__)
+_logger.setLevel(_logging.INFO)
 _dir_path = _os.path.dirname(_os.path.realpath(__file__))
 
 
@@ -206,6 +210,223 @@ def _pad_to_square(im_path, new_width=500):
     new_im.save(im_path)
 
 
+def _get_marker_color(annotation):
+    """
+    Get the color of a DigitalMicrograph annotation
+
+    Parameters
+    ----------
+    annotation : dict
+        The tag dictionary for a given annotation from a DigitalMicrograph
+        tag structure
+
+    Returns
+    -------
+    color : str or tuple
+        Either an RGB tuple, or string containing a color name
+    """
+    if ('ForegroundColor' in annotation) or ('Color' in annotation):
+        # There seems to be 3 different colors in annotations in
+        # dm3-files: Color, ForegroundColor and BackgroundColor.
+        # ForegroundColor and BackgroundColor seems to be present
+        # for all annotations. Color is present in some of them.
+        # If Color is present, it seems to override the others.
+        # Currently, BackgroundColor is not utilized, due to
+        # HyperSpy markers only supporting a single color.
+        if 'Color' in annotation:
+            color_raw = annotation['Color']
+        else:
+            color_raw = annotation['ForegroundColor']
+        # Colors in DM are saved as negative values
+        # Some values are also in 16-bit
+        color = []
+        for raw_value in color_raw:
+            raw_value = abs(raw_value)
+            if raw_value > 1:
+                raw_value /= 2**16
+            color.append(raw_value)
+        color = tuple(color)
+    else:
+        color = 'red'
+
+    return color
+
+
+def _get_marker_props(annotation):
+    """
+    Get the properties of a DigitalMicrograph annotation
+
+    Parameters
+    ----------
+    annotation : dict
+        The tag dictionary for a given annotation from a DigitalMicrograph
+        tag structure
+
+    Returns
+    -------
+    marker_properties : dict
+        A dictionary containing various properties for this
+        annotation/marker, such as line width, style, etc.
+    temp_dict : dict
+        A dictionary that contains the marker type
+    marker_text : None or str
+        If present, the text of a textual annotation
+    """
+    marker_properties = {}
+    temp_dict = {}
+    marker_text = None
+    if 'AnnotationType' in annotation:
+        annotation_type = annotation['AnnotationType']
+        if annotation_type == 2:
+            temp_dict['marker_type'] = "LineSegment"
+            marker_properties['linewidth'] = 2
+        elif annotation_type == 3:
+            _logger.debug('Arrow marker not loaded: not implemented')
+        elif annotation_type == 4:
+            _logger.debug('Double arrow marker not loaded: not implemented')
+        elif annotation_type == 5:
+            temp_dict['marker_type'] = "Rectangle"
+            marker_properties['linewidth'] = 2
+        elif annotation_type == 6:
+            _logger.debug('Ellipse marker not loaded: not implemented')
+        elif annotation_type == 8:
+            _logger.debug('Mask spot marker not loaded: not implemented')
+        elif annotation_type == 9:
+            _logger.debug('Mask array marker not loaded: not implemented')
+        elif annotation_type == 13:
+            temp_dict['marker_type'] = "Text"
+            marker_text = annotation['Text']
+        elif annotation_type == 15:
+            _logger.debug(
+                    'Mask band pass marker not loaded: not implemented')
+        elif annotation_type == 19:
+            _logger.debug(
+                    'Mask wedge marker not loaded: not implemented')
+        elif annotation_type == 23:  # roirectangle
+            temp_dict['marker_type'] = "Rectangle"
+            marker_properties['linestyle'] = '--'
+            marker_properties['linewidth'] = 2
+        elif annotation_type == 25:  # roiline
+            temp_dict['marker_type'] = "LineSegment"
+            marker_properties['linestyle'] = '--'
+            marker_properties['linewidth'] = 2
+        elif annotation_type == 27:
+            temp_dict['marker_type'] = "Point"
+        elif annotation_type == 29:
+            _logger.debug(
+                    'ROI curve marker not loaded: not implemented')
+        elif annotation_type == 31:
+            _logger.debug('Scalebar marker not loaded: not implemented')
+
+    return marker_properties, temp_dict, marker_text
+
+
+def _get_markers_dict(s, tags_dict):
+    """
+
+    Parameters
+    ----------
+    s : :py:class:`hyperspy.signal.BaseSignal`
+        The HyperSpy signal from which annotations should be read
+    tags_dict : dict
+        The dictionary of DigitalMicrograph tags (saved as
+        ``s.original_metadata``)
+
+    Returns
+    -------
+    markers_dict : dict
+        The Markers that correspond to the annotations found in `s`
+    """
+    scale_y, scale_x = s.axes_manager['y'].scale, s.axes_manager['x'].scale
+    offset_y, offset_x = s.axes_manager['y'].offset, s.axes_manager['x'].offset
+
+    markers_dict = {}
+    annotations_dict = tags_dict[
+            'DocumentObjectList']['TagGroup0']['AnnotationGroupList']
+    for annotation in annotations_dict.values():
+        if 'Rectangle' in annotation:
+            position = annotation['Rectangle']
+        marker_properties, temp_dict, marker_text = \
+            _get_marker_props(annotation)
+        if 'marker_type' in temp_dict:
+            color = _get_marker_color(annotation)
+            if 'Label' in annotation:
+                # Some annotations contains an empty label, which are
+                # represented in the input dict as an empty list: []
+                if annotation['Label'] != []:
+                    marker_label = annotation['Label']
+                    label_marker_dict = {
+                        'marker_type': "Text",
+                        'plot_marker': True,
+                        'plot_on_signal': True,
+                        'axes_manager': s.axes_manager,
+                        'data': {
+                            'y1': position[0] * scale_y+offset_y,
+                            'x1': position[1] * scale_x+offset_x,
+                            'size': 20,
+                            'text': marker_label,
+                            },
+                        'marker_properties': {
+                            'color': color,
+                            'va': 'bottom',
+                            }
+                        }
+                    marker_name = "Text" + str(annotation['UniqueID'])
+                    markers_dict[marker_name] = label_marker_dict
+
+            marker_properties['color'] = color
+            temp_dict['plot_on_signal'] = True,
+            temp_dict['plot_marker'] = True,
+            temp_dict['axes_manager'] = s.axes_manager,
+            temp_dict['data'] = {
+                'y1': position[0]*scale_y+offset_y,
+                'x1': position[1]*scale_x+offset_x,
+                'y2': position[2]*scale_y+offset_y,
+                'x2': position[3]*scale_x+offset_x,
+                'size': 20,
+                'text': marker_text,
+            }
+            temp_dict['marker_properties'] = marker_properties
+            name = temp_dict['marker_type'] + str(annotation['UniqueID'])
+            markers_dict[name] = temp_dict
+
+    return markers_dict
+
+
+def add_annotation_markers(s):
+    """
+    Read annotations from a signal originating from DigitalMicrograph and
+    convert the ones (that we can) into Hyperspy markers for plotting.
+    Adapted from a currently (at the time of writing) open `pull request`_ in
+    HyperSpy.
+
+    .. _pull request: https://github.com/hyperspy/hyperspy/pull/1491
+
+    Parameters
+    ----------
+    s : :py:class:`hyperspy.signal.BaseSignal` (or subclass)
+        The HyperSpy signal for which a thumbnail should be generated
+    """
+    # Parsing markers can potentially lead to errors, so to avoid
+    # this any Exceptions are caught and logged instead of the files
+    # not being loaded at all.
+    try:
+        markers_dict = _get_markers_dict(s, s.original_metadata.as_dictionary())
+    except Exception as err:
+        _logger.warning(
+            "Markers could not be loaded from the file "
+            "due to: {0}".format(err))
+        markers_dict = {}
+    if markers_dict:
+        markers_list = []
+        for k, v in markers_dict.items():
+            # convert each marker dictionary item into a Marker object
+            markers_list.append(_dict2marker(v, k))
+        if len(markers_list) > 0:
+            # add the Marker objects (in a list) to the signal
+            s.add_marker(markers_list, permanent=True)
+
+
 def sig_to_thumbnail(s, out_path, dpi=92):
     """
     Generate a thumbnail of from an arbitrary HyperSpy signal. For a 2D
@@ -314,8 +535,18 @@ def sig_to_thumbnail(s, out_path, dpi=92):
     elif isinstance(s, _hsapi.signals.Signal2D):
         # signal is single image
         if s.axes_manager.navigation_dimension == 0:
-            _hsapi.plot.plot_images([s], axes_decor='off',
-                                    colorbar=False, scalebar='all', label=None)
+            # check to see if this is a dm3/dm4; if so try to plot with
+            # annotations
+            orig_fname = s.metadata.General.original_filename
+            if '.dm3' in orig_fname or '.dm4' in orig_fname:
+                add_annotation_markers(s)
+                s.plot(colorbar=False)
+                _plt.gca().axis('off')
+            else:
+                _hsapi.plot.plot_images([s], axes_decor='off',
+                                        colorbar=False, scalebar='all',
+                                        label=None)
+
             f = _plt.gcf()
             ax = _plt.gca()
             _set_title(ax, s.metadata.General.title)
