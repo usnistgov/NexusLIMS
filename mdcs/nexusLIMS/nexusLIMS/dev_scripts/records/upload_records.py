@@ -32,6 +32,8 @@ if __name__ == '__main__':
     import requests as _requests
     from glob import glob as _glob
     from urllib.parse import urljoin as _urljoin
+    import sys
+    import argparse
     from nexusLIMS._urls import cdcs_url as _cdcs_url
     import warnings as _warnings
     from urllib3.exceptions import InsecureRequestWarning as _InsecReqWarning
@@ -43,7 +45,37 @@ if __name__ == '__main__':
     _warnings.filterwarnings("ignore",
                              category=_InsecReqWarning)
 
-    file_list = _glob('*.xml')
+    parser = argparse.ArgumentParser(
+        description='Upload XML record(s) to a Nexus CDCS instance')
+    parser.add_argument('xml',
+                        nargs='*',
+                        help='Files to upload (separated by space and '
+                             'surrounded by quotes)')
+    parser.add_argument('--all',
+                        action='store_true',
+                        help='Upload all .xml files in this directory. If no '
+                             'options are provided, --all is assumed.',
+                        required=False)
+
+    args = parser.parse_args()
+
+    # no arguments were given, so assume the user wanted --all
+    if len(sys.argv) == 1:
+        args.all = True
+
+    file_list = []
+    if args.all:
+        print('Using all .xml files in this directory')
+        file_list = _glob('*.xml')
+        print(f'Found {len(file_list)} files to upload\n')
+    else:
+        print('Using .xml files from command line')
+        file_list = args.xml
+        print(f'Found {len(file_list)} files to upload\n')
+    if len(file_list) == 0:
+        raise ValueError('No .xml files were found (please specify on the '
+                         'command line, or run this script from a directory '
+                         'containing one or more .xml files')
 
     username = _os.environ['nexusLIMS_user']
     password = _os.environ['nexusLIMS_pass']
@@ -60,6 +92,7 @@ if __name__ == '__main__':
 
     endpoint = _urljoin(_cdcs_url, 'rest/data/')
 
+    files_uploaded = 0
     for f in _tqdm(file_list):
         with open(f, 'r') as xml_file:
             xml_content = xml_file.read()
@@ -73,9 +106,12 @@ if __name__ == '__main__':
         r = _requests.request("POST", endpoint, auth=(username, password),
                               json=payload, verify=False)
 
-        if r.status_code == 500:
-            logger.warning('Got error on ' + _os.path.basename(f))
+        if r.status_code != 201:
+            logger.warning(f'Got error on {_os.path.basename(f)}: ')
+            logger.warning(f'{r.text}')
+            continue
 
+        files_uploaded += 1
         record_id = r.json()['id']
         wrk_endpoint = _urljoin(_cdcs_url,
                                 f'rest/data/{record_id}/assign/{workspace_id}')
@@ -83,4 +119,4 @@ if __name__ == '__main__':
         r = _requests.request("PATCH", wrk_endpoint, auth=(username, password),
                               verify=False)
 
-        # print(r.text)
+    print(f'\nSuccessfully uploaded {files_uploaded} of {len(file_list)} files')
