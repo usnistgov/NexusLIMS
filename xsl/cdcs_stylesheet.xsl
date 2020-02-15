@@ -258,6 +258,7 @@
             
             img.nx-img.aa-img {
                 display: block;
+                width: 400px;
             }
             
             img.nx-img.aa-img.hidden {
@@ -400,7 +401,7 @@
                 margin: auto;
                 padding: 20px;
                 border: 1px solid #888;
-                width: 80%;
+                width: fit-content;
             }
             
             .close-modal { /* Parameters for 'X' used to close the modal box */
@@ -482,7 +483,7 @@
                 border-color: black;
                 color: white;
             }
-
+            
             th.parameter-name {
                 font-weight: bold;
             }
@@ -512,7 +513,7 @@
             
             .modal table{
               margin: 0 auto;
-              width: 100% !important;
+              width: auto;
               clear: both;
               border-collapse: collapse;
               table-layout: fixed;
@@ -1158,9 +1159,9 @@
                                     </xsl:call-template>
                                 </div>
                             </div>
-                            <div class="row vertical-align aa-content-row">
+                            <div class="row aa-content-row">
                                 <!-- preview image column -->
-                                <div class="col-xs-4 aa-img-col">
+                                <div class="col-lg-5 aa-img-col">
                                     <!-- likely better to load and hide each image first rather than change img src dynamically -->
                                     <xsl:for-each select="dataset[1]">
                                         <img class="nx-img aa-img visible" id="{generate-id()}-aa-img"><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute></img>        
@@ -1171,8 +1172,8 @@
                                 </div>
                                 
                                 <!-- dataset listing column -->
-                                <div class="col-xs-8 aa-table-col">
-                                    <table class="table table-condensed table-hover aa-table compact" border="1" style="width:100%; border-collapse:collapse;">
+                                <div class="col-lg-7 aa-table-col">
+                                    <table class="table table-condensed table-hover aa-table compact wrap" border="1" style="width:100%; border-collapse:collapse;">
                                         <thead>
                                             <tr>
                                                 <th>
@@ -1359,18 +1360,22 @@
                             <div class="modal-content">
                                 <div class="container-fluid">
                                     <div class="row">
-                                        <div class="col-xs-11">
+                                        <div class="col-med-11">
                                             <b>Experiment activity <xsl:value-of select="@seqno+1"/></b><br/>
+                                        </div>
+                                        
+                                        <div class="col-med-1 pull-right">
+                                            <i class="close-modal fa fa-close" onclick="closeModal('{generate-id(current())}-modal')"/>
+                                        </div> 
+                                    </div>
+                                    <div class="row">
+                                        <div class='col-xs-12' style='padding-top: 0.25em;'>
                                             <div style="font-size:15px">Activity contents: 
                                                 <i>
                                                     <xsl:call-template name="parse-activity-contents"></xsl:call-template>
                                                 </i>
                                             </div>
                                         </div>
-                                        
-                                        <div class="col-xs-1">
-                                            <i class="close-modal fa fa-close" onclick="closeModal('{generate-id(current())}-modal')"/>
-                                        </div> 
                                     </div>
                                     <div class="row">
                                         <div class='col-xs-12' style="padding-top: 10px;">
@@ -1794,7 +1799,7 @@
                         select: 'single',
                         responsive: true,
                         ordering: false,
-                        dom: "<'row'<'col-sm-4'f><'col-sm-8'p>><'row't>",
+                        dom: "<'row'<'col-sm-4'f><'col-sm-8'p>><'row'<'col-sm-12't>>",
                         drawCallback: function(){
                                         $('.paginate_button.next', this.api().table().container())          
                                             .on('click', activate_metadata_tooltips());    
