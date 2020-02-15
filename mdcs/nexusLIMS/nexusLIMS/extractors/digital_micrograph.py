@@ -34,6 +34,8 @@ import shutil as _shutil
 import tarfile as _tarfile
 import numpy as _np
 from datetime import datetime as _dt
+from decimal import Decimal as _Decimal
+from decimal import InvalidOperation as _invalidOp
 
 from hyperspy.io import load as _hs_load
 from hyperspy.exceptions import *
@@ -906,6 +908,15 @@ def parse_dm3_spectrum_image_info(mdict):
     return mdict
 
 
+def _try_decimal(val):
+    try:
+        val = _Decimal(val)
+        val = float(val)
+    except (ValueError, _invalidOp):
+        pass
+    return val
+
+
 def process_tecnai_microscope_info(microscope_info, delimiter=u'\u2028'):
     """
     Process the Microscope_Info metadata string from an FEI Titan
@@ -971,9 +982,9 @@ def process_tecnai_microscope_info(microscope_info, delimiter=u'\u2028'):
     tmp = tmp[tmp.index('Gun Lens ') + len('Gun Lens '):]
     info_dict['Gun_Lens_No'] = int(tmp.split()[0])
 
-    # Float (microAmps)
+    # Decimal (microAmps)
     tmp = tmp[tmp.index('Emission ') + len('Emission '):]
-    info_dict['Emission_Current'] = float(tmp.split('uA')[0])
+    info_dict['Emission_Current'] = _try_decimal(tmp.split('uA')[0])
 
     # String
     tmp = __find_val('Mode ', tecnai_info)
@@ -981,40 +992,44 @@ def process_tecnai_microscope_info(microscope_info, delimiter=u'\u2028'):
     # 'Mode' should be five terms long, and the last term is either 'Image',
     # 'Diffraction', (or maybe something else)
 
-    # Float (micrometer)
+    # Decimal (micrometer)
     if 'Magn ' in tmp:  # Imaging mode
-        info_dict['Defocus'] = float(tmp.split('Defocus (um) ')[1].split()[0])
+        info_dict['Defocus'] = _try_decimal(
+            tmp.split('Defocus (um) ')[1].split()[0])
     elif 'CL ' in tmp:  # Diffraction mode
-        info_dict['Defocus'] = float(tmp.split('Defocus ')[1].split()[0])
+        info_dict['Defocus'] = _try_decimal(tmp.split('Defocus ')[1].split()[0])
 
     # This value changes based on whether in image or diffraction mode
     # (magnification or camera length)
     # Integer
     if info_dict['Mode'].split()[4] == 'Image':
         info_dict['Magnification'] = int(tmp.split('Magn ')[1].strip('x'))
-    # Float
+    # Decimal
     elif info_dict['Mode'].split()[4] == 'Diffraction':
-        info_dict['Camera_Length'] = float(tmp.split('CL ')[1].strip('m'))
+        info_dict['Camera_Length'] = _try_decimal(
+            tmp.split('CL ')[1].strip('m'))
 
     # Integer (1 to 5)
     info_dict['Spot'] = int(__find_val('Spot ', tecnai_info))
 
-    # Float - Lens strengths expressed as a "%" value
-    info_dict['C2_Strength'] = float(__find_val('C2 ', tecnai_info).strip('%'))
-    info_dict['C3_Strength'] = float(__find_val('C3 ', tecnai_info).strip('%'))
-    info_dict['Obj_Strength'] = float(
+    # Decimals - Lens strengths expressed as a "%" value
+    info_dict['C2_Strength'] = _try_decimal(
+        __find_val('C2 ', tecnai_info).strip('%'))
+    info_dict['C3_Strength'] = _try_decimal(
+        __find_val('C3 ', tecnai_info).strip('%'))
+    info_dict['Obj_Strength'] = _try_decimal(
         __find_val('Obj ', tecnai_info).strip('%'))
-    info_dict['Dif_Strength'] = float(
+    info_dict['Dif_Strength'] = _try_decimal(
         __find_val('Dif ', tecnai_info).strip('%'))
 
-    # Float (micrometers)
+    # Decimals (micrometers)
     tmp = __find_val('Image shift ', tecnai_info).strip('um')
-    info_dict['Image_Shift_x'] = float(tmp.split('/')[0])
-    info_dict['Image_Shift_y'] = float(tmp.split('/')[1])
+    info_dict['Image_Shift_x'] = _try_decimal(tmp.split('/')[0])
+    info_dict['Image_Shift_y'] = _try_decimal(tmp.split('/')[1])
 
-    # Float values are given in micrometers and degrees
+    # Decimal values are given in micrometers and degrees
     tmp = __find_val('Stage ', tecnai_info).split(',')
-    tmp = [float(t.strip(' umdeg')) for t in tmp]
+    tmp = [_try_decimal(t.strip(' umdeg')) for t in tmp]
     info_dict['Stage_Position_x'] = tmp[0]
     info_dict['Stage_Position_y'] = tmp[1]
     info_dict['Stage_Position_z'] = tmp[2]
@@ -1046,35 +1061,36 @@ def process_tecnai_microscope_info(microscope_info, delimiter=u'\u2028'):
         # String
         info_dict['Filter_Settings']['Mode'] = __find_val('Mode: ',
                                                           tecnai_filter_info)
-        # Float (eV/channel)
+        # Decimal (eV/channel)
         tmp = __find_val('Selected dispersion: ', tecnai_filter_info)
         if tmp is not None:
             tmp = _re.sub(r'\[eV/Channel\]', '', tmp)
-            info_dict['Filter_Settings']['Dispersion'] = float(tmp)
+            info_dict['Filter_Settings']['Dispersion'] = _try_decimal(tmp)
 
-        # Float (millimeter)
+        # Decimal (millimeter)
         tmp = __find_val('Selected aperture: ', tecnai_filter_info)
         if tmp is not None:
             tmp = tmp.strip('m')
-            info_dict['Filter_Settings']['Aperture'] = float(tmp)
+            info_dict['Filter_Settings']['Aperture'] = _try_decimal(tmp)
 
-        # Float (eV)
+        # Decimal (eV)
         tmp = __find_val('Prism shift: ', tecnai_filter_info)
         if tmp is not None:
             tmp = _re.sub(r'\[eV\]', '', tmp)
-            info_dict['Filter_Settings']['Prism_Shift'] = float(tmp)
+            info_dict['Filter_Settings']['Prism_Shift'] = _try_decimal(tmp)
 
-        # Float (eV)
+        # Decimal (eV)
         tmp = __find_val('Drift tube: ', tecnai_filter_info)
         if tmp is not None:
             tmp = _re.sub(r'\[eV\]', '', tmp)
-            info_dict['Filter_Settings']['Drift_Tube'] = float(tmp)
+            info_dict['Filter_Settings']['Drift_Tube'] = _try_decimal(tmp)
 
-        # Float (eV)
+        # Decimal (eV)
         tmp = __find_val('Total energy loss: ', tecnai_filter_info)
         if tmp is not None:
             tmp = _re.sub(r'\[eV\]', '', tmp)
-            info_dict['Filter_Settings']['Total_Energy_Loss'] = float(tmp)
+            info_dict['Filter_Settings']['Total_Energy_Loss'] = \
+                _try_decimal(tmp)
     except ValueError as _:
         _logger.info('Filter settings not found in Tecnai microscope info')
 
