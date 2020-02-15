@@ -402,7 +402,7 @@
                 margin: auto;
                 padding: 20px;
                 border: 1px solid #888;
-                width: fit-content;
+                width: max-content;
             }
             
             .close-modal { /* Parameters for 'X' used to close the modal box */
@@ -1119,6 +1119,9 @@
                     <div class="row aa_header_row">
                         <div class="col-md-12">
                             <div class="row">
+                                <xsl:if test="@seqno = 0">
+                                    <xsl:attribute name="style">margin-top: -20px;</xsl:attribute>
+                                </xsl:if>
                                 <div class="col-md-6">
                                     <!-- Generate name id which corresponds to the link associated with the acquisition activity --> 
                                     <a class="aa_anchor" name="{generate-id(current())}"/>
