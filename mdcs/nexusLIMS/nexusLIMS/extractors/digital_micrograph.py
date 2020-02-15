@@ -150,6 +150,7 @@ def get_dm3_metadata(filename):
         m_list[i]['nx_meta']['fname'] = filename
         # set type to Image by default
         m_list[i]['nx_meta']['DatasetType'] = 'Image'
+        m_list[i]['nx_meta']['Data Type'] = 'TEM_Imaging'
         m_list[i]['nx_meta']['Data Dimensions'] = str(s[i].data.shape)
         m_list[i]['nx_meta']['Instrument ID'] = instr_name
         m_list[i]['nx_meta']['warnings'] = []
@@ -209,6 +210,7 @@ def parse_643_titan(mdict):
     if 'Imaging Mode' in mdict['nx_meta']:
         if mdict['nx_meta']['Imaging Mode'] == 'EFTEM DIFFRACTION':
             mdict['nx_meta']['DatasetType'] = 'Diffraction'
+            mdict['nx_meta']['Data Type'] = 'TEM_EFTEM_Diffraction'
 
     return mdict
 
@@ -331,6 +333,7 @@ def parse_642_titan(mdict):
         _logger.info('Detected file as Diffraction type based on "Tecnai '
                      'Mode" == "STEM nP SA Zoom Diffraction"')
         mdict['nx_meta']['DatasetType'] = 'Diffraction'
+        mdict['nx_meta']['Data Type'] = 'STEM_Diffraction'
 
     # also, if `Operation Mode` is `DIFFRACTION`, it's diffraction
     elif 'Operation Mode' in mdict['nx_meta'] and \
@@ -338,6 +341,7 @@ def parse_642_titan(mdict):
         _logger.info('Detected file as Diffraction type based on "Operation '
                      'Mode" == "DIFFRACTION"')
         mdict['nx_meta']['DatasetType'] = 'Diffraction'
+        mdict['nx_meta']['Data Type'] = 'TEM_Diffraction'
 
     return mdict
 
@@ -373,6 +377,7 @@ def parse_642_jeol(mdict):
             _logger.info(f'Detected file as Diffraction type based on "{s}" in '
                          f'the filename')
             mdict['nx_meta']['DatasetType'] = 'Diffraction'
+            mdict['nx_meta']['Data Type'] = 'TEM_Diffraction'
 
     return mdict
 
@@ -543,6 +548,9 @@ def parse_dm3_microscope_info(mdict):
         _set_nest_dict_val(mdict, ['nx_meta', 'Camera/Detector Processing'],
                            val)
 
+    if 'STEM' in mdict['nx_meta']['Illumination Mode']:
+        mdict['nx_meta']['Data Type'] = 'STEM_Imaging'
+
     return mdict
 
 
@@ -646,6 +654,10 @@ def parse_dm3_eels_info(mdict):
         _logger.info('Detected file as Spectrum type based on presence of '
                      'EELS metadata')
         mdict['nx_meta']['DatasetType'] = 'Spectrum'
+        if 'STEM' in mdict['nx_meta']['Illumination Mode']:
+            mdict['nx_meta']['Data Type'] = 'STEM_EELS'
+        else:
+            mdict['nx_meta']['Data Type'] = 'TEM_EELS'
 
     return mdict
 
@@ -791,6 +803,10 @@ def parse_dm3_eds_info(mdict):
         _logger.info('Detected file as Spectrum type based on presence of '
                      'EDS metadata')
         mdict['nx_meta']['DatasetType'] = 'Spectrum'
+        if 'STEM' in mdict['nx_meta']['Illumination Mode']:
+            mdict['nx_meta']['Data Type'] = 'STEM_EDS'
+        else:
+            mdict['nx_meta']['Data Type'] = 'TEM_EDS'
 
     return mdict
 
@@ -881,6 +897,11 @@ def parse_dm3_spectrum_image_info(mdict):
                          'presence of spectral metadata and spectrum imaging '
                          'info')
             mdict['nx_meta']['DatasetType'] = 'SpectrumImage'
+            mdict['nx_meta']['Data Type'] = 'Spectrum_Imaging'
+            if 'EELS' in mdict['nx_meta']:
+                mdict['nx_meta']['Data Type'] = 'EELS_Spectrum_Imaging'
+            if 'EDS' in mdict['nx_meta']:
+                mdict['nx_meta']['Data Type'] = 'EDS_Spectrum_Imaging'
 
     return mdict
 

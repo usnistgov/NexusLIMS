@@ -81,6 +81,7 @@ def get_quanta_metadata(filename):
     mdict['nx_meta'] = {}
     # assume all datasets coming from Quanta are Images, currently
     mdict['nx_meta']['DatasetType'] = 'Image'
+    mdict['nx_meta']['Data Type'] = 'SEM_Imaging'
 
     instr = _get_instr(filename)
     # if we found the instrument, then store the name as string, else None

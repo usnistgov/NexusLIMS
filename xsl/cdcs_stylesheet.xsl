@@ -739,7 +739,7 @@
                     <a class="link" href="#{generate-id(current())}">
                         Activity <xsl:value-of select="@seqno+1"/>
                     </a>
-                        <div><xsl:call-template name="parse-instrument-mode"></xsl:call-template></div>
+                        <div><xsl:call-template name="parse-activity-contents"></xsl:call-template></div>
                     </td></tr>
                 </xsl:for-each>
                 </tbody>
@@ -1127,9 +1127,9 @@
                                        title="Click to view this activity's setup parameters">
                                        <i class='fa fa-tasks fa-border param-button'/>
                                     </a>
-                                    <div style="font-size:15px">Instrument mode: 
+                                    <div style="font-size:15px">Activity contents: 
                                         <i>
-                                            <xsl:call-template name="parse-instrument-mode"></xsl:call-template>
+                                            <xsl:call-template name="parse-activity-contents"></xsl:call-template>
                                         </i>
                                     </div>
                                     <span class="badge list-record-badge">
@@ -1278,7 +1278,7 @@
                                                                     <div class="row">
                                                                         <div class='col-xs-12' style="padding-top: 10px;">
                                                                             <!-- Generate the table with setup conditions for each acquisition activity -->
-                                                                            <table class="table table-condensed table-hover meta-table compact" border="1" style="">
+                                                                            <table class="table table-condensed table-hover meta-table compact text-left" border="1" style="">
                                                                                 <thead>
                                                                                     <tr>
                                                                                         <th>Metadata Parameter
@@ -1295,6 +1295,7 @@
                                                                                         <tr>
                                                                                             <!-- Populate table values with the metadata name and value -->
                                                                                             <td><b><xsl:value-of select="@name"/></b>
+                                                                                            <!-- If this parameter has a warning attribute, then add warning tooltip -->
                                                                                             <xsl:if test="@warning = 'true'"><xsl:text> </xsl:text>
                                                                                                 <xsl:call-template name="warning-tip">
                                                                                                     <xsl:with-param name="tip-placement">right</xsl:with-param>
@@ -1306,7 +1307,19 @@
                                                                                                 <xsl:attribute name="class">
                                                                                                     <xsl:if test="@warning = 'true'">has-warning</xsl:if>
                                                                                                 </xsl:attribute>
-                                                                                                <xsl:value-of select="current()"/>
+                                                                                                <!-- If metadata tag is "Data Type", then replace '_' with ' ' -->
+                                                                                                <xsl:choose>
+                                                                                                    <xsl:when test="@name = 'Data Type'">
+                                                                                                        <xsl:call-template name="string-replace-all">
+                                                                                                            <xsl:with-param name="text"><xsl:value-of select="current()"/></xsl:with-param>
+                                                                                                            <xsl:with-param name="replace" select="'_'" />
+                                                                                                            <xsl:with-param name="by" select="' '" />
+                                                                                                        </xsl:call-template>
+                                                                                                    </xsl:when>
+                                                                                                    <xsl:otherwise>
+                                                                                                        <xsl:value-of select="current()"/>
+                                                                                                    </xsl:otherwise>
+                                                                                                </xsl:choose>
                                                                                             </td>
                                                                                         </tr>
                                                                                     </xsl:for-each>
@@ -1348,9 +1361,9 @@
                                     <div class="row">
                                         <div class="col-xs-11">
                                             <b>Experiment activity <xsl:value-of select="@seqno+1"/></b><br/>
-                                            <div style="font-size:15px">Instrument mode: 
+                                            <div style="font-size:15px">Activity contents: 
                                                 <i>
-                                                    <xsl:call-template name="parse-instrument-mode"></xsl:call-template>
+                                                    <xsl:call-template name="parse-activity-contents"></xsl:call-template>
                                                 </i>
                                             </div>
                                         </div>
@@ -1401,7 +1414,19 @@
                                                                 <xsl:attribute name="class">
                                                                     <xsl:if test="@warning = 'true'">has-warning</xsl:if>
                                                                 </xsl:attribute>
-                                                                <xsl:value-of select="current()"/></td>
+                                                                <!-- If metadata tag is "Data Type", then replace '_' with ' ' -->
+                                                                <xsl:choose>
+                                                                    <xsl:when test="@name = 'Data Type'">
+                                                                        <xsl:call-template name="string-replace-all">
+                                                                            <xsl:with-param name="text"><xsl:value-of select="current()"/></xsl:with-param>
+                                                                            <xsl:with-param name="replace" select="'_'" />
+                                                                            <xsl:with-param name="by" select="' '" />
+                                                                        </xsl:call-template>
+                                                                    </xsl:when>
+                                                                    <xsl:otherwise>
+                                                                        <xsl:value-of select="current()"/>
+                                                                    </xsl:otherwise>
+                                                                </xsl:choose></td>
                                                         </tr>
                                                     </xsl:for-each>
                                                 </tbody>
@@ -2141,18 +2166,61 @@
             <xsl:value-of select="key('lookup.instrument.url', $instrument)"/>DispForm.aspx?ID=<xsl:value-of select="$event-id"/></xsl:for-each>
     </xsl:template>
     
-    <xsl:template name="parse-instrument-mode">
+    <xsl:template name="parse-activity-contents">
         <xsl:choose>
-            <xsl:when test="contains(setup/param[@name='Mode'], 'TEM')">TEM<xsl:text> </xsl:text></xsl:when>
-            <xsl:when test="contains(setup/param[@name='Mode'], 'SEM')">SEM<xsl:text> </xsl:text></xsl:when>
-            <xsl:when test="contains(setup/param[@name='Illumination Mode'], 'STEM')">STEM<xsl:text> </xsl:text></xsl:when>
-            <xsl:otherwise></xsl:otherwise>
+            <xsl:when test="setup/param[@name='Data Type']">
+                <xsl:call-template name="string-replace-all">
+                    <xsl:with-param name="text" select="setup/param[@name='Data Type']/text()"/>
+                    <xsl:with-param name="replace" select="'_'" />
+                    <xsl:with-param name="by" select="' '" />
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:variable name="this-aa-data-types">
+                    <xsl:for-each select="./dataset/meta[@name='Data Type']"><xsl:value-of select="."/><xsl:text> </xsl:text></xsl:for-each>
+                </xsl:variable>
+                <xsl:variable name="deduped-data-types">
+                    <xsl:call-template name="dedup-list">
+                        <xsl:with-param name="input">
+                            <xsl:value-of select="$this-aa-data-types"/>
+                        </xsl:with-param>
+                    </xsl:call-template>
+                </xsl:variable>
+                <xsl:variable name="comma-separated-list">
+                    <xsl:call-template name="string-replace-all">
+                        <xsl:with-param name="text" select="$deduped-data-types"/>
+                        <xsl:with-param name="replace" select="' '" />
+                        <xsl:with-param name="by" select="', '" />
+                    </xsl:call-template>
+                </xsl:variable>
+                <xsl:call-template name="string-replace-all">
+                    <xsl:with-param name="text" select="$comma-separated-list"/>
+                    <xsl:with-param name="replace" select="'_'" />
+                    <xsl:with-param name="by" select="' '" />
+                </xsl:call-template>
+            </xsl:otherwise>
         </xsl:choose>
+    </xsl:template>
+    
+    <!-- Taken from http://geekswithblogs.net/Erik/archive/2008/04/01/120915.aspx -->
+    <xsl:template name="string-replace-all">
+        <xsl:param name="text" />
+        <xsl:param name="replace" />
+        <xsl:param name="by" />
         <xsl:choose>
-            <xsl:when test="contains(setup/param[@name='Mode'], 'Diffraction')">Diffraction</xsl:when>
-            <xsl:when test="contains(setup/param[@name='Mode'], 'Image')">Imaging</xsl:when>
-            <xsl:when test="contains(setup/param[@name='Illumination Mode'], 'NANOPROBE')">Nanoprobe<xsl:text> </xsl:text></xsl:when>
-            <xsl:otherwise><xsl:value-of select="setup/param[@name='Mode']"/></xsl:otherwise>
+            <xsl:when test="contains($text, $replace)">
+                <xsl:value-of select="substring-before($text,$replace)" />
+                <xsl:value-of select="$by" />
+                <xsl:call-template name="string-replace-all">
+                    <xsl:with-param name="text"
+                        select="substring-after($text,$replace)" />
+                    <xsl:with-param name="replace" select="$replace" />
+                    <xsl:with-param name="by" select="$by" />
+                </xsl:call-template>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$text" />
+            </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
     

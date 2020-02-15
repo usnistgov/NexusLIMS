@@ -212,7 +212,7 @@ class AcquisitionActivity:
     def __str__(self):
         return f'{self.start.isoformat()} AcquisitionActivity {self.mode}'
 
-    def add_file(self, fname):
+    def add_file(self, fname, generate_preview=True):
         """
         Add a file to this activity's file list, parse its metadata (storing
         a flattened copy of it to this activity), generate a preview
@@ -222,11 +222,14 @@ class AcquisitionActivity:
         ----------
         fname : str
             The file to be added to the file list
+        generate_preview : bool
+            Whether or not to create the preview thumbnail images
         """
         if _os.path.exists(fname):
             self.files.append(fname)
+            gen_prev = generate_preview
             meta, preview_fname = _parse_metadata(fname,
-                                                  generate_preview=True)
+                                                  generate_preview=gen_prev)
 
             if meta is None:
                 # Something bad happened, so we need to alert the user

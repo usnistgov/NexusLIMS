@@ -68,6 +68,7 @@ def parse_metadata(fname, write_output=True, generate_preview=True,
         # Set the dataset type to Misc if it was not set by the file reader
         if 'DatasetType' not in nx_meta['nx_meta']:
             nx_meta['nx_meta']['DatasetType'] = 'Misc'
+            nx_meta['nx_meta']['Data Type'] = 'Miscellaneous'
 
         if write_output:
             out_fname = fname.replace(_mmf_path, _nx_path) + '.json'

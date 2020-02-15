@@ -48,7 +48,8 @@ XSLT_PATH = _os.path.join(_os.path.dirname(__file__),
                           "cal_events_to_nx_record.xsl")
 
 
-def build_record(instrument, dt_from, dt_to, date, user):
+def build_record(instrument, dt_from, dt_to, date, user,
+                 generate_previews=True):
     """
     Construct an XML document conforming to the NexusLIMS schema from a
     directory containing microscopy data files. For calendar parsing,
@@ -78,6 +79,8 @@ def build_record(instrument, dt_from, dt_to, date, user):
         instead of ernst.august.ruska@nist.gov). Controls the results
         returned from the calendar - value is as specified in
         :py:func:`~.sharepoint_calendar.get_events`
+    generate_previews : bool
+        Whether or not to create the preview thumbnail images
 
     Returns
     -------
@@ -130,23 +133,21 @@ def build_record(instrument, dt_from, dt_to, date, user):
 
     _logger.info(f"Building acquisition activities for timespan from "
                  f"{dt_from.isoformat()} to {dt_to.isoformat()}")
-    xml_record += build_acq_activities(instrument, dt_from, dt_to)
+    xml_record += build_acq_activities(instrument,
+                                       dt_from, dt_to, generate_previews)
 
     xml_record += "</nx:Experiment>"  # Add closing tag for root element.
 
     return xml_record
 
 
-def build_acq_activities(instrument, dt_from, dt_to):
+def build_acq_activities(instrument, dt_from, dt_to, generate_previews):
     """
     Build an XML string representation of each AcquisitionActivity for a
     single microscopy session. This includes setup parameters and metadata
     associated with each dataset obtained during a microscopy session. Unique
-    AcquisitionActivities are delimited via comparison of imaging modes (e.g. a
-    switch from Imaging to Diffraction mode constitutes 2 unique
-    AcquisitionActivities).
-
-    Currently only working for 'FEI-Titan-TEM-635816' .dm3 files...
+    AcquisitionActivities are delimited via clustering of file collection
+    time to detect "long" breaks during a session.
 
     Parameters
     ----------
@@ -160,6 +161,8 @@ def build_acq_activities(instrument, dt_from, dt_to):
     dt_to : datetime.datetime
         The ending timestamp used to determine the last point in time for
         which files should be associated with this record
+    generate_previews : bool
+        Whether or not to create the preview thumbnail images
 
     Returns
     -------
@@ -213,7 +216,7 @@ def build_acq_activities(instrument, dt_from, dt_to):
             # add this file to the AA
             _logger.info(f'Adding file {i} {f.replace(_mmf_path,"")} to activity'
                          f' {aa_idx}')
-            activities[aa_idx].add_file(f)
+            activities[aa_idx].add_file(f, generate_previews)
             # assume this file is the last one in the activity (this will be
             # true on the last iteration where mtime is <= to the
             # aa_bounds value)
@@ -247,7 +250,8 @@ def dump_record(instrument,
                 dt_to,
                 filename=None,
                 date=None,
-                user=None):
+                user=None,
+                generate_previews=True):
     """
     Writes an XML record composed of information pulled from the Sharepoint
     calendar as well as metadata extracted from the microscope data (e.g. dm3
@@ -274,6 +278,8 @@ def dump_record(instrument,
     user : str
         A string which corresponds to the NIST user who performed the
         microscopy experiment
+    generate_previews : bool
+        Whether or not to create the preview thumbnail images
 
     Returns
     -------
@@ -288,6 +294,7 @@ def dump_record(instrument,
     _pathlib.Path(_os.path.dirname(filename)).mkdir(parents=True, exist_ok=True)
     with open(filename, 'w') as f:
         text = build_record(instrument, dt_from, dt_to,
-                            date=date, user=user)
+                            date=date, user=user,
+                            generate_previews=generate_previews)
         f.write(text)
     return filename
