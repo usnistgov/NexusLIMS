@@ -96,6 +96,7 @@
         <style>
             .scrollDisabled { /* class to prevent scrolling when modal is shown */
                 position: fixed; 
+                width: 100%;
                 overflow-y:scroll;
             }
             
