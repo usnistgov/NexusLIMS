@@ -13,6 +13,37 @@ gen_prev = True
 
 
 class TestRecordBuilder:
+    def test_quanta_record_1(self):
+        starting_time = _dt.fromisoformat('2019-12-23T08:40:50.484')
+        ending_time = _dt.fromisoformat('2019-12-23T09:20:28.343')
+        # Build the XML record and write it to a file
+        filename = _rb.dump_record(instrument_db['FEI-Quanta200-ESEM-633137'],
+                                   starting_time,
+                                   ending_time,
+                                   filename=None,
+                                   generate_previews=gen_prev)
+
+    def test_quanta_record_2(self):
+        starting_time = _dt.fromisoformat('2020-01-09T11:10:51.093')
+        ending_time = _dt.fromisoformat('2020-01-09T14:02:30.000')
+        # Build the XML record and write it to a file
+        filename = _rb.dump_record(instrument_db['FEI-Quanta200-ESEM-633137'],
+                                   starting_time,
+                                   ending_time,
+                                   filename=None,
+                                   generate_previews=gen_prev)
+
+    def test_quanta_record_3(self):
+        starting_time = _dt.fromisoformat('2020-01-29+13:12:27.015')
+        ending_time = _dt.fromisoformat('2020-01-29+17:12:42.438')
+        # Build the XML record and write it to a file
+        filename = _rb.dump_record(instrument_db['FEI-Quanta200-ESEM-633137'],
+                                   starting_time,
+                                   ending_time,
+                                   filename=None,
+                                   generate_previews=gen_prev)
+
+
     def test_643_1(self):
         starting_time = _dt.fromisoformat('2020-01-21T14:18:58.393')
         ending_time = _dt.fromisoformat('2020-01-21T16:42:54.211')
