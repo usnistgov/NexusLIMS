@@ -53,10 +53,10 @@ def get_current_xslt_ids(names):
 
 def replace_xslt_files():
     list_xsl_file = __file__.replace('mdcs/nexusLIMS/nexusLIMS/'
-                                     'dev_scripts/upload_xsl.py',
+                                     'dev_scripts/update_xslt_files.py',
                                      'xsl/cdcs_stylesheet_list.xsl')
     detail_xsl_file = __file__.replace('mdcs/nexusLIMS/nexusLIMS/'
-                                       'dev_scripts/upload_xsl.py',
+                                       'dev_scripts/update_xslt_files.py',
                                        'xsl/cdcs_stylesheet.xsl')
     with open(list_xsl_file) as f:
         list_content = f.read()
