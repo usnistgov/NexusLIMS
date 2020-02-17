@@ -30,26 +30,150 @@ from nexusLIMS.instruments import instrument_db as _instr_db
 from nexusLIMS import nexuslims_db_path as _nx_db_path
 from nexusLIMS import mmf_nexus_root_path as _mmf_path
 from datetime import datetime as _dt
-from collections import namedtuple as _nt
 import sqlite3 as _sql3
 import contextlib as _contextlib
 import logging as _logging
 
 _logger = _logging.getLogger(__name__)
 
-# use a couple namedtuples to keep track of information pulled from the database
 
-# SessionLog is just a simple mapping of one row in the session_log table of
-# the NexusLIMS database (all values are strings - instrument is the instr. PID)
-SessionLog = _nt('SessionLog', 'session_identifier instrument timestamp '
-                               'event_type user')
+class SessionLog:
+    """
+    A simple mapping of one row in the ``session_log`` table of the NexusLIMS
+    database (all values are strings)
 
-# Session is like above, but with combining two logs with status "TO_BE_BUILT"
-# into one session with start and end points as datetime objects
-# session_identifier and user are strings
-# instrument is a nexusLIMS.instruments.Instrument object
-# dt_from and dt_to are datetime.datetime objects
-Session = _nt('Session', 'session_identifier instrument dt_from dt_to user')
+    Parameters
+    ----------
+    session_identifier : str
+         A UUID4 (36-character string) that is consistent among a single
+         record's `"START"`, `"END"`, and `"RECORD_GENERATION"` events
+    instrument : str
+        The instrument associated with this session (foreign key reference to
+        the ``instruments`` table)
+    timestamp : str
+        The ISO format timestamp representing the date and time of the logged
+        event
+    event_type : str
+        The type of log for this session (either `"START"`, `"END"`,
+        or `"RECORD_GENERATION"`)
+    user : str
+        The NIST "short style" username associated with this session (if known)
+    """
+    def __init__(self, session_identifier, instrument,
+                 timestamp, event_type, user):
+        self.session_identifier = session_identifier
+        self.instrument = instrument
+        self.timestamp = timestamp
+        self.event_type = event_type
+        self.user = user
+
+
+class Session:
+    """
+    A record of an individual session as read from the Nexus Microscopy
+    facility session database. Created by combining two
+    :py:class:`~nexusLIMS.db.session_handler.SessionLog` objects with status
+    ``"TO_BE_BUILT"``.
+
+    Parameters
+    ----------
+    session_identifier : str
+        The UUIDv4 identifier for an individual session on an instrument
+    instrument : ~nexusLIMS.instruments.Instrument
+        An object representing the instrument associated with this session
+    dt_from : :py:class:`~datetime.datetime`
+        A :py:class:`~datetime.datetime` object representing the start of this
+        session
+    dt_to : :py:class:`~datetime.datetime`
+        A :py:class:`~datetime.datetime` object representing the end of this
+        session
+    user : str
+        The username associated with this session (may not be trustworthy)
+    """
+    def __init__(self, session_identifier, instrument, dt_from, dt_to, user):
+        self.session_identifier = session_identifier
+        self.instrument = instrument
+        self.dt_from = dt_from
+        self.dt_to = dt_to
+        self.user = user
+
+    def update_session_status(self, status):
+        """
+        Update the ``record_status`` in the session logs for this
+        :py:class:`~nexusLIMS.db.session_handler.Session`
+
+        Parameters
+        ----------
+        status : str
+            One of `"COMPLETED"`, `"WAITING_FOR_END"`, `"TO_BE_BUILT"`,
+            `"ERROR"`, `"NO_FILES_FOUND"` (the allowed values in the
+            NexusLIMS database). Status value will be validated by the database
+
+        Returns
+        -------
+        success : bool
+            Whether or not the update operation was successful
+        """
+        update_query = f"UPDATE session_log SET record_status = '{status}' " \
+                       f"WHERE session_identifier = '{self.session_identifier}'"
+        success = False
+
+        # use contextlib to auto-close the connection and database cursors
+        with _contextlib.closing(_sql3.connect(_nx_db_path)) as conn:
+            with conn:  # auto-commits
+                with _contextlib.closing(
+                        conn.cursor()) as cursor:  # auto-closes
+                    results = cursor.execute(update_query)
+                    success = True
+
+        return success
+
+    def insert_record_generation_event(self):
+        """
+        Insert a log for this sesssion into the session database with
+        ``event_type`` `"RECORD_GENERATION"`
+
+        Returns
+        -------
+        success : bool
+            Whether or not the update operation was successful
+        """
+        _logger.debug(f'Logging RECORD_GENERATION for '
+                      f'{self.session_identifier}')
+        insert_query = f"INSERT INTO session_log " \
+                       f"(instrument, event_type, session_identifier) " \
+                       f"VALUES ('{self.instrument.name}', " \
+                       f"'RECORD_GENERATION', '{self.session_identifier}');"
+        success = False
+
+        # use contextlib to auto-close the connection and database cursors
+        with _contextlib.closing(_sql3.connect(_nx_db_path)) as conn:
+            with conn:  # auto-commits
+                with _contextlib.closing(
+                        conn.cursor()) as cursor:  # auto-closes
+                    results = cursor.execute(insert_query)
+
+        check_query = f"SELECT event_type, session_identifier, " \
+                      f"id_session_log, " \
+                      f"timestamp FROM session_log " \
+                      f"WHERE instrument = '{self.instrument.name}' " \
+                      f"AND event_type = 'RECORD_GENERATION'" \
+                      f"ORDER BY timestamp DESC LIMIT 1;"
+
+        # use contextlib to auto-close the connection and database cursors
+        with _contextlib.closing(_sql3.connect(_nx_db_path)) as conn:
+            with conn:  # auto-commits
+                with _contextlib.closing(
+                        conn.cursor()) as cursor:  # auto-closes
+                    results = cursor.execute(check_query)
+                    res = results.fetchone()
+
+        if res[0:2] == ('RECORD_GENERATION', self.session_identifier):
+            _logger.debug(f'Confirmed RECORD_GENERATION insertion for'
+                          f' {self.session_identifier}')
+            success = True
+
+        return success
 
 
 def get_sessions_to_build():
@@ -61,8 +185,8 @@ def get_sessions_to_build():
     Returns
     -------
     sessions : list
-        A list of ``namedtuple``s containing the sessions that the need their
-        record built
+        A list of :py:class:`~nexusLIMS.db.session_handler.Session` objects
+        containing the sessions that the need their record built
     """
     sessions = []
 

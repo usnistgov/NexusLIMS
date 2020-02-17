@@ -13,6 +13,9 @@ gen_prev = True
 
 
 class TestRecordBuilder:
+    def test_new_session_builder(self):
+        _rb.build_new_session_records()
+
     def test_quanta_record_1(self):
         starting_time = _dt.fromisoformat('2019-12-23T08:40:50.484')
         ending_time = _dt.fromisoformat('2019-12-23T09:20:28.343')

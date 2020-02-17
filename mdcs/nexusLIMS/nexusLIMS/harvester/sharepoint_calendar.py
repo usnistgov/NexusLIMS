@@ -152,7 +152,7 @@ def get_div_and_group(username):
     return div, group
 
 
-def get_auth(filename="credentials.ini"):
+def get_auth(filename="credentials.ini", basic=False):
     """
     Set up NTLM authentication for the Microscopy Nexus using an account
     as specified from a file that lives in the package root named
@@ -167,10 +167,14 @@ def get_auth(filename="credentials.ini"):
     filename : str
         Name relative to this file (or absolute path) of file from which to
         read the parameters
+    basic : bool
+        If True, return only username and password rather than NTLM
+        authentication (like what is used for CDCS access rather than for
+        NIST network resources)
 
     Returns
     -------
-    auth : ``requests_ntlm.HttpNtlmAuth``
+    auth : ``requests_ntlm.HttpNtlmAuth`` or tuple
         NTLM authentication handler for ``requests``
 
     Notes
@@ -203,6 +207,10 @@ def get_auth(filename="credentials.ini"):
 
         username = config.get("nexus_credentials", "username")
         passwd = config.get("nexus_credentials", "password")
+
+    if basic:
+        # return just username and password (for BasicAuthentication)
+        return username, passwd
 
     domain = 'nist'
     path = domain + '\\' + username

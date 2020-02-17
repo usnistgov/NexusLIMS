@@ -32,23 +32,33 @@ import logging as _logging
 import hyperspy.api_nogui as _hs
 import pathlib as _pathlib
 from uuid import uuid4 as _uuid4
+from lxml import etree as _etree
 from datetime import datetime as _datetime
+from io import StringIO as _stringIO
+from io import BytesIO as _bytesIO
 from nexusLIMS import mmf_nexus_root_path as _mmf_path
+from nexusLIMS import nexuslims_root_path as _nx_path
+import nexusLIMS.schemas.activity as _activity
 from nexusLIMS.schemas.activity import AcquisitionActivity as _AcqAc
 from nexusLIMS.schemas.activity import cluster_filelist_mtimes
 from nexusLIMS.harvester import sharepoint_calendar as _sp_cal
 from nexusLIMS.utils import parse_xml as _parse_xml
 from nexusLIMS.utils import find_files_by_mtime as _find_files
 from nexusLIMS.extractors import extension_reader_map as _ext
+from nexusLIMS.db import session_handler as _session_handler
 from glob import glob as _glob
 from timeit import default_timer as _timer
 
 _logger = _logging.getLogger(__name__)
 XSLT_PATH = _os.path.join(_os.path.dirname(__file__),
                           "cal_events_to_nx_record.xsl")
+XSD_PATH = _os.path.join(_os.path.dirname(_activity.__file__),
+                         "nexus-experiment.xsd")
 
 
-def build_record(instrument, dt_from, dt_to, date, user,
+def build_record(instrument, dt_from, dt_to,
+                 date=None,
+                 user=None,
                  generate_previews=True):
     """
     Construct an XML document conforming to the NexusLIMS schema from a
@@ -74,7 +84,7 @@ def build_record(instrument, dt_from, dt_to, date, user,
         None, the date detected from the modified time of the folder will be
         used (which may or may not be correct, but given that the folders on
         ***REMOVED*** are read-only, should generally be able to be trusted).
-    user : str
+    user : str or None
         A valid NIST username (the short format: e.g. "ear1"
         instead of ernst.august.ruska@nist.gov). Controls the results
         returned from the calendar - value is as specified in
@@ -189,6 +199,10 @@ def build_acq_activities(instrument, dt_from, dt_to, generate_previews):
     files = [f for f in files if _os.path.splitext(f)[1].strip('.') in
              _ext.keys()]
 
+    # return a string indicating no files found if none were found
+    if len(files) == 0:
+        raise FileNotFoundError('No files found in this time range')
+
     # get the timestamp boundaries of acquisition activities
     aa_bounds = cluster_filelist_mtimes(files)
 
@@ -298,3 +312,88 @@ def dump_record(instrument,
                             generate_previews=generate_previews)
         f.write(text)
     return filename
+
+
+def validate_record(xml_filename):
+    """
+    Validate an .xml record against the Nexus schema
+
+    Parameters
+    ----------
+    xml_filename : str or io.StringIO or io.BytesIO
+        The path to the xml file to be validated (can also be a file-like
+        object like StringIO or BytesIO)
+
+    Returns
+    -------
+    validates : bool
+        Whether or not the record validates against the Nexus schema
+    """
+    xsd_doc = _etree.parse(XSD_PATH)
+    xml_schema = _etree.XMLSchema(xsd_doc)
+    xml_doc = _etree.parse(xml_filename)
+    validates = xml_schema.validate(xml_doc)
+    return validates
+
+
+def build_new_session_records():
+    """
+    Fetches new records that need to be built from the database, builds those
+    records (saving to the NexusLIMS folder), and returns a list of resulting
+    .xml files to be uploaded to CDCS.
+
+    Returns
+    -------
+    xml_files : list
+        A list of record files that were successfully built and saved to
+        centralized storage
+    """
+    # get the list of sessions with 'WAITING_TO_BE_BUILT' status
+    sessions = _session_handler.get_sessions_to_build()
+    xml_files = []
+    # loop through the sessions
+    for s in sessions:
+        try:
+            s.insert_record_generation_event()
+            record_text = build_record(instrument=s.instrument,
+                                       dt_from=s.dt_from, dt_to=s.dt_to,
+                                       generate_previews=True)
+        except (FileNotFoundError, Exception) as e:
+            if isinstance(e, FileNotFoundError):
+                # if no files were found for this session log, mark it as so in
+                # the database
+                path = _os.path.join(_mmf_path, s.instrument.filestore_path)
+                _logger.warning(f'No files found in '
+                                f'{_os.path.abspath(path)} between '
+                                f'{s.dt_from.isoformat()} and '
+                                f'{s.dt_to.isoformat()}')
+                _logger.warning(f'Marking {s.session_identifier} as '
+                                f'"NO_FILES_FOUND"')
+                s.update_session_status('NO_FILES_FOUND')
+            else:
+                _logger.error(f'Could not generate record text: {e}')
+                _logger.error(f'Marking {s.session_identifier} as "ERROR"')
+                s.update_session_status('ERROR')
+        else:
+            if validate_record(_bytesIO(bytes(record_text, 'UTF-8'))):
+                _logger.info(f'Validated newly generated record')
+                # generate filename for saved record and make sure path exists
+                basename = f'{s.dt_from.strftime("%Y-%m-%d")}_' \
+                           f'{s.instrument.name}_' \
+                           f'{s.session_identifier.split("-")[0]}.xml'
+                filename = _os.path.join(_nx_path, '..', 'records', basename)
+                filename = _os.path.abspath(filename)
+                _pathlib.Path(_os.path.dirname(filename)).mkdir(parents=True,
+                                                                exist_ok=True)
+                # write the record to disk and append to list of files generated
+                with open(filename, 'w') as f:
+                    f.write(record_text)
+                _logger.info(f'Wrote record to {filename}')
+                xml_files.append(filename)
+                # Mark this session as completed in the database
+                _logger.info(f'Marking {s.session_identifier} as "COMPLETED"')
+                s.update_session_status('COMPLETED')
+            else:
+                _logger.error(f'Marking {s.session_identifier} as "ERROR"')
+                _logger.error(f'')
+                s.update_session_status('ERROR')

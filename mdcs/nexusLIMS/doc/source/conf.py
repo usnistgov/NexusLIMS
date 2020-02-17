@@ -62,6 +62,24 @@ pygments_style = 'sphinx'
 add_function_parentheses = True
 # master_doc = 'index'
 
+# # LXML does not use sphinx, so if you want to link to specific page,
+# # you have to create a custom objects.inv file for that module (this is
+# # used for nexusLIMS.utils.parse_xml, for example). To do this, use the
+# # example below to add the specific objects and links as needed (this
+# # method from https://sphobjinv.readthedocs.io/en/latest/customfile.html)
+
+#     import sphobjinv as soi
+#     inv = soi.Inventory()
+#     inv.project = 'lxml'
+#     inv.version = lxml.__version__
+#     o = soi.DataObjStr(name='lxml.etree._XSLTResultTree', domain='py',
+#     role='class', priority='1', uri='xpathxslt.html#xslt', dispname='-')
+#     inv.objects.append(o)
+#     text = inv.data_file(contract=True)
+#     ztext = soi.compress(text)
+#     soi.writebytes('***REMOVED***NexusMicroscopyLIMS/mdcs/nexusLIMS/'
+#                    'doc/source/objects_lxml.inv', ztext)
+
 intersphinx_mapping = {'python': ('https://docs.python.org/3.7/', None),
                        'dateparser': (
                            'https://dateparser.readthedocs.io/en/latest/',
@@ -75,7 +93,9 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3.7/', None),
                            'https://2.python-requests.org/en/master', None),
                        'PIL': (
                            'https://pillow.readthedocs.io/en/3.1.x/',
-                           None)
+                           None),
+                       # use the custom objects.inv file above for LXML:
+                       'lxml': ('https://lxml.de/', 'objects_lxml.inv')
                        }
 
 import sphinx_bootstrap_theme
@@ -218,6 +238,8 @@ def run_apidoc(_):
     modules = os.path.normpath(os.path.join(cur_dir, "../../nexusLIMS"))
     to_exclude = list(glob(os.path.join(modules, 'dev_scripts') + '/**/*',
                            recursive=True))
+    # exclude db_logger_gui files from autodoc
+    to_exclude += list(glob(os.path.join(modules, 'db', 'db_logger_gui', '*')))
     # to_exclude += [os.path.join(modules, 'builder')]
     main(['-f', '-M', '-T', '-d', '-1', '-o', output_path, modules] +
          to_exclude)

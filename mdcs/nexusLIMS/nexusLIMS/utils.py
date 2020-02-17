@@ -53,7 +53,7 @@ def parse_xml(xml, xslt_file, **kwargs):
         transformer. ``None`` values are converted to an empty string.
     Returns
     -------
-    simplified_dom : ``lxml.XSLT`` transformation result
+    simplified_dom : :py:class:`lxml.etree._XSLTResultTree`
     """
 
     for key, value in kwargs.items():
@@ -80,7 +80,7 @@ def parse_xml(xml, xslt_file, **kwargs):
     return simplified_dom
 
 
-def nexus_req(url, fn, **kwargs):
+def nexus_req(url, fn, basic_auth=False, **kwargs):
     """
     A helper method that wraps a function from :py:mod:`requests`, but adds a
     local certificate authority chain to validate the SharePoint server's
@@ -94,6 +94,10 @@ def nexus_req(url, fn, **kwargs):
         The function from the ``requests`` library to use (e.g.
         :py:func:`~requests.get`, :py:func:`~requests.put`,
         :py:func:`~requests.post`, etc.)
+    basic_auth : bool
+        If True, use only username and password for authentication rather than
+        NTLM (like what is used for CDCS access rather than for NIST network
+        resources)
     **kwargs : dict, optional
         Other keyword arguments are passed along to the ``fn``
 
@@ -111,7 +115,7 @@ def nexus_req(url, fn, **kwargs):
             lines = our_cert.readlines()
         tmp.writelines(lines)
         tmp.seek(0)
-        r = fn(url, auth=get_auth(), verify=tmp.name, **kwargs)
+        r = fn(url, auth=get_auth(basic=basic_auth), verify=tmp.name, **kwargs)
 
     return r
 
