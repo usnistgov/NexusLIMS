@@ -225,4 +225,5 @@ def get_sessions_to_build():
                           dt_from=dt_from, dt_to=dt_to, user=sl.user)
         sessions.append(session)
 
+    _logger.info(f'Found {len(sessions)} new sessions to build')
     return sessions

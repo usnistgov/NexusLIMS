@@ -29,12 +29,11 @@
 
 import os as _os
 import logging as _logging
-import hyperspy.api_nogui as _hs
 import pathlib as _pathlib
+import shutil as _shutil
 from uuid import uuid4 as _uuid4
 from lxml import etree as _etree
 from datetime import datetime as _datetime
-from io import StringIO as _stringIO
 from io import BytesIO as _bytesIO
 from nexusLIMS import mmf_nexus_root_path as _mmf_path
 from nexusLIMS import nexuslims_root_path as _nx_path
@@ -46,7 +45,7 @@ from nexusLIMS.utils import parse_xml as _parse_xml
 from nexusLIMS.utils import find_files_by_mtime as _find_files
 from nexusLIMS.extractors import extension_reader_map as _ext
 from nexusLIMS.db import session_handler as _session_handler
-from glob import glob as _glob
+from nexusLIMS.cdcs import upload_record_files as _upload_record_files
 from timeit import default_timer as _timer
 
 _logger = _logging.getLogger(__name__)
@@ -191,13 +190,14 @@ def build_acq_activities(instrument, dt_from, dt_to, generate_previews):
     path = _os.path.abspath(_os.path.join(_mmf_path, instrument.filestore_path))
     _logger.info(f'Starting new file-finding in {path}')
     files = _find_files(path, dt_from, dt_to)
-    end_timer = _timer()
-    _logger.info(f'Found {len(files)} files in'
-                 f' {end_timer - start_timer:.2f} seconds')
 
     # remove all files but those supported by nexusLIMS.extractors
     files = [f for f in files if _os.path.splitext(f)[1].strip('.') in
              _ext.keys()]
+
+    end_timer = _timer()
+    _logger.info(f'Found {len(files)} files in'
+                 f' {end_timer - start_timer:.2f} seconds')
 
     # return a string indicating no files found if none were found
     if len(files) == 0:
@@ -397,3 +397,26 @@ def build_new_session_records():
                 _logger.error(f'Marking {s.session_identifier} as "ERROR"')
                 _logger.error(f'')
                 s.update_session_status('ERROR')
+
+    return xml_files
+
+
+def process_new_records():
+    """
+    Using :py:math:`build_new_session_records()`, process new records,
+    save them to disk, and upload them to the NexusLIMS CDCS instance.
+    """
+    xml_files = build_new_session_records()
+    files_uploaded = _upload_record_files(xml_files)
+    for f in files_uploaded:
+        _shutil.move(f, _os.path.abspath(_os.path.join(
+            _os.path.dirname(f), 'uploaded')))
+    files_not_uploaded = [f for f in xml_files if f not in files_uploaded]
+
+    if len(files_not_uploaded) > 0:
+        _logger.warning(f'Some record files were not uploaded: '
+                        f'{files_not_uploaded}')
+
+
+if __name__ == '__main__':
+    process_new_records()

@@ -66,7 +66,7 @@ def upload_record_content(xml_content, title):
 
     Returns
     -------
-    r : ~requests.Response
+    post_r : ~requests.Response
         The REST response returned from the CDCS instance after attempting
         the upload
     """
@@ -78,22 +78,22 @@ def upload_record_content(xml_content, title):
         'xml_content': xml_content
     }
 
-    r = _nx_req(endpoint, _requests.post, json=payload, basic_auth=True)
+    post_r = _nx_req(endpoint, _requests.post, json=payload, basic_auth=True)
 
-    if r.status_code != 201:
+    if post_r.status_code != 201:
         # anything other than 201 status means something went wrong
         _logger.error(f'Got error while uploading {title}:\n'
-                      f'{r.text}')
-        return r
+                      f'{post_r.text}')
+        return post_r
 
     # assign this record to the public workspace
-    record_id = r.json()['id']
+    record_id = post_r.json()['id']
     wrk_endpoint = _urljoin(_cdcs_url,
                             f'rest/data/{record_id}/assign/{workspace_id}')
 
     r = _nx_req(wrk_endpoint, _requests.patch, basic_auth=True)
 
-    return r
+    return post_r
 
 
 def upload_record_files(files_to_upload):
@@ -109,8 +109,8 @@ def upload_record_files(files_to_upload):
 
     Returns
     -------
-    files_uploaded : int
-        The number of files that were successfully uploaded
+    files_uploaded : list
+        A list of the files that were successfully uploaded
     """
     if files_to_upload is None:
         _logger.info('Using all .xml files in this directory')
@@ -124,7 +124,7 @@ def upload_record_files(files_to_upload):
                          'command line, or run this script from a directory '
                          'containing one or more .xml files')
 
-    files_uploaded = 0
+    files_uploaded = []
     for f in _tqdm(files_to_upload):
         with open(f, 'r') as xml_file:
             xml_content = xml_file.read()
@@ -135,10 +135,11 @@ def upload_record_files(files_to_upload):
         if r.status_code != 201:
             continue
         else:
-            files_uploaded += 1
+            files_uploaded.append(f)
 
-    _logger.info(f'Successfully uploaded {files_uploaded} of '
+    _logger.info(f'Successfully uploaded {len(files_uploaded)} of '
                  f'{len(files_to_upload)} files')
+
     return files_uploaded
 
 

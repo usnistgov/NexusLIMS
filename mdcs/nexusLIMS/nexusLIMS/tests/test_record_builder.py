@@ -13,6 +13,9 @@ gen_prev = True
 
 
 class TestRecordBuilder:
+    def test_new_session_processor(self):
+        _rb.process_new_records()
+
     def test_new_session_builder(self):
         _rb.build_new_session_records()
 
