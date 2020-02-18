@@ -27,11 +27,11 @@
 #
 
 import os as _os
-import pathlib as _pathlib
 import logging as _logging
 from datetime import datetime as _datetime
 import math as _math
-from xml.sax.saxutils import escape, unescape
+from xml.sax.saxutils import escape
+from urllib.parse import quote as _urlquote
 from timeit import default_timer as _timer
 
 import hyperspy.api_nogui as _hs
@@ -434,6 +434,10 @@ class AcquisitionActivity:
             # build path to thumbnail
             rel_fname = f.replace(_mmf_path, '')
             rel_thumb_name = f'{rel_fname}.thumb.png'
+
+            # encode for safe URLs
+            rel_fname = _urlquote(rel_fname)
+            rel_thumb_name = _urlquote(rel_thumb_name)
 
             # f is string; um is a dictionary, w is a list
             aqAc_xml += f'{INDENT*2}<dataset ' \
