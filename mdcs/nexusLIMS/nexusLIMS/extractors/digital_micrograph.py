@@ -146,6 +146,9 @@ def get_dm3_metadata(filename):
 
         # Get the instrument object associated with this file
         instr = _get_instr(filename)
+        # get the modification time (as ISO format):
+        mtime = _os.path.getmtime(filename)
+        mtime_iso = _dt.fromtimestamp(mtime).isoformat()
         # if we found the instrument, then store the name as string, else None
         instr_name = instr.name if instr is not None else None
         m_list[i]['nx_meta'] = {}
@@ -153,6 +156,7 @@ def get_dm3_metadata(filename):
         # set type to Image by default
         m_list[i]['nx_meta']['DatasetType'] = 'Image'
         m_list[i]['nx_meta']['Data Type'] = 'TEM_Imaging'
+        m_list[i]['nx_meta']['Creation Time'] = mtime_iso
         m_list[i]['nx_meta']['Data Dimensions'] = str(s[i].data.shape)
         m_list[i]['nx_meta']['Instrument ID'] = instr_name
         m_list[i]['nx_meta']['warnings'] = []

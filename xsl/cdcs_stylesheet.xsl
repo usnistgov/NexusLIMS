@@ -1188,6 +1188,9 @@
                                                     </xsl:call-template>
                                                 </th>
                                                 <th>
+                                                    Creation Time
+                                                </th>
+                                                <th>
                                                     Type
                                                     <xsl:call-template name="help-tip">
                                                         <xsl:with-param name="tip-placement">top</xsl:with-param>
@@ -1224,6 +1227,17 @@
                                                     <!-- generate a dataset id that matches preview image as an attribute on the first column for accessing later via JS -->
                                                     <xsl:element name="td">
                                                         <xsl:value-of select="name"/>
+                                                    </xsl:element>
+                                                    <xsl:element name="td">
+                                                        <xsl:choose>
+                                                            <xsl:when test="meta[@name = 'Creation Time']">
+                                                                <xsl:value-of select="string(meta[@name = 'Creation Time'])"/>
+                                                            </xsl:when>
+                                                            <xsl:when test="../setup/param[@name = 'Creation Time']">
+                                                                <xsl:value-of select="string(../setup/param[@name = 'Creation Time'])"/>
+                                                            </xsl:when>
+                                                            <xsl:otherwise>---</xsl:otherwise>
+                                                        </xsl:choose>
                                                     </xsl:element>
                                                     <xsl:variable name="dataset-type">
                                                         <xsl:choose>

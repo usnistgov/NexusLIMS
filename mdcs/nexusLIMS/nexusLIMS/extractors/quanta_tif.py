@@ -27,6 +27,8 @@
 #
 import configparser as _cp
 import io as _io
+import os as _os
+from datetime import datetime as _dt
 from math import degrees
 from decimal import Decimal as _Decimal
 from decimal import InvalidOperation as _invalidOp
@@ -83,10 +85,15 @@ def get_quanta_metadata(filename):
     mdict['nx_meta']['DatasetType'] = 'Image'
     mdict['nx_meta']['Data Type'] = 'SEM_Imaging'
 
+    # get the modification time (as ISO format):
+    mtime = _os.path.getmtime(filename)
+    mtime_iso = _dt.fromtimestamp(mtime).isoformat()
+
     instr = _get_instr(filename)
     # if we found the instrument, then store the name as string, else None
     instr_name = instr.name if instr is not None else None
     mdict['nx_meta']['Instrument ID'] = instr_name
+    mdict['nx_meta']['Creation Time'] = mtime_iso
     mdict['nx_meta']['warnings'] = []
 
     mdict = parse_nx_meta(mdict)
