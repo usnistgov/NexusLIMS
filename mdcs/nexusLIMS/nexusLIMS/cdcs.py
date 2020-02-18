@@ -33,6 +33,8 @@ from urllib.parse import urljoin as _urljoin
 import sys
 import argparse
 from nexusLIMS._urls import cdcs_url as _cdcs_url
+from nexusLIMS.harvester.sharepoint_calendar import AuthenticationError as \
+    _authError
 from nexusLIMS.utils import nexus_req as _nx_req
 from tqdm import tqdm as _tqdm
 import logging as _logging
@@ -45,11 +47,17 @@ _logger.setLevel(_logging.INFO)
 # workspace)
 _endpoint = _urljoin(_cdcs_url, 'rest/workspace/read_access')
 _r = _nx_req(_endpoint, _requests.get, basic_auth=True)
+if _r.status_code == 401:
+    raise _authError('Could not authenticate to CDCS. Are the nexusLIMS_user '
+                     'and nexusLIMS_pass environment variables set correctly?')
 workspace_id = _r.json()[0]['id']
 
 # get the current template (XSD) id value:
 _endpoint = _urljoin(_cdcs_url, 'rest/template-version-manager/global')
 _r = _nx_req(_endpoint, _requests.get, basic_auth=True)
+if _r.status_code == 401:
+    raise _authError('Could not authenticate to CDCS. Are the nexusLIMS_user '
+                     'and nexusLIMS_pass environment variables set correctly?')
 template_id = _r.json()[0]['current']
 
 
