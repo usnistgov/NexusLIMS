@@ -25,6 +25,17 @@
 #  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
+"""
+**Attributes**
+
+Attributes
+----------
+instrument_db : dict
+    A dictionary of :py:class:`~nexusLIMS.instruments.Instrument` objects.
+
+    Each object in this dictionary represents an instrument detected in the
+    NexusLIMS remote database.
+"""
 
 from nexusLIMS import nexuslims_db_path as _nx_path
 from nexusLIMS import mmf_nexus_root_path as _mmf_path
@@ -147,12 +158,6 @@ class Instrument:
 
 
 instrument_db = _get_instrument_db()
-"""
-dict: A dictionary of :py:class:`~nexusLIMS.instruments.Instrument` objects.
-
-Each object in this dictionary represents an instrument detected in the 
-NexusLIMS remote database.
-"""
 
 
 def get_instr_from_filepath(path):

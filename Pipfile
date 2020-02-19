@@ -9,6 +9,7 @@ pytest = "*"
 pytest-cov = "*"
 sphinx = "*"
 sphinx-bootstrap-theme = "*"
+sphinxcontrib-plantuml = "*"
 nexuslims = {editable = true,path = "./mdcs/nexusLIMS"}
 
 [packages]

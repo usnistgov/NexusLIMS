@@ -26,6 +26,6 @@
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
 
-calendar_root_url = 'https://***REMOVED***/***REMOVED***/'
+calendar_root_url = 'https://***REMOVED***/Div/msed/MSED-MMF/'
 ldap_url = 'ldap://***REMOVED***:389'
 cdcs_url = 'https://***REMOVED***/'

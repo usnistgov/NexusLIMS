@@ -25,6 +25,49 @@
 #  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
+"""The NexusLIMS backend software.
+
+This module contains the software required to monitor a database for sessions
+logged by users on instruments that are part of the NIST Electron Microscopy
+Nexus Facility. Based off this information, records representing individual
+experiments are automatically generated and uploaded to the frontend NexusLIMS
+CDCS instance for users to browse, query, and edit.
+
+Example
+-------
+In most cases, the only code that needs to be run directly is initiating the
+record builder to look for new sessions, which can be done by running the
+:py:mod:`~nexusLIMS.builder.record_builder` module directly:
+
+.. code-block:: bash
+
+    $ python -m nexusLIMS.builder.record_builder
+
+Refer to :ref:`record-building` for more details.
+
+**Attributes**
+
+Attributes
+----------
+mmf_nexus_root_path : str
+    The root path for data from the Electron Microscopy Nexus
+
+    This folder is accessible read-only, and it is where data is written to by
+    instruments in the Electron Microscopy Nexus. The file paths for specific
+    instruments (specified in the NexusLIMS database) are relative to this root.
+
+nexuslims_root_path : str
+    The root path used by NexusLIMS for various needs
+
+    This folder is used to store the NexusLIMS database, generated records,
+    individual file metadata dumps and preview images, and anything else that is
+    needed by the backend system.
+
+nexuslims_db_path : str
+    The direct path to the NexusLIMS SQLite database file that contains
+    information about the instruments in the Nexus Facility, as well as logs
+    for the sessions created by users using the Session Logger Application.
+"""
 
 from ._urls import calendar_root_url
 from ._urls import ldap_url

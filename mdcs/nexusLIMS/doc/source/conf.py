@@ -37,12 +37,8 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
-    # 'sphinx.ext.imgmath',
-    # 'sphinx.ext.autosummary',
     'sphinx.ext.coverage',
-    # 'sphinx.ext.todo',
-    # 'sphinx.ext.ifconfig',
-    # 'sphinx.ext.viewcode',
+    'sphinxcontrib.plantuml'
 ]
 
 try:

@@ -25,7 +25,15 @@
 #  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
+"""
+**Attributes**
 
+Attributes
+----------
+XSLT_PATH : str
+    The path to ``cal_events_to_nx_record.xsl``, which is used to translate
+    the calender event response XML to a format compatible with the Nexus Schema
+"""
 
 import os as _os
 import logging as _logging
@@ -338,9 +346,11 @@ def validate_record(xml_filename):
 
 def build_new_session_records():
     """
-    Fetches new records that need to be built from the database, builds those
-    records (saving to the NexusLIMS folder), and returns a list of resulting
-    .xml files to be uploaded to CDCS.
+    Fetches new records that need to be built from the database (using
+    :py:func:`~nexusLIMS.db.session_handler.get_sessions_to_build`), builds
+    those records using
+    :py:func:`build_record` (saving to the NexusLIMS folder), and returns a
+    list of resulting .xml files to be uploaded to CDCS.
 
     Returns
     -------
@@ -395,7 +405,8 @@ def build_new_session_records():
                 s.update_session_status('COMPLETED')
             else:
                 _logger.error(f'Marking {s.session_identifier} as "ERROR"')
-                _logger.error(f'')
+                _logger.error(f'Could not validate record, did not write to '
+                              f'disk')
                 s.update_session_status('ERROR')
 
     return xml_files
@@ -403,7 +414,7 @@ def build_new_session_records():
 
 def process_new_records():
     """
-    Using :py:math:`build_new_session_records()`, process new records,
+    Using :py:meth:`build_new_session_records()`, process new records,
     save them to disk, and upload them to the NexusLIMS CDCS instance.
     """
     xml_files = build_new_session_records()
@@ -414,9 +425,12 @@ def process_new_records():
     files_not_uploaded = [f for f in xml_files if f not in files_uploaded]
 
     if len(files_not_uploaded) > 0:
-        _logger.warning(f'Some record files were not uploaded: '
-                        f'{files_not_uploaded}')
+        _logger.error(f'Some record files were not uploaded: '
+                      f'{files_not_uploaded}')
 
 
 if __name__ == '__main__':
+    """
+    If running as a module, process new records 
+    """
     process_new_records()
