@@ -23,6 +23,7 @@ from glob import glob
 project = 'NexusLIMS'
 copyright = f'{datetime.now().year}, NIST Office of Data and Informatics'
 author = 'NIST Office of Data and Informatics'
+numfig = True
 
 # The full version, including alpha/beta/rc tags
 release = nexusLIMS.version.__version__

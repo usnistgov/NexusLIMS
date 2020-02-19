@@ -429,7 +429,7 @@ def add_annotation_markers(s):
 
 def sig_to_thumbnail(s, out_path, dpi=92):
     """
-    Generate a thumbnail of from an arbitrary HyperSpy signal. For a 2D
+    Generate a preview thumbnail from an arbitrary HyperSpy signal. For a 2D
     signal, the signal from the first navigation position is used (most
     likely the top- and left-most position. For a 1D signal (*i.e.* a
     spectrum or spectrum image), the output depends on the

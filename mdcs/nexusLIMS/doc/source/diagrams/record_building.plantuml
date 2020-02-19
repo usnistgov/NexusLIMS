@@ -100,13 +100,13 @@ if (Are there new sessions?) then (True)
       :Separate files into "activities" 
       (""schemas.activity.AcquisitionActivity""
       objects) by clustering file creation times;
-      ' note right
-      '   ""schemas.activity.""
-      '   ""cluster_filelist_mtimes()""
-      '   performs statistical analysis
-      '   of file modification times to
-      '   group related files together
-      ' end note
+      note right
+        ""schemas.activity.""
+        ""cluster_filelist_mtimes()""
+        performs statistical analysis
+        of file modification times to
+        group (likely) related files together
+      end note
       repeat :Build one ""AcquisitionActivity"";
         :Parse metadata for all files part
         of this activity;
@@ -201,7 +201,7 @@ endif
 
 
 center footer
- Last updated Feb. 18, 2020
+ Last updated Feb. 19, 2020
 end footer
 
 @enduml

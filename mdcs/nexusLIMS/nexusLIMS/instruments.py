@@ -141,17 +141,17 @@ class Instrument:
         self.computer_mount = computer_mount
 
     def __repr__(self):
-        return f'Nexus Instrument:\t{self.name}\n' \
-               f'API url:\t\t{self.api_url}\n' \
-               f'Calendar name:\t\t{self.calendar_name}\n' \
-               f'Calendar url:\t\t{self.calendar_url}\n' \
-               f'Schema name:\t\t{self.schema_name}\n' \
-               f'Location:\t\t{self.location}\n' \
-               f'Property tag:\t\t{self.property_tag}\n' \
-               f'Filestore path:\t\t{self.filestore_path}\n' \
-               f'Computer IP:\t\t{self.computer_ip}\n' \
-               f'Computer name:\t\t{self.computer_name}\n' \
-               f'Computer mount:\t\t{self.computer_mount}\n'
+        return f'Nexus Instrument: {self.name}\n' \
+               f'API url:          {self.api_url}\n' \
+               f'Calendar name:    {self.calendar_name}\n' \
+               f'Calendar url:     {self.calendar_url}\n' \
+               f'Schema name:      {self.schema_name}\n' \
+               f'Location:         {self.location}\n' \
+               f'Property tag:     {self.property_tag}\n' \
+               f'Filestore path:   {self.filestore_path}\n' \
+               f'Computer IP:      {self.computer_ip}\n' \
+               f'Computer name:    {self.computer_name}\n' \
+               f'Computer mount:   {self.computer_mount}\n'
 
     def __str__(self):
         return f'{self.name}' + f' in {self.location}' if self.location else ''

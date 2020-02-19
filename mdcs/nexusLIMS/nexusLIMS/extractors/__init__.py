@@ -135,8 +135,9 @@ def parse_metadata(fname, write_output=True, generate_preview=True,
 
 def flatten_dict(d, parent_key='', separator=' '):
     """
-    Take a nested dictionary and flatten it into a single level, separating
-    the levels by a string as specified by `separator`
+    Utility method to take a nested dictionary structure and flatten it into a
+    single level, separating the levels by a string as specified by
+    ``separator``
 
     Cribbed from: https://stackoverflow.com/a/6027615/1435788
 
