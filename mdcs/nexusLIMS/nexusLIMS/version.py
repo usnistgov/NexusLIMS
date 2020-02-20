@@ -1,4 +1,4 @@
-#  NIST Public License - 2019
+#  NIST Public License - 2020
 #
 #  This software was developed by employees of the National Institute of
 #  Standards and Technology (NIST), an agency of the Federal Government
@@ -28,4 +28,4 @@
 """
 This module is only used for keeping track of the current software version.
 """
-__version__ = '0.0.2'
+__version__ = '0.0.9'
