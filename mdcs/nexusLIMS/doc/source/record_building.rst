@@ -493,9 +493,8 @@ Record Generation Diagram
 
 The following diagram illustrates the logic (described above) that is used to
 generate ``Experiment`` records and upload them to the NexusLIMS CDCS instance.
-To better inspect the diagram, right click the image and select
-"View Image", "Open image in new tab", or the equivalent option in your browser
-to be able to zoom and pan.
+To better inspect the diagram, click the image to open just the figure in
+your browser to be able to zoom and pan.
 
 The diagram should be fairly self-explanatory, but in general: the green dot
 represents the start of the record builder code, and any red dots represent a
@@ -506,4 +505,6 @@ can be read by simply following the arrows. The only exception is for the orange
 boxes, which indicate a jump to the other orange box in the bottom left,
 representing when an individual session is updated in the database.
 
-.. uml:: diagrams/record_building.plantuml
+..  image:: _static/record_building.png
+    :width: 90%
+    :alt: Activity diagram for record building process

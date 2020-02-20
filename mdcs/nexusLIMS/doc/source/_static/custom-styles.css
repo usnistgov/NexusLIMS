@@ -64,6 +64,11 @@ div#sidebar > img {
     width: 50%;
 }
 
+/*!* Hide footer source link since it's not really useful anyway *!*/
+.footer #sourcelink {
+    display: none;
+}
+
 /*         */
 /* Autodoc */
 /*         */

@@ -36,9 +36,9 @@ end note
 :""session_handler.get_sessions_to_build()"";
 note right
   Check NexusLIMS database for
-  logs with the same 
+  logs with the same
   ""session_identifier"" value
-  and both a ""START"" and 
+  and both a ""START"" and
   ""END"" log that have status
   ""TO_BE_BUILT""
 end note
@@ -46,9 +46,9 @@ end note
 if (Are there new sessions?) then (True)
   repeat :Extract single ""Session"";
     :Return ""session_handler.Session"" object;
-    note right 
+    note right
       Contains ""session_identifier""
-      (UUID), instrument definition, 
+      (UUID), instrument definition,
       start and end timestamps,
       and user information
     end note
@@ -61,7 +61,7 @@ if (Are there new sessions?) then (True)
     ""             time_to)"";
     note left
       Creates a new "".xml""
-      document for this 
+      document for this
       ""Experiment""
     end note
     :""harvester.sharepoint_calendar.get_events()"";
@@ -76,9 +76,9 @@ if (Are there new sessions?) then (True)
       info to record summary
       ""XML"";
       note left
-        Experiment title, 
-        motivation, sample 
-        name, project info, 
+        Experiment title,
+        motivation, sample
+        name, project info,
         etc.
       end note
     else (False)
@@ -86,18 +86,18 @@ if (Are there new sessions?) then (True)
       such as ""instrument""
       and date to ""XML"";
     endif
-    :Identify files (of known filetype) 
-    created on this ""instrument"" 
+    :Identify files (of known filetype)
+    created on this ""instrument""
     within this timespan to be
     associated with this record;
     note left
       NexusLIMS database
-      indicates where to look for 
+      indicates where to look for
       files for each ""instrument""
     end note
     if (One or more files found?) then (True)
       |Record builder|
-      :Separate files into "activities" 
+      :Separate files into "activities"
       (""schemas.activity.AcquisitionActivity""
       objects) by clustering file creation times;
       note right
@@ -114,8 +114,8 @@ if (Are there new sessions?) then (True)
         repeat :""extractors.parse_metadata(filename)"";
           :Extract all known metadata
           from the the raw data file;
-          :Determine "dataset type" 
-          (<i>i.e.</i> "TEM Imaging", 
+          :Determine "dataset type"
+          (<i>i.e.</i> "TEM Imaging",
           "STEM EELS", "SEM EDS", etc.);
           :Generate "".png"" preview image
           and save in NexusLIMS folder;
@@ -125,8 +125,8 @@ if (Are there new sessions?) then (True)
         -> False;
         |Record builder|
         split
-        :Assign metadata values 
-        common between all files 
+        :Assign metadata values
+        common between all files
         as <i>Setup parameters</i>
         for this ""AcquisitionActivity"";
         split again
@@ -146,8 +146,8 @@ if (Are there new sessions?) then (True)
       repeat while (More activities to process) is (True)
     else (False)
       |Session handler|
-      #Orange:Update ""Session"" status in 
-      NexusLIMS database 
+      #Orange:Update ""Session"" status in
+      NexusLIMS database
       as ""NO_FILES_FOUND"";
       (A)
       detach
@@ -159,16 +159,16 @@ if (Are there new sessions?) then (True)
       :Write ""XML"" record to NexusLIMS
       folder;
       |Session handler|
-      #Orange:Update ""Session"" status in 
-      NexusLIMS database 
+      #Orange:Update ""Session"" status in
+      NexusLIMS database
       as ""COMPLETED"";
       (A)
       detach
       |Record builder|
     else (False)
       |Session handler|
-      #Orange:Update ""Session"" status in 
-      NexusLIMS database 
+      #Orange:Update ""Session"" status in
+      NexusLIMS database
       as ""ERROR"";
       (A)
       detach
@@ -177,7 +177,7 @@ if (Are there new sessions?) then (True)
     |Session handler|
     (A)
     #Orange:Verify ""Session"" was
-    updated in NexusLIMS 
+    updated in NexusLIMS
     database;
   repeat while (More sessions to process?) is (True)
   |Session handler|
@@ -187,7 +187,7 @@ if (Are there new sessions?) then (True)
   else (True)
     |#ffefe1|CDCS Connector|
     repeat :Upload single "".xml"" record;
-      :Assign to public 
+      :Assign to public
       CDCS workspace;
     repeat while (More records to upload?) is (True)
     -> False;
@@ -203,6 +203,4 @@ endif
 center footer
  Last updated Feb. 19, 2020
 end footer
-
 @enduml
-

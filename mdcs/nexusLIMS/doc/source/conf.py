@@ -39,7 +39,6 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
     'sphinx.ext.coverage',
-    'sphinxcontrib.plantuml'
 ]
 
 try:
@@ -132,6 +131,14 @@ keep_warnings = True
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+html_css_files = [
+    'custom-styles.css',
+]
+
+html_js_files = [
+    'custom.js',
+]
+
 # html_title = "NexusLIMS documentation"
 html_short_title = "NexusLIMS"
 html_logo = "_static/logo_horizontal.png"
@@ -139,7 +146,7 @@ html_favicon = "_static/nexusLIMS_bare_logo.ico"
 html_last_updated_fmt = '%b, %d, %Y'
 html_use_smartypants = True
 html_show_sourcelink = True
-html_show_sphinx = True
+html_show_sphinx = False
 html_show_copyright = True
 
 # html_sidebars = {'**': ['localtoc.html', 'sourcelink.html', 'searchbox.html']}
@@ -242,6 +249,20 @@ def run_apidoc(_):
          to_exclude)
 
 
+# def build_plantuml(_):
+#     from glob import glob
+#     from plantuml import PlantUML
+#     pl = PlantUML('http://www.plantuml.com/plantuml/img/')
+#     cur_dir = os.path.normpath(os.path.dirname(__file__))
+#     diagrams = os.path.join(cur_dir, 'diagrams')
+#     output_path = os.path.join(cur_dir, '_static')
+#     for f in glob(os.path.join(diagrams, '*uml')):
+#         print(f)
+#         out_name = os.path.splitext(os.path.basename(f))[0] + '.png'
+#         out_f_path = os.path.join(output_path, out_name)
+#         pl.processes_file(f, outfile=out_f_path)
+
+
 # lines from intersphinx to ignore during api-doc autogeneration (so we don't
 # get useless warning messages while the docs are being built
 nitpick_ignore = [('py:class', 'function'),
@@ -258,4 +279,7 @@ def skip(app, what, name, obj, would_skip, options):
 def setup(app):
     # app.connect("autodoc-skip-member", skip)
     app.connect('builder-inited', run_apidoc)
-    app.add_stylesheet("custom-styles.css")
+    # app.connect('builder-inited', build_plantuml)
+    print('If you need to update the PlantUML diagrams, run\n'
+          'build_plantuml.sh in this directory')
+    # app.add_stylesheet("custom-styles.css")
