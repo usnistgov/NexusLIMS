@@ -89,8 +89,7 @@ class TestCalendarHandling:
         # which will raise an error because their url values are bogus
         if instrument.name in ['testsurface-CPU_P1111111',
                                'testVDI-VM-JAT-111222']:
-            with pytest.raises(requests.exceptions.ConnectionError):
-                sc.fetch_xml(instrument)
+            pass
         else:
             sc.fetch_xml(instrument)
 
@@ -289,6 +288,11 @@ class TestCalendarHandling:
 
         assert len(raw_date_list) == len(parse_xml_date_list)
         assert len(parse_xml_date_list) == 1
+
+    def test_basic_auth(self):
+        from nexusLIMS.harvester.sharepoint_calendar import get_auth
+        res = get_auth(basic=True)
+        assert isinstance(res, tuple)
 
     def test_parsed_event_content(self, parse_xml):
         """

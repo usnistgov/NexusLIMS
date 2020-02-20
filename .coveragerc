@@ -1,0 +1,2 @@
+[run]
+omit = mdcs/nexusLIMS/nexusLIMS/dev_scripts/*

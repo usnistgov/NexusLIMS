@@ -121,9 +121,6 @@ def parse_nx_meta(mdict):
         The same metadata dictionary with some values added under the
         root-level ``nx_meta`` key
     """
-    if 'nx_meta' not in mdict:
-        mdict['nx_meta'] = {}
-
     # The name of the beam, scan, and detector will determine which sections are
     # present (have not seen more than one beam/detector -- although likely
     # will be the case for dual beam FIB/SEM)
@@ -240,7 +237,7 @@ def parse_nx_meta(mdict):
         try:
             ch_pres_val = _Decimal(ch_pres_val)
         except _invalidOp:
-            ch_pres_val = float(ch_pres_val)
+            ch_pres_val = ch_pres_val
         if _try_get_dict_val(mdict,
                              ['nx_meta', 'Vacuum Mode']) == 'High vacuum':
             ch_pres_str = 'Chamber Pressure (mPa)'

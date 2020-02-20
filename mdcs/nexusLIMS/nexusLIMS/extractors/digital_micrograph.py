@@ -26,7 +26,6 @@
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
 
-# limit our imports to hopefully reduce loading time
 import os as _os
 import re as _re
 import logging as _logging
@@ -331,7 +330,10 @@ def parse_642_titan(mdict):
     val = _try_get_dict_val(mdict, path)
     if val != 'not found' and \
             val != 'Specimen information is not available yet':
-        _set_nest_dict_val(mdict, ['nx_meta', 'Specimen'], val)
+        # do not count coverage for this line, because no files match this
+        # condition (as far as data seen so far on file system)
+        _set_nest_dict_val(mdict, ['nx_meta', 'Specimen'], # pragma: no cover
+                           val)  # pragma: no cover
 
     # If `Tecnai Mode` is `STEM nP SA Zoom Diffraction`, it's diffraction
     if 'Tecnai Mode' in mdict['nx_meta'] and \
@@ -384,6 +386,9 @@ def parse_642_jeol(mdict):
                          f'the filename')
             mdict['nx_meta']['DatasetType'] = 'Diffraction'
             mdict['nx_meta']['Data Type'] = 'TEM_Diffraction'
+
+    mdict['nx_meta']['warnings'].append(['DatasetType'])
+    mdict['nx_meta']['warnings'].append(['Data Type'])
 
     return mdict
 
@@ -554,8 +559,9 @@ def parse_dm3_microscope_info(mdict):
         _set_nest_dict_val(mdict, ['nx_meta', 'Camera/Detector Processing'],
                            val)
 
-    if 'STEM' in mdict['nx_meta']['Illumination Mode']:
-        mdict['nx_meta']['Data Type'] = 'STEM_Imaging'
+    if 'Illumination Mode' in mdict['nx_meta']:
+        if 'STEM' in mdict['nx_meta']['Illumination Mode']:
+            mdict['nx_meta']['Data Type'] = 'STEM_Imaging'
 
     return mdict
 

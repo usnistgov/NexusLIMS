@@ -256,9 +256,9 @@ def fetch_xml(instrument, date=None):
         # try to convert from instrument PID string to actual instrument
         try:
             instrument = _instr_db[instrument]
-        except ValueError:
-            raise ValueError('Entered instrument string "{}" could not be '
-                             'parsed'.format(instrument))
+        except KeyError:
+            raise KeyError('Entered instrument string "{}" could not be '
+                           'parsed'.format(instrument))
     elif isinstance(instrument, _Instrument):
         pass
     else:

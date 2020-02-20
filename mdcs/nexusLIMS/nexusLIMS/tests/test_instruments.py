@@ -27,11 +27,14 @@
 #
 
 from nexusLIMS.instruments import Instrument
+from nexusLIMS.instruments import instrument_db
+from nexusLIMS.instruments import get_instr_from_filepath
+from nexusLIMS import mmf_nexus_root_path as _mmf_path
+import os
 
 
 class TestInstruments:
     def test_getting_instruments(self):
-        from nexusLIMS.instruments import instrument_db
         assert isinstance(instrument_db, dict)
 
     def test_database_contains_instruments(self):
@@ -53,28 +56,36 @@ class TestInstruments:
         assert 'some_random_instrument' not in instrument_db
 
     def test_instrument_str(self):
-        from nexusLIMS.instruments import instrument_db
         assert \
             str(instrument_db['FEI-Titan-TEM-635816']) == \
             'FEI-Titan-TEM-635816 in ***REMOVED***'
 
     def test_instrument_repr(self):
-        from nexusLIMS.instruments import instrument_db
-        api_url = 'https://***REMOVED***/***REMOVED***/' \
-                  '_vti_bin/ListData.svc/FEITitanTEMEvents'
-        cal_url = 'https://***REMOVED***/***REMOVED***/' \
-                  'Lists/FEI%20Titan%20Events/calendar.aspx'
+        api_url = 'https://***REMOVED***/Div/msed/MSED-MMF/_vti_bin/' \
+                  'ListData.svc/FEITitanTEMEvents'
+        cal_url = 'https://***REMOVED***/Div/msed/MSED-MMF/Lists/' \
+                  'FEI%20Titan%20Events/calendar.aspx'
 
         assert \
             repr(instrument_db['FEI-Titan-TEM-635816']) == \
-            'Nexus Instrument:\tFEI-Titan-TEM-635816\n' + \
-            f'API url:\t\t{api_url}\n' + \
-            'Calendar name:\t\tFEI Titan TEM\n' + \
-            f'Calendar url:\t\t{cal_url}\n' + \
-            'Schema name:\t\tFEI Titan TEM\n' \
-            'Location:\t\t***REMOVED***\n' \
-            'Property tag:\t\t635816\n' \
-            'Filestore path:\t\t./Titan\n' \
-            'Computer IP:\t\t***REMOVED***\n' \
-            'Computer name:\t\t***REMOVED***\n' \
-            'Computer mount:\t\tM:/\n'
+            f'Nexus Instrument: FEI-Titan-TEM-635816\n' + \
+            f'API url:          {api_url}\n' + \
+            f'Calendar name:    FEI Titan TEM\n' + \
+            f'Calendar url:     {cal_url}\n' + \
+            f'Schema name:      FEI Titan TEM\n' \
+            f'Location:         ***REMOVED***\n' \
+            f'Property tag:     635816\n' \
+            f'Filestore path:   ./Titan\n' \
+            f'Computer IP:      ***REMOVED***\n' \
+            f'Computer name:    ***REMOVED***\n' \
+            f'Computer mount:   M:/\n'
+
+    def test_get_instr_from_filepath(self):
+        path = os.path.join(_mmf_path, 'Titan/***REMOVED***/***REMOVED***/'
+                                       '***REMOVED***/4_330mm.dm3')
+        instr = get_instr_from_filepath(path)
+        assert isinstance(instr, Instrument)
+        assert instr.name == 'FEI-Titan-TEM-635816'
+
+        instr = get_instr_from_filepath('bad_path_no_instrument')
+        assert instr is None
