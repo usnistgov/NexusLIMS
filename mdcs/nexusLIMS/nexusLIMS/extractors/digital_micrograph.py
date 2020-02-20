@@ -330,10 +330,7 @@ def parse_642_titan(mdict):
     val = _try_get_dict_val(mdict, path)
     if val != 'not found' and \
             val != 'Specimen information is not available yet':
-        # do not count coverage for this line, because no files match this
-        # condition (as far as data seen so far on file system)
-        _set_nest_dict_val(mdict, ['nx_meta', 'Specimen'], # pragma: no cover
-                           val)  # pragma: no cover
+        _set_nest_dict_val(mdict, ['nx_meta', 'Specimen'], val)
 
     # If `Tecnai Mode` is `STEM nP SA Zoom Diffraction`, it's diffraction
     if 'Tecnai Mode' in mdict['nx_meta'] and \
@@ -818,7 +815,8 @@ def parse_dm3_eds_info(mdict):
         if 'STEM' in mdict['nx_meta']['Illumination Mode']:
             mdict['nx_meta']['Data Type'] = 'STEM_EDS'
         else:
-            mdict['nx_meta']['Data Type'] = 'TEM_EDS'
+            # no known files match this mode, so skip for coverage
+            mdict['nx_meta']['Data Type'] = 'TEM_EDS'    # pragma: no cover
 
     return mdict
 

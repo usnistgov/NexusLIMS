@@ -3,13 +3,12 @@ import tarfile
 from nexusLIMS.extractors.quanta_tif import get_quanta_metadata
 from nexusLIMS.extractors import digital_micrograph
 from nexusLIMS import instruments
+import pytest
 
 
 class TestDigitalMicrographExtractor:
     tars = \
-        {'CTEM': 'titan_CTEM_zeroData.dm3.tar.gz',
-         'DP': 'titan_DP_zeroData.dm3.tar.gz',
-         'CORRUPTED': 'test_corrupted.dm3.tar.gz',
+        {'CORRUPTED': 'test_corrupted.dm3.tar.gz',
          'LIST_SIGNAL': 'list_signal_dataZeroed.dm3.tar.gz',
          '643_EFTEM_DIFF': '643_EFTEM_DIFFRACTION_dataZeroed.dm3.tar.gz',
          '643_EELS_SI': '643_Titan_EELS_SI_dataZeroed.dm3.tar.gz',
@@ -20,14 +19,17 @@ class TestDigitalMicrographExtractor:
          '643_EELS_SI_DRIFT':
              '643_Titan_EELS_SI_driftcorr_dataZeroed.dm3.tar.gz',
          '643_EDS_SI': '643_Titan_EDS_SI_dataZeroed.dm4.tar.gz',
+         '643_STEM_STACK': '643_Titan_STEM_stack_dataZeroed.dm3.tar.gz',
          '642_STEM_DIFF': '642_Titan_STEM_DIFFRACTION_dataZeroed.dm3.tar.gz',
          '642_OPMODE_DIFF':
              '642_Titan_opmode_diffraction_dataZeroed.dm3.tar.gz',
          '642_EELS_SI_DRIFT':
              '642_Titan_EELS_SI_driftcorr_dataZeroed.dm3.tar.gz',
          '642_EELS_PROC_1': '642_Titan_EELS_proc_1_dataZeroed.dm3.tar.gz',
+         '642_TECNAI_MAG': '642_Titan_Tecnai_mag_dataZeroed.dm3.tar.gz',
          'JEOL3010_DIFF': 'JEOL3010_diffraction_dataZeroed.dm3.tar.gz'
          }
+
     for name, f in tars.items():
         tars[name] = os.path.join(os.path.dirname(__file__), 'files', f)
 
@@ -52,16 +54,6 @@ class TestDigitalMicrographExtractor:
         for name, f in cls.files.items():
             os.remove(f)
 
-    def test_dm3_extraction_ctem(self):
-        assert os.path.exists(self.files['CTEM'])
-
-        metadata = digital_micrograph.get_dm3_metadata(self.files['CTEM'])
-
-    def test_dm3_extraction_dp(self):
-        assert os.path.exists(self.files['DP'])
-
-        metadata = digital_micrograph.get_dm3_metadata(self.files['DP'])
-
     def test_corrupted_file(self):
         assert digital_micrograph.get_dm3_metadata(
             self.files['CORRUPTED']) is None
@@ -75,7 +67,11 @@ class TestDigitalMicrographExtractor:
 
         metadata = digital_micrograph.get_dm3_metadata(
             self.files['LIST_SIGNAL'])
-        pass
+
+        assert metadata['nx_meta']['Data Type'] == 'STEM_Imaging'
+        assert metadata['nx_meta']['Imaging Mode'] == 'DIFFRACTION'
+        assert metadata['nx_meta']['Microscope'] == 'Titan80-300_D3094'
+        assert metadata['nx_meta']['Voltage'] == 300000.0
 
     def test_642_dm3(self, monkeypatch):
         # monkeypatch so DM extractor thinks this file came from FEI Titan TEM
@@ -85,12 +81,48 @@ class TestDigitalMicrographExtractor:
                             "_get_instr", mock_instr)
 
         meta = digital_micrograph.get_dm3_metadata(self.files['642_STEM_DIFF'])
+        assert meta['nx_meta']['Data Type'] == 'STEM_Diffraction'
+        assert meta['nx_meta']['Imaging Mode'] == 'DIFFRACTION'
+        assert meta['nx_meta']['Microscope'] == 'MSED Titan'
+        assert meta['nx_meta']['Voltage'] == 300000.0
+
         meta = digital_micrograph.get_dm3_metadata(self.files[
                                                        '642_OPMODE_DIFF'])
+        assert meta['nx_meta']['Data Type'] == 'TEM_Diffraction'
+        assert meta['nx_meta']['Imaging Mode'] == 'DIFFRACTION'
+        assert meta['nx_meta']['Microscope'] == 'MSED Titan'
+        assert meta['nx_meta']['Voltage'] == 300000.0
+
         meta = digital_micrograph.get_dm3_metadata(self.files[
                                                        '642_EELS_PROC_1'])
+        assert meta['nx_meta']['Data Type'] == 'STEM_EELS'
+        assert meta['nx_meta']['Imaging Mode'] == 'DIFFRACTION'
+        assert meta['nx_meta']['Microscope'] == 'MSED Titan'
+        assert meta['nx_meta']['Voltage'] == 300000.0
+        assert meta['nx_meta']['EELS']['Processing Steps'] == \
+            'Aligned parent SI By Peak, Extracted from SI'
+        assert meta['nx_meta']['EELS']['Spectrometer Aperture label'] == '2mm'
+
         meta = digital_micrograph.get_dm3_metadata(self.files[
                                                        '642_EELS_SI_DRIFT'])
+        assert meta['nx_meta']['Data Type'] == 'EELS_Spectrum_Imaging'
+        assert meta['nx_meta']['Imaging Mode'] == 'DIFFRACTION'
+        assert meta['nx_meta']['Microscope'] == 'MSED Titan'
+        assert meta['nx_meta']['Voltage'] == 300000.0
+        assert meta['nx_meta']['EELS']['Convergence semi-angle (mrad)'] == 10.0
+        assert meta['nx_meta']['EELS']['Spectrometer Aperture label'] == '2mm'
+        assert meta['nx_meta']['Spectrum Imaging']['Artefact Correction'] == \
+            'Spatial drift correction every 100 seconds'
+        assert meta['nx_meta']['Spectrum Imaging']['Pixel time (s)'] == 0.05
+
+        meta = digital_micrograph.get_dm3_metadata(self.files[
+                                                       '642_TECNAI_MAG'])
+        assert meta['nx_meta']['Data Type'] == 'TEM_Imaging'
+        assert meta['nx_meta']['Imaging Mode'] == 'IMAGING'
+        assert meta['nx_meta']['Microscope'] == 'MSED Titan'
+        assert meta['nx_meta']['Indicated Magnification'] == 8100.0
+        assert meta['nx_meta']['Tecnai User'] == 'MBK1'
+        assert meta['nx_meta']['Tecnai Mode'] == 'TEM uP SA Zoom Image'
 
     def test_643_dm3(self, monkeypatch):
         # monkeypatch so DM extractor thinks this file came from FEI Titan STEM
@@ -100,14 +132,92 @@ class TestDigitalMicrographExtractor:
         monkeypatch.setattr(digital_micrograph,
                             "_get_instr", mock_instr)
         meta = digital_micrograph.get_dm3_metadata(self.files['643_EFTEM_DIFF'])
+        assert meta['nx_meta']['Data Type'] == 'TEM_EFTEM_Diffraction'
+        assert meta['nx_meta']['DatasetType'] == 'Diffraction'
+        assert meta['nx_meta']['Imaging Mode'] == 'EFTEM DIFFRACTION'
+        assert meta['nx_meta']['Microscope'] == 'Titan80-300_D3094'
+        assert meta['nx_meta']['STEM Camera Length'] == 5.0
+        assert meta['nx_meta']['EELS']['Spectrometer Aperture label'] == '5 mm'
+
         meta = digital_micrograph.get_dm3_metadata(self.files['643_EELS_SI'])
+        assert meta['nx_meta']['Data Type'] == 'EELS_Spectrum_Imaging'
+        assert meta['nx_meta']['DatasetType'] == 'SpectrumImage'
+        assert meta['nx_meta']['Imaging Mode'] == 'DIFFRACTION'
+        assert meta['nx_meta']['Operation Mode'] == 'SCANNING'
+        assert meta['nx_meta']['STEM Camera Length'] == 60.0
+        assert meta['nx_meta']['EELS']['Convergence semi-angle (mrad)'] == 13.0
+        assert meta['nx_meta']['EELS']['Exposure (s)'] == 0.5
+        assert meta['nx_meta']['Spectrum Imaging']['Pixel time (s)'] == 0.5
+        assert meta['nx_meta']['Spectrum Imaging']['Scan Mode'] == 'LineScan'
+        assert meta['nx_meta']['Spectrum Imaging']['Acquisition Duration (s)'] \
+            == 605
+
         meta = digital_micrograph.get_dm3_metadata(
             self.files['643_EELS_PROC_INT_BG'])
+        assert meta['nx_meta']['Data Type'] == 'STEM_EELS'
+        assert meta['nx_meta']['DatasetType'] == 'Spectrum'
+        assert meta['nx_meta']['Analytic Signal'] == 'EELS'
+        assert meta['nx_meta']['Analytic Format'] == 'Image'
+        assert meta['nx_meta']['STEM Camera Length'] == 48.0
+        assert meta['nx_meta']['EELS']['Background Removal Model'] == \
+            'Power Law'
+        assert meta['nx_meta']['EELS']['Processing Steps'] == \
+            'Background Removal, Signal Integration'
+
         meta = digital_micrograph.get_dm3_metadata(
             self.files['643_EELS_PROC_THICK'])
+        assert meta['nx_meta']['Data Type'] == 'STEM_EELS'
+        assert meta['nx_meta']['DatasetType'] == 'Spectrum'
+        assert meta['nx_meta']['Analytic Signal'] == 'EELS'
+        assert meta['nx_meta']['Analytic Format'] == 'Spectrum'
+        assert meta['nx_meta']['STEM Camera Length'] == 60.0
+        assert meta['nx_meta']['EELS']['Exposure (s)'] == 0.05
+        assert meta['nx_meta']['EELS']['Integration time (s)'] == 0.25
+        assert meta['nx_meta']['EELS']['Processing Steps'] == \
+            'Calibrated Post-acquisition, Compute Thickness'
+        assert meta['nx_meta']['EELS']['Thickness (absolute) [nm]'] == \
+            pytest.approx(85.29884338378906, 0.1)
+
         meta = digital_micrograph.get_dm3_metadata(self.files['643_EDS_SI'])
+        assert meta['nx_meta']['Data Type'] == 'EDS_Spectrum_Imaging'
+        assert meta['nx_meta']['DatasetType'] == 'SpectrumImage'
+        assert meta['nx_meta']['Analytic Signal'] == 'X-ray'
+        assert meta['nx_meta']['Analytic Format'] == 'Spectrum image'
+        assert meta['nx_meta']['STEM Camera Length'] == 77.0
+        assert meta['nx_meta']['EDS']['Real time (SI Average)'] == \
+            pytest.approx(0.9696700292825698, 0.1)
+        assert meta['nx_meta']['EDS']['Live time (SI Average)'] == \
+            pytest.approx(0.9696700292825698, 0.1)
+        assert meta['nx_meta']['Spectrum Imaging']['Pixel time (s)'] == 1.0
+        assert meta['nx_meta']['Spectrum Imaging']['Scan Mode'] == 'LineScan'
+        assert meta['nx_meta']['Spectrum Imaging'][
+            'Spatial Sampling (Horizontal)'] == 100
+
         meta = digital_micrograph.get_dm3_metadata(self.files[
                                                        '643_EELS_SI_DRIFT'])
+        assert meta['nx_meta']['Data Type'] == 'EELS_Spectrum_Imaging'
+        assert meta['nx_meta']['DatasetType'] == 'SpectrumImage'
+        assert meta['nx_meta']['Analytic Signal'] == 'EELS'
+        assert meta['nx_meta']['Analytic Format'] == 'Spectrum image'
+        assert meta['nx_meta']['Analytic Acquisition Mode'] == 'Parallel ' \
+                                                               'dispersive'
+        assert meta['nx_meta']['STEM Camera Length'] == 100.0
+        assert meta['nx_meta']['EELS']['Exposure (s)'] == 0.5
+        assert meta['nx_meta']['EELS']['Number of frames'] == 1
+        assert meta['nx_meta']['Spectrum Imaging']['Acquisition Duration (s)']\
+            == 2173
+        assert meta['nx_meta']['Spectrum Imaging']['Artefact Correction'] == \
+            'Spatial drift correction every 1 row'
+        assert meta['nx_meta']['Spectrum Imaging']['Scan Mode'] == '2D Array'
+
+        meta = digital_micrograph.get_dm3_metadata(self.files['643_STEM_STACK'])
+        assert meta['nx_meta']['Data Type'] == 'STEM_Imaging'
+        assert meta['nx_meta']['DatasetType'] == 'Image'
+        assert meta['nx_meta']['Acquisition Device'] == 'DigiScan'
+        assert meta['nx_meta']['Cs(mm)'] == 1.0
+        assert meta['nx_meta']['Data Dimensions'] == '(12, 1024, 1024)'
+        assert meta['nx_meta']['Indicated Magnification'] == 7200000.0
+        assert meta['nx_meta']['STEM Camera Length'] == 100.0
 
     def test_jeol3010_dm3(self, monkeypatch):
         # monkeypatch so DM extractor thinks this file came from JEOL 3010
@@ -118,9 +228,19 @@ class TestDigitalMicrographExtractor:
                             "_get_instr", mock_instr)
 
         meta = digital_micrograph.get_dm3_metadata(self.files['JEOL3010_DIFF'])
+        assert meta['nx_meta']['Data Type'] == 'TEM_Diffraction'
+        assert meta['nx_meta']['DatasetType'] == 'Diffraction'
+        assert meta['nx_meta']['Acquisition Device'] == 'Orius '
+        assert meta['nx_meta']['Microscope'] == 'JEM3010 UHR'
+        assert meta['nx_meta']['Data Dimensions'] == '(2672, 4008)'
+        assert meta['nx_meta']['Facility'] == 'Microscopy Nexus'
+        assert meta['nx_meta']['Camera/Detector Processing'] == \
+            'Gain Normalized'
 
     def test_try_decimal(self):
         from nexusLIMS.extractors.digital_micrograph import _try_decimal
+        # this function should just return the input if it cannot be
+        # converted to a decimal
         assert 'bogus' == _try_decimal('bogus')
 
     def test_zero_data(self):
@@ -131,6 +251,26 @@ class TestDigitalMicrographExtractor:
         fname_1 = _zero_data_in_dm3(input_path, out_filename=None)
         fname_2 = _zero_data_in_dm3(input_path, out_filename=output_fname)
         fname_3 = _zero_data_in_dm3(input_path, compress=False)
+
+        # All three files should have been created
+        for f in [fname_1, fname_2, fname_3]:
+            assert os.path.isfile(f)
+
+        # The first two files should be compressed so data is smaller
+        assert os.path.getsize(input_path) > os.path.getsize(fname_1)
+        assert os.path.getsize(input_path) > os.path.getsize(fname_2)
+        # The last should be the same size
+        assert os.path.getsize(input_path) == os.path.getsize(fname_3)
+
+        meta_in = digital_micrograph.get_dm3_metadata(input_path)
+        meta_3 = digital_micrograph.get_dm3_metadata(fname_3)
+
+        # Creation times will be different, so remove that metadata
+        del meta_in['nx_meta']['Creation Time']
+        del meta_3['nx_meta']['Creation Time']
+
+        # All other metadata should be equal
+        assert meta_in == meta_3
 
         for f in [fname_1, fname_2, fname_3]:
             if os.path.isfile(f):
@@ -151,7 +291,8 @@ class TestQuantaExtractor:
         # test 'nx_meta' values of interest
         assert metadata['nx_meta']['Data Type'] == 'SEM_Imaging'
         assert metadata['nx_meta']['DatasetType'] == 'Image'
-        assert metadata['nx_meta']['Creation Time'] == '2019-03-26T16:42:24'
+        assert metadata['nx_meta']['Creation Time'] == \
+            '2019-03-26T16:42:24.234538'
         assert metadata['nx_meta']['warnings'] == [['Operator']]
 
         # test two values from each of the native sections
