@@ -1,62 +1,175 @@
 import os
 import tarfile
-from nexusLIMS.extractors.quanta_tif import get_quanta_metadata
-from nexusLIMS.extractors import digital_micrograph
-from nexusLIMS import instruments
 import pytest
+import numpy as np
+import matplotlib.pyplot as plt
+import hyperspy.api as hs
+import logging
+
+import nexusLIMS
+from nexusLIMS import instruments
+from nexusLIMS.extractors import digital_micrograph
+from nexusLIMS.extractors.quanta_tif import get_quanta_metadata
+from nexusLIMS.extractors import thumbnail_generator
+from nexusLIMS.extractors import parse_metadata, flatten_dict
+from nexusLIMS.extractors.thumbnail_generator import sig_to_thumbnail
+from nexusLIMS.extractors.thumbnail_generator import down_sample_image
+
+tars = \
+    {'CORRUPTED': 'test_corrupted.dm3.tar.gz',
+     'LIST_SIGNAL': 'list_signal_dataZeroed.dm3.tar.gz',
+     '643_EFTEM_DIFF': '643_EFTEM_DIFFRACTION_dataZeroed.dm3.tar.gz',
+     '643_EELS_SI': '643_Titan_EELS_SI_dataZeroed.dm3.tar.gz',
+     '643_EELS_PROC_THICK':
+         '643_Titan_EELS_proc_thickness_dataZeroed.dm3.tar.gz',
+     '643_EELS_PROC_INT_BG':
+         '643_Titan_EELS_proc_integrate_and_bg_dataZeroed.dm3.tar.gz',
+     '643_EELS_SI_DRIFT':
+         '643_Titan_EELS_SI_driftcorr_dataZeroed.dm3.tar.gz',
+     '643_EDS_SI': '643_Titan_EDS_SI_dataZeroed.dm4.tar.gz',
+     '643_STEM_STACK': '643_Titan_STEM_stack_dataZeroed.dm3.tar.gz',
+     '643_SURVEY': '643_Titan_survey_image_dataZeroed.dm3.tar.gz',
+     '642_STEM_DIFF': '642_Titan_STEM_DIFFRACTION_dataZeroed.dm3.tar.gz',
+     '642_OPMODE_DIFF':
+         '642_Titan_opmode_diffraction_dataZeroed.dm3.tar.gz',
+     '642_EELS_SI_DRIFT':
+         '642_Titan_EELS_SI_driftcorr_dataZeroed.dm3.tar.gz',
+     '642_EELS_PROC_1': '642_Titan_EELS_proc_1_dataZeroed.dm3.tar.gz',
+     '642_ANNOTATIONS':
+         '642_Titan_opmode_diffraction_dataZeroed_annotations.dm3.tar.gz',
+     '642_TECNAI_MAG': '642_Titan_Tecnai_mag_dataZeroed.dm3.tar.gz',
+     'JEOL3010_DIFF': 'JEOL3010_diffraction_dataZeroed.dm3.tar.gz',
+     'FFT': 'FFT.dm3.tar.gz',
+     'QUANTA_TIF': 'quad1image_001.tif.tar.gz',
+     'QUANTA_32BIT': 'quad1image_001_32bit.tif.tar.gz',
+     '4D_STEM': '4d_stem.hdf5.tar.gz',
+     'PARSE_META_642_TITAN': '01 - 13k - 30um obj.dm3.tar.gz'
+     }
+
+for name, f in tars.items():
+    tars[name] = os.path.join(os.path.dirname(__file__), 'files', f)
+
+files = {}
+for k, v in tars.items():
+    files[k] = v.strip('.tar.gz')
+
+
+def setup_module():
+    """
+    Setup by extracting the compressed test files
+    """
+    for _, tarf in tars.items():
+        with tarfile.open(tarf, 'r:gz') as tar:
+            tar.extractall(path=os.path.dirname(tarf))
+
+
+def teardown_module():
+    """
+    Teardown by deleting the extracted test files
+    """
+    for _, fn in files.items():
+        os.remove(fn)
+
+
+@pytest.fixture
+def mock_nexus_path(monkeypatch):
+    monkeypatch.setattr(nexusLIMS,
+                        "mmf_nexus_root_path",
+                        os.path.join(os.path.dirname(__file__), 'files'))
+    monkeypatch.setattr(nexusLIMS,
+                        "nexuslims_root_path",
+                        os.path.join(os.path.dirname(__file__), 'files'))
+
+
+class TestExtractorModule:
+    def test_parse_metadata_642_titan(self, mock_nexus_path):
+        meta, thumb_fname = parse_metadata(fname=files['PARSE_META_642_TITAN'])
+        assert meta['nx_meta']['Acquisition Device'] == 'BM-UltraScan'
+        assert meta['nx_meta']['Actual Magnification'] == 17677.0
+        assert meta['nx_meta']['Cs(mm)'] == 1.2
+        assert meta['nx_meta']['Data Dimensions'] == '(2048, 2048)'
+        assert meta['nx_meta']['Data Type'] == 'TEM_Imaging'
+        assert meta['nx_meta']['DatasetType'] == 'Image'
+        assert len(meta['nx_meta']['warnings']) == 0
+
+        os.remove(thumb_fname)
+        os.remove(thumb_fname.replace('thumb.png', 'json'))
+
+    def test_parse_metadata_list_signal(self, mock_nexus_path):
+        meta, thumb_fname = parse_metadata(fname=files['LIST_SIGNAL'])
+        assert meta['nx_meta']['Acquisition Device'] == 'DigiScan'
+        assert meta['nx_meta']['STEM Camera Length'] == 77.0
+        assert meta['nx_meta']['Cs(mm)'] == 1.0
+        assert meta['nx_meta']['Data Dimensions'] == '(512, 512)'
+        assert meta['nx_meta']['Data Type'] == 'STEM_Imaging'
+        assert meta['nx_meta']['DatasetType'] == 'Image'
+        assert len(meta['nx_meta']['warnings']) == 0
+
+        os.remove(thumb_fname)
+        os.remove(thumb_fname.replace('thumb.png', 'json'))
+
+    def test_parse_metadata_overwrite_false(self, mock_nexus_path, caplog):
+        thumb_fname = files['LIST_SIGNAL'] + '.thumb.png'
+        # create the thumbnail file so we can't overwrite
+        open(thumb_fname, 'a').close()
+        nexusLIMS.extractors._logger.setLevel(logging.INFO)
+        meta, thumb_fname = parse_metadata(fname=files['LIST_SIGNAL'],
+                                           overwrite=False)
+        assert 'Preview already exists' in caplog.text
+        os.remove(thumb_fname)
+        os.remove(thumb_fname.replace('thumb.png', 'json'))
+
+    def test_parse_metadata_quanta(self, mock_nexus_path, monkeypatch):
+        def mock_instr(_):
+            return instruments.instrument_db['FEI-Quanta200-ESEM-633137']
+        monkeypatch.setattr(nexusLIMS.extractors,
+                            "_get_instr", mock_instr)
+
+        meta, thumb_fname = parse_metadata(fname=files['QUANTA_TIF'])
+        os.remove(thumb_fname)
+        os.remove(thumb_fname.replace('thumb.png', 'json'))
+
+    def test_parse_metadata_tif_other_instr(self, mock_nexus_path, monkeypatch):
+        def mock_instr(_):
+            return None
+        monkeypatch.setattr(nexusLIMS.extractors,
+                            "_get_instr", mock_instr)
+
+        meta, thumb_fname = parse_metadata(fname=files['QUANTA_TIF'])
+        os.remove(thumb_fname)
+        os.remove(thumb_fname.replace('thumb.png', 'json'))
+
+    def test_parse_metadata_no_dataset_type(self, mock_nexus_path, monkeypatch):
+        monkeypatch.setitem(nexusLIMS.extractors.extension_reader_map,
+                            'tif', lambda x: {'nx_meta': {'key': 'val'}})
+
+        meta, thumb_fname = parse_metadata(fname=files['QUANTA_TIF'])
+        assert meta['nx_meta']['DatasetType'] == 'Misc'
+        assert meta['nx_meta']['Data Type'] == 'Miscellaneous'
+        assert meta['nx_meta']['key'] == 'val'
+
+        os.remove(thumb_fname)
+        os.remove(thumb_fname.replace('thumb.png', 'json'))
+
+    def test_flatten_dict(self):
+        dict_to_flatten = {
+            'level1.1': 'level1.1v',
+            'level1.2': {
+                'level2.1': 'level2.1v'
+            }
+        }
+
+        flattened = flatten_dict(dict_to_flatten)
+        assert flattened == {
+            'level1.1': 'level1.1v',
+            'level1.2 level2.1': 'level2.1v'
+        }
 
 
 class TestDigitalMicrographExtractor:
-    tars = \
-        {'CORRUPTED': 'test_corrupted.dm3.tar.gz',
-         'LIST_SIGNAL': 'list_signal_dataZeroed.dm3.tar.gz',
-         '643_EFTEM_DIFF': '643_EFTEM_DIFFRACTION_dataZeroed.dm3.tar.gz',
-         '643_EELS_SI': '643_Titan_EELS_SI_dataZeroed.dm3.tar.gz',
-         '643_EELS_PROC_THICK':
-             '643_Titan_EELS_proc_thickness_dataZeroed.dm3.tar.gz',
-         '643_EELS_PROC_INT_BG':
-             '643_Titan_EELS_proc_integrate_and_bg_dataZeroed.dm3.tar.gz',
-         '643_EELS_SI_DRIFT':
-             '643_Titan_EELS_SI_driftcorr_dataZeroed.dm3.tar.gz',
-         '643_EDS_SI': '643_Titan_EDS_SI_dataZeroed.dm4.tar.gz',
-         '643_STEM_STACK': '643_Titan_STEM_stack_dataZeroed.dm3.tar.gz',
-         '642_STEM_DIFF': '642_Titan_STEM_DIFFRACTION_dataZeroed.dm3.tar.gz',
-         '642_OPMODE_DIFF':
-             '642_Titan_opmode_diffraction_dataZeroed.dm3.tar.gz',
-         '642_EELS_SI_DRIFT':
-             '642_Titan_EELS_SI_driftcorr_dataZeroed.dm3.tar.gz',
-         '642_EELS_PROC_1': '642_Titan_EELS_proc_1_dataZeroed.dm3.tar.gz',
-         '642_TECNAI_MAG': '642_Titan_Tecnai_mag_dataZeroed.dm3.tar.gz',
-         'JEOL3010_DIFF': 'JEOL3010_diffraction_dataZeroed.dm3.tar.gz'
-         }
-
-    for name, f in tars.items():
-        tars[name] = os.path.join(os.path.dirname(__file__), 'files', f)
-
-    files = {}
-    for k, v in tars.items():
-        files[k] = v.strip('.tar.gz')
-
-    @classmethod
-    def setup_class(cls):
-        """
-        Setup the class by extracting the compressed test files
-        """
-        for name, tarf in cls.tars.items():
-            with tarfile.open(tarf, 'r:gz') as tar:
-                tar.extractall(path=os.path.dirname(tarf))
-
-    @classmethod
-    def teardown_class(cls):
-        """
-        Teardown the class by deleting the extracted test files
-        """
-        for name, f in cls.files.items():
-            os.remove(f)
-
     def test_corrupted_file(self):
         assert digital_micrograph.get_dm3_metadata(
-            self.files['CORRUPTED']) is None
+            files['CORRUPTED']) is None
 
     def test_dm3_list_file(self, monkeypatch):
         # monkeypatch so DM extractor thinks this file came from FEI Titan TEM
@@ -66,7 +179,7 @@ class TestDigitalMicrographExtractor:
                             "_get_instr", mock_instr)
 
         metadata = digital_micrograph.get_dm3_metadata(
-            self.files['LIST_SIGNAL'])
+            files['LIST_SIGNAL'])
 
         assert metadata['nx_meta']['Data Type'] == 'STEM_Imaging'
         assert metadata['nx_meta']['Imaging Mode'] == 'DIFFRACTION'
@@ -80,21 +193,20 @@ class TestDigitalMicrographExtractor:
         monkeypatch.setattr(digital_micrograph,
                             "_get_instr", mock_instr)
 
-        meta = digital_micrograph.get_dm3_metadata(self.files['642_STEM_DIFF'])
+        meta = digital_micrograph.get_dm3_metadata(files['642_STEM_DIFF'])
         assert meta['nx_meta']['Data Type'] == 'STEM_Diffraction'
         assert meta['nx_meta']['Imaging Mode'] == 'DIFFRACTION'
         assert meta['nx_meta']['Microscope'] == 'MSED Titan'
         assert meta['nx_meta']['Voltage'] == 300000.0
 
-        meta = digital_micrograph.get_dm3_metadata(self.files[
+        meta = digital_micrograph.get_dm3_metadata(files[
                                                        '642_OPMODE_DIFF'])
         assert meta['nx_meta']['Data Type'] == 'TEM_Diffraction'
         assert meta['nx_meta']['Imaging Mode'] == 'DIFFRACTION'
         assert meta['nx_meta']['Microscope'] == 'MSED Titan'
         assert meta['nx_meta']['Voltage'] == 300000.0
 
-        meta = digital_micrograph.get_dm3_metadata(self.files[
-                                                       '642_EELS_PROC_1'])
+        meta = digital_micrograph.get_dm3_metadata(files['642_EELS_PROC_1'])
         assert meta['nx_meta']['Data Type'] == 'STEM_EELS'
         assert meta['nx_meta']['Imaging Mode'] == 'DIFFRACTION'
         assert meta['nx_meta']['Microscope'] == 'MSED Titan'
@@ -103,8 +215,7 @@ class TestDigitalMicrographExtractor:
             'Aligned parent SI By Peak, Extracted from SI'
         assert meta['nx_meta']['EELS']['Spectrometer Aperture label'] == '2mm'
 
-        meta = digital_micrograph.get_dm3_metadata(self.files[
-                                                       '642_EELS_SI_DRIFT'])
+        meta = digital_micrograph.get_dm3_metadata(files['642_EELS_SI_DRIFT'])
         assert meta['nx_meta']['Data Type'] == 'EELS_Spectrum_Imaging'
         assert meta['nx_meta']['Imaging Mode'] == 'DIFFRACTION'
         assert meta['nx_meta']['Microscope'] == 'MSED Titan'
@@ -115,8 +226,7 @@ class TestDigitalMicrographExtractor:
             'Spatial drift correction every 100 seconds'
         assert meta['nx_meta']['Spectrum Imaging']['Pixel time (s)'] == 0.05
 
-        meta = digital_micrograph.get_dm3_metadata(self.files[
-                                                       '642_TECNAI_MAG'])
+        meta = digital_micrograph.get_dm3_metadata(files['642_TECNAI_MAG'])
         assert meta['nx_meta']['Data Type'] == 'TEM_Imaging'
         assert meta['nx_meta']['Imaging Mode'] == 'IMAGING'
         assert meta['nx_meta']['Microscope'] == 'MSED Titan'
@@ -131,7 +241,7 @@ class TestDigitalMicrographExtractor:
 
         monkeypatch.setattr(digital_micrograph,
                             "_get_instr", mock_instr)
-        meta = digital_micrograph.get_dm3_metadata(self.files['643_EFTEM_DIFF'])
+        meta = digital_micrograph.get_dm3_metadata(files['643_EFTEM_DIFF'])
         assert meta['nx_meta']['Data Type'] == 'TEM_EFTEM_Diffraction'
         assert meta['nx_meta']['DatasetType'] == 'Diffraction'
         assert meta['nx_meta']['Imaging Mode'] == 'EFTEM DIFFRACTION'
@@ -139,7 +249,7 @@ class TestDigitalMicrographExtractor:
         assert meta['nx_meta']['STEM Camera Length'] == 5.0
         assert meta['nx_meta']['EELS']['Spectrometer Aperture label'] == '5 mm'
 
-        meta = digital_micrograph.get_dm3_metadata(self.files['643_EELS_SI'])
+        meta = digital_micrograph.get_dm3_metadata(files['643_EELS_SI'])
         assert meta['nx_meta']['Data Type'] == 'EELS_Spectrum_Imaging'
         assert meta['nx_meta']['DatasetType'] == 'SpectrumImage'
         assert meta['nx_meta']['Imaging Mode'] == 'DIFFRACTION'
@@ -153,7 +263,7 @@ class TestDigitalMicrographExtractor:
             == 605
 
         meta = digital_micrograph.get_dm3_metadata(
-            self.files['643_EELS_PROC_INT_BG'])
+            files['643_EELS_PROC_INT_BG'])
         assert meta['nx_meta']['Data Type'] == 'STEM_EELS'
         assert meta['nx_meta']['DatasetType'] == 'Spectrum'
         assert meta['nx_meta']['Analytic Signal'] == 'EELS'
@@ -164,8 +274,7 @@ class TestDigitalMicrographExtractor:
         assert meta['nx_meta']['EELS']['Processing Steps'] == \
             'Background Removal, Signal Integration'
 
-        meta = digital_micrograph.get_dm3_metadata(
-            self.files['643_EELS_PROC_THICK'])
+        meta = digital_micrograph.get_dm3_metadata(files['643_EELS_PROC_THICK'])
         assert meta['nx_meta']['Data Type'] == 'STEM_EELS'
         assert meta['nx_meta']['DatasetType'] == 'Spectrum'
         assert meta['nx_meta']['Analytic Signal'] == 'EELS'
@@ -178,7 +287,7 @@ class TestDigitalMicrographExtractor:
         assert meta['nx_meta']['EELS']['Thickness (absolute) [nm]'] == \
             pytest.approx(85.29884338378906, 0.1)
 
-        meta = digital_micrograph.get_dm3_metadata(self.files['643_EDS_SI'])
+        meta = digital_micrograph.get_dm3_metadata(files['643_EDS_SI'])
         assert meta['nx_meta']['Data Type'] == 'EDS_Spectrum_Imaging'
         assert meta['nx_meta']['DatasetType'] == 'SpectrumImage'
         assert meta['nx_meta']['Analytic Signal'] == 'X-ray'
@@ -193,8 +302,7 @@ class TestDigitalMicrographExtractor:
         assert meta['nx_meta']['Spectrum Imaging'][
             'Spatial Sampling (Horizontal)'] == 100
 
-        meta = digital_micrograph.get_dm3_metadata(self.files[
-                                                       '643_EELS_SI_DRIFT'])
+        meta = digital_micrograph.get_dm3_metadata(files['643_EELS_SI_DRIFT'])
         assert meta['nx_meta']['Data Type'] == 'EELS_Spectrum_Imaging'
         assert meta['nx_meta']['DatasetType'] == 'SpectrumImage'
         assert meta['nx_meta']['Analytic Signal'] == 'EELS'
@@ -210,7 +318,7 @@ class TestDigitalMicrographExtractor:
             'Spatial drift correction every 1 row'
         assert meta['nx_meta']['Spectrum Imaging']['Scan Mode'] == '2D Array'
 
-        meta = digital_micrograph.get_dm3_metadata(self.files['643_STEM_STACK'])
+        meta = digital_micrograph.get_dm3_metadata(files['643_STEM_STACK'])
         assert meta['nx_meta']['Data Type'] == 'STEM_Imaging'
         assert meta['nx_meta']['DatasetType'] == 'Image'
         assert meta['nx_meta']['Acquisition Device'] == 'DigiScan'
@@ -227,7 +335,7 @@ class TestDigitalMicrographExtractor:
         monkeypatch.setattr(digital_micrograph,
                             "_get_instr", mock_instr)
 
-        meta = digital_micrograph.get_dm3_metadata(self.files['JEOL3010_DIFF'])
+        meta = digital_micrograph.get_dm3_metadata(files['JEOL3010_DIFF'])
         assert meta['nx_meta']['Data Type'] == 'TEM_Diffraction'
         assert meta['nx_meta']['DatasetType'] == 'Diffraction'
         assert meta['nx_meta']['Acquisition Device'] == 'Orius '
@@ -253,8 +361,8 @@ class TestDigitalMicrographExtractor:
         fname_3 = _zero_data_in_dm3(input_path, compress=False)
 
         # All three files should have been created
-        for f in [fname_1, fname_2, fname_3]:
-            assert os.path.isfile(f)
+        for fn in [fname_1, fname_2, fname_3]:
+            assert os.path.isfile(fn)
 
         # The first two files should be compressed so data is smaller
         assert os.path.getsize(input_path) > os.path.getsize(fname_1)
@@ -272,14 +380,13 @@ class TestDigitalMicrographExtractor:
         # All other metadata should be equal
         assert meta_in == meta_3
 
-        for f in [fname_1, fname_2, fname_3]:
-            if os.path.isfile(f):
-                os.remove(f)
+        for fn in [fname_1, fname_2, fname_3]:
+            if os.path.isfile(fn):
+                os.remove(fn)
 
 
 class TestQuantaExtractor:
-    QUANTA_TEST_FILE = os.path.join(os.path.dirname(__file__),
-                                    "files", "quad1image_001.tif")
+    QUANTA_TEST_FILE = files['QUANTA_TIF']
     QUANTA_BAD_MDATA = os.path.join(os.path.dirname(__file__),
                                     "files", "quanta_bad_metadata.tif")
     QUANTA_MODDED_MDATA = os.path.join(os.path.dirname(__file__),
@@ -291,8 +398,6 @@ class TestQuantaExtractor:
         # test 'nx_meta' values of interest
         assert metadata['nx_meta']['Data Type'] == 'SEM_Imaging'
         assert metadata['nx_meta']['DatasetType'] == 'Image'
-        assert metadata['nx_meta']['Creation Time'] == \
-            '2019-03-26T16:42:24.234538'
         assert metadata['nx_meta']['warnings'] == [['Operator']]
 
         # test two values from each of the native sections
@@ -334,10 +439,177 @@ class TestQuantaExtractor:
         # test 'nx_meta' values of interest
         assert metadata['nx_meta']['Data Type'] == 'SEM_Imaging'
         assert metadata['nx_meta']['DatasetType'] == 'Image'
-        assert metadata['nx_meta']['Creation Time'] == '2020-02-20T00:52:55'
         assert metadata['nx_meta']['warnings'] == [['Operator']]
 
         assert metadata['nx_meta']['Scan Rotation (°)'] == 179.9947
         assert metadata['nx_meta']['Tilt Correction Angle'] == 0.0121551
         assert metadata['nx_meta']['Specimen Temperature (K)'] == 'j'
         assert len(metadata['nx_meta']['Chamber Pressure (mPa)']) == 7000
+
+
+class TestThumbnailGenerator:
+    @classmethod
+    def setup_class(cls):
+        cls.s = hs.datasets.example_signals.EDS_TEM_Spectrum()
+        cls.oned_s = hs.stack([cls.s * i for i in np.arange(.1, 1, .3)],
+                              new_axis_name='x')
+        cls.twod_s = hs.stack([cls.oned_s * i for i in np.arange(.1, 1, .3)],
+                              new_axis_name='y')
+        cls.threed_s = hs.stack([cls.twod_s * i for i in
+                                np.arange(.1, 1, .3)], new_axis_name='z')
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_0d_spectrum(self):
+        self.s.metadata.General.title = 'Dummy spectrum'
+        fig = sig_to_thumbnail(self.s, 'output.png')
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_1d_spectrum_image(self):
+        self.oned_s.metadata.General.title = 'Dummy line scan'
+        fig = sig_to_thumbnail(self.oned_s, f'output.png')
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_2d_spectrum_image(self):
+        self.twod_s.metadata.General.title = 'Dummy 2D spectrum image'
+        fig = sig_to_thumbnail(self.twod_s, f'output.png')
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_2d_spectrum_image_nav_under_9(self):
+        self.twod_s.metadata.General.title = 'Dummy 2D spectrum image'
+        fig = sig_to_thumbnail(self.twod_s.inav[:2,:2], f'output.png',)
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_3d_spectrum_image(self):
+        self.threed_s.metadata.General.title = 'Dummy 3D spectrum image'
+        fig = sig_to_thumbnail(self.threed_s, f'output.png')
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_single_image(self):
+        fig = sig_to_thumbnail(hs.load(files['643_EFTEM_DIFF']), f'output.png')
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_single_not_dm3_image(self):
+        s = hs.load(files['643_EFTEM_DIFF'])
+        s.metadata.General.original_filename = 'not dm3'
+        fig = sig_to_thumbnail(s, f'output.png')
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_image_stack(self):
+        fig = sig_to_thumbnail(hs.load(files['643_STEM_STACK']), f'output.png')
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_4d_stem_type(self):
+        fig = sig_to_thumbnail(hs.load(files['4D_STEM']), f'output.png')
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_4d_stem_type_1(self):
+        # nav size >= 4 but < 9
+        fig = sig_to_thumbnail(hs.load(files['4D_STEM']).inav[:2, :3],
+                               f'output.png')
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_4d_stem_type_2(self):
+        # nav size = 1
+        fig = sig_to_thumbnail(hs.load(files['4D_STEM']).inav[:1, :2],
+                               f'output.png')
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_complex_image(self):
+        fig = sig_to_thumbnail(hs.load(files['FFT']), f'output.png')
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_higher_dimensional_signal(self):
+        dict0 = {'size': 10, 'name': 'nav axis 3', 'units': 'nm',
+                 'scale': 2, 'offset': 0}
+        dict1 = {'size': 10, 'name': 'nav axis 2', 'units': 'pm',
+                 'scale': 200, 'offset': 0}
+        dict2 = {'size': 10, 'name': 'nav axis 1', 'units': 'mm',
+                 'scale': 0.02, 'offset': 0}
+        dict3 = {'size': 10, 'name': 'sig axis 3', 'units': 'eV',
+                 'scale': 100, 'offset': 0}
+        dict4 = {'size': 10, 'name': 'sig axis 2', 'units': 'Hz',
+                 'scale': 0.2121, 'offset': 0}
+        dict5 = {'size': 10, 'name': 'sig axis 1', 'units': 'radians',
+                 'scale': 0.314, 'offset': 0}
+        s = hs.signals.BaseSignal(np.zeros((10, 10, 10, 10, 10, 10),
+                                           dtype=int),
+                                  axes=[dict0, dict1, dict2, dict3, dict4,
+                                        dict5])
+        s = s.transpose(navigation_axes=3)
+        s.metadata.General.title = 'Signal with higher-order dimensionality'
+        fig = sig_to_thumbnail(s, f'output.png')
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_survey_image(self):
+        fig = sig_to_thumbnail(hs.load(files['643_SURVEY']), f'output.png')
+        os.remove('output.png')
+        return fig
+
+    def test_annotation_error(self, monkeypatch):
+        def monkey_get_annotation(a, b):
+            raise ValueError("Mocked error for testing")
+        monkeypatch.setattr(thumbnail_generator,
+                            "_get_markers_dict", monkey_get_annotation)
+        thumbnail_generator.add_annotation_markers(hs.load(files['643_SURVEY']))
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_annotations(self):
+        fig = sig_to_thumbnail(hs.load(files['642_ANNOTATIONS']), f'output.png')
+        os.remove('output.png')
+        return fig
+
+    def test_downsample_image_errors(self):
+        with pytest.raises(ValueError):
+            # providing neither output size and factor should raise an error
+            down_sample_image('', '')
+
+        with pytest.raises(ValueError):
+            # providing both output size and factor should raise an error
+            down_sample_image('', '', output_size=(20, 20), factor=5)
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_downsample_image_factor(self):
+        fig = down_sample_image(TestQuantaExtractor.QUANTA_TEST_FILE,
+                                'output.png', factor=3)
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_downsample_image_32_bit(self):
+        fig = down_sample_image(files['QUANTA_32BIT'],
+                                'output.png', factor=2)
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_downsample_image_output_size(self):
+        fig = down_sample_image(TestQuantaExtractor.QUANTA_TEST_FILE,
+                                'output.png', output_size=(500, 500))
+        os.remove('output.png')
+        return fig

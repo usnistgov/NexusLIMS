@@ -450,12 +450,17 @@ def sig_to_thumbnail(s, out_path, dpi=92):
     dpi : int
         The "dots per inch" resolution for the outputted figure
 
+    Returns
+    -------
+    f : :py:class:`matplotlib.figure.Figure`
+        Handle to a matplotlib Figure
+
     Notes
     -----
     This method heavily utilizes HyperSpy's existing plotting functions to
     figure out how to best display the image
     """
-    def _set_extent_save_and_close():
+    def _set_extent_and_save():
         _set_title(ax, s.metadata.General.title)
         items = [ax, ax.title, ax.xaxis.label, ax.yaxis.label]
         for labels in _get_visible_labels(ax):
@@ -463,7 +468,10 @@ def sig_to_thumbnail(s, out_path, dpi=92):
         extent = _full_extent(ax, items, pad=0.05).transformed(
             ax.figure.dpi_scale_trans.inverted())
         f.savefig(out_path, bbox_inches=extent, dpi=dpi)
-        _plt.close(f)
+        _pad_to_square(out_path, 500)
+        # _plt.close(f)
+
+    _plt.rcParams['image.cmap'] = 'gray'
 
     # Processing 1D signals (spectra, spectrum images, etc)
     if isinstance(s, _hsapi.signals.Signal1D):
@@ -475,7 +483,8 @@ def sig_to_thumbnail(s, out_path, dpi=92):
             ax = f.get_axes()[0]
             # Change line color to matplotlib default
             ax.get_lines()[0].set_color(_plt.get_cmap('tab10')(0))
-            _set_extent_save_and_close()
+            _set_extent_and_save()
+            return f
         # signal is 1D linescan
         elif s.axes_manager.navigation_dimension == 1:
             s.plot()
@@ -483,7 +492,8 @@ def sig_to_thumbnail(s, out_path, dpi=92):
             f = s._plot.navigator_plot.figure
             f.get_axes()[1].remove()            # remove colorbar scale
             ax = f.get_axes()[0]
-            _set_extent_save_and_close()
+            _set_extent_and_save()
+            return f
         elif s.axes_manager.navigation_dimension > 1:
             nav_size = s.axes_manager.navigation_size
             if nav_size >= 9:
@@ -529,7 +539,8 @@ def sig_to_thumbnail(s, out_path, dpi=92):
             # Pack figure and save
             f.tight_layout()
             f.savefig(out_path, dpi=dpi)
-            _plt.close(f)
+            _pad_to_square(out_path, 500)
+            return f
 
     # Signal is an image of some sort, so we'll use hs.plot.plot_images
     elif isinstance(s, _hsapi.signals.Signal2D):
@@ -552,7 +563,9 @@ def sig_to_thumbnail(s, out_path, dpi=92):
             _set_title(ax, s.metadata.General.title)
             f.tight_layout()
             f.savefig(out_path, dpi=dpi)
-            _plt.close(f)
+            _pad_to_square(out_path, 500)
+            return f
+
         # we're looking at an image stack
         elif s.axes_manager.navigation_dimension == 1:
             _plt.figure()
@@ -570,7 +583,9 @@ def sig_to_thumbnail(s, out_path, dpi=92):
             extent = _full_extent(ax, [ax, ax.title], pad=0.1).transformed(
                 ax.figure.dpi_scale_trans.inverted())
             ax.figure.savefig(out_path, bbox_inches=extent, dpi=300)
-            _plt.close(ax.figure)
+            _pad_to_square(out_path, 500)
+            return ax.figure
+
         # This is a 4D-STEM type image, so display as tableau
         elif s.axes_manager.navigation_dimension == 2:
             asp_ratio = s.axes_manager.signal_shape[
@@ -590,8 +605,11 @@ def sig_to_thumbnail(s, out_path, dpi=92):
             s.unfold_navigation_space()
             chunk_size = s.axes_manager.navigation_size // num_to_plot
             for i in range(num_to_plot):
-                im_list[i] = s.inav[i * chunk_size:
-                                    (i+1) * chunk_size].inav[chunk_size//2]
+                if square_n == 1:
+                    im_list =[s]
+                else:
+                    im_list[i] = s.inav[i * chunk_size:
+                                        (i+1) * chunk_size].inav[chunk_size//2]
             axlist = _hsapi.plot.plot_images(im_list, colorbar=None,
                                              axes_decor='off',
                                              tight_layout=True, scalebar=[0],
@@ -612,7 +630,8 @@ def sig_to_thumbnail(s, out_path, dpi=92):
                                  f.texts[0].get_window_extent().transformed(
                                      f.transFigure.inverted()).bounds[1]))
             f.savefig(out_path, dpi=dpi)
-            _plt.close(f)
+            _pad_to_square(out_path, 500)
+            return f
 
     # Complex image, so plot power spectrum (like an FFT)
     elif isinstance(s, _hsapi.signals.ComplexSignal2D):
@@ -626,7 +645,8 @@ def sig_to_thumbnail(s, out_path, dpi=92):
         extent = _full_extent(ax, [ax, ax.title], pad=0.1).transformed(
                               ax.figure.dpi_scale_trans.inverted())
         f.savefig(out_path, dpi=dpi, bbox_inches=extent)
-        _plt.close(f)
+        _pad_to_square(out_path, 500)
+        return f
 
     # if we have a different type of signal, just output a graphical
     # representation of the axis manager
@@ -654,9 +674,8 @@ def sig_to_thumbnail(s, out_path, dpi=92):
             ax.figure.dpi_scale_trans.inverted())
 
         f.savefig(out_path, bbox_inches=extent, dpi=300)
-
-    # regardless of how figure was created, make sure it is 500x500
-    _pad_to_square(out_path, 500)
+        _pad_to_square(out_path, 500)
+        return f
 
 
 def down_sample_image(fname, out_path, output_size=None, factor=None):
@@ -703,3 +722,9 @@ def down_sample_image(fname, out_path, output_size=None, factor=None):
     im.thumbnail(resized, resample=_LANCZOS)
     im.save(out_path)
     _pad_to_square(out_path, new_width=500)
+
+    _plt.rcParams['image.cmap'] = 'gray'
+    f = _plt.figure()
+    f.gca().imshow(im)
+
+    return f
