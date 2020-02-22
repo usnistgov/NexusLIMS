@@ -15,6 +15,7 @@ while test $# -ge 1; do
       echo "options:"
       echo "-h, --help                     show brief help"
       echo "-r, --run-tests                run test suite"
+      echo "-rb                            run record builder tests"
       echo "-g, --generate-test-figs       generate figures for mpl tests instead of running tests"
       exit 0
       ;;
@@ -34,6 +35,18 @@ while test $# -ge 1; do
       pipenv run pytest mdcs/nexusLIMS/nexusLIMS/tests \
         -k "test_extractors or test_calendar_handling \\
             or test_instruments or test_version" \
+        --cov=mdcs/nexusLIMS/nexusLIMS \
+        --cov-report html:/home/miclims/NexusMicroscopyLIMS/htmlcov \
+        --mpl --mpl-baseline-path=mdcs/nexusLIMS/nexusLIMS/tests/files/figs
+      break
+      ;;
+    -rb)
+      echo "Removing previous coverage reports..."
+      rm -rf htmlcov/*
+      rm .coverage
+      echo "Running record builder test suite with coverage..."
+      pipenv run pytest mdcs/nexusLIMS/nexusLIMS/tests \
+        -k "test_records" \
         --cov=mdcs/nexusLIMS/nexusLIMS \
         --cov-report html:/home/miclims/NexusMicroscopyLIMS/htmlcov \
         --mpl --mpl-baseline-path=mdcs/nexusLIMS/nexusLIMS/tests/files/figs

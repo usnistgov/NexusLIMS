@@ -43,22 +43,30 @@ _logging.basicConfig()
 _logger = _logging.getLogger(__name__)
 _logger.setLevel(_logging.INFO)
 
-# assuming there's only one workspace for this user (that is the public
-# workspace)
-_endpoint = _urljoin(_cdcs_url, 'rest/workspace/read_access')
-_r = _nx_req(_endpoint, _requests.get, basic_auth=True)
-if _r.status_code == 401:
-    raise _authError('Could not authenticate to CDCS. Are the nexusLIMS_user '
-                     'and nexusLIMS_pass environment variables set correctly?')
-workspace_id = _r.json()[0]['id']
 
-# get the current template (XSD) id value:
-_endpoint = _urljoin(_cdcs_url, 'rest/template-version-manager/global')
-_r = _nx_req(_endpoint, _requests.get, basic_auth=True)
-if _r.status_code == 401:
-    raise _authError('Could not authenticate to CDCS. Are the nexusLIMS_user '
-                     'and nexusLIMS_pass environment variables set correctly?')
-template_id = _r.json()[0]['current']
+def get_workspace_id():
+    # assuming there's only one workspace for this user (that is the public
+    # workspace)
+    _endpoint = _urljoin(_cdcs_url, 'rest/workspace/read_access')
+    _r = _nx_req(_endpoint, _requests.get, basic_auth=True)
+    if _r.status_code == 401:
+        raise _authError('Could not authenticate to CDCS. Are the '
+                         'nexusLIMS_user and nexusLIMS_pass environment '
+                         'variables set correctly?')
+    workspace_id = _r.json()[0]['id']
+    return workspace_id
+
+
+def get_template_id():
+    # get the current template (XSD) id value:
+    _endpoint = _urljoin(_cdcs_url, 'rest/template-version-manager/global')
+    _r = _nx_req(_endpoint, _requests.get, basic_auth=True)
+    if _r.status_code == 401:
+        raise _authError('Could not authenticate to CDCS. Are the '
+                         'nexusLIMS_user and nexusLIMS_pass environment '
+                         'variables set correctly?')
+    template_id = _r.json()[0]['current']
+    return template_id
 
 
 def upload_record_content(xml_content, title):
@@ -81,7 +89,7 @@ def upload_record_content(xml_content, title):
     endpoint = _urljoin(_cdcs_url, 'rest/data/')
 
     payload = {
-        'template': template_id,
+        'template': get_template_id(),
         'title': title,
         'xml_content': xml_content
     }
@@ -97,7 +105,8 @@ def upload_record_content(xml_content, title):
     # assign this record to the public workspace
     record_id = post_r.json()['id']
     wrk_endpoint = _urljoin(_cdcs_url,
-                            f'rest/data/{record_id}/assign/{workspace_id}')
+                            f'rest/data/{record_id}/assign/'
+                            f'{get_workspace_id()}')
 
     r = _nx_req(wrk_endpoint, _requests.patch, basic_auth=True)
 

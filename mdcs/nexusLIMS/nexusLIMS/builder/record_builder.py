@@ -53,6 +53,7 @@ from nexusLIMS.utils import parse_xml as _parse_xml
 from nexusLIMS.utils import find_files_by_mtime as _find_files
 from nexusLIMS.extractors import extension_reader_map as _ext
 from nexusLIMS.db import session_handler as _session_handler
+from nexusLIMS.db.session_handler import get_sessions_to_build as _get_sessions
 from nexusLIMS.cdcs import upload_record_files as _upload_record_files
 from timeit import default_timer as _timer
 
@@ -359,15 +360,14 @@ def build_new_session_records():
         centralized storage
     """
     # get the list of sessions with 'WAITING_TO_BE_BUILT' status
-    sessions = _session_handler.get_sessions_to_build()
+    sessions = _get_sessions()
     xml_files = []
     # loop through the sessions
     for s in sessions:
         try:
             s.insert_record_generation_event()
             record_text = build_record(instrument=s.instrument,
-                                       dt_from=s.dt_from, dt_to=s.dt_to,
-                                       generate_previews=True)
+                                       dt_from=s.dt_from, dt_to=s.dt_to)
         except (FileNotFoundError, Exception) as e:
             if isinstance(e, FileNotFoundError):
                 # if no files were found for this session log, mark it as so in
@@ -420,8 +420,12 @@ def process_new_records():
     xml_files = build_new_session_records()
     files_uploaded = _upload_record_files(xml_files)
     for f in files_uploaded:
-        _shutil.move(f, _os.path.abspath(_os.path.join(
-            _os.path.dirname(f), 'uploaded')))
+        uploaded_dir = _os.path.abspath(_os.path.join(_os.path.dirname(f),
+                                                      'uploaded'))
+        _pathlib.Path(uploaded_dir).mkdir(parents=True, exist_ok=True)
+
+        _shutil.copy2(f, uploaded_dir)
+        _os.remove(f)
     files_not_uploaded = [f for f in xml_files if f not in files_uploaded]
 
     if len(files_not_uploaded) > 0:
@@ -433,4 +437,4 @@ if __name__ == '__main__':
     """
     If running as a module, process new records 
     """
-    process_new_records()
+    process_new_records()   # pragma: no cover

@@ -97,6 +97,10 @@ class Session:
         self.dt_to = dt_to
         self.user = user
 
+    def __repr__(self):
+        return f'{self.dt_from.isoformat()} to {self.dt_from.isoformat()} on ' \
+               f'{self.instrument.name}'
+
     def update_session_status(self, status):
         """
         Update the ``record_status`` in the session logs for this
