@@ -98,7 +98,7 @@ class Session:
         self.user = user
 
     def __repr__(self):
-        return f'{self.dt_from.isoformat()} to {self.dt_from.isoformat()} on ' \
+        return f'{self.dt_from.isoformat()} to {self.dt_to.isoformat()} on ' \
                f'{self.instrument.name}'
 
     def update_session_status(self, status):
@@ -204,7 +204,6 @@ def get_sessions_to_build():
             with _contextlib.closing(conn.cursor()) as cursor:  # auto-closes
                 results = cursor.execute(db_query).fetchall()
                 col_names = list(map(lambda x: x[0], cursor.description))
-                # unpack each result into a namedtuple
 
     session_logs = [SessionLog(*i) for i in results]
     start_logs = [sl for sl in session_logs if sl.event_type == 'START']

@@ -33,8 +33,6 @@ while test $# -ge 1; do
       rm .coverage
       echo "Running test suite with coverage..."
       pipenv run pytest mdcs/nexusLIMS/nexusLIMS/tests \
-        -k "test_extractors or test_calendar_handling \\
-            or test_instruments or test_version" \
         --cov=mdcs/nexusLIMS/nexusLIMS \
         --cov-report html:/home/miclims/NexusMicroscopyLIMS/htmlcov \
         --mpl --mpl-baseline-path=mdcs/nexusLIMS/nexusLIMS/tests/files/figs

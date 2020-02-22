@@ -151,8 +151,9 @@ def build_record(instrument, dt_from, dt_to,
 
     _logger.info(f"Building acquisition activities for timespan from "
                  f"{dt_from.isoformat()} to {dt_to.isoformat()}")
-    xml_record += build_acq_activities(instrument,
-                                       dt_from, dt_to, generate_previews)
+    aa_str, activities = build_acq_activities(instrument,
+                                              dt_from, dt_to, generate_previews)
+    xml_record += aa_str
 
     xml_record += "</nx:Experiment>"  # Add closing tag for root element.
 
@@ -187,6 +188,10 @@ def build_acq_activities(instrument, dt_from, dt_to, generate_previews):
     acq_activities : str
         A string representing the XML output for each AcquisitionActivity
         associated with a given reservation/experiment on a microscope.
+
+    activities : :obj:`list` of :obj:`~nexusLIMS.schemas.activity.AcquisitionActivity`:
+        The list of :py:class:`~nexusLIMS.schemas.activity.AcquisitionActivity`
+        objects generated for the record
     """
 
     _logger = _logging.getLogger(__name__)
@@ -265,7 +270,7 @@ def build_acq_activities(instrument, dt_from, dt_to, generate_previews):
         acq_activities_str += a.as_xml(i, sample_id,
                                        indent_level=1, print_xml=False)
 
-    return acq_activities_str
+    return acq_activities_str, activities
 
 
 def dump_record(instrument,
@@ -418,7 +423,7 @@ def process_new_records():
     save them to disk, and upload them to the NexusLIMS CDCS instance.
     """
     xml_files = build_new_session_records()
-    files_uploaded = _upload_record_files(xml_files)
+    files_uploaded, record_ids = _upload_record_files(xml_files)
     for f in files_uploaded:
         uploaded_dir = _os.path.abspath(_os.path.join(_os.path.dirname(f),
                                                       'uploaded'))

@@ -26,3 +26,32 @@
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
 
+import contextlib as _contextlib
+import sqlite3 as _sql3
+from nexusLIMS import nexuslims_db_path as _nx_db_path
+
+
+def make_db_query(query):
+    """
+    Execute an arbitrary query on the NexusLIMS database and return the results
+    as a list
+
+    Parameters
+    ----------
+    query : str
+        The SQL query to execute
+
+    Returns
+    -------
+    res_list : :obj:`list` of :obj:`tuple`
+        The results of the SQL query
+    """
+    # use contextlib to auto-close the connection and database cursors
+    with _contextlib.closing(_sql3.connect(_nx_db_path)) as conn:
+        with conn:  # auto-commits
+            with _contextlib.closing(
+                    conn.cursor()) as cursor:  # auto-closes
+                results = cursor.execute(query)
+                res_list = results.fetchall()
+
+    return res_list

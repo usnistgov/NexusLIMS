@@ -324,8 +324,9 @@ class AcquisitionActivity:
                         # but if it is, it means this value, which should
                         # have already been added to setup_params is somehow
                         # new, so delete vts from values to search
-                        _logger.debug(f'iter: {i}; removing {vts}')
-                        values_to_search.remove(vts)
+                        _logger.debug(f'iter: {i}; '
+                                      f'removing {vts}')  # pragma: no cover
+                        values_to_search.remove(vts)      # pragma: no cover
                     if vts in m:
                         if setup_params[vts] == m[vts]:
                             # value in m matches that already in setup_params

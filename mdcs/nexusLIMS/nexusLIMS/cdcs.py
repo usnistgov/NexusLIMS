@@ -85,6 +85,8 @@ def upload_record_content(xml_content, title):
     post_r : ~requests.Response
         The REST response returned from the CDCS instance after attempting
         the upload
+    record_id : str
+        The id (on the server) of the record that was uploaded
     """
     endpoint = _urljoin(_cdcs_url, 'rest/data/')
 
@@ -110,7 +112,31 @@ def upload_record_content(xml_content, title):
 
     r = _nx_req(wrk_endpoint, _requests.patch, basic_auth=True)
 
-    return post_r
+    return post_r, record_id
+
+
+def delete_record(record_id):
+    """
+    Delete a Data record from the NexusLIMS CDCS instance via REST API
+
+    Parameters
+    ----------
+    record_id : str
+        The id value (on the CDCS server) of the record to be deleted
+
+    Returns
+    -------
+    r : ~requests.Response
+        The REST response returned from the CDCS instance after attempting
+        the delete
+    """
+    endpoint = _urljoin(_cdcs_url, f'rest/data/{record_id}')
+    r = _nx_req(endpoint, _requests.delete, basic_auth=True)
+    if r.status_code != 204:
+        # anything other than 204 status means something went wrong
+        _logger.error(f'Got error while deleting {record_id}:\n'
+                      f'{r.text}')
+    return r
 
 
 def upload_record_files(files_to_upload):
@@ -126,8 +152,10 @@ def upload_record_files(files_to_upload):
 
     Returns
     -------
-    files_uploaded : list
+    files_uploaded : list of str
         A list of the files that were successfully uploaded
+    record_ids : list of str
+        A list of the record id values (onthe server) that were uploaded
     """
     if files_to_upload is None:
         _logger.info('Using all .xml files in this directory')
@@ -137,30 +165,35 @@ def upload_record_files(files_to_upload):
 
     _logger.info(f'Found {len(files_to_upload)} files to upload\n')
     if len(files_to_upload) == 0:
-        raise ValueError('No .xml files were found (please specify on the '
-                         'command line, or run this script from a directory '
-                         'containing one or more .xml files')
+        msg = 'No .xml files were found (please specify on the ' \
+              'command line, or run this script from a directory ' \
+              'containing one or more .xml files'
+        _logger.error(msg)
+        raise ValueError(msg)
 
     files_uploaded = []
+    record_ids = []
     for f in _tqdm(files_to_upload):
         with open(f, 'r') as xml_file:
             xml_content = xml_file.read()
 
         title = _os.path.basename(f)
-        r = upload_record_content(xml_content, title)
+        r, record_id = upload_record_content(xml_content, title)
 
         if r.status_code != 201:
+            _logger.warning(f'Could not upload {title}')
             continue
         else:
             files_uploaded.append(f)
+            record_ids.append(record_id)
 
     _logger.info(f'Successfully uploaded {len(files_uploaded)} of '
                  f'{len(files_to_upload)} files')
 
-    return files_uploaded
+    return files_uploaded, record_ids
 
 
-if __name__ == '__main__':
+if __name__ == '__main__':   # pragma: no cover
     parser = argparse.ArgumentParser(
         description='Communicate with the Nexus CDCS instance')
     parser.add_argument('--upload-records',
