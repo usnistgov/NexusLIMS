@@ -93,7 +93,10 @@ def cluster_filelist_mtimes(filelist):
     """
     _logger.info('Starting clustering of file mtimes')
     start_timer = _timer()
-    mtimes = [_os.path.getmtime(f) for f in filelist]
+    mtimes = sorted([_os.path.getmtime(f) for f in filelist])
+
+    # remove duplicate file mtimes (since they cause errors below):
+    mtimes = sorted(list(set(mtimes)))
     m_array = _np.array(mtimes).reshape(-1, 1)
 
     # mtime_diff is a discrete differentiation to find the time gap between
@@ -105,8 +108,9 @@ def cluster_filelist_mtimes(filelist):
     # biased towards smaller values). we do cross-validation using the Leave
     # One Out strategy and using the total log-likelihood from the KDE as
     # the score to maximize (goodness of fit)
-    bandwidths = 10 ** _np.linspace(_math.log(min(mtime_diff)),
-                                    _math.log(max(mtime_diff)), 35)
+    bandwidths = _np.logspace(_math.log(min(mtime_diff)),
+                              _math.log(max(mtime_diff)),
+                              35, base=_math.e)
     _logger.info('KDE bandwidth grid search')
     grid = _grid(_KernelDensity(kernel='gaussian'),
                  {'bandwidth': bandwidths}, cv=_loo(), n_jobs=-1)
