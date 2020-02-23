@@ -27,8 +27,7 @@
 #
 
 from nexusLIMS.instruments import instrument_db as _instr_db
-from nexusLIMS import nexuslims_db_path as _nx_db_path
-from nexusLIMS import mmf_nexus_root_path as _mmf_path
+import os as _os
 from datetime import datetime as _dt
 import sqlite3 as _sql3
 import contextlib as _contextlib
@@ -123,7 +122,8 @@ class Session:
         success = False
 
         # use contextlib to auto-close the connection and database cursors
-        with _contextlib.closing(_sql3.connect(_nx_db_path)) as conn:
+        with _contextlib.closing(_sql3.connect(
+                _os.environ['nexusLIMS_db_path'])) as conn:
             with conn:  # auto-commits
                 with _contextlib.closing(
                         conn.cursor()) as cursor:  # auto-closes
@@ -151,7 +151,8 @@ class Session:
         success = False
 
         # use contextlib to auto-close the connection and database cursors
-        with _contextlib.closing(_sql3.connect(_nx_db_path)) as conn:
+        with _contextlib.closing(_sql3.connect(
+                _os.environ['nexusLIMS_db_path'])) as conn:
             with conn:  # auto-commits
                 with _contextlib.closing(
                         conn.cursor()) as cursor:  # auto-closes
@@ -165,7 +166,8 @@ class Session:
                       f"ORDER BY timestamp DESC LIMIT 1;"
 
         # use contextlib to auto-close the connection and database cursors
-        with _contextlib.closing(_sql3.connect(_nx_db_path)) as conn:
+        with _contextlib.closing(_sql3.connect(
+                _os.environ['nexusLIMS_db_path'])) as conn:
             with conn:  # auto-commits
                 with _contextlib.closing(
                         conn.cursor()) as cursor:  # auto-closes
@@ -199,7 +201,8 @@ def get_sessions_to_build():
                "FROM session_log WHERE record_status == 'TO_BE_BUILT'"
 
     # use contextlib to auto-close the connection and database cursors
-    with _contextlib.closing(_sql3.connect(_nx_db_path)) as conn:
+    with _contextlib.closing(_sql3.connect(
+            _os.environ['nexusLIMS_db_path'])) as conn:
         with conn:  # auto-commits
             with _contextlib.closing(conn.cursor()) as cursor:  # auto-closes
                 results = cursor.execute(db_query).fetchall()

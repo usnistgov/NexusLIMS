@@ -17,35 +17,176 @@ from nexusLIMS.extractors.thumbnail_generator import sig_to_thumbnail
 from nexusLIMS.extractors.thumbnail_generator import down_sample_image
 
 
-def setup_module():
-    """
-    Setup by extracting the compressed test files
-    """
-    for _, tarf in tars.items():
-        with tarfile.open(tarf, 'r:gz') as tar:
-            tar.extractall(path=os.path.dirname(tarf))
+class TestThumbnailGenerator:
+    @classmethod
+    def setup_class(cls):
+        cls.s = hs.datasets.example_signals.EDS_TEM_Spectrum()
+        cls.oned_s = hs.stack([cls.s * i for i in np.arange(.1, 1, .3)],
+                              new_axis_name='x')
+        cls.twod_s = hs.stack([cls.oned_s * i for i in np.arange(.1, 1, .3)],
+                              new_axis_name='y')
+        cls.threed_s = hs.stack([cls.twod_s * i for i in
+                                np.arange(.1, 1, .3)], new_axis_name='z')
 
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_0d_spectrum(self):
+        self.s.metadata.General.title = 'Dummy spectrum'
+        fig = sig_to_thumbnail(self.s, 'output.png')
+        os.remove('output.png')
+        return fig
 
-def teardown_module():
-    """
-    Teardown by deleting the extracted test files
-    """
-    for _, fn in files.items():
-        os.remove(fn)
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_1d_spectrum_image(self):
+        self.oned_s.metadata.General.title = 'Dummy line scan'
+        fig = sig_to_thumbnail(self.oned_s, f'output.png')
+        os.remove('output.png')
+        return fig
 
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_2d_spectrum_image(self):
+        self.twod_s.metadata.General.title = 'Dummy 2D spectrum image'
+        fig = sig_to_thumbnail(self.twod_s, f'output.png')
+        os.remove('output.png')
+        return fig
 
-@pytest.fixture
-def mock_nexus_path(monkeypatch):
-    monkeypatch.setattr(nexusLIMS,
-                        "mmf_nexus_root_path",
-                        os.path.join(os.path.dirname(__file__), 'files'))
-    monkeypatch.setattr(nexusLIMS,
-                        "nexuslims_root_path",
-                        os.path.join(os.path.dirname(__file__), 'files'))
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_2d_spectrum_image_nav_under_9(self):
+        self.twod_s.metadata.General.title = 'Dummy 2D spectrum image'
+        fig = sig_to_thumbnail(self.twod_s.inav[:2,:2], f'output.png',)
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_3d_spectrum_image(self):
+        self.threed_s.metadata.General.title = 'Dummy 3D spectrum image'
+        fig = sig_to_thumbnail(self.threed_s, f'output.png')
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_single_image(self):
+        fig = sig_to_thumbnail(hs.load(files['643_EFTEM_DIFF']), f'output.png')
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_single_not_dm3_image(self):
+        s = hs.load(files['643_EFTEM_DIFF'])
+        s.metadata.General.original_filename = 'not dm3'
+        fig = sig_to_thumbnail(s, f'output.png')
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_image_stack(self):
+        fig = sig_to_thumbnail(hs.load(files['643_STEM_STACK']), f'output.png')
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_4d_stem_type(self):
+        fig = sig_to_thumbnail(hs.load(files['4D_STEM']), f'output.png')
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_4d_stem_type_1(self):
+        # nav size >= 4 but < 9
+        fig = sig_to_thumbnail(hs.load(files['4D_STEM']).inav[:2, :3],
+                               f'output.png')
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_4d_stem_type_2(self):
+        # nav size = 1
+        fig = sig_to_thumbnail(hs.load(files['4D_STEM']).inav[:1, :2],
+                               f'output.png')
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_complex_image(self):
+        fig = sig_to_thumbnail(hs.load(files['FFT']), f'output.png')
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_higher_dimensional_signal(self):
+        dict0 = {'size': 10, 'name': 'nav axis 3', 'units': 'nm',
+                 'scale': 2, 'offset': 0}
+        dict1 = {'size': 10, 'name': 'nav axis 2', 'units': 'pm',
+                 'scale': 200, 'offset': 0}
+        dict2 = {'size': 10, 'name': 'nav axis 1', 'units': 'mm',
+                 'scale': 0.02, 'offset': 0}
+        dict3 = {'size': 10, 'name': 'sig axis 3', 'units': 'eV',
+                 'scale': 100, 'offset': 0}
+        dict4 = {'size': 10, 'name': 'sig axis 2', 'units': 'Hz',
+                 'scale': 0.2121, 'offset': 0}
+        dict5 = {'size': 10, 'name': 'sig axis 1', 'units': 'radians',
+                 'scale': 0.314, 'offset': 0}
+        s = hs.signals.BaseSignal(np.zeros((10, 10, 10, 10, 10, 10),
+                                           dtype=int),
+                                  axes=[dict0, dict1, dict2, dict3, dict4,
+                                        dict5])
+        s = s.transpose(navigation_axes=3)
+        s.metadata.General.title = 'Signal with higher-order dimensionality'
+        fig = sig_to_thumbnail(s, f'output.png')
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_survey_image(self):
+        fig = sig_to_thumbnail(hs.load(files['643_SURVEY']), f'output.png')
+        os.remove('output.png')
+        return fig
+
+    def test_annotation_error(self, monkeypatch):
+        def monkey_get_annotation(a, b):
+            raise ValueError("Mocked error for testing")
+        monkeypatch.setattr(thumbnail_generator,
+                            "_get_markers_dict", monkey_get_annotation)
+        thumbnail_generator.add_annotation_markers(hs.load(files['643_SURVEY']))
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_annotations(self):
+        fig = sig_to_thumbnail(hs.load(files['642_ANNOTATIONS']), f'output.png')
+        os.remove('output.png')
+        return fig
+
+    def test_downsample_image_errors(self):
+        with pytest.raises(ValueError):
+            # providing neither output size and factor should raise an error
+            down_sample_image('', '')
+
+        with pytest.raises(ValueError):
+            # providing both output size and factor should raise an error
+            down_sample_image('', '', output_size=(20, 20), factor=5)
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_downsample_image_factor(self):
+        fig = down_sample_image(TestQuantaExtractor.QUANTA_TEST_FILE,
+                                'output.png', factor=3)
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_downsample_image_32_bit(self):
+        fig = down_sample_image(files['QUANTA_32BIT'],
+                                'output.png', factor=2)
+        os.remove('output.png')
+        return fig
+
+    @pytest.mark.mpl_image_compare(style='default')
+    def test_downsample_image_output_size(self):
+        fig = down_sample_image(TestQuantaExtractor.QUANTA_TEST_FILE,
+                                'output.png', output_size=(500, 500))
+        os.remove('output.png')
+        return fig
 
 
 class TestExtractorModule:
-    def test_parse_metadata_642_titan(self, mock_nexus_path):
+    def test_parse_metadata_642_titan(self):
         meta, thumb_fname = parse_metadata(fname=files['PARSE_META_642_TITAN'])
         assert meta['nx_meta']['Acquisition Device'] == 'BM-UltraScan'
         assert meta['nx_meta']['Actual Magnification'] == 17677.0
@@ -58,7 +199,7 @@ class TestExtractorModule:
         os.remove(thumb_fname)
         os.remove(thumb_fname.replace('thumb.png', 'json'))
 
-    def test_parse_metadata_list_signal(self, mock_nexus_path):
+    def test_parse_metadata_list_signal(self):
         meta, thumb_fname = parse_metadata(fname=files['LIST_SIGNAL'])
         assert meta['nx_meta']['Acquisition Device'] == 'DigiScan'
         assert meta['nx_meta']['STEM Camera Length'] == 77.0
@@ -71,7 +212,7 @@ class TestExtractorModule:
         os.remove(thumb_fname)
         os.remove(thumb_fname.replace('thumb.png', 'json'))
 
-    def test_parse_metadata_overwrite_false(self, mock_nexus_path, caplog):
+    def test_parse_metadata_overwrite_false(self, caplog):
         thumb_fname = files['LIST_SIGNAL'] + '.thumb.png'
         # create the thumbnail file so we can't overwrite
         open(thumb_fname, 'a').close()
@@ -82,7 +223,7 @@ class TestExtractorModule:
         os.remove(thumb_fname)
         os.remove(thumb_fname.replace('thumb.png', 'json'))
 
-    def test_parse_metadata_quanta(self, mock_nexus_path, monkeypatch):
+    def test_parse_metadata_quanta(self, monkeypatch):
         def mock_instr(_):
             return instruments.instrument_db['FEI-Quanta200-ESEM-633137']
         monkeypatch.setattr(nexusLIMS.extractors,
@@ -92,7 +233,7 @@ class TestExtractorModule:
         os.remove(thumb_fname)
         os.remove(thumb_fname.replace('thumb.png', 'json'))
 
-    def test_parse_metadata_tif_other_instr(self, mock_nexus_path, monkeypatch):
+    def test_parse_metadata_tif_other_instr(self, monkeypatch):
         def mock_instr(_):
             return None
         monkeypatch.setattr(nexusLIMS.extractors,
@@ -102,7 +243,7 @@ class TestExtractorModule:
         os.remove(thumb_fname)
         os.remove(thumb_fname.replace('thumb.png', 'json'))
 
-    def test_parse_metadata_no_dataset_type(self, mock_nexus_path, monkeypatch):
+    def test_parse_metadata_no_dataset_type(self, monkeypatch):
         monkeypatch.setitem(nexusLIMS.extractors.extension_reader_map,
                             'tif', lambda x: {'nx_meta': {'key': 'val'}})
 
@@ -408,171 +549,3 @@ class TestQuantaExtractor:
         assert metadata['nx_meta']['Tilt Correction Angle'] == 0.0121551
         assert metadata['nx_meta']['Specimen Temperature (K)'] == 'j'
         assert len(metadata['nx_meta']['Chamber Pressure (mPa)']) == 7000
-
-
-class TestThumbnailGenerator:
-    @classmethod
-    def setup_class(cls):
-        cls.s = hs.datasets.example_signals.EDS_TEM_Spectrum()
-        cls.oned_s = hs.stack([cls.s * i for i in np.arange(.1, 1, .3)],
-                              new_axis_name='x')
-        cls.twod_s = hs.stack([cls.oned_s * i for i in np.arange(.1, 1, .3)],
-                              new_axis_name='y')
-        cls.threed_s = hs.stack([cls.twod_s * i for i in
-                                np.arange(.1, 1, .3)], new_axis_name='z')
-
-    @pytest.mark.mpl_image_compare(style='default')
-    def test_0d_spectrum(self):
-        self.s.metadata.General.title = 'Dummy spectrum'
-        fig = sig_to_thumbnail(self.s, 'output.png')
-        os.remove('output.png')
-        return fig
-
-    @pytest.mark.mpl_image_compare(style='default')
-    def test_1d_spectrum_image(self):
-        self.oned_s.metadata.General.title = 'Dummy line scan'
-        fig = sig_to_thumbnail(self.oned_s, f'output.png')
-        os.remove('output.png')
-        return fig
-
-    @pytest.mark.mpl_image_compare(style='default')
-    def test_2d_spectrum_image(self):
-        self.twod_s.metadata.General.title = 'Dummy 2D spectrum image'
-        fig = sig_to_thumbnail(self.twod_s, f'output.png')
-        os.remove('output.png')
-        return fig
-
-    @pytest.mark.mpl_image_compare(style='default')
-    def test_2d_spectrum_image_nav_under_9(self):
-        self.twod_s.metadata.General.title = 'Dummy 2D spectrum image'
-        fig = sig_to_thumbnail(self.twod_s.inav[:2,:2], f'output.png',)
-        os.remove('output.png')
-        return fig
-
-    @pytest.mark.mpl_image_compare(style='default')
-    def test_3d_spectrum_image(self):
-        self.threed_s.metadata.General.title = 'Dummy 3D spectrum image'
-        fig = sig_to_thumbnail(self.threed_s, f'output.png')
-        os.remove('output.png')
-        return fig
-
-    @pytest.mark.mpl_image_compare(style='default')
-    def test_single_image(self):
-        fig = sig_to_thumbnail(hs.load(files['643_EFTEM_DIFF']), f'output.png')
-        os.remove('output.png')
-        return fig
-
-    @pytest.mark.mpl_image_compare(style='default')
-    def test_single_not_dm3_image(self):
-        s = hs.load(files['643_EFTEM_DIFF'])
-        s.metadata.General.original_filename = 'not dm3'
-        fig = sig_to_thumbnail(s, f'output.png')
-        os.remove('output.png')
-        return fig
-
-    @pytest.mark.mpl_image_compare(style='default')
-    def test_image_stack(self):
-        fig = sig_to_thumbnail(hs.load(files['643_STEM_STACK']), f'output.png')
-        os.remove('output.png')
-        return fig
-
-    @pytest.mark.mpl_image_compare(style='default')
-    def test_4d_stem_type(self):
-        fig = sig_to_thumbnail(hs.load(files['4D_STEM']), f'output.png')
-        os.remove('output.png')
-        return fig
-
-    @pytest.mark.mpl_image_compare(style='default')
-    def test_4d_stem_type_1(self):
-        # nav size >= 4 but < 9
-        fig = sig_to_thumbnail(hs.load(files['4D_STEM']).inav[:2, :3],
-                               f'output.png')
-        os.remove('output.png')
-        return fig
-
-    @pytest.mark.mpl_image_compare(style='default')
-    def test_4d_stem_type_2(self):
-        # nav size = 1
-        fig = sig_to_thumbnail(hs.load(files['4D_STEM']).inav[:1, :2],
-                               f'output.png')
-        os.remove('output.png')
-        return fig
-
-    @pytest.mark.mpl_image_compare(style='default')
-    def test_complex_image(self):
-        fig = sig_to_thumbnail(hs.load(files['FFT']), f'output.png')
-        os.remove('output.png')
-        return fig
-
-    @pytest.mark.mpl_image_compare(style='default')
-    def test_higher_dimensional_signal(self):
-        dict0 = {'size': 10, 'name': 'nav axis 3', 'units': 'nm',
-                 'scale': 2, 'offset': 0}
-        dict1 = {'size': 10, 'name': 'nav axis 2', 'units': 'pm',
-                 'scale': 200, 'offset': 0}
-        dict2 = {'size': 10, 'name': 'nav axis 1', 'units': 'mm',
-                 'scale': 0.02, 'offset': 0}
-        dict3 = {'size': 10, 'name': 'sig axis 3', 'units': 'eV',
-                 'scale': 100, 'offset': 0}
-        dict4 = {'size': 10, 'name': 'sig axis 2', 'units': 'Hz',
-                 'scale': 0.2121, 'offset': 0}
-        dict5 = {'size': 10, 'name': 'sig axis 1', 'units': 'radians',
-                 'scale': 0.314, 'offset': 0}
-        s = hs.signals.BaseSignal(np.zeros((10, 10, 10, 10, 10, 10),
-                                           dtype=int),
-                                  axes=[dict0, dict1, dict2, dict3, dict4,
-                                        dict5])
-        s = s.transpose(navigation_axes=3)
-        s.metadata.General.title = 'Signal with higher-order dimensionality'
-        fig = sig_to_thumbnail(s, f'output.png')
-        os.remove('output.png')
-        return fig
-
-    @pytest.mark.mpl_image_compare(style='default')
-    def test_survey_image(self):
-        fig = sig_to_thumbnail(hs.load(files['643_SURVEY']), f'output.png')
-        os.remove('output.png')
-        return fig
-
-    def test_annotation_error(self, monkeypatch):
-        def monkey_get_annotation(a, b):
-            raise ValueError("Mocked error for testing")
-        monkeypatch.setattr(thumbnail_generator,
-                            "_get_markers_dict", monkey_get_annotation)
-        thumbnail_generator.add_annotation_markers(hs.load(files['643_SURVEY']))
-
-    @pytest.mark.mpl_image_compare(style='default')
-    def test_annotations(self):
-        fig = sig_to_thumbnail(hs.load(files['642_ANNOTATIONS']), f'output.png')
-        os.remove('output.png')
-        return fig
-
-    def test_downsample_image_errors(self):
-        with pytest.raises(ValueError):
-            # providing neither output size and factor should raise an error
-            down_sample_image('', '')
-
-        with pytest.raises(ValueError):
-            # providing both output size and factor should raise an error
-            down_sample_image('', '', output_size=(20, 20), factor=5)
-
-    @pytest.mark.mpl_image_compare(style='default')
-    def test_downsample_image_factor(self):
-        fig = down_sample_image(TestQuantaExtractor.QUANTA_TEST_FILE,
-                                'output.png', factor=3)
-        os.remove('output.png')
-        return fig
-
-    @pytest.mark.mpl_image_compare(style='default')
-    def test_downsample_image_32_bit(self):
-        fig = down_sample_image(files['QUANTA_32BIT'],
-                                'output.png', factor=2)
-        os.remove('output.png')
-        return fig
-
-    @pytest.mark.mpl_image_compare(style='default')
-    def test_downsample_image_output_size(self):
-        fig = down_sample_image(TestQuantaExtractor.QUANTA_TEST_FILE,
-                                'output.png', output_size=(500, 500))
-        os.remove('output.png')
-        return fig

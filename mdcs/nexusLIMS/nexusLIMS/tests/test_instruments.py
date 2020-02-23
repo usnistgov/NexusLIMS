@@ -26,11 +26,10 @@
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
 
+import os
 from nexusLIMS.instruments import Instrument
 from nexusLIMS.instruments import instrument_db
 from nexusLIMS.instruments import get_instr_from_filepath
-from nexusLIMS import mmf_nexus_root_path as _mmf_path
-import os
 
 
 class TestInstruments:
@@ -81,8 +80,9 @@ class TestInstruments:
             f'Computer mount:   M:/\n'
 
     def test_get_instr_from_filepath(self):
-        path = os.path.join(_mmf_path, 'Titan/***REMOVED***/***REMOVED***/'
-                                       '***REMOVED***/4_330mm.dm3')
+        path = os.path.join(os.environ['mmfnexus_path'],
+                            'Titan/***REMOVED***/***REMOVED***/'
+                            '***REMOVED***/4_330mm.dm3')
         instr = get_instr_from_filepath(path)
         assert isinstance(instr, Instrument)
         assert instr.name == 'FEI-Titan-TEM-635816'

@@ -44,7 +44,8 @@ and the operators of NexusLIMS are notified so the issue can be corrected.
     authentication (such as the SharePoint Calendar and the CDCS instance), it
     is necessary to provide suitable credentials, or no information will be able
     to be fetched. This is done by specifying two environment variables in the
-    context the code is run: ``nexusLIMS_user`` and ``nexusLIMS_pass``. The
+    context the code is run: :ref:`nexusLIMS_user <nexusLIMS-user>` and
+    :ref:`nexusLIMS_pass <nexusLIMS-pass>`. The
     values provided in these variables will be used for authentication to all
     network resources that require it. If running the code inside of a
     `pipenv <https://pipenv.readthedocs.io/en/latest/>`_, the easiest way to do
@@ -62,9 +63,10 @@ immediately calls
 :py:func:`~nexusLIMS.builder.record_builder.build_new_session_records`, which in
 turn uses :py:func:`~nexusLIMS.db.session_handler.get_sessions_to_build` to
 query the NexusLIMS database for sessions awaiting processing (the database
-location can be referenced within the code as
-:py:data:`~nexusLIMS.nexuslims_db_path`). This method interrogates the database
-for session logs with a status of ``TO_BE_BUILT`` using the SQL query:
+location can be referenced within the code using the environment variable
+:ref:`nexusLIMS_db_path <nexusLIMS-db-path>` (`e.g.`
+``os.environ["nexusLIMS_db_path"]``. This method interrogates the database for
+session logs with a status of ``TO_BE_BUILT`` using the SQL query:
 
 .. code-block:: sql
 
@@ -139,7 +141,8 @@ Overview
     in turn uses :py:func:`~nexusLIMS.extractors.parse_metadata` to extract
     known metadata and :py:mod:`~nexusLIMS.extractors.thumbnail_generator` to
     generate a web-accessible preview image of the dataset. These files are
-    saved within the :py:data:`~nexusLIMS.nexuslims_root_path` directory.
+    saved within the directory contained in the
+    :ref:`nexusLIMS_path <nexusLIMS-path>` environment variable.
 6.  `(link) <separate-setup-parameters_>`_
     Once all the individual files have been processed, their metadata is
     inspected and any values that are common to all files are assigned as
@@ -220,14 +223,14 @@ the timespan of interest, as well as the
 are read from the ``instruments`` table of the NexusLIMS database, and contain
 known important information about the physical instrument, such as the
 persistent identifier for the microscope, its location, the URL where its
-reservations can be found, where it saves its files (relative to
-:py:data:`~nexusLIMS.mmf_nexus_root_path`), etc. Sourcing this information from
-the master database allows for one central location for authoritative data.
-Thus, if something changes about the instruments' configuration, the data needs
-to be updated in one location only. The following is an example of the
-information extracted from the database and available to the NexusLIMS backend
-software for a given instrument (in this case the FEI Titan TEM in Building
-223):
+reservations can be found, where it saves its files (relative to the directory
+specified in the :ref:`mmfnexus_path <mmfnexus-path>` environment variable),
+etc. Sourcing this information from the master database allows for one central
+location for authoritative data. Thus, if something changes about the
+instruments' configuration, the data needs to be updated in one location only.
+The following is an example of the information extracted from the database and
+available to the NexusLIMS backend software for a given instrument (in this
+case the FEI Titan TEM in Building 223):
 
 .. code-block::
 
@@ -383,9 +386,11 @@ and implementing the extractors/preview generator manually.
 .. _hyperspy: https://hyperspy.org/
 
 :py:func:`~nexusLIMS.extractors.parse_metadata` will (by default) write a JSON
-representation of the metadata it extracts to a sub-directory within
-:py:data:`~nexusLIMS.nexuslims_root_path` that matches where the original raw
-data file was found in :py:data:`~nexusLIMS.mmf_nexus_root_path`. A link to
+representation of the metadata it extracts to a sub-directory within the
+directory contained in the :ref:`nexusLIMS_path <nexusLIMS-path>` environment
+variable that matches where the original raw
+data file was found in the directory from the
+:ref:`mmfnexus_path <mmfnexus-path>` environment variable. A link to
 this file is included in the outputted XML record to provide users with an easy
 way to query the metadata for their files in a text-based format. Likewise, the
 :py:func:`~nexusLIMS.extractors.parse_metadata` function also handles
@@ -456,8 +461,8 @@ used to mark the session's record status as ``'ERROR'`` in the database so the
 root cause of the problem can be investigated by the NexusLIMS operations team.
 
 If the record does validate, it is written to a subdirectory of
-:py:data:`~nexusLIMS.nexuslims_root_path` for storage before it is uploaded to
-the CDCS instance.
+:ref:`nexusLIMS_path <nexusLIMS-path>` (environment variable) for storage
+before it is uploaded to the CDCS instance.
 
 Regardless, the backend then proceeds with `step 1 <starting-record-builder_>`_
 for the next :py:class:`~nexusLIMS.db.session_handler.Session` to be processed,

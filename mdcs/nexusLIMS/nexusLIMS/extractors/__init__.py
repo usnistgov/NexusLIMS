@@ -9,8 +9,6 @@ from .quanta_tif import get_quanta_metadata
 from .digital_micrograph import get_dm3_metadata
 from .thumbnail_generator import sig_to_thumbnail as _s2thumb
 from .thumbnail_generator import down_sample_image as _down_sample
-from nexusLIMS import mmf_nexus_root_path as _mmf_path
-from nexusLIMS import nexuslims_root_path as _nx_path
 from nexusLIMS.instruments import get_instr_from_filepath as _get_instr
 import hyperspy.api_nogui as _hs
 import logging as _logging
@@ -71,7 +69,7 @@ def parse_metadata(fname, write_output=True, generate_preview=True,
             nx_meta['nx_meta']['Data Type'] = 'Miscellaneous'
 
         if write_output:
-            out_fname = fname.replace(_mmf_path, _nx_path) + '.json'
+            out_fname = fname.replace(_os.environ["mmfnexus_path"], _os.environ["nexusLIMS_path"]) + '.json'
             if not _os.path.isfile(out_fname) or overwrite:
                 # Create the directory for the metadata file, if needed
                 _pathlib.Path(_os.path.dirname(out_fname)).mkdir(parents=True,
@@ -88,7 +86,7 @@ def parse_metadata(fname, write_output=True, generate_preview=True,
                     _json.dump(out_dict, f, sort_keys=False, indent=2)
 
         if generate_preview:
-            preview_fname = fname.replace(_mmf_path, _nx_path) + '.thumb.png'
+            preview_fname = fname.replace(_os.environ["mmfnexus_path"], _os.environ["nexusLIMS_path"]) + '.thumb.png'
             if extension == 'tif':
                 instr = _get_instr(fname)
                 instr_name = instr.name if instr is not None else None

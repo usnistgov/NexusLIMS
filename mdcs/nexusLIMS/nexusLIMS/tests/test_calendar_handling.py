@@ -6,6 +6,7 @@ from nexusLIMS.harvester import sharepoint_calendar as sc
 from nexusLIMS.utils import parse_xml as _parse_xml
 from nexusLIMS.utils import nexus_req as _nexus_req
 from nexusLIMS.harvester.sharepoint_calendar import AuthenticationError
+from nexusLIMS import instruments
 from nexusLIMS.instruments import instrument_db
 from collections import OrderedDict
 
@@ -35,7 +36,7 @@ class TestCalendarHandling:
     #  'xmlns="http://www.w3.org/2005/Atom"' from the top level element,
     #  since this is done by fetch_xml() in the actual processing
     instr_url = instrument_db['FEI-Titan-TEM-635816'].api_url + \
-                '?$expand=CreatedBy'
+        '?$expand=CreatedBy'
     xml_content = _nexus_req(instr_url, requests.get).text.replace(
         'xmlns="http://www.w3.org/2005/Atom"', '')
 

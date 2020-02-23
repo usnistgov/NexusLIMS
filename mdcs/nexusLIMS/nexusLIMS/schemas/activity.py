@@ -38,13 +38,9 @@ import hyperspy.api_nogui as _hs
 import numpy as _np
 from sklearn.neighbors import KernelDensity as _KernelDensity
 from scipy.signal import argrelextrema as _argrelextrema
-from sklearn.model_selection import GridSearchCV as _grid
-from sklearn.model_selection import LeaveOneOut as _loo
+from sklearn.model_selection import GridSearchCV as _GridSearchCV
+from sklearn.model_selection import LeaveOneOut as _LeaveOneOut
 
-from nexusLIMS.extractors.digital_micrograph import \
-    process_tecnai_microscope_info as _tecnai
-from nexusLIMS import mmf_nexus_root_path as _mmf_path
-from nexusLIMS import nexuslims_root_path as _nx_path
 from nexusLIMS.extractors import parse_metadata as _parse_metadata
 from nexusLIMS.extractors import flatten_dict as _flatten_dict
 
@@ -112,8 +108,8 @@ def cluster_filelist_mtimes(filelist):
                               _math.log(max(mtime_diff)),
                               35, base=_math.e)
     _logger.info('KDE bandwidth grid search')
-    grid = _grid(_KernelDensity(kernel='gaussian'),
-                 {'bandwidth': bandwidths}, cv=_loo(), n_jobs=-1)
+    grid = _GridSearchCV(_KernelDensity(kernel='gaussian'),
+                         {'bandwidth': bandwidths}, cv=_LeaveOneOut(), n_jobs=-1)
     grid.fit(m_array)
     bw = grid.best_params_['bandwidth']
     _logger.info(f'Using bandwidth of {bw:.3f} minutes for KDE')
@@ -437,7 +433,7 @@ class AcquisitionActivity:
                 f = escape(f)
 
             # build path to thumbnail
-            rel_fname = f.replace(_mmf_path, '')
+            rel_fname = f.replace(_os.environ["mmfnexus_path"], '')
             rel_thumb_name = f'{rel_fname}.thumb.png'
 
             # encode for safe URLs

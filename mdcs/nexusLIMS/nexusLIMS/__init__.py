@@ -45,25 +45,42 @@ record builder to look for new sessions, which can be done by running the
 
 Refer to :ref:`record-building` for more details.
 
-**Attributes**
+**Configuration variables**
 
-Attributes
-----------
-mmf_nexus_root_path : str
-    The root path for data from the Electron Microscopy Nexus
+The following variables should be defined as environment variables in your
+session, or in the ``.env`` file in the root of this package's repository (if
+you are running using ``pipenv``.
 
-    This folder is accessible read-only, and it is where data is written to by
-    instruments in the Electron Microscopy Nexus. The file paths for specific
-    instruments (specified in the NexusLIMS database) are relative to this root.
+.. _nexusLIMS-user:
 
-nexuslims_root_path : str
-    The root path used by NexusLIMS for various needs
+`nexusLIMS_user`
+    The username used to authenticate to calendar resources and CDCS
 
-    This folder is used to store the NexusLIMS database, generated records,
-    individual file metadata dumps and preview images, and anything else that is
-    needed by the backend system.
+.. _nexusLIMS-pass:
 
-nexuslims_db_path : str
+`nexusLIMS_pass`
+    The password used to authenticate to calendar resources and CDCS
+
+.. _mmfnexus-path:
+
+`mmfnexus_path`
+    The path (should be already mounted) to the root folder containing data
+    from the Electron Microscopy Nexus. This folder is accessible read-only,
+    and it is where data is written to by instruments in the Electron
+    Microscopy Nexus. The file paths for specific instruments (specified in
+    the NexusLIMS database) are relative to this root.
+
+.. _nexusLIMS-path:
+
+`nexusLIMS_path`
+    The root path used by NexusLIMS for various needs. This folder is used to
+    store the NexusLIMS database, generated records, individual file metadata
+    dumps and preview images, and anything else that is needed by the backend
+    system.
+
+.. _nexusLIMS-db-path:
+
+`nexusLIMS_db_path`
     The direct path to the NexusLIMS SQLite database file that contains
     information about the instruments in the Nexus Facility, as well as logs
     for the sessions created by users using the Session Logger Application.
@@ -72,22 +89,4 @@ nexuslims_db_path : str
 from ._urls import calendar_root_url
 from ._urls import ldap_url
 
-import socket as _socket
-import os as _os
-
-_mmf_nexus_paths = {'limsimages': '/data/smb/mmfnexus/',
-                    '***REMOVED***': '/mnt/***REMOVED***/',
-                    'poole': '/mnt/***REMOVED***/',
-                    '***REMOVED***': '***REMOVED***/mmfnexus/',
-                    '***REMOVED***': ''}
-
-_nexuslims_paths = {'limsimages': '/data/smb/nexusLIMS/mmfnexus/',
-                    '***REMOVED***': '/mnt/***REMOVED***/nexusLIMS/mmfnexus/',
-                    'poole': '/mnt/***REMOVED***/nexusLIMS/mmfnexus/',
-                    '***REMOVED***': '***REMOVED***/nexusLIMS/mmfnexus/',
-                    '***REMOVED***': ''}
-
-mmf_nexus_root_path = _mmf_nexus_paths[_socket.gethostname()]
-nexuslims_root_path = _nexuslims_paths[_socket.gethostname()]
-nexuslims_db_path = _os.path.join(nexuslims_root_path, '..',
-                                  'nexuslims_db.sqlite')
+# raise ValueError('nexusLIMS import')

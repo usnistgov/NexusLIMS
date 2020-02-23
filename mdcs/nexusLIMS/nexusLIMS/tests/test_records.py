@@ -16,42 +16,20 @@ from uuid import uuid4
 from datetime import datetime as _dt
 from nexusLIMS.tests.utils import tars, files
 from nexusLIMS.harvester.sharepoint_calendar import AuthenticationError
-import tarfile
 import pytest
-
-
-def setup_module():
-    """
-    Setup by extracting the compressed test files
-    """
-    for _, tarf in tars.items():
-        with tarfile.open(tarf, 'r:gz') as tar:
-            tar.extractall(path=os.path.dirname(tarf))
-
-
-def teardown_module():
-    """
-    Teardown by deleting the extracted test files
-    """
-    for _, fn in files.items():
-        os.remove(fn)
 
 
 class TestRecordBuilder:
     def test_new_session_processor(self, monkeypatch):
-        # set session_handler to use test database
-        monkeypatch.setattr(session_handler, "_nx_db_path", files['DB'])
-        monkeypatch.setattr(nexusLIMS.db, "_nx_db_path", files['DB'])
-
         # make record uploader just pretend by returning all files provided (
         # as if they were actually uploaded)
         monkeypatch.setattr(_rb, "_upload_record_files", lambda x: (x, x))
 
-        # overwrite _nx_path so we write records to the test folder rather
+        # overwrite nexusLIMS_path so we write records to the test folder rather
         # than real nexusLIMS folder
-        monkeypatch.setattr(_rb, "_nx_path",
-                            os.path.join(os.path.dirname(__file__), 'files',
-                                         'records'))
+        monkeypatch.setenv("nexusLIMS_path",
+                           os.path.join(os.path.dirname(__file__), 'files',
+                                        'records'))
 
         # Override the build_records function to not generate previews (since
         # this is tested elsewhere) to speed things up
@@ -170,7 +148,6 @@ class TestRecordBuilder:
             return [session_handler.Session('dummy_id', 'no_instrument',
                                             _dt.now(), _dt.now(), 'None')]
         monkeypatch.setattr(_rb, '_get_sessions', mock_get_sessions)
-        monkeypatch.setattr(session_handler, "_nx_db_path", files['DB'])
         _rb.build_new_session_records()
         assert 'Marking dummy_id as "ERROR"' in caplog.text
 
@@ -187,7 +164,6 @@ class TestRecordBuilder:
             return '<xml>Record that will not validate against NexusLIMS ' \
                    'Schema</xml>'
 
-        monkeypatch.setattr(session_handler, "_nx_db_path", files['DB'])
         monkeypatch.setattr(_rb, '_get_sessions', mock_get_sessions)
         monkeypatch.setattr(_rb, 'build_record', mock_build_record)
         _rb.build_new_session_records()
@@ -268,9 +244,6 @@ class TestSession:
                                '2020-02-04T12:00:00 on FEI-Titan-TEM-635816'
 
     def test_bad_db_status(self, monkeypatch):
-        # set session_handler to use test database
-        monkeypatch.setattr(session_handler, "_nx_db_path", files['DB'])
-        monkeypatch.setattr(nexusLIMS.db, "_nx_db_path", files['DB'])
         uuid = uuid4()
         q = f"INSERT INTO session_log " \
             f"(instrument, event_type, session_identifier, record_status) " \

@@ -43,8 +43,6 @@ from uuid import uuid4 as _uuid4
 from lxml import etree as _etree
 from datetime import datetime as _datetime
 from io import BytesIO as _bytesIO
-from nexusLIMS import mmf_nexus_root_path as _mmf_path
-from nexusLIMS import nexuslims_root_path as _nx_path
 import nexusLIMS.schemas.activity as _activity
 from nexusLIMS.schemas.activity import AcquisitionActivity as _AcqAc
 from nexusLIMS.schemas.activity import cluster_filelist_mtimes
@@ -52,7 +50,6 @@ from nexusLIMS.harvester import sharepoint_calendar as _sp_cal
 from nexusLIMS.utils import parse_xml as _parse_xml
 from nexusLIMS.utils import find_files_by_mtime as _find_files
 from nexusLIMS.extractors import extension_reader_map as _ext
-from nexusLIMS.db import session_handler as _session_handler
 from nexusLIMS.db.session_handler import get_sessions_to_build as _get_sessions
 from nexusLIMS.cdcs import upload_record_files as _upload_record_files
 from timeit import default_timer as _timer
@@ -201,7 +198,8 @@ def build_acq_activities(instrument, dt_from, dt_to, generate_previews):
         _logging.WARNING)
 
     start_timer = _timer()
-    path = _os.path.abspath(_os.path.join(_mmf_path, instrument.filestore_path))
+    path = _os.path.abspath(_os.path.join(_os.environ['mmfnexus_path'],
+                                          instrument.filestore_path))
     _logger.info(f'Starting new file-finding in {path}')
     files = _find_files(path, dt_from, dt_to)
 
@@ -242,8 +240,10 @@ def build_acq_activities(instrument, dt_from, dt_to, generate_previews):
                 activities[aa_idx] = _AcqAc(start=start_time)
 
             # add this file to the AA
-            _logger.info(f'Adding file {i} {f.replace(_mmf_path,"")} to activity'
-                         f' {aa_idx}')
+            _logger.info(
+                f'Adding file {i} '
+                f'{f.replace(_os.environ["mmfnexus_path"], "").strip("/")} '
+                f'to activity {aa_idx}')
             activities[aa_idx].add_file(f, generate_previews)
             # assume this file is the last one in the activity (this will be
             # true on the last iteration where mtime is <= to the
@@ -260,7 +260,7 @@ def build_acq_activities(instrument, dt_from, dt_to, generate_previews):
     _logger.info('Finished detecting activities')
     sample_id = str(_uuid4())       # just a random string for now
     for i, a in enumerate(activities):
-        aa_logger = _logging.getLogger('nexusLIMS.schemas.activity')
+        # aa_logger = _logging.getLogger('nexusLIMS.schemas.activity')
         # aa_logger.setLevel(_logging.ERROR)
         _logger.info(f'Activity {i}: storing setup parameters')
         a.store_setup_params()
@@ -377,7 +377,8 @@ def build_new_session_records():
             if isinstance(e, FileNotFoundError):
                 # if no files were found for this session log, mark it as so in
                 # the database
-                path = _os.path.join(_mmf_path, s.instrument.filestore_path)
+                path = _os.path.join(_os.environ['mmfnexus_path'],
+                                     s.instrument.filestore_path)
                 _logger.warning(f'No files found in '
                                 f'{_os.path.abspath(path)} between '
                                 f'{s.dt_from.isoformat()} and '
@@ -396,7 +397,8 @@ def build_new_session_records():
                 basename = f'{s.dt_from.strftime("%Y-%m-%d")}_' \
                            f'{s.instrument.name}_' \
                            f'{s.session_identifier.split("-")[0]}.xml'
-                filename = _os.path.join(_nx_path, '..', 'records', basename)
+                filename = _os.path.join(_os.environ['nexusLIMS_path'], '..',
+                                         'records', basename)
                 filename = _os.path.abspath(filename)
                 _pathlib.Path(_os.path.dirname(filename)).mkdir(parents=True,
                                                                 exist_ok=True)

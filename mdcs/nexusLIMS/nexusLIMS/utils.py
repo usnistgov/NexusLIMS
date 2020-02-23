@@ -46,7 +46,7 @@ def parse_xml(xml, xslt_file, **kwargs):
     ----------
     xml : str or bytes
         A string containing XML, such as that returned by :py:func:`~.fetch_xml`
-    xslt_file : str or BytesIO
+    xslt_file : str or io.BytesIO
         Path to the XSLT file to use for transformation
     **kwargs : dict, optional
         Other keyword arguments are passed as parameters to the XSLT
@@ -146,7 +146,8 @@ def is_subpath(path, of_paths):
     --------
     >>> is_subpath('/mnt/***REMOVED***/Titan/***REMOVED***/190628 - Aaron ' +
     ...            'Training/***REMOVED***/4_330mm.dm3',
-    ...            os.path.join(_mmf_path, titan.filestore_path))
+    ...            os.path.join(os.environ['mmfnexus_path'],
+    ...                         titan.filestore_path))
     True
     """
     if isinstance(of_paths, str):

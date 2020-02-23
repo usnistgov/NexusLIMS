@@ -25,34 +25,50 @@
 #  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
+import tarfile
+import os
+from nexusLIMS.tests.utils import tars, files
 
-import contextlib as _contextlib
-import sqlite3 as _sql3
-import os as _os
+# we don't want to mask both directories, because the record builder tests
+# need to look at the real files on ***REMOVED***:
+# os.environ['nexusLIMS_path'] =os.path.join(os.path.dirname(__file__), 'files')
+# os.environ['mmfnexus_path'] = os.path.join(os.path.dirname(__file__), 'files')
+
+# use our test database for all tests (don't want to impact real one)
+os.environ['nexusLIMS_db_path'] = files['DB']
 
 
-def make_db_query(query):
+def pytest_configure(config):
     """
-    Execute an arbitrary query on the NexusLIMS database and return the results
-    as a list
+    Allows plugins and conftest files to perform initial configuration.
+    This hook is called for every plugin and initial conftest
+    file after command line options have been parsed.
 
-    Parameters
-    ----------
-    query : str
-        The SQL query to execute
-
-    Returns
-    -------
-    res_list : :obj:`list` of :obj:`tuple`
-        The results of the SQL query
+    Unpack the test_db at the very beginning since we need it right away
+    when importing the instruments.py module (for instrument_db)
     """
-    # use contextlib to auto-close the connection and database cursors
-    with _contextlib.closing(_sql3.connect(
-            _os.environ['nexusLIMS_db_path'])) as conn:
-        with conn:  # auto-commits
-            with _contextlib.closing(
-                    conn.cursor()) as cursor:  # auto-closes
-                results = cursor.execute(query)
-                res_list = results.fetchall()
+    with tarfile.open(tars['DB'], 'r:gz') as tar:
+        tar.extractall(path=os.path.dirname(tars['DB']))
 
-    return res_list
+
+def pytest_sessionstart(session):
+    """
+    Called after the Session object has been created and
+    before performing collection and entering the run test loop.
+
+    Unpack the compressed test files.
+    """
+    for _, tarf in tars.items():
+        with tarfile.open(tarf, 'r:gz') as tar:
+            tar.extractall(path=os.path.dirname(tarf))
+
+
+def pytest_sessionfinish(session, exitstatus):
+    """
+    Called after whole test run finished, right before
+    returning the exit status to the system.
+
+    Remove the unpacked test files.
+    """
+    for _, fn in files.items():
+        os.remove(fn)

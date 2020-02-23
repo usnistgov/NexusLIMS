@@ -37,8 +37,6 @@ instrument_db : dict
     NexusLIMS remote database.
 """
 
-from nexusLIMS import nexuslims_db_path as _nx_path
-from nexusLIMS import mmf_nexus_root_path as _mmf_path
 from nexusLIMS.utils import is_subpath as _is_subpath
 import sqlite3 as _sql3
 import contextlib as _contextlib
@@ -59,7 +57,8 @@ def _get_instrument_db():
     """
     query = "SELECT * from instruments"
     # use contextlib to auto-close the connection and database cursors
-    with _contextlib.closing(_sql3.connect(_nx_path)) as conn:
+    with _contextlib.closing(_sql3.connect(
+            _os.environ['nexusLIMS_db_path'])) as conn:
         with conn:  # auto-commits
             with _contextlib.closing(conn.cursor()) as cursor:  # auto-closes
                 results = cursor.execute(query).fetchall()
@@ -185,7 +184,8 @@ def get_instr_from_filepath(path):
     'FEI-Titan-TEM-635816 in ***REMOVED***'
     """
     for k, v in instrument_db.items():
-        if _is_subpath(path, _os.path.join(_mmf_path, v.filestore_path)):
+        if _is_subpath(path, _os.path.join(_os.environ["mmfnexus_path"],
+                                           v.filestore_path)):
             return v
 
     return None
