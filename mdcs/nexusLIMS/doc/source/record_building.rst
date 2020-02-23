@@ -3,7 +3,7 @@
 Record building workflow
 ========================
 
-    `Last updated: February 19, 2020`
+    `Last updated: February 23, 2020`
 
 This page describes the process used to build records based on the data saved by
 instruments in the
@@ -246,17 +246,24 @@ case the FEI Titan TEM in Building 223):
     Computer name:    ***REMOVED***
     Computer mount:   M:/
 
-Using the `Filestore path` information, NexusLIMS first searches for directories
+Using the `Filestore path` information, NexusLIMS searches for files
 modified within the :py:class:`~nexusLIMS.instruments.Instrument`'s path during
-the specified timespan using :py:meth:`~nexusLIMS.utils.find_dirs_by_mtime`.
-Searching for directories first enhances performance by limiting actual file
-traversal to just those likely to be part of the record. If no directories are
-found (which is often the case if a user subsequently added something to the
-folder, or a record is being built for older experiments), then all files
-within the :py:class:`~nexusLIMS.instruments.Instrument`'s root-level folder
-are searched. This code is executed via the
-:py:meth:`~nexusLIMS.utils.find_files_by_mtime` method. Currently, this process
-takes on the order of 30 s to 1 min for typical records.
+the specified timespan. This is first tried using the
+:py:meth:`~nexusLIMS.utils.gnu_find_files_by_mtime`, which attempts to use
+the Unix |find|_ by spawning a sub-process. This only works on Linux, and may
+fail, so a slower pure-Python implementation (implemented in
+:py:meth:`~nexusLIMS.utils.find_files_by_mtime`) is used as a fallback if so.
+All files within the :py:class:`~nexusLIMS.instruments.Instrument`'s root-level
+folder are searched and only files with modificaiton times with the timespan
+of interest are returned. Currently, this process takes on the order of tens of
+seconds for typical records (depending on how many files are in the instrument's
+folder) when using the :py:meth:`~nexusLIMS.utils.gnu_find_files_by_mtime`.
+Basic testing has revealed the pure Python implementation of
+:py:meth:`~nexusLIMS.utils.find_files_by_mtime` to be approximately 3 times
+slower.
+
+.. |find| replace:: ``find`` command
+.. _find: https://www.gnu.org/software/findutils/
 
 If no files matching this session's timespan are found (as could be the case if
 a user accidentally started the logger application or did not generate any

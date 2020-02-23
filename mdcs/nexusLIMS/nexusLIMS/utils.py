@@ -30,9 +30,11 @@ from lxml import etree as _etree
 import certifi as _certifi
 import tempfile as _tempfile
 import os as _os
+import subprocess as _sp
 from os.path import getmtime as _getmtime
-import json as _json
+from warnings import warn
 import logging as _logging
+import sys as _sys
 
 _logger = _logging.getLogger(__name__)
 _logger.setLevel(_logging.INFO)
@@ -313,6 +315,13 @@ def find_dirs_by_mtime(path, dt_from, dt_to):
     Given two timestamps, find the directories under a path that were
     last modified between the two
 
+    .. deprecated:: 0.0.9
+          `find_dirs_by_mtime` is not recommended for use to find files for
+          record inclusion, because subsequent modifications to a directory
+          (e.g. the user wrote a text file or did some analysis afterwards)
+          means no files will be returned from that directory (because it is
+          not searched)
+
     Parameters
     ----------
     path : str
@@ -324,7 +333,7 @@ def find_dirs_by_mtime(path, dt_from, dt_to):
 
     Returns
     -------
-    dirs : list
+    dirs : :obj:`list` of :obj:`str`
         A list of the directories that have modification times within the
         time range provided
     """
@@ -342,8 +351,7 @@ def find_dirs_by_mtime(path, dt_from, dt_to):
 def find_files_by_mtime(path, dt_from, dt_to):
     """
     Given two timestamps, find files under a path that were
-    last modified between the two. Works by first searching for directories
-    that match and then only looking in those directories (to speed things up).
+    last modified between the two.
 
     Parameters
     ----------
@@ -362,15 +370,10 @@ def find_files_by_mtime(path, dt_from, dt_to):
     """
     # find only the directories that have been modified between these two
     # timestamps (should be much faster than inspecting all files)
-    dirs = find_dirs_by_mtime(path, dt_from, dt_to)
+    # Note: this doesn't work reliably, so just look in entire path...
+    # dirs = find_dirs_by_mtime(path, dt_from, dt_to)
 
-    if len(dirs) == 0:
-        # we didn't find any directories in our time of interest (likely the
-        # case when looking at data that was collected before it started
-        # being saved to the centralized share; fallback to all directories
-        _logger.info('Could not find directories modified in time span, '
-                     'so searching all directories')
-        dirs = [path]
+    dirs = [path]
 
     files = set()    # use a set here (faster and we won't have duplicates)
     # for each of those directories, walk the file tree and inspect the
@@ -384,6 +387,85 @@ def find_files_by_mtime(path, dt_from, dt_to):
 
     # convert the set to a list and sort my mtime
     files = list(files)
+    files.sort(key=_getmtime)
+
+    return files
+
+
+def gnu_find_files_by_mtime(path, dt_from, dt_to):
+    """
+    Given two timestamps, find files under a path that were
+    last modified between the two. Uses the system-provided GNU ``find``
+    command. In basic testing, this method was found to be approximately 3 times
+    faster than using :py:meth:`find_files_by_mtime` (which is implemented in
+    pure Python).
+
+    Parameters
+    ----------
+    path : str
+        The root path from which to start the search
+    dt_from : datetime.datetime
+        The "starting" point of the search timeframe
+    dt_to : datetime.datetime
+        The "ending" point of the search timeframe
+
+    Returns
+    -------
+    files : :obj:`list` of :obj:`str`
+        A list of the files that have modification times within the
+        time range provided (sorted by modification time)
+
+    Raises
+    ------
+    NotImplementedError
+        If the system running this code is not Linux-based
+    RuntimeError
+        If the find command cannot be found, or running it results in output
+        to `stderr`
+    """
+    # Verify we're running on Linux
+    if not _sys.platform.startswith('linux'):
+        raise NotImplementedError('gnu_find_files_by_mtime only implemented '
+                                  'for Linux')
+
+    def _which(fname):
+        def _is_exec(f):
+            return _os.path.isfile(f) and _os.access(f, _os.X_OK)
+
+        # Check to see if find command is on PATH:
+        exec_file = fname
+
+        for p in _os.environ["PATH"].split(_os.pathsep):
+            exe_file = _os.path.join(p, exec_file)
+            if _is_exec(exe_file):
+                return exe_file
+
+        return False
+
+    if not _which('find'):
+        raise RuntimeError('find command was not found on the system PATH')
+
+    # Actually run find command:
+    cmd = f'find {_os.path.join(_os.environ["mmfnexus_path"], path)} ' \
+          f'-type f ' \
+          f'-newermt "{dt_from.isoformat()}" ' \
+          f'\\! -newermt "{dt_to.isoformat()}" ' \
+          f'-print0'
+
+    out = _sp.Popen(cmd, shell=True,
+                    stdin=_sp.PIPE, stdout=_sp.PIPE, stderr=_sp.PIPE)
+
+    (stdout, stderr) = out.communicate()
+
+    if len(stderr) > 0:
+        # find command returned an error
+        raise RuntimeError(stderr)
+
+    files = stdout.split(b'\x00')
+    files = [f.decode() for f in files if len(f) > 0]
+
+    # convert to set and back to remove duplicates and sort my mtime
+    files = list(set(files))
     files.sort(key=_getmtime)
 
     return files

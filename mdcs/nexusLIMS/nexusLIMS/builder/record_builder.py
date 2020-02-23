@@ -49,6 +49,7 @@ from nexusLIMS.schemas.activity import cluster_filelist_mtimes
 from nexusLIMS.harvester import sharepoint_calendar as _sp_cal
 from nexusLIMS.utils import parse_xml as _parse_xml
 from nexusLIMS.utils import find_files_by_mtime as _find_files
+from nexusLIMS.utils import gnu_find_files_by_mtime as _gnu_find_files
 from nexusLIMS.extractors import extension_reader_map as _ext
 from nexusLIMS.db.session_handler import get_sessions_to_build as _get_sessions
 from nexusLIMS.cdcs import upload_record_files as _upload_record_files
@@ -64,6 +65,7 @@ XSD_PATH = _os.path.join(_os.path.dirname(_activity.__file__),
 def build_record(instrument, dt_from, dt_to,
                  date=None,
                  user=None,
+                 sample_id=None,
                  generate_previews=True):
     """
     Construct an XML document conforming to the NexusLIMS schema from a
@@ -94,6 +96,9 @@ def build_record(instrument, dt_from, dt_to,
         instead of ernst.august.ruska@nist.gov). Controls the results
         returned from the calendar - value is as specified in
         :py:func:`~.sharepoint_calendar.get_events`
+    sample_id : str or None
+        A unique identifier pointing to a sample identifier for data
+        collected in this record. If None, a UUIDv4 will be generated
     generate_previews : bool
         Whether or not to create the preview thumbnail images
 
@@ -105,6 +110,9 @@ def build_record(instrument, dt_from, dt_to,
     """
 
     xml_record = ''
+
+    if sample_id is None:
+        sample_id = str(_uuid4())
 
     # if an explicit date is not provided, use the start of the timespan
     if date is None:
@@ -132,7 +140,7 @@ def build_record(instrument, dt_from, dt_to,
                         instrument_name=instrument.schema_name,
                         experiment_id=str(_uuid4()),
                         collaborator=None,
-                        sample_id=str(_uuid4()))
+                        sample_id=sample_id)
 
     # No calendar events were found
     if str(output) == '':
@@ -149,7 +157,8 @@ def build_record(instrument, dt_from, dt_to,
     _logger.info(f"Building acquisition activities for timespan from "
                  f"{dt_from.isoformat()} to {dt_to.isoformat()}")
     aa_str, activities = build_acq_activities(instrument,
-                                              dt_from, dt_to, generate_previews)
+                                              dt_from, dt_to, sample_id,
+                                              generate_previews)
     xml_record += aa_str
 
     xml_record += "</nx:Experiment>"  # Add closing tag for root element.
@@ -157,7 +166,8 @@ def build_record(instrument, dt_from, dt_to,
     return xml_record
 
 
-def build_acq_activities(instrument, dt_from, dt_to, generate_previews):
+def build_acq_activities(instrument, dt_from, dt_to,
+                         sample_id, generate_previews):
     """
     Build an XML string representation of each AcquisitionActivity for a
     single microscopy session. This includes setup parameters and metadata
@@ -177,6 +187,8 @@ def build_acq_activities(instrument, dt_from, dt_to, generate_previews):
     dt_to : datetime.datetime
         The ending timestamp used to determine the last point in time for
         which files should be associated with this record
+    sample_id : str
+        An identifier for the sample from which data was collected
     generate_previews : bool
         Whether or not to create the preview thumbnail images
 
@@ -201,7 +213,12 @@ def build_acq_activities(instrument, dt_from, dt_to, generate_previews):
     path = _os.path.abspath(_os.path.join(_os.environ['mmfnexus_path'],
                                           instrument.filestore_path))
     _logger.info(f'Starting new file-finding in {path}')
-    files = _find_files(path, dt_from, dt_to)
+    try:
+        files = _gnu_find_files(path, dt_from, dt_to)
+    except (NotImplementedError, RuntimeError) as e:
+        _logger.warning(f'GNU find returned error: {e}\nFalling back to pure '
+                        f'Python implementation')
+        files = _find_files(path, dt_from, dt_to)
 
     # remove all files but those supported by nexusLIMS.extractors
     files = [f for f in files if _os.path.splitext(f)[1].strip('.') in
@@ -258,7 +275,6 @@ def build_acq_activities(instrument, dt_from, dt_to, generate_previews):
 
     acq_activities_str = ''
     _logger.info('Finished detecting activities')
-    sample_id = str(_uuid4())       # just a random string for now
     for i, a in enumerate(activities):
         # aa_logger = _logging.getLogger('nexusLIMS.schemas.activity')
         # aa_logger.setLevel(_logging.ERROR)

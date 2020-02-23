@@ -26,10 +26,12 @@
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
 
-from nexusLIMS.utils import parse_xml
-from nexusLIMS.utils import try_getting_dict_value
-from nexusLIMS.utils import get_nested_dict_value
-from io import StringIO, BytesIO
+from nexusLIMS.utils import *
+from nexusLIMS.utils import find_dirs_by_mtime
+from datetime import datetime
+import os
+import sys
+from io import BytesIO
 from lxml import etree
 import pytest
 
@@ -66,3 +68,67 @@ class TestUtils:
         assert try_getting_dict_value(non_nest, 'level3') == 'not found'
         assert try_getting_dict_value(nest, ['level1', 'level2.1']) == {
             'level3.1': 'value'}
+
+    def test_find_dirs_by_mtime(self):
+        path = os.path.join(os.environ["mmfnexus_path"], "JEOL3010")
+        dt_from = datetime.fromisoformat("2019-07-24T11:00:00.000")
+        dt_to = datetime.fromisoformat("2019-07-24T16:00:00.000")
+        dirs = find_dirs_by_mtime(path, dt_from, dt_to)
+
+        assert len(dirs) == 3
+        for d in ['JEOL3010/***REMOVED***/***REMOVED***/20190724/M1_DC_Beam',
+                  'JEOL3010/***REMOVED***/***REMOVED***/20190724/M2_DC_Beam_Dose_1',
+                  'JEOL3010/***REMOVED***/***REMOVED***/20190724/M3_DC_Beam_Dose_2']:
+            assert os.path.join(os.environ['mmfnexus_path'], d) in dirs
+
+    def test_gnu_find(self):
+        files = gnu_find_files_by_mtime(
+            os.path.join(os.environ["mmfnexus_path"], "643Titan"),
+            dt_from=datetime.fromisoformat("2019-11-06T15:00:00.000"),
+            dt_to=datetime.fromisoformat("2019-11-06T18:00:00.000"))
+
+        assert len(files) == 38
+
+    def test_gnu_and_pure_find_together(self):
+        # both file-finding methods should return the same list (when sorted
+        # by mtime) for the same path and date range
+        path = os.path.join(os.environ["mmfnexus_path"], "JEOL3010")
+        dt_from = datetime.fromisoformat("2019-07-24T11:00:00.000")
+        dt_to = datetime.fromisoformat("2019-07-24T16:00:00.000")
+        gnu_files = gnu_find_files_by_mtime(path, dt_from=dt_from, dt_to=dt_to)
+        find_files = find_files_by_mtime(path, dt_from=dt_from, dt_to=dt_to)
+
+        gnu_files = sorted(gnu_files)
+        find_files = sorted(find_files)
+
+        assert len(gnu_files) == 55
+        assert len(find_files) == 55
+        assert gnu_files == find_files
+
+    def test_gnu_find_not_implemented(self, monkeypatch):
+        monkeypatch.setattr(sys, 'platform', 'win32')
+
+        with pytest.raises(NotImplementedError):
+            files = gnu_find_files_by_mtime(
+                os.path.join(os.environ["mmfnexus_path"], "643Titan"),
+                dt_from=datetime.fromisoformat("2019-11-06T15:00:00.000"),
+                dt_to=datetime.fromisoformat("2019-11-06T18:00:00.000"))
+
+    def test_gnu_find_not_on_path(self, monkeypatch):
+        monkeypatch.setenv('PATH', '.')
+
+        with pytest.raises(RuntimeError) as e:
+            files = gnu_find_files_by_mtime(
+                os.path.join(os.environ["mmfnexus_path"], "643Titan"),
+                dt_from=datetime.fromisoformat("2019-11-06T15:00:00.000"),
+                dt_to=datetime.fromisoformat("2019-11-06T18:00:00.000"))
+        assert str(e.value) == 'find command was not found on the system PATH'
+
+    def test_gnu_find_stderr(self):
+        with pytest.raises(RuntimeError) as e:
+            # bad path should cause output to stderr, which should raise error
+            files = gnu_find_files_by_mtime(
+                '...............',
+                dt_from=datetime.fromisoformat("2019-11-06T15:00:00.000"),
+                dt_to=datetime.fromisoformat("2019-11-06T18:00:00.000"))
+        assert '...............' in str(e.value)

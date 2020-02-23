@@ -9,12 +9,13 @@ from nexusLIMS.builder import record_builder as _rb
 from nexusLIMS.schemas import activity
 from nexusLIMS.db import session_handler
 from nexusLIMS.db import make_db_query
+import nexusLIMS.utils
 from collections import namedtuple
 from glob import glob
 from lxml import etree as et
 from uuid import uuid4
 from datetime import datetime as _dt
-from nexusLIMS.tests.utils import tars, files
+from nexusLIMS.tests.utils import files
 from nexusLIMS.harvester.sharepoint_calendar import AuthenticationError
 import pytest
 
@@ -69,8 +70,8 @@ class TestRecordBuilder:
             },
             '2019-07-24_JEOL-JEM3010-TEM-565989_41ec0ad1.xml': {
                 '/title': '***REMOVED***',
-                '//acquisitionActivity': 4,
-                '//dataset': 34,
+                '//acquisitionActivity': 6,
+                '//dataset': 55,
                 '/summary/motivation': '***REMOVED*** '
                                        '***REMOVED*** '
                                        'beam',
@@ -183,11 +184,28 @@ class TestRecordBuilder:
 class TestActivity:
     @classmethod
     def setup_class(cls):
+        cls.instr = instrument_db['FEI-Titan-TEM-635816']
+        cls.dt_from = _dt.fromisoformat('2018-11-13T13:00:00.000')
+        cls.dt_to = _dt.fromisoformat('2018-11-13T16:00:00.000')
         cls.activities_str, cls.activities_list = _rb.build_acq_activities(
-            instrument=instrument_db['FEI-Titan-TEM-635816'],
-            dt_from=_dt.fromisoformat('2018-11-13T13:00:00.000'),
-            dt_to=_dt.fromisoformat('2018-11-13T16:00:00.000'),
-            generate_previews=False)
+            instrument=cls.instr, dt_from=cls.dt_from, dt_to=cls.dt_to,
+            sample_id='test_sample_id', generate_previews=False)
+
+    def test_gnu_find_vs_pure_python(self, monkeypatch):
+        # force the GNU find method to fail
+        def mock_gnu_find(x, y, z):
+            raise RuntimeError('Mock failure for GNU find method')
+
+        monkeypatch.setattr(_rb, '_gnu_find_files', mock_gnu_find)
+        self.activities_str_python_find, self.activities_list_python_find = \
+            _rb.build_acq_activities(
+                instrument=self.instr, dt_from=self.dt_from, dt_to=self.dt_to,
+                sample_id='test_sample_id',
+                generate_previews=False)
+
+        assert len(self.activities_list) == \
+            len(self.activities_list_python_find)
+        assert self.activities_str == self.activities_str_python_find
 
     def test_activity_repr(self):
         assert self.activities_list[0].__repr__() == \
