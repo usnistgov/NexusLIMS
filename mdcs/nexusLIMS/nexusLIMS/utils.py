@@ -423,6 +423,7 @@ def gnu_find_files_by_mtime(path, dt_from, dt_to):
         If the find command cannot be found, or running it results in output
         to `stderr`
     """
+    _logger.info(f'Using GNU `find` to search for files')
     # Verify we're running on Linux
     if not _sys.platform.startswith('linux'):
         raise NotImplementedError('gnu_find_files_by_mtime only implemented '
@@ -452,6 +453,7 @@ def gnu_find_files_by_mtime(path, dt_from, dt_to):
           f'\\! -newermt "{dt_to.isoformat()}" ' \
           f'-print0'
 
+    _logger.info(f'Running via subprocess: "{cmd}"')
     out = _sp.Popen(cmd, shell=True,
                     stdin=_sp.PIPE, stdout=_sp.PIPE, stderr=_sp.PIPE)
 
