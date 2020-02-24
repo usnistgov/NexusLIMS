@@ -65,7 +65,7 @@ setup(
 
         # Specify the Python versions you support here. In particular, ensure
         # that you indicate whether you support Python 2, Python 3 or both.
-        'Programming Language :: Python :: 3.6'
+        'Programming Language :: Python :: 3.7'
     ],
 
     # What does your project relate to?
@@ -73,7 +73,7 @@ setup(
 
     # You can just specify the packages manually here if your project is
     # simple. Or you can use find_packages().
-    packages=['nexusLIMS', 'nexusLIMS.cal_harvesting', 'nexusLIMS.extractors'],
+    packages=['nexusLIMS'],
 
     # List run-time dependencies here.  These will be installed by pip when your
     # project is installed. For an analysis of "install_requires" vs pip's
@@ -83,7 +83,11 @@ setup(
                       'requests',
                       'requests-ntlm',
                       'ntlm-auth',
-                      'dateparser'],
+                      'dateparser',
+                      'hyperspy',
+                      'numpy',
+                      'matplotlib',
+                      'scikit-image'],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,
@@ -93,7 +97,8 @@ setup(
         'devel': ['coverage',
                   'pytest',
                   'pytest-cov',
-                  ],
+                  'sphinx'
+                  ]
     },
 
     # required to include additional resource files in the package

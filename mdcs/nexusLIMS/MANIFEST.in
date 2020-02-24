@@ -1,3 +1,0 @@
-include nexusLIMS/cal_harvesting/cal_parser.xsl
-include nexusLIMS/tests/*
-include nexusLIMS/credentials.ini.example

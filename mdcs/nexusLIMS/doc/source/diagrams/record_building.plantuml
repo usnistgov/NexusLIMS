@@ -1,0 +1,206 @@
+@startuml
+skinparam ConditionEndStyle hline
+skinparam ActivityBackgroundColor #ffffff
+skinparam ActivityStartColor green
+skinparam ActivityEndColor red
+skinparam linetype polyline
+skinparam linetype ortho
+
+center header
+<font size=32><b>Nexus<font color=#316982><i>LIMS</i></b> record generation</font>
+<font size=32>documentation diagram</font>
+
+
+endheader
+
+
+|#eee|Record builder|
+start
+
+:""record_builder.process_new_sessions()"";
+note left
+  The record building process
+  is initiated by this method,
+  which is run automatically on
+  a periodic basis to detect
+  new sessions
+end note
+
+note right
+  It can be run manually via
+  ""python -m nexusLIMS.record_builder""
+end note
+
+|#eeeeff|Session handler|
+
+:""session_handler.get_sessions_to_build()"";
+note right
+  Check NexusLIMS database for
+  logs with the same
+  ""session_identifier"" value
+  and both a ""START"" and
+  ""END"" log that have status
+  ""TO_BE_BUILT""
+end note
+
+if (Are there new sessions?) then (True)
+  repeat :Extract single ""Session"";
+    :Return ""session_handler.Session"" object;
+    note right
+      Contains ""session_identifier""
+      (UUID), instrument definition,
+      start and end timestamps,
+      and user information
+    end note
+    :Insert ""RECORD_GENERATION"" event in
+    NexusLIMS database for this ""Session"";
+    :""record_builder.build_record(Session)"";
+    |Record builder|
+    :""build_record(instrument, ""
+    ""             time_from, ""
+    ""             time_to)"";
+    note left
+      Creates a new "".xml""
+      document for this
+      ""Experiment""
+    end note
+    :""harvester.sharepoint_calendar.get_events()"";
+    note left
+      Finds reservation for
+      this ""instrument"" that
+      match the specified
+      timespan
+    end note
+    if (Calendar event found?) then (True)
+      :Add detailed event
+      info to record summary
+      ""XML"";
+      note left
+        Experiment title,
+        motivation, sample
+        name, project info,
+        etc.
+      end note
+    else (False)
+      :Add basic information
+      such as ""instrument""
+      and date to ""XML"";
+    endif
+    :Identify files (of known filetype)
+    created on this ""instrument""
+    within this timespan to be
+    associated with this record;
+    note left
+      NexusLIMS database
+      indicates where to look for
+      files for each ""instrument""
+    end note
+    if (One or more files found?) then (True)
+      |Record builder|
+      :Separate files into "activities"
+      (""schemas.activity.AcquisitionActivity""
+      objects) by clustering file creation times;
+      note right
+        ""schemas.activity.""
+        ""cluster_filelist_mtimes()""
+        performs statistical analysis
+        of file modification times to
+        group (likely) related files together
+      end note
+      repeat :Build one ""AcquisitionActivity"";
+        :Parse metadata for all files part
+        of this activity;
+        |#eeffee|Metadata extractors|
+        repeat :""extractors.parse_metadata(filename)"";
+          :Extract all known metadata
+          from the the raw data file;
+          :Determine "dataset type"
+          (<i>i.e.</i> "TEM Imaging",
+          "STEM EELS", "SEM EDS", etc.);
+          :Generate "".png"" preview image
+          and save in NexusLIMS folder;
+          :Save metadata to NexusLIMS
+          folder as "".json"";
+        repeat while (More files to process?) is (True)
+        -> False;
+        |Record builder|
+        split
+        :Assign metadata values
+        common between all files
+        as <i>Setup parameters</i>
+        for this ""AcquisitionActivity"";
+        split again
+        :Assign all other metadata
+        values as unique to each
+        ""dataset"";
+        ' note right
+        '   test
+        ' end note
+        end split
+        :Add this ""AcquisitionActivity""
+        to the "".xml"" record;
+        note left
+          Uses the ""as_xml()""
+          method
+        end note
+      repeat while (More activities to process) is (True)
+    else (False)
+      |Session handler|
+      #Orange:Update ""Session"" status in
+      NexusLIMS database
+      as ""NO_FILES_FOUND"";
+      (A)
+      detach
+    endif
+    -> False;
+    |Record builder|
+    if (""record_builder.validate_record()"") then (True)
+      |Record builder|
+      :Write ""XML"" record to NexusLIMS
+      folder;
+      |Session handler|
+      #Orange:Update ""Session"" status in
+      NexusLIMS database
+      as ""COMPLETED"";
+      (A)
+      detach
+      |Record builder|
+    else (False)
+      |Session handler|
+      #Orange:Update ""Session"" status in
+      NexusLIMS database
+      as ""ERROR"";
+      (A)
+      detach
+      |Record builder|
+    endif
+    |Session handler|
+    (A)
+    #Orange:Verify ""Session"" was
+    updated in NexusLIMS
+    database;
+  repeat while (More sessions to process?) is (True)
+  |Session handler|
+  -> False;
+  if (Any records created?) then (False)
+    stop
+  else (True)
+    |#ffefe1|CDCS Connector|
+    repeat :Upload single "".xml"" record;
+      :Assign to public
+      CDCS workspace;
+    repeat while (More records to upload?) is (True)
+    -> False;
+    |Record builder|
+    stop
+  endif
+else (False)
+  |Session handler|
+  stop
+endif
+
+
+center footer
+ Last updated Feb. 19, 2020
+end footer
+@enduml

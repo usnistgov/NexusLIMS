@@ -1,31 +1,56 @@
-# Cache the "test_env" conda environment between jobs
+# Cache the conda environment between jobs
 variables:
-  CONDA_ENV: "test_env"
+  CONDA_ENV: "/home/gitlab-runner/conda_envs/NexusLIMS_conda_env"
 
 cache:
   paths:
-    - ${CONDA_ENV}
+    - .gitlab-cache.tar.gz
 
 nexusLIMS_tests:
   script:
-    - pipenv run pytest --cov=mdcs/nexusLIMS/nexusLIMS mdcs/nexusLIMS/nexusLIMS/tests
+    # run tests with coverage
+    - pipenv run pytest mdcs/nexusLIMS/nexusLIMS/tests --cov=mdcs/nexusLIMS/nexusLIMS --mpl --mpl-baseline-path=mdcs/nexusLIMS/nexusLIMS/tests/files/figs
   # Install the environment
   before_script:
+    # before anything, try to remove the existing conda environment and replace
+    # with gitlab cache, returning true whether or not we succeeded
     - /opt/conda/bin/conda remove -p ${CONDA_ENV} --all || true
-    - echo "Use conda to install the base python environment so we don't mess with system packages"
-    - for i in $(seq 1 5); do [ $i -gt 1 ] && echo "Sleeping for 15 seconds..."; sleep 15; /opt/conda/bin/conda create -p ${CONDA_ENV} python=3.7 && s=0 && break || s=$?; done; (exit $s)
-    - source /opt/conda/bin/activate $(pwd)/${CONDA_ENV}
+    - tar -xzf .gitlab-cache.tar.gz -C / || true
+    # try to source the unpacked environment, and if we succeeded, continue, if not, create new environment and install pipenv
+    - source /opt/conda/bin/activate ${CONDA_ENV} && EXITCODE=0 || EXITCODE=$? && true
+    # the following syntax allows for multi-line command (using > )
+    - >
+      if [ ${EXITCODE} -eq 0 ]; then
+        # we succeeded, so we don't need to do anything
+        :
+      else
+        # we failed, so install conda environment
+        echo "Use conda to install the base python environment so we don't mess with system packages"
+        for i in $(seq 1 5); do [ $i -gt 1 ] && echo "Sleeping for 15 seconds..."; sleep 15; /opt/conda/bin/conda create -p ${CONDA_ENV} python=3.7 && s=0 && break || s=$?; done; (exit $s)
+      fi
+    - source /opt/conda/bin/activate ${CONDA_ENV}
     - echo "install pipenv to build the actual environment"
     - pip install pipenv
     - pipenv install --dev
+  after_script:
+    # create a cache file of the conda environment, always returning true
+    - tar -czf .gitlab-cache.tar.gz ${CONDA_ENV} || true
 
 pages:
   script:
+    # run twice because for some reason the plantuml documents don't work the first time
     - pipenv run python -m sphinx.cmd.build mdcs/nexusLIMS/doc/source public/doc -n -E -a -j auto -b html
   before_script:
-    - source /opt/conda/bin/activate $(pwd)/${CONDA_ENV}
+    # before anything, try to remove the existing conda environment and replace
+    # with gitlab cache, returning true whether or not we succeeded
+    - /opt/conda/bin/conda remove -p ${CONDA_ENV} --all || true
+    - tar -xzf .gitlab-cache.tar.gz -C / || true
+    - source /opt/conda/bin/activate ${CONDA_ENV}
     - pip install pipenv
     - pipenv install --dev
+  after_script:
+    # create a cache file of the conda environment, always returning true
+    - tar -czf .gitlab-cache.tar.gz ${CONDA_ENV} || true
   artifacts:
     paths:
       - public

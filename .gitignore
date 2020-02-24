@@ -1,6 +1,6 @@
 # File patterns we want git to ignore
 
-# backup 
+# backup
 *~
 *.bak
 backups
@@ -10,12 +10,28 @@ backups
 gitlab_backup.log
 *credentials.ini
 .coverage
+.env
+.directory
 
 # dev files
 *.pyc
 .idea
 .vscode
+test_data/
 **/doc/build
+**/db_logger_gui/build
+mdcs/nexusLIMS/doc/source/api/*.rst
+_coverage_output
 
 # pip installation files
 *.egg-info
+
+# pytest coverage results
+htmlcov/
+
+# pickle save files
+*.pk
+
+# Oxygen project files
+*.xpr
+/mdcs/nexusLIMS/nexusLIMS/db/build/

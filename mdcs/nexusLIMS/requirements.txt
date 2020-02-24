@@ -10,3 +10,5 @@ pytest-cov=2.6.1=py_0
 python=3.7.2=h0371630_0
 requests=2.21.0=py37_1000
 requests_ntlm=1.1.0=py_0
+hyperspy=1.4.1
+sphinx=1.8.5

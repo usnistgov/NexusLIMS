@@ -16,12 +16,14 @@ import shutil
 sys.path.insert(0, os.path.abspath('../../'))
 import nexusLIMS.version
 from datetime import datetime
+from glob import glob
 
 # -- Project information -----------------------------------------------------
 
 project = 'NexusLIMS'
 copyright = f'{datetime.now().year}, NIST Office of Data and Informatics'
 author = 'NIST Office of Data and Informatics'
+numfig = True
 
 # The full version, including alpha/beta/rc tags
 release = nexusLIMS.version.__version__
@@ -36,12 +38,7 @@ extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
-    # 'sphinx.ext.imgmath',
-    # 'sphinx.ext.autosummary',
     'sphinx.ext.coverage',
-    # 'sphinx.ext.todo',
-    # 'sphinx.ext.ifconfig',
-    # 'sphinx.ext.viewcode',
 ]
 
 try:
@@ -61,12 +58,40 @@ pygments_style = 'sphinx'
 add_function_parentheses = True
 # master_doc = 'index'
 
-intersphinx_mapping = {'python': ('https://docs.python.org/3', None),
+# # LXML does not use sphinx, so if you want to link to specific page,
+# # you have to create a custom objects.inv file for that module (this is
+# # used for nexusLIMS.utils.parse_xml, for example). To do this, use the
+# # example below to add the specific objects and links as needed (this
+# # method from https://sphobjinv.readthedocs.io/en/latest/customfile.html)
+
+#     import sphobjinv as soi
+#     inv = soi.Inventory()
+#     inv.project = 'lxml'
+#     inv.version = lxml.__version__
+#     o = soi.DataObjStr(name='lxml.etree._XSLTResultTree', domain='py',
+#     role='class', priority='1', uri='xpathxslt.html#xslt', dispname='-')
+#     inv.objects.append(o)
+#     text = inv.data_file(contract=True)
+#     ztext = soi.compress(text)
+#     soi.writebytes('***REMOVED***NexusMicroscopyLIMS/mdcs/nexusLIMS/'
+#                    'doc/source/objects_lxml.inv', ztext)
+
+intersphinx_mapping = {'python': ('https://docs.python.org/3.7/', None),
                        'dateparser': (
                            'https://dateparser.readthedocs.io/en/latest/',
                            None),
                        'hyperspy': (
-                           'http://hyperspy.org/hyperspy-doc/current/', None)
+                           'http://hyperspy.org/hyperspy-doc/current/', None),
+                       'numpy': (
+                           'https://docs.scipy.org/doc/numpy/', None),
+                       'matplotlib': ('https://matplotlib.org/', None),
+                       'requests': (
+                           'https://2.python-requests.org/en/master', None),
+                       'PIL': (
+                           'https://pillow.readthedocs.io/en/3.1.x/',
+                           None),
+                       # use the custom objects.inv file above for LXML:
+                       'lxml': ('https://lxml.de/', 'objects_lxml.inv')
                        }
 
 import sphinx_bootstrap_theme
@@ -84,9 +109,10 @@ exclude_patterns = [
     'Thumbs.db',
     '.DS_Store',
     'build',
-    'api/nexusLIMS.rst',
+#    'api/nexusLIMS.rst',
     'api/nexusLIMS.version.rst',
-    'README.rst'
+    'README.rst',
+    'dev_scripts'
 ]
 
 # Keep warnings as “system message” paragraphs in the built documents.
@@ -105,6 +131,14 @@ keep_warnings = True
 # so a file named "default.css" will overwrite the builtin "default.css".
 html_static_path = ['_static']
 
+html_css_files = [
+    'custom-styles.css',
+]
+
+html_js_files = [
+    'custom.js',
+]
+
 # html_title = "NexusLIMS documentation"
 html_short_title = "NexusLIMS"
 html_logo = "_static/logo_horizontal.png"
@@ -112,7 +146,7 @@ html_favicon = "_static/nexusLIMS_bare_logo.ico"
 html_last_updated_fmt = '%b, %d, %Y'
 html_use_smartypants = True
 html_show_sourcelink = True
-html_show_sphinx = True
+html_show_sphinx = False
 html_show_copyright = True
 
 # html_sidebars = {'**': ['localtoc.html', 'sourcelink.html', 'searchbox.html']}
@@ -206,11 +240,46 @@ def run_apidoc(_):
     output_path = os.path.join(cur_dir, 'api')
     shutil.rmtree(output_path, ignore_errors=True)
     modules = os.path.normpath(os.path.join(cur_dir, "../../nexusLIMS"))
-    main(['-f', '-M', '-T', '-o', output_path, modules])
+    to_exclude = list(glob(os.path.join(modules, 'dev_scripts') + '/**/*',
+                           recursive=True))
+    # exclude db_logger_gui files from autodoc
+    to_exclude += list(glob(os.path.join(modules, 'db', 'db_logger_gui', '*')))
+    # to_exclude += [os.path.join(modules, 'builder')]
+    main(['-f', '-M', '-T', '-d', '-1', '-o', output_path, modules] +
+         to_exclude)
+
+
+# def build_plantuml(_):
+#     from glob import glob
+#     from plantuml import PlantUML
+#     pl = PlantUML('http://www.plantuml.com/plantuml/img/')
+#     cur_dir = os.path.normpath(os.path.dirname(__file__))
+#     diagrams = os.path.join(cur_dir, 'diagrams')
+#     output_path = os.path.join(cur_dir, '_static')
+#     for f in glob(os.path.join(diagrams, '*uml')):
+#         print(f)
+#         out_name = os.path.splitext(os.path.basename(f))[0] + '.png'
+#         out_f_path = os.path.join(output_path, out_name)
+#         pl.processes_file(f, outfile=out_f_path)
+
+
+# lines from intersphinx to ignore during api-doc autogeneration (so we don't
+# get useless warning messages while the docs are being built
+nitpick_ignore = [('py:class', 'function'),
+                  ('py:class', 'optional'),
+                  ('py:class', 'json.encoder.JSONEncoder')]
+
+
+def skip(app, what, name, obj, would_skip, options):
+    if name == "__init__":
+        return False
+    return would_skip
 
 
 def setup(app):
+    # app.connect("autodoc-skip-member", skip)
     app.connect('builder-inited', run_apidoc)
-    app.add_stylesheet("custom-styles.css")
-
-
+    # app.connect('builder-inited', build_plantuml)
+    print('If you need to update the PlantUML diagrams, run\n'
+          'build_plantuml.sh in this directory')
+    # app.add_stylesheet("custom-styles.css")

@@ -1,0 +1,4 @@
+[run]
+omit =
+    mdcs/nexusLIMS/nexusLIMS/dev_scripts/*
+    mdcs/nexusLIMS/nexusLIMS/tests/conftest.py

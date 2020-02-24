@@ -1,3 +1,22 @@
+/*             */
+/* Admonitions */
+/*             */
+
+.alert-info {
+    border-color: #b1dcec;
+    background-color: #d2eef9;
+    color: #494949;
+}
+
+.alert-info a {
+    color: #0080ff;
+}
+
+.alert-info .admonition-title {
+    /*font-variant: petite-caps;*/
+    font-style: italic;
+}
+
 /*               */
 /* Miscellaneous */
 /*               */
@@ -45,6 +64,11 @@ div#sidebar > img {
     width: 50%;
 }
 
+/*!* Hide footer source link since it's not really useful anyway *!*/
+.footer #sourcelink {
+    display: none;
+}
+
 /*         */
 /* Autodoc */
 /*         */
@@ -78,4 +102,14 @@ div.toctree-wrapper > p.caption > span.caption-text {
     font-size: 24px;
     margin-top: 20px;
     margin-bottom: 10px;
+}
+
+/* Hide value of the instrument_db attribute */
+dt#nexusLIMS\.instruments\.instrument_db > em {
+    display: none;
+}
+
+/* Make blockquotes same size as other text */
+blockquote {
+    font-size: unset;
 }
