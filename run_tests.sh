@@ -15,6 +15,7 @@ while test $# -ge 1; do
       echo "options:"
       echo "-h, --help                     show brief help"
       echo "-r, --run-tests                run test suite"
+      echo "-rh, --run-tests-htmlcov       run test suite with HTML coverage report"
       echo "-rb                            run record builder tests"
       echo "-g, --generate-test-figs       generate figures for mpl tests instead of running tests"
       exit 0
@@ -28,13 +29,22 @@ while test $# -ge 1; do
       break
       ;;
     -r|--run-tests)
-      echo "Removing previous coverage reports..."
-      rm -rf htmlcov/*
       rm .coverage
       echo "Running test suite with coverage..."
       pipenv run pytest mdcs/nexusLIMS/nexusLIMS/tests \
         --cov=mdcs/nexusLIMS/nexusLIMS \
-        --cov-report html:/home/miclims/NexusMicroscopyLIMS/htmlcov \
+#        --cov-report html:/home/miclims/NexusMicroscopyLIMS/htmlcov \
+        --mpl --mpl-baseline-path=mdcs/nexusLIMS/nexusLIMS/tests/files/figs
+      break
+      ;;
+    -rh|--run-tests-htmlcov)
+      echo "Removing previous coverage reports..."
+      rm -rf htmlcov/*
+      rm .coverage
+      echo "Running test suite with coverage (HTML output)..."
+      pipenv run pytest mdcs/nexusLIMS/nexusLIMS/tests \
+        --cov=mdcs/nexusLIMS/nexusLIMS \
+        --cov-report html:htmlcov \
         --mpl --mpl-baseline-path=mdcs/nexusLIMS/nexusLIMS/tests/files/figs
       break
       ;;

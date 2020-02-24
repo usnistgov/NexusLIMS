@@ -9,7 +9,7 @@ cache:
 nexusLIMS_tests:
   script:
     # run tests, but exclude record builders that need access to ***REMOVED*** until we figure that out (or do local files)
-    - run_tests.sh -r
+    - bash run_tests.sh -r
   # Install the environment
   before_script:
     # before anything, try to remove the existing conda environment and replace
