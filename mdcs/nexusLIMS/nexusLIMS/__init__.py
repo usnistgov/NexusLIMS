@@ -49,7 +49,7 @@ Refer to :ref:`record-building` for more details.
 
 The following variables should be defined as environment variables in your
 session, or in the ``.env`` file in the root of this package's repository (if
-you are running using ``pipenv``.
+you are running using ``pipenv``).
 
 .. _nexusLIMS-user:
 

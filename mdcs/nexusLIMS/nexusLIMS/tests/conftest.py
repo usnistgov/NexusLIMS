@@ -28,6 +28,12 @@
 import tarfile
 import os
 from nexusLIMS.tests.utils import tars, files
+from datetime import datetime as _dt
+from datetime import timedelta as _td
+from datetime import timezone as _tz
+import time
+import pytest
+import nexusLIMS.utils
 
 # we don't want to mask both directories, because the record builder tests
 # need to look at the real files on ***REMOVED***:
@@ -72,3 +78,35 @@ def pytest_sessionfinish(session, exitstatus):
     """
     for _, fn in files.items():
         os.remove(fn)
+
+
+@pytest.fixture(scope='session')
+def monkey_session():
+    from _pytest.monkeypatch import MonkeyPatch
+    mpatch = MonkeyPatch()
+    yield mpatch
+    mpatch.undo()
+
+
+@pytest.fixture(scope='session')
+def fix_mountain_time(monkey_session):
+    """
+    Hack to determine if we need to adjust our datetime objects for the time
+    difference between Boulder and G'burg
+    """
+    def currenttz():
+        if time.daylight:
+            return _tz(_td(seconds=-time.altzone), time.tzname[1])
+        else:   # pragma: no cover
+            return _tz(_td(seconds=-time.timezone), time.tzname[0])
+
+    tz_string = currenttz().tzname(_dt.now())
+
+    # if timezone is MST or MDT, we're 2 hours behind, so we need to adjust
+    # datetime objects to match file store
+    if tz_string in ['MST', 'MDT']:
+        # get current timezone, and adjust tz_offset as needed
+        monkey_session.setattr(nexusLIMS.utils, "tz_offset",
+                            _td(hours=-2))
+        monkey_session.setenv('ignore_mib', 'True')
+        monkey_session.setenv('is_mountain_time', 'True')

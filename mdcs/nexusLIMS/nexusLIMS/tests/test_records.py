@@ -10,18 +10,21 @@ from nexusLIMS.schemas import activity
 from nexusLIMS.db import session_handler
 from nexusLIMS.db import make_db_query
 import nexusLIMS.utils
+import time
 from collections import namedtuple
 from glob import glob
 from lxml import etree as et
 from uuid import uuid4
 from datetime import datetime as _dt
+from datetime import timedelta as _td
 from nexusLIMS.tests.utils import files
 from nexusLIMS.harvester.sharepoint_calendar import AuthenticationError
 import pytest
 
 
 class TestRecordBuilder:
-    def test_new_session_processor(self, monkeypatch):
+
+    def test_new_session_processor(self, monkeypatch, fix_mountain_time):
         # make record uploader just pretend by returning all files provided (
         # as if they were actually uploaded)
         monkeypatch.setattr(_rb, "_upload_record_files", lambda x: (x, x))
@@ -171,7 +174,7 @@ class TestRecordBuilder:
         assert "ERROR" in caplog.text
         assert "Could not validate record, did not write to disk" in caplog.text
 
-    def test_dump_record(self):
+    def test_dump_record(self, monkeypatch, fix_mountain_time):
         out_fname = _rb.dump_record(instrument_db['FEI-Titan-TEM-635816'],
                                     dt_from=_dt.fromisoformat('2020-02-04T'
                                                               '09:00:00.000'),
@@ -181,17 +184,26 @@ class TestRecordBuilder:
         os.remove(out_fname)
 
 
-class TestActivity:
-    @classmethod
-    def setup_class(cls):
-        cls.instr = instrument_db['FEI-Titan-TEM-635816']
-        cls.dt_from = _dt.fromisoformat('2018-11-13T13:00:00.000')
-        cls.dt_to = _dt.fromisoformat('2018-11-13T16:00:00.000')
-        cls.activities_str, cls.activities_list = _rb.build_acq_activities(
-            instrument=cls.instr, dt_from=cls.dt_from, dt_to=cls.dt_to,
-            sample_id='test_sample_id', generate_previews=False)
+@pytest.fixture(scope='module')
+def gnu_find_activities(fix_mountain_time):
+    instr = instrument_db['FEI-Titan-TEM-635816']
+    dt_from = _dt.fromisoformat('2018-11-13T13:00:00.000')
+    dt_to = _dt.fromisoformat('2018-11-13T16:00:00.000')
+    activities_str, activities_list = _rb.build_acq_activities(
+        instrument=instr, dt_from=dt_from, dt_to=dt_to,
+        sample_id='test_sample_id', generate_previews=False)
 
-    def test_gnu_find_vs_pure_python(self, monkeypatch):
+    yield {'instr': instr,
+           'dt_from': dt_from,
+           'dt_to': dt_to,
+           'activities_str': activities_str,
+           'activities_list': activities_list}
+
+
+class TestActivity:
+    def test_gnu_find_vs_pure_python(self, monkeypatch,
+                                     fix_mountain_time,
+                                     gnu_find_activities):
         # force the GNU find method to fail
         def mock_gnu_find(x, y, z):
             raise RuntimeError('Mock failure for GNU find method')
@@ -199,55 +211,72 @@ class TestActivity:
         monkeypatch.setattr(_rb, '_gnu_find_files', mock_gnu_find)
         self.activities_str_python_find, self.activities_list_python_find = \
             _rb.build_acq_activities(
-                instrument=self.instr, dt_from=self.dt_from, dt_to=self.dt_to,
+                instrument=gnu_find_activities['instr'],
+                dt_from=gnu_find_activities['dt_from'],
+                dt_to=gnu_find_activities['dt_to'],
                 sample_id='test_sample_id',
                 generate_previews=False)
 
-        assert len(self.activities_list) == \
+        assert len(gnu_find_activities['activities_list']) == \
             len(self.activities_list_python_find)
-        assert self.activities_str == self.activities_str_python_find
+        assert gnu_find_activities['activities_str'] == \
+            self.activities_str_python_find
 
-    def test_activity_repr(self):
-        assert self.activities_list[0].__repr__() == \
-            '             AcquisitionActivity; ' \
-            'start: 2018-11-13T13:01:28.179682; ' \
-            'end: 2018-11-13T13:19:14.635522'
+    def test_activity_repr(self, gnu_find_activities):
+        if 'is_mountain_time' in os.environ:    # pragma: no cover
+            expected = '             AcquisitionActivity; ' \
+                       'start: 2018-11-13T11:01:28.179682; ' \
+                       'end: 2018-11-13T11:19:14.635522'
+        else:                                   # pragma: no cover
+            expected = '             AcquisitionActivity; ' \
+                       'start: 2018-11-13T13:01:28.179682; ' \
+                       'end: 2018-11-13T13:19:14.635522'
+        assert gnu_find_activities['activities_list'][0].__repr__() == \
+            expected
 
-    def test_activity_str(self):
-        assert self.activities_list[0].__str__() == \
-               '2018-11-13T13:01:28.179682 AcquisitionActivity '
+    def test_activity_str(self, gnu_find_activities):
+        if 'is_mountain_time' in os.environ:    # pragma: no cover
+            expected = '2018-11-13T11:01:28.179682 AcquisitionActivity '
+        else:                                   # pragma: no cover
+            expected = '2018-11-13T13:01:28.179682 AcquisitionActivity '
+        assert gnu_find_activities['activities_list'][0].__str__() == \
+            expected
 
-    def test_add_file_bad_meta(self, monkeypatch, caplog):
+    def test_add_file_bad_meta(self, monkeypatch, caplog,
+                               gnu_find_activities):
         # make parse_metadata return None to force into error situation
         monkeypatch.setattr(activity, '_parse_metadata',
                             lambda fname, generate_preview: (None, ''))
-        orig_activity_file_length = len(self.activities_list[0].files)
-        self.activities_list[0].add_file(files['643_EELS_SI'])
-        assert len(self.activities_list[0].files) == \
+        orig_activity_file_length = \
+            len(gnu_find_activities['activities_list'][0].files)
+        gnu_find_activities['activities_list'][0].add_file(files['643_EELS_SI'])
+        assert len(gnu_find_activities['activities_list'][0].files) == \
             orig_activity_file_length + 1
         assert f"Could not parse metadata of " \
                f"{files['643_EELS_SI']}" in caplog.text
 
-    def test_add_file_bad_file(self):
+    def test_add_file_bad_file(self, gnu_find_activities):
         with pytest.raises(FileNotFoundError):
-            self.activities_list[0].add_file('dummy_file_does_not_exist')
+            gnu_find_activities['activities_list'][0].add_file(
+                'dummy_file_does_not_exist')
 
-    def test_store_unique_before_setup(self, monkeypatch, caplog):
-        a = self.activities_list[0]
+    def test_store_unique_before_setup(self, monkeypatch, caplog,
+                                       gnu_find_activities):
+        a = gnu_find_activities['activities_list'][0]
         monkeypatch.setattr(a, 'setup_params', None)
         a.store_unique_metadata()
         assert 'setup_params has not been defined; call store_setup_params() ' \
                'prior to using this method. Nothing was done.' in caplog.text
 
-    def test_as_xml(self):
+    def test_as_xml(self, gnu_find_activities):
+        a = gnu_find_activities['activities_list'][0]
         # setup a few values in the activity to trigger XML escaping:
-        self.activities_list[0].setup_params['Acquisition Device'] = '<TEST>'
-        self.activities_list[0].files[0] += '<&'
-        self.activities_list[0].unique_meta[0]['Imaging Mode'] = '<IMAGING>'
+        a.setup_params['Acquisition Device'] = '<TEST>'
+        a.files[0] += '<&'
+        a.unique_meta[0]['Imaging Mode'] = '<IMAGING>'
 
-        xml_str = self.activities_list[0].as_xml(seqno=0,
-                                                 sample_id='sample_id',
-                                                 indent_level=1, print_xml=True)
+        xml_str = a.as_xml(seqno=0, sample_id='sample_id', indent_level=1,
+                           print_xml=True)
 
 
 class TestSession:

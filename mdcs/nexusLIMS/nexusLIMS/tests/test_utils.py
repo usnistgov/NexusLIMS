@@ -26,6 +26,7 @@
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
 
+import nexusLIMS.utils
 from nexusLIMS.utils import *
 from nexusLIMS.utils import find_dirs_by_mtime
 from datetime import datetime
@@ -34,6 +35,7 @@ import sys
 from io import BytesIO
 from lxml import etree
 import pytest
+from datetime import timedelta as _td
 
 
 class TestUtils:
@@ -69,7 +71,7 @@ class TestUtils:
         assert try_getting_dict_value(nest, ['level1', 'level2.1']) == {
             'level3.1': 'value'}
 
-    def test_find_dirs_by_mtime(self):
+    def test_find_dirs_by_mtime(self, fix_mountain_time, monkeypatch):
         path = os.path.join(os.environ["mmfnexus_path"], "JEOL3010")
         dt_from = datetime.fromisoformat("2019-07-24T11:00:00.000")
         dt_to = datetime.fromisoformat("2019-07-24T16:00:00.000")
@@ -81,13 +83,13 @@ class TestUtils:
                   'JEOL3010/***REMOVED***/***REMOVED***/20190724/M3_DC_Beam_Dose_2']:
             assert os.path.join(os.environ['mmfnexus_path'], d) in dirs
 
-    def test_gnu_find(self):
+    def test_gnu_find(self, fix_mountain_time):
         files = gnu_find_files_by_mtime(
-            os.path.join(os.environ["mmfnexus_path"], "643Titan"),
-            dt_from=datetime.fromisoformat("2019-11-06T15:00:00.000"),
-            dt_to=datetime.fromisoformat("2019-11-06T18:00:00.000"))
+            os.path.join(os.environ["mmfnexus_path"], "Titan"),
+            dt_from=datetime.fromisoformat("2018-11-13T13:00:00.000"),
+            dt_to=datetime.fromisoformat("2018-11-13T16:00:00.000"))
 
-        assert len(files) == 38
+        assert len(files) == 42
 
     def test_gnu_and_pure_find_together(self):
         # both file-finding methods should return the same list (when sorted

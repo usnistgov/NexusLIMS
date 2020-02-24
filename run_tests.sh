@@ -33,7 +33,6 @@ while test $# -ge 1; do
       echo "Running test suite with coverage..."
       pipenv run pytest mdcs/nexusLIMS/nexusLIMS/tests \
         --cov=mdcs/nexusLIMS/nexusLIMS \
-#        --cov-report html:/home/miclims/NexusMicroscopyLIMS/htmlcov \
         --mpl --mpl-baseline-path=mdcs/nexusLIMS/nexusLIMS/tests/files/figs
       break
       ;;
@@ -41,10 +40,11 @@ while test $# -ge 1; do
       echo "Removing previous coverage reports..."
       rm -rf htmlcov/*
       rm .coverage
+      rm .coverage.*
       echo "Running test suite with coverage (HTML output)..."
       pipenv run pytest mdcs/nexusLIMS/nexusLIMS/tests \
         --cov=mdcs/nexusLIMS/nexusLIMS \
-        --cov-report html:htmlcov \
+        --cov-report html:$(pwd)/htmlcov \
         --mpl --mpl-baseline-path=mdcs/nexusLIMS/nexusLIMS/tests/files/figs
       break
       ;;
@@ -52,11 +52,12 @@ while test $# -ge 1; do
       echo "Removing previous coverage reports..."
       rm -rf htmlcov/*
       rm .coverage
+      rm .coverage.*
       echo "Running record builder test suite with coverage..."
       pipenv run pytest mdcs/nexusLIMS/nexusLIMS/tests \
         -k "test_records" \
         --cov=mdcs/nexusLIMS/nexusLIMS \
-        --cov-report html:/home/miclims/NexusMicroscopyLIMS/htmlcov \
+        --cov-report html:$(pwd)/htmlcov \
         --mpl --mpl-baseline-path=mdcs/nexusLIMS/nexusLIMS/tests/files/figs
       break
       ;;

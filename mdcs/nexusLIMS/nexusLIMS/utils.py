@@ -31,6 +31,7 @@ import certifi as _certifi
 import tempfile as _tempfile
 import os as _os
 import subprocess as _sp
+from datetime import timedelta as _timedelta
 from os.path import getmtime as _getmtime
 from warnings import warn
 import logging as _logging
@@ -38,6 +39,10 @@ import sys as _sys
 
 _logger = _logging.getLogger(__name__)
 _logger.setLevel(_logging.INFO)
+
+# hours to add to datetime objects (hack for poole testing -- should be -2 if
+# running tests from Mountain Time on files in Eastern Time)
+tz_offset = _timedelta(hours=0)
 
 
 def parse_xml(xml, xslt_file, **kwargs):
@@ -338,6 +343,11 @@ def find_dirs_by_mtime(path, dt_from, dt_to):
         time range provided
     """
     dirs = []
+
+    # adjust the datetime objects with the tz_offset (usually should be 0)
+    dt_from += tz_offset
+    dt_to += tz_offset
+
     # use os.walk and only inspect the directories for mtime (much fewer
     # comparisons than looking at every file):
     _logger.info(f'Finding directories modified between {dt_from.isoformat()} '
@@ -374,6 +384,10 @@ def find_files_by_mtime(path, dt_from, dt_to):
     # dirs = find_dirs_by_mtime(path, dt_from, dt_to)
 
     dirs = [path]
+
+    # adjust the datetime objects with the tz_offset (usually should be 0)
+    dt_from += tz_offset
+    dt_to += tz_offset
 
     files = set()    # use a set here (faster and we won't have duplicates)
     # for each of those directories, walk the file tree and inspect the
@@ -446,11 +460,17 @@ def gnu_find_files_by_mtime(path, dt_from, dt_to):
     if not _which('find'):
         raise RuntimeError('find command was not found on the system PATH')
 
-    # Actually run find command:
-    cmd = f'find {_os.path.join(_os.environ["mmfnexus_path"], path)} ' \
-          f'-type f ' \
-          f'-newermt "{dt_from.isoformat()}" ' \
-          f'\\! -newermt "{dt_to.isoformat()}" ' \
+    # adjust the datetime objects with the tz_offset (usually should be 0)
+    dt_from += tz_offset
+    dt_to += tz_offset
+
+    # Actually run find command (ignoring mib files if specified by
+    # environment variable):
+    cmd = f'find {_os.path.join(_os.environ["mmfnexus_path"], path)} ' + \
+          f'-type f ' + \
+          f'-newermt "{dt_from.isoformat()}" ' + \
+          f'\\! -newermt "{dt_to.isoformat()}" ' + \
+          (f'\\! -name "*.mib" ' if 'ignore_mib' in _os.environ else '') + \
           f'-print0'
 
     _logger.info(f'Running via subprocess: "{cmd}"')
