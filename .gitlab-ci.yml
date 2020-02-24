@@ -8,8 +8,8 @@ cache:
 
 nexusLIMS_tests:
   script:
-    # run tests, but exclude record builders that need access to ***REMOVED*** until we figure that out (or do local files)
-    - bash run_tests.sh -r
+    # run tests with coverage
+    - pipenv run pytest mdcs/nexusLIMS/nexusLIMS/tests --cov=mdcs/nexusLIMS/nexusLIMS --mpl --mpl-baseline-path=mdcs/nexusLIMS/nexusLIMS/tests/files/figs
   # Install the environment
   before_script:
     # before anything, try to remove the existing conda environment and replace
