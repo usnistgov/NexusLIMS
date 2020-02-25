@@ -145,9 +145,10 @@ class Session:
         _logger.debug(f'Logging RECORD_GENERATION for '
                       f'{self.session_identifier}')
         insert_query = f"INSERT INTO session_log " \
-                       f"(instrument, event_type, session_identifier) " \
+                       f"(instrument, event_type, session_identifier, user) " \
                        f"VALUES ('{self.instrument.name}', " \
-                       f"'RECORD_GENERATION', '{self.session_identifier}');"
+                       f"'RECORD_GENERATION', '{self.session_identifier}', " \
+                       f"'{_os.environ['nexusLIMS_user']}');"
         success = False
 
         # use contextlib to auto-close the connection and database cursors

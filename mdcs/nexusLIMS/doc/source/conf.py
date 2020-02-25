@@ -244,6 +244,7 @@ def run_apidoc(_):
                            recursive=True))
     # exclude db_logger_gui files from autodoc
     to_exclude += list(glob(os.path.join(modules, 'db', 'db_logger_gui', '*')))
+    # to_exclude += list(glob(os.path.join(modules, 'db', 'migrate_db.py')))
     # to_exclude += [os.path.join(modules, 'builder')]
     main(['-f', '-M', '-T', '-d', '-1', '-o', output_path, modules] +
          to_exclude)
