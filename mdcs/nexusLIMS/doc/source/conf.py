@@ -149,6 +149,8 @@ html_show_sourcelink = True
 html_show_sphinx = False
 html_show_copyright = True
 
+html_extra_path = ['schema_doc']
+
 # html_sidebars = {'**': ['localtoc.html', 'sourcelink.html', 'searchbox.html']}
 html_sidebars = {'**': ['custom-sidebar.html',
                         'localtoc.html',

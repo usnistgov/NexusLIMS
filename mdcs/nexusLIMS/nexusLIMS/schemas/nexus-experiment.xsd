@@ -33,7 +33,7 @@
   xmlns:nx="https://data.nist.gov/od/dm/nexus/experiment/v1.0"
   xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:xsi="http://www.w3c.org/2001/XMLSchema-instance" elementFormDefault="unqualified"
-  attributeFormDefault="unqualified" version="0.10-07-2018">
+  attributeFormDefault="unqualified" version="0.02-26-2020">
 
   <xs:annotation>
     <xs:documentation>
