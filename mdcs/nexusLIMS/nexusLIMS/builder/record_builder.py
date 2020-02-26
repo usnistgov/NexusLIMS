@@ -39,6 +39,7 @@ import os as _os
 import logging as _logging
 import pathlib as _pathlib
 import shutil as _shutil
+import sys as _sys
 from uuid import uuid4 as _uuid4
 from lxml import etree as _etree
 from datetime import datetime as _datetime
@@ -382,6 +383,8 @@ def build_new_session_records():
     """
     # get the list of sessions with 'WAITING_TO_BE_BUILT' status
     sessions = _get_sessions()
+    if not sessions:
+        _sys.exit("No 'WAITING_TO_BE_BUILT' sessions were found. Exiting.")
     xml_files = []
     # loop through the sessions
     for s in sessions:

@@ -88,5 +88,20 @@ you are running using ``pipenv``).
 
 from ._urls import calendar_root_url
 from ._urls import ldap_url
+import logging as _logging
 
-# raise ValueError('nexusLIMS import')
+
+def _filter_hyperspy_messages(record):
+    """Filter to be used with logging class to hide HyperSpy API import
+    warnings within the NexusLIMS codebase"""
+    if record.msg.startswith('The ipywidgets GUI') or \
+            record.msg.startswith('The traitsui GUI'):
+        return False
+    else:
+        # unless we come across another HyperSpy error, this line won't be
+        # reached, so exclude from coverage
+        return True     # pragma: no cover
+
+
+# connect the filter function to the HyperSpy logger
+_logging.getLogger('hyperspy.api').addFilter(_filter_hyperspy_messages)
