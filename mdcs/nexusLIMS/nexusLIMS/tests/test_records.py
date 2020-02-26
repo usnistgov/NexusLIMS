@@ -183,6 +183,13 @@ class TestRecordBuilder:
                                     generate_previews=False)
         os.remove(out_fname)
 
+    def test_no_sessions(self, monkeypatch):
+        # monkeypatch to return empty list (as if there are no sessions)
+        monkeypatch.setattr(_rb, '_get_sessions', lambda: [])
+        with pytest.raises(SystemExit) as e:
+            _rb.build_new_session_records()
+        assert e.type == SystemExit
+
 
 @pytest.fixture(scope='module')
 def gnu_find_activities(fix_mountain_time):

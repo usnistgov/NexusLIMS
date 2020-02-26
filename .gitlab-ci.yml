@@ -5,11 +5,12 @@ variables:
 cache:
   paths:
     - .gitlab-cache.tar.gz
+    - coverage.tar.gz
 
 nexusLIMS_tests:
   script:
-    # run tests with coverage
-    - pipenv run pytest mdcs/nexusLIMS/nexusLIMS/tests --cov=mdcs/nexusLIMS/nexusLIMS --mpl --mpl-baseline-path=mdcs/nexusLIMS/nexusLIMS/tests/files/figs
+    # run tests with coverage and output coverage report to html
+    - pipenv run pytest mdcs/nexusLIMS/nexusLIMS/tests --cov=mdcs/nexusLIMS/nexusLIMS --cov-report html:$(pwd)/coverage --cov-report term --mpl --mpl-baseline-path=mdcs/nexusLIMS/nexusLIMS/tests/files/figs
   # Install the environment
   before_script:
     # before anything, try to remove the existing conda environment and replace
@@ -35,6 +36,11 @@ nexusLIMS_tests:
   after_script:
     # create a cache file of the conda environment, always returning true
     - tar -czf .gitlab-cache.tar.gz ${CONDA_ENV} || true
+    - tar -czf coverage.tar.gz coverage || true
+  artifacts:
+    paths:
+      - coverage
+    expire_in: 30 days
 
 pages:
   script:
@@ -45,6 +51,7 @@ pages:
     # with gitlab cache, returning true whether or not we succeeded
     - /opt/conda/bin/conda remove -p ${CONDA_ENV} --all || true
     - tar -xzf .gitlab-cache.tar.gz -C / || true
+    - tar -xzf coverage.tar.gz -C public/ || true
     - source /opt/conda/bin/activate ${CONDA_ENV}
     - pip install pipenv
     - pipenv install --dev
@@ -54,3 +61,4 @@ pages:
   artifacts:
     paths:
       - public
+

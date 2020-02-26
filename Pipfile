@@ -11,6 +11,7 @@ sphinx = "*"
 sphinx-bootstrap-theme = "*"
 nexuslims = {editable = true,path = "./mdcs/nexusLIMS"}
 pytest-mpl = "*"
+pytest-sugar = "*"
 
 [packages]
 lxml = "*"

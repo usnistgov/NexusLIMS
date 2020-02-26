@@ -471,6 +471,9 @@ def sig_to_thumbnail(s, out_path, dpi=92):
         _pad_to_square(out_path, 500)
         # _plt.close(f)
 
+    # close all currently open plots to ensure we don't leave a mess behind
+    # in memory
+    _plt.close('all')
     _plt.rcParams['image.cmap'] = 'gray'
 
     # Processing 1D signals (spectra, spectrum images, etc)
