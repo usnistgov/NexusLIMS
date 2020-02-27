@@ -61,4 +61,5 @@ pages:
   artifacts:
     paths:
       - public
-
+  dependencies:
+    - nexusLIMS_tests
