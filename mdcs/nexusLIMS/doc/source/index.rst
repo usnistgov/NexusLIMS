@@ -3,10 +3,13 @@
    :maxdepth: 2
    :hidden:
 
-   Package Introduction <self>
-   api
+   Package introduction <self>
+   data_security
+   database
+   session_logger_app
    record_building
    schema_documentation
    customizing_cdcs
+   api
 
 .. include:: README.rst

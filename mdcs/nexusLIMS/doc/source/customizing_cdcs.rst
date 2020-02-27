@@ -1,4 +1,4 @@
-Tips for Customizing CDCS
+Tips for customizing CDCS
 =========================
 
     `Originally written by: Joshua Taillon -- ODI`

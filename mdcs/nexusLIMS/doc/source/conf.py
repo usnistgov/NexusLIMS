@@ -232,6 +232,11 @@ html_theme_options = {
     'bootstrap_version': "3",
 }
 
+rst_epilog = """
+.. |SQLSchemaLink| replace:: SQL Schema Definition
+.. _SQLSchemaLink: https://***REMOVED***nexuslims/NexusMicroscopyLIMS/blob/master/mdcs/nexusLIMS/nexusLIMS/db/NexusLIMS_db_creation_script.sql
+"""
+
 
 # api-doc autogeneration adapted from
 # https://github.com/isogeo/isogeo-api-py-minsdk/blob/master/docs/conf.py
