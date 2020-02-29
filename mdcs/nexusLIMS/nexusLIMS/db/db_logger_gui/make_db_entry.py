@@ -164,6 +164,11 @@ class DBSessionLogger:
         self.instr_pid = None
         self.instr_schema_name = None
 
+        self.log('Used drives are: {}'.format(get_drives()), 2)
+        self.log('Unused drives are: {}'.format(get_free_drives()), 2)
+        self.log('First available drive letter is {}'.format(
+            self.drive_letter), 2)
+
     def log(self, to_print, this_verbosity):
         """
         Log a message to the console, only printing if the given verbosity is
@@ -300,40 +305,69 @@ class DBSessionLogger:
                                    "not defined. Please contact "
                                    "***REMOVED*** for assistance.")
 
-        mount_command = 'net use {} \\\\{}{} '.format(self.drive_letter,
-                                                      ip if have_ip else
-                                                      self.hostname,
-                                                      self.db_path) + \
-                        '/user:NIST\\***REMOVED*** {}'.format(self.password)
-        self.log('mounting {}:'.format(self.drive_letter), 2)
+        current_mounts = str(self.run_cmd('net use')).split('\r\n')
+        self.log('Currently mounted: ', 2)
+        do_mount = True
+        self.log('Looking for '
+                 r'{}\{}'.format(ip if have_ip else
+                                 self.hostname,
+                                 self.db_path).replace(r'\\', '\\'), 2)
+        for m in current_mounts:
+            self.log(m, 2)
+            if r'{}\{}'.format(ip if have_ip else
+                               self.hostname,
+                               self.db_path).replace(r'\\', '\\') in m:
+                old_drive_letter = self.drive_letter
+                self.drive_letter = m.split()[0]
+                if 'test_db' in os.environ:
+                    self.log('(TEST) Using test db at '
+                             '{}'.format(self.full_path), 0)
+                else:
+                    self.full_path = '{}\\{}'.format(self.drive_letter,
+                                                     self.db_name)
+                    self.log('{} is already mounted'.format(self.drive_letter),
+                             0)
+                do_mount = False
 
-        # mounting requires a security policy:
-        # https://support.microsoft.com/en-us/help/968264/error-message-when-
-        # you-try-to-map-to-a-network-drive-of-a-dfs-share-by
+        if do_mount:
+            mount_command = 'net use {} \\\\{}{} '.format(self.drive_letter,
+                                                          ip if have_ip else
+                                                          self.hostname,
+                                                          self.db_path) + \
+                            '/user:NIST\\***REMOVED*** {}'.format(self.password)
+            self.log('mounting {}'.format(self.drive_letter), 2)
 
-        self.log('using "{}'.format(mount_command).replace(self.password,
-                                                           '**************'), 2)
-        p = self.run_cmd(mount_command)
+            # mounting requires a security policy:
+            # https://support.microsoft.com/en-us/help/968264/error-message-when-
+            # you-try-to-map-to-a-network-drive-of-a-dfs-share-by
 
-        if 'error' in str(p):
-            if '1312' in str(p):
-                self.log('Visit https://bit.ly/38DvqVh\n'
-                         'to see how to allow mounting network drives as '
-                         'another user.\n'
-                         '(You\'ll need to change HKLM\\System\\'
-                         'CurrentControlSet\\Control\\Lsa\\DisableDomanCreds '
-                         'to 0 in the registry)', 0)
-            raise ConnectionError('Could not mount network share to access '
-                                  'database' + " (\"DisableDomanCreds\" "
-                                               "error)" if '1312' in str(p)
-                                               else "")
+            self.log('using "{}'.format(
+                mount_command).replace(self.password, '**************'), 2)
+            p = self.run_cmd(mount_command)
+
+            if 'error' in str(p):
+                if '1312' in str(p):
+                    self.log('Visit https://bit.ly/38DvqVh\n'
+                             'to see how to allow mounting network drives as '
+                             'another user.\n'
+                             '(You\'ll need to change HKLM\\System\\'
+                             'CurrentControlSet\\Control\\Lsa\\'
+                             'DisableDomanCreds '
+                             'to 0 in the registry)', 0)
+                raise ConnectionError('Could not mount network share to access '
+                                      'database' + " (\"DisableDomanCreds\" "
+                                                   "error)" if '1312' in str(p)
+                                                   else "")
+        else:
+            self.log('Using existing mount point {}'.format(
+                self.drive_letter), 1)
 
     def umount_network_share(self):
         """
-        Unmount the network share at N: using the Windows `cmd`
+        Unmount the network share using the Windows `cmd`
         """
-        self.log('unmounting N:', 2)
-        p = self.run_cmd(r'net use N: /del /y')
+        self.log('unmounting {}'.format(self.drive_letter), 2)
+        p = self.run_cmd(r'net use {} /del /y'.format(self.drive_letter))
         if 'error' in str(p):
             self.log(str(p), 0)
 
@@ -357,9 +391,28 @@ class DBSessionLogger:
                                   'WHERE '
                                   'computer_name is '
                                   '\'{}\''.format(self.cpu_name))
-                instrument_pid, instrument_schema_name = res.fetchone()
-            self.log('Found instrument ID: {} using '.format(instrument_pid) +
-                     '{}'.format(self.cpu_name), 1)
+                one_result = res.fetchone()
+                self.log('Database result is {}'.format(one_result), 2)
+                if one_result is not None:
+                    instrument_pid, instrument_schema_name = one_result
+                else:
+                    instrument_pid, instrument_schema_name = (None, None)
+
+            self.log('instrument_pid: {} / '.format(instrument_pid) +
+                     'instrument_schema_name: '
+                     '{}'.format(instrument_schema_name), 2)
+            if instrument_pid is None:
+                raise sqlite3.DataError('Could not find an instrument matching '
+                                        'this computer\'s name '
+                                        '({}) '.format(self.cpu_name) +
+                                        'in the database!\n\n'
+                                        'This should not happen. Please '
+                                        'contact ***REMOVED*** as soon as '
+                                        'possible.')
+            else:
+                self.log('Found instrument ID: '
+                         '{} using '.format(instrument_pid) +
+                         '{}'.format(self.cpu_name), 1)
         return instrument_pid, instrument_schema_name
 
     def last_session_ended(self, thread_queue=None, exit_queue=None):
@@ -664,6 +717,8 @@ class DBSessionLogger:
             if not os.path.isfile(self.full_path):
                 raise FileNotFoundError('Could not find NexusLIMS database at '
                                         '{}'.format(self.full_path))
+            else:
+                self.log('Path to database is {}'.format(self.full_path), 1)
         except Exception as e:
             thread_queue.put(e)
             self.log("Could not mount the network share holding the "

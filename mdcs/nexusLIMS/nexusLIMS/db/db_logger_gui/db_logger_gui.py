@@ -55,7 +55,7 @@ def resource_path(relative_path):
         # running from a compiled .exe built with pyinstaller
         base_path = sys._MEIPASS
     except Exception:
-        base_path = os.path.abspath('.')
+        base_path = os.path.join(os.path.abspath('.'), 'resources')
 
     pth = os.path.join(base_path, relative_path)
 
@@ -199,7 +199,7 @@ class MainApp(Tk):
         self.style.configure('.', font="TkDefaultFont")
 
         self.tooltip_font = "TkDefaultFont"
-        self.geometry(self.screen_res.get_center_geometry_string(350, 500))
+        self.geometry(self.screen_res.get_center_geometry_string(350, 600))
         self.minsize(1, 1)
         self.maxsize(3840, 1170)
         self.resizable(0, 0)
@@ -367,9 +367,8 @@ class MainApp(Tk):
             else:
                 # we got an inconsistent state from the DB, so ask user
                 # what to do about it
-                response = HangingSessionDialog(self,
-                                                self.db_logger,
-                                                screen_res=screen_res).show()
+                response = HangingSessionDialog(
+                    self, self.db_logger, screen_res=self.screen_res).show()
                 if response == 'new':
                     # we need to end the existing session that was found
                     # and then create a new one by changing the session_id to
@@ -544,7 +543,7 @@ class MainApp(Tk):
     def on_closing(self):
         resp = PauseOrEndDialogue(self,
                                   db_logger=self.db_logger,
-                                  screen_res=screen_res).show()
+                                  screen_res=self.screen_res).show()
         self.db_logger.log('(GUI) User clicked on window manager close button; '
                            'asking for clarification', 2)
         if resp == 'end':
@@ -869,6 +868,7 @@ class LogWindow(Toplevel):
         def _close_cmd():
             """Fix for LogWindow preventing app from closing if there was an
             error"""
+            parent.db_logger.umount_network_share()
             self.destroy()
             parent.destroy()
             sys.exit(1)
