@@ -92,11 +92,11 @@ a change is made. This happens automatically using the continuous integration
 features of Gitlab, ensuring that any regressions should be identified prior
 to deployment. Changes to the code are not merged if they cause the coverage
 percentage to decrease or any tests to fail. The current
-|CoverageLink|_ of the codebase is published as part of the integration process,
-and can be viewed from anywhere on the NIST network. Similarly, every
-function used in the project is documented fully, which enables the automatic
-creation of detailed :doc:`API Documentation <api>` that is ensured
-to be up to date every time a change is made to the code.
+`test coverage <../../coverage>`_ of the codebase is published as part of the
+integration process, and can be viewed from anywhere on the NIST network.
+Similarly, every function used in the project is documented fully, which
+enables the automatic creation of detailed :doc:`API Documentation <api>`
+that is ensured to be up to date every time a change is made to the code.
 
 .. _tdd: https://en.wikipedia.org/wiki/Test-driven_development
 
