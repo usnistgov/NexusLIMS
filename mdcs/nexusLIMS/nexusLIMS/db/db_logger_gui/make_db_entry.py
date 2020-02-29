@@ -41,6 +41,60 @@ import sys
 import contextlib
 from uuid import uuid4
 import queue
+import string
+from ctypes import windll
+
+
+def get_drives():
+    """
+    Get the drive letters (uppercase) in current use by Windows
+
+    Adapted from https://stackoverflow.com/a/827398/1435788
+
+    Returns
+    -------
+    drives : :obj:`list` of str
+        A list of drive letters currently in use
+    """
+    drives = []
+    bitmask = windll.kernel32.GetLogicalDrives()
+    for letter in string.ascii_uppercase:
+        if bitmask & 1:
+            drives.append(letter)
+        bitmask >>= 1
+
+    return drives
+
+
+def get_free_drives():
+    """
+    Get currently unused drive letters, leaving out A through G and M for
+    safety (since those are often Windows drives and the M drive is used for
+    ``mmfnexus``
+
+    Returns
+    -------
+    not_in_use : :obj:`list` of str
+        A list of "safe" drive letters not currently in use
+    """
+    in_use = get_drives()
+    not_in_use = [lett for lett in string.ascii_uppercase if lett not in in_use]
+    not_in_use = [lett for lett in not_in_use if lett not in 'ABCDEFGM']
+    return not_in_use
+
+
+def get_first_free_drive():
+    """
+    Get the first available drive letter that is not being used on this computer
+
+    Returns
+    -------
+    first_free : str
+        The first free drive letter that should be safe to use with colon
+        appended
+    """
+    first_free = get_free_drives()[0]
+    return first_free + ':'
 
 
 class DBSessionLogger:
@@ -49,7 +103,6 @@ class DBSessionLogger:
 
     def __init__(self,
                  verbosity=0,
-                 testing=False,
                  db_name='nexuslims_db.sqlite',
                  user=None,
                  hostname='***REMOVED***'):
@@ -65,8 +118,9 @@ class DBSessionLogger:
         """
         self.log_text = ""
         self.verbosity = verbosity
-        self.testing = testing
+        self.testing = 'nexuslims_testing' in os.environ
         self.db_name = db_name
+        self.drive_letter = get_first_free_drive()
         self.user = user
         self.hostname = hostname
         self.session_started = False
@@ -78,8 +132,11 @@ class DBSessionLogger:
         self.progress_num = 0
 
         if self.testing:
-            # Values for testing from local machine
-            self.db_path = '/mnt/***REMOVED***/'
+            # Values for testing from local machine (XP mode)
+            self.verbosity = 10   # make testing very verbose
+            self.log('(TEST) Found testing environment variable', 1)
+            self.db_path = os.path.abspath('Z:\\')
+            self.db_name = 'test_db.sqlite'
             # Make sure to mount cifs with nobrl option, or else sqlite will
             # fail with a "Database is Locked" error
             self.password = None
@@ -88,6 +145,8 @@ class DBSessionLogger:
             self.user = '***REMOVED***'
             self.log('(TEST) Using {} as path to db'.format(self.full_path), 2)
             self.log('(TEST) Using {} as cpu name'.format(self.cpu_name), 2)
+            self.log('(TEST) if not testing, self.full_path would be '
+                     '{}\\{}'.format(self.drive_letter, db_name), 1)
         else:
             # actual values to use in production
             self.db_path = '\\***REMOVED***\\nexuslims'
@@ -98,7 +157,7 @@ class DBSessionLogger:
                          '"***REMOVED***"', -1)
                 self.log_exception(e)
                 self.password = e
-            self.full_path = "N:\\{}".format(db_name)
+            self.full_path = '{}\\{}'.format(self.drive_letter, db_name)
             self.cpu_name = os.environ['COMPUTERNAME']
 
         self.session_id = str(uuid4())
@@ -203,14 +262,15 @@ class DBSessionLogger:
 
     def mount_network_share(self):
         """
-        Mount the path containing the database to the N: drive (forcefully
-        unmounting anything present there) using Windows `cmd`. Due to some
-        Windows limitations, this requires looking up the server's IP address
+        Mount the path containing the database to the first free drive letter
+        found using Windows `cmd`. Due to some Windows limitations,
+        this requires looking up the server's IP address
         and mounting using the IP rather than the actual domain name
         """
-        # disconnect anything mounted at "N:/"
-        self.log('unmounting existing N:', 2)
-        _ = self.run_cmd(r'net use N: /delete /y')
+        # we should not have to disconnect anything because we're using free
+        # letter:
+        # self.log('unmounting existing N:', 2)
+        # _ = self.run_cmd(r'net use N: /delete /y')
 
         # Connect to shared drive, windows does not allow multiple connections
         # to the same server, but you can trick it by using IP address
@@ -240,16 +300,12 @@ class DBSessionLogger:
                                    "not defined. Please contact "
                                    "***REMOVED*** for assistance.")
 
-        mount_command = 'net use N: \\\\{}{} '.format(ip if have_ip else
+        mount_command = 'net use {} \\\\{}{} '.format(self.drive_letter,
+                                                      ip if have_ip else
                                                       self.hostname,
                                                       self.db_path) + \
                         '/user:NIST\\***REMOVED*** {}'.format(self.password)
-        if self.testing:
-            mount_command = 'net use N: \\\\{}{} ' \
-                            '/user:NIST\\***REMOVED***'.format(ip if have_ip else
-                                                     self.hostname,
-                                                     self.db_path)
-        self.log('mounting N:', 2)
+        self.log('mounting {}:'.format(self.drive_letter), 2)
 
         # mounting requires a security policy:
         # https://support.microsoft.com/en-us/help/968264/error-message-when-
@@ -340,10 +396,12 @@ class DBSessionLogger:
                      "this instrument was an \"END\" log", -1)
             return False
 
-        # Get last inserted line for this instrument
+        # Get last inserted line for this instrument that is not a record
+        # generation (should be either a START or END)
         query_statement = 'SELECT event_type, session_identifier, ' \
                           'id_session_log, timestamp FROM session_log WHERE ' \
                           'instrument = "{}" '.format(self.instr_pid) + \
+                          'AND NOT event_type = "RECORD_GENERATION" ' + \
                           'ORDER BY timestamp DESC LIMIT 1'
 
         self.log('last_session_ended query: {}'.format(query_statement), 2)
@@ -595,13 +653,17 @@ class DBSessionLogger:
         self.log('computer name is {}'.format(self.cpu_name), 1)
         try:
             self.check_exit_queue(thread_queue, exit_queue)
-            if sys.platform == 'win32':
+            if sys.platform == 'win32' and not self.testing:
                 self.log('running `mount_network_share()`', 2)
                 self.mount_network_share()
-            elif sys.platform == 'linux':
-                self.log('on linux; skipping `mount_network_share()`', 2)
-                self.log('sleeping for 2 seconds to simulate network lag', 2)
-                time.sleep(2)
+            elif sys.platform == 'linux' or self.testing:
+                self.log('on linux/testing; skipping '
+                         '`mount_network_share()`', 2)
+                self.log('sleeping for 1 second to simulate network lag', 2)
+                time.sleep(1)
+            if not os.path.isfile(self.full_path):
+                raise FileNotFoundError('Could not find NexusLIMS database at '
+                                        '{}'.format(self.full_path))
         except Exception as e:
             thread_queue.put(e)
             self.log("Could not mount the network share holding the "
@@ -637,13 +699,14 @@ class DBSessionLogger:
                                   self.progress_num))
                 self.progress_num += 1
             self.check_exit_queue(thread_queue, exit_queue)
-            if sys.platform == 'win32':
+            if sys.platform == 'win32' and not self.testing:
                 self.log('running `umount_network_share()`', 2)
                 self.umount_network_share()
-            elif sys.platform == 'linux':
-                self.log('on linux; skipping `umount_network_share()`', 2)
-                self.log('sleeping for 2 seconds to simulate network lag', 2)
-                time.sleep(2)
+            elif sys.platform == 'linux' or self.testing:
+                self.log('on linux/testing; skipping '
+                         '`umount_network_share()`', 2)
+                self.log('sleeping for 1 second to simulate network lag', 2)
+                time.sleep(1)
         except Exception as e:
             thread_queue.put(e)
             self.log("Could not unmount the network share holding the "
@@ -714,36 +777,3 @@ def gui_end_callback(db_logger):
     db_logger.db_logger_setup()
     db_logger.process_end()
     db_logger.db_logger_teardown()
-
-
-# if __name__ == '__main__':
-#
-#     log('parsing arguments', 2)
-#     args = cmdline_args()
-#     verbosity = args.verbosity
-#     if not args.user:
-#         username = os.environ['username']
-#     else:
-#         username = args.user
-#
-#     log('username is {}'.format(username), 1)
-#
-#     log('running `mount_network_share()`', 2)
-#     mount_network_share()
-#
-#     log('running `get_instr_pid()`', 2)
-#     instr_pid = get_instr_pid()
-#
-#     if args.event_type == 'START':
-#         process_start(instr_pid, user=username)
-#     elif args.event_type == 'END':
-#         process_end(instr_pid, user=username)
-#     else:
-#         log('running `umount_network_share()`', 2)
-#         umount_network_share()
-#         error_string = "event_type must be either 'START' or" + \
-#                        " 'END'; '{}' provided".format(args.event_type)
-#         raise ValueError(error_string)
-#
-#     log('running `umount_network_share()`', 2)
-#     umount_network_share()

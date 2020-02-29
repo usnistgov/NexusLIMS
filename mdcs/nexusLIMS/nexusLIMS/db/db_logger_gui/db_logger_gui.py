@@ -138,11 +138,10 @@ class ScreenRes:
     def get_center_geometry_string(self, width, height):
         """
         This method will return a Tkinter geometry string that will place a
-        Toplevel
-        window into the middle of the screen given the widget's width and
-        height
-        (using a Windows command or `xrandr` as needed). If it fails for some
-        reason, a basic resolution of 800x600 is assumed.
+        Toplevel window into the middle of the screen given the
+        widget's width and height (using a Windows command or `xrandr` as
+        needed). If it fails for some reason, a basic resolution of 800x600
+        is assumed.
 
         Parameters
         ----------
@@ -200,7 +199,7 @@ class MainApp(Tk):
         self.style.configure('.', font="TkDefaultFont")
 
         self.tooltip_font = "TkDefaultFont"
-        self.geometry(self.screen_res.get_center_geometry_string(350, 450))
+        self.geometry(self.screen_res.get_center_geometry_string(350, 500))
         self.minsize(1, 1)
         self.maxsize(3840, 1170)
         self.resizable(0, 0)
@@ -300,11 +299,12 @@ class MainApp(Tk):
         self.end_button = Button(self.button_frame,
                                  # takefocus="",
                                  text="End session",
-                                 padx=5, pady=5,
+                                 padx=15, pady=15,
                                  state=DISABLED,
                                  compound=LEFT,
                                  command=self.session_end,
                                  image=self.end_icon)
+        self.end_button.config(fg='black', font='-weight bold')
         ToolTip(self.end_button,
                 self.tooltip_font,
                 "Ending the session will close this window and start the record"
@@ -331,8 +331,8 @@ class MainApp(Tk):
 
         # grid the button_frame contents
         self.button_frame.grid(row=2, column=0, sticky=S, pady=(0, 15))
-        self.end_button.grid(row=0, column=0, sticky=E, padx=15)
-        self.log_button.grid(row=0, column=1, sticky=W, padx=15)
+        self.end_button.grid(row=0, column=0, sticky=N, pady=5)
+        self.log_button.grid(row=1, column=0, sticky=S, pady=5)
 
         self.columnconfigure(0, weight=1)
         self.rowconfigure(1, weight=1)
@@ -703,7 +703,7 @@ class HangingSessionDialog(Toplevel):
         self.response = StringVar()
         self.screen_res = ScreenRes() if screen_res is None else screen_res
         Toplevel.__init__(self, parent)
-        self.geometry(self.screen_res.get_center_geometry_string(400, 175))
+        self.geometry(self.screen_res.get_center_geometry_string(400, 250))
         self.grab_set()
         self.title("Incomplete session warning")
         self.protocol("WM_DELETE_WINDOW", self.destroy)
@@ -866,10 +866,16 @@ class LogWindow(Toplevel):
                 self.tooltip_font,
                 "Copy log information to clipboard", delay=0.25)
 
+        def _close_cmd():
+            """Fix for LogWindow preventing app from closing if there was an
+            error"""
+            self.destroy()
+            parent.destroy()
+            sys.exit(1)
         self.close_button = Button(self.button_frame,
                                    text='Close',  # window',
                                    command=self.destroy if not is_error else
-                                   lambda: sys.exit(1),
+                                   _close_cmd,
                                    padx=10, pady=5, width=60,
                                    compound=LEFT, image=self.close_icon)
         # Make close window button do same thing as regular close button
@@ -1072,11 +1078,8 @@ if __name__ == "__main__":
         sys.exit(0)
 
     # if we're on Linux, use the testing settings for debugging
-    testing = sys.platform != 'win32'
     db_logger = db.DBSessionLogger(verbosity=2,
-                                   testing=testing,
-                                   user=None if testing else
-                                   os.environ['username'])
+                                   user=os.environ['username'])
     screen_res = ScreenRes(db_logger=db_logger)
     root = MainApp(db_logger=db_logger, screen_res=screen_res)
     root.protocol("WM_DELETE_WINDOW", root.on_closing)
