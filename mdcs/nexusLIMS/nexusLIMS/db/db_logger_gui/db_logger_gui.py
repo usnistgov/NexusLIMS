@@ -115,6 +115,10 @@ class ScreenRes:
                 db_logger.log("(SCREENRES) Found DPI of {}; ".format(dpi) +
                               "Scale factor {}; Scaled ".format(scale_factor) +
                               "resolution is {}".format(screen_dims), 2)
+                temp_file = 'TempWmicBatchFile.bat'
+                if os.path.isfile(temp_file):
+                    os.remove(temp_file)
+                    db_logger.log("(SCREENRES) Removed {}".format(temp_file), 2)
 
             elif sys.platform == 'linux':
                 cmd = 'xrandr'
