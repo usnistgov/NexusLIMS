@@ -384,7 +384,7 @@ def build_new_session_records():
     # get the list of sessions with 'WAITING_TO_BE_BUILT' status
     sessions = _get_sessions()
     if not sessions:
-        _sys.exit("No 'WAITING_TO_BE_BUILT' sessions were found. Exiting.")
+        _sys.exit("No 'TO_BE_BUILT' sessions were found. Exiting.")
     xml_files = []
     # loop through the sessions
     for s in sessions:
