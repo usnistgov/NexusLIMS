@@ -124,7 +124,7 @@ placed on their values:
 |                        |              | generation occurred, but no files   |
 |                        |              | matched time span)                  |
 +------------------------+--------------+-------------------------------------+
-| ``user``               | VARCHAR(50)  | Tthe NIST "short style"             |
+| ``user``               | VARCHAR(50)  | The NIST "short style"              |
 |                        |              | username associated with this       |
 |                        |              | session (if known) -- this value    |
 |                        |              | is not currently used by the        |

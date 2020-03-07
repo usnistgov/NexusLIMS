@@ -1,3 +1,5 @@
+:tocdepth: 2
+
 .. _record-building:
 
 Record building workflow
