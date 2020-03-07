@@ -39,6 +39,7 @@ extensions = [
     'sphinx.ext.napoleon',
     'sphinx.ext.intersphinx',
     'sphinx.ext.coverage',
+    'sphinx.ext.viewcode'
 ]
 
 try:
@@ -243,6 +244,8 @@ rst_epilog = """
 .. _makedbentryLink: https://***REMOVED***nexuslims/NexusMicroscopyLIMS/-/blob/master/mdcs/nexusLIMS/nexusLIMS/db/db_logger_gui/make_db_entry.py
 .. |specfileLink| replace:: ``db_logger_gui.spec``
 .. _specfileLink: https://***REMOVED***nexuslims/NexusMicroscopyLIMS/-/blob/master/mdcs/nexusLIMS/nexusLIMS/db/db_logger_gui/db_logger_gui.spec
+.. |testsLink| replace:: ``tests``
+.. _testsLink: https://***REMOVED***nexuslims/NexusMicroscopyLIMS/-/tree/master/mdcs/nexusLIMS/nexusLIMS/tests
 """
 
 

@@ -52,7 +52,7 @@ def get_quanta_metadata(filename):
 
     Returns
     -------
-    midct : dict
+    mdict : dict
         The metadata text extracted from the file
     """
     with open(filename, 'rb') as f:

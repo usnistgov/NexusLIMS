@@ -8,6 +8,7 @@
    database
    session_logger_app
    record_building
+   development
    schema_documentation
    customizing_cdcs
    api
