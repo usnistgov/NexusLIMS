@@ -352,7 +352,7 @@ class DBSessionLogger:
                              'another user.\n'
                              '(You\'ll need to change HKLM\\System\\'
                              'CurrentControlSet\\Control\\Lsa\\'
-                             'DisableDomanCreds '
+                             'DisableDomainCreds '
                              'to 0 in the registry)', 0)
                 raise ConnectionError('Could not mount network share to access '
                                       'database' + " (\"DisableDomanCreds\" "
