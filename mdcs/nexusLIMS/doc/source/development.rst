@@ -1,7 +1,7 @@
 Developer documentation
 =======================
 
-If you are interested in learning about how the NexusLIMS backend works or
+If you are interested in learning about how the NexusLIMS back-end works or
 adding new features, these instructions should get you up and running with a
 development environment that will allow you to modify how the code operates.
 
@@ -75,7 +75,7 @@ access to the installed packages and environment variables set appropriately.
 Building new records
 --------------------
 
-The most basic feature of the NexusLIMS backend is to check the
+The most basic feature of the NexusLIMS back-end is to check the
 :doc:`database <database>` for any logs (inserted by the
 :doc:`Session Logger App <session_logger_app>`) with a status of
 ``'TO_BE_BUILT'``. This can be accomplished simply by running the
@@ -86,7 +86,7 @@ The most basic feature of the NexusLIMS backend is to check the
     $ pipenv run python -m nexusLIMS.builder.record_builder
 
 This command will find any records that need to be built, build the .xml file,
-and then upload it to the frontend CDCS instance.
+and then upload it to the front-end CDCS instance.
 
 Using other features of the library
 -----------------------------------

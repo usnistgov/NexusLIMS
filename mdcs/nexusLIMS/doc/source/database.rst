@@ -22,7 +22,7 @@ This database fulfills two primary purposes (in its current implementation).
 First, it serves as a location for the
 :doc:`Session Logger App <session_logger_app>` to make entries related to when
 a user has started and finished an Experiment on an instrument, as well as
-when the backend has attempted (and completed) building a record based on that
+when the back-end has attempted (and completed) building a record based on that
 Experiment. The second purpose is to contain authoritative information about
 the instruments in the Nexus Microscopy Facility, such as the instruments'
 names, their calendar URLs, where a given instrument stores its data, etc.
@@ -37,7 +37,7 @@ The ``session_log`` table
 +++++++++++++++++++++++++
 
 As described above, the ``session_log`` table is where the instruments (and the
-NexusLIMS backend) store information that is used to determine what records
+NexusLIMS back-end) store information that is used to determine what records
 need to be built and which files should be included in a given record (see the
 :doc:`record building <record_building>` documentation for more details).
 Each row of this table represents a single timestamped log of a certain type of
@@ -46,13 +46,13 @@ the :doc:`Session Logger App <session_logger_app>` on an instrument at the
 beginning of their session, and again when they click the `"End Session"`
 button or close the application at the end of their experiment. Together, these
 `"START"` and `"END"` logs (linked by a ``session_identifier``) represent a unit
-of time on a given instrument, and indicate to the NexusLIMS backend
+of time on a given instrument, and indicate to the NexusLIMS back-end
 that a record needs to be built for that instrument, containing files created
-between the starting and ending timestamps. The backend periodically polls
+between the starting and ending timestamps. The back-end periodically polls
 this database table for any logs with a status of `"TO_BE_BUILT"`, and fires off
 the :doc:`record building <record_building>` process if any are found.
-Upon completion of record building, the backend updates the ``record_status``
-of these logs as needed so that duplicate records are not created. The backend
+Upon completion of record building, the back-end updates the ``record_status``
+of these logs as needed so that duplicate records are not created. The back-end
 then continues polling the database indefinitely for any new sessions that need
 to be built.
 
@@ -128,7 +128,7 @@ placed on their values:
 |                        |              | username associated with this       |
 |                        |              | session (if known) -- this value    |
 |                        |              | is not currently used by the        |
-|                        |              | backend since it is not reliable    |
+|                        |              | back-end since it is not reliable   |
 |                        |              | across different instruments.       |
 +------------------------+--------------+-------------------------------------+
 
@@ -138,16 +138,16 @@ placed on their values:
 The ``instruments`` table
 +++++++++++++++++++++++++
 
-This table serves as the authoritative data source for the NexusLIMS backend
+This table serves as the authoritative data source for the NexusLIMS back-end
 regarding information about the instruments in the Nexus Facility. By locating
 this information in an external database, changes to instrument configuration
 (or addition of a new instrument) requires making adjustments to just one
 location, simplifying maintenance of the system. For example, when the
 SharePoint calendar system version was transitioned from 2010 to 2016, the
 calendar URLs changed, but after a simple update to the entries in this table,
-the existing backend code continued working with no other changes needed.
+the existing back-end code continued working with no other changes needed.
 
-**Backend implementation details**
+**Back-end implementation details**
 
 When the :py:mod:`nexusLIMS` module is imported, one of the "setup" tasks
 performed is to load the ``instruments`` table from the database into a

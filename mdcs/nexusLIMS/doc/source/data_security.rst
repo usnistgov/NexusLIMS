@@ -1,3 +1,5 @@
+.. _data-security:
+
 Data security in NexusLIMS
 ==========================
 
@@ -79,7 +81,7 @@ Development practices
 +++++++++++++++++++++
 
 The final piece of the data security ecosystem is the methodology used to
-develop the backend code that handles record building and communication with
+develop the back-end code that handles record building and communication with
 CDCS. Where possible, best-practices from the open source software development
 community are enacted, so the entire codebase can be inspected at the
 Gitlab |RepoLink|_, where issue tracking, feature development, and deployment
