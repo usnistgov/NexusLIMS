@@ -1,3 +1,5 @@
+:tocdepth: 2
+
 .. _record-building:
 
 Record building workflow
@@ -20,7 +22,7 @@ detail about the methods and classes used during record generation.
 General Approach
 ++++++++++++++++
 
-Because the instruments cannot communicate directly with the NexusLIMS backend,
+Because the instruments cannot communicate directly with the NexusLIMS back-end,
 the system utilizes a polling approach to detect when a new record should be
 built. The process described on this page happens periodically (using a system
 scheduling tool such as ``systemd`` or ``cron``). The record builder is begun by
@@ -40,7 +42,7 @@ and the operators of NexusLIMS are notified so the issue can be corrected.
 
 ..  admonition:: A note on authentication...
 
-    Since many of the resources accessed by the NexusLIMS backend require
+    Since many of the resources accessed by the NexusLIMS back-end require
     authentication (such as the SharePoint Calendar and the CDCS instance), it
     is necessary to provide suitable credentials, or no information will be able
     to be fetched. This is done by specifying two environment variables in the
@@ -229,7 +231,7 @@ etc. Sourcing this information from the master database allows for one central
 location for authoritative data. Thus, if something changes about the
 instruments' configuration, the data needs to be updated in one location only.
 The following is an example of the information extracted from the database and
-available to the NexusLIMS backend software for a given instrument (in this
+available to the NexusLIMS back-end software for a given instrument (in this
 case the FEI Titan TEM in Building 223):
 
 .. code-block::
@@ -270,7 +272,7 @@ a user accidentally started the logger application or did not generate any
 data), the
 :py:meth:`~nexusLIMS.db.session_handler.Session.update_session_status` method is
 used to mark the session's record status as ``'NO_FILES_FOUND'`` in the
-database, and the backend proceeds with `step 1 <starting-record-builder_>`_ for
+database, and the back-end proceeds with `step 1 <starting-record-builder_>`_ for
 the next :py:class:`~nexusLIMS.db.session_handler.Session` to be processed.
 `(go to top) <overview_>`_
 
@@ -284,7 +286,7 @@ the next step is to separate those files into logical groupings to try and
 approximate conceptual boundaries that occur during an experiment. In the
 NexusLIMS schema, these groups are called ``AcquisitionActivities``, which are
 represented by :py:class:`~nexusLIMS.schemas.activity.AcquisitionActivity`
-objects by the NexusLIMS backend.
+objects by the NexusLIMS back-end.
 
 To separate the list of files into groups, a statistical analysis of the file
 creation times is performed, as illustrated in :numref:`cluster-fig` for an
@@ -471,7 +473,7 @@ If the record does validate, it is written to a subdirectory of
 :ref:`nexusLIMS_path <nexusLIMS-path>` (environment variable) for storage
 before it is uploaded to the CDCS instance.
 
-Regardless, the backend then proceeds with `step 1 <starting-record-builder_>`_
+Regardless, the back-end then proceeds with `step 1 <starting-record-builder_>`_
 for the next :py:class:`~nexusLIMS.db.session_handler.Session` to be processed,
 and repeats until all sessions have been analyzed.
 `(go to top) <overview_>`_

@@ -1,4 +1,4 @@
-API Documentation
+API documentation
 =================
 
 This page contains links to the automatically generated documentation

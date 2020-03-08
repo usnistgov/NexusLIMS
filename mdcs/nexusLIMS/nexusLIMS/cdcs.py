@@ -45,6 +45,15 @@ _logger.setLevel(_logging.INFO)
 
 
 def get_workspace_id():
+    """
+    Get the workspace ID that the user has access to (should be the Global
+    Public Workspace)
+
+    Returns
+    -------
+    workspace_id : str
+        The workspace ID
+    """
     # assuming there's only one workspace for this user (that is the public
     # workspace)
     _endpoint = _urljoin(_cdcs_url, 'rest/workspace/read_access')
@@ -58,6 +67,14 @@ def get_workspace_id():
 
 
 def get_template_id():
+    """
+    Get the template ID for the schema (so the record can be associated with it)
+
+    Returns
+    -------
+    template_id : str
+        The template ID
+    """
     # get the current template (XSD) id value:
     _endpoint = _urljoin(_cdcs_url, 'rest/template-version-manager/global')
     _r = _nx_req(_endpoint, _requests.get, basic_auth=True)
@@ -82,7 +99,7 @@ def upload_record_content(xml_content, title):
 
     Returns
     -------
-    post_r : ~requests.Response
+    post_r : :py:class:`~requests.Response`
         The REST response returned from the CDCS instance after attempting
         the upload
     record_id : str
@@ -126,7 +143,7 @@ def delete_record(record_id):
 
     Returns
     -------
-    r : ~requests.Response
+    r : :py:class:`~requests.Response`
         The REST response returned from the CDCS instance after attempting
         the delete
     """

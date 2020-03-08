@@ -1,5 +1,8 @@
-Schema Documentation
+Schema documentation
 ====================
+
+    `Last updated: February 25, 2020`
+
 
 This page contains the documentation automatically generated from the NexusLIMS
 Schema (``nexus-experiment.xsd``) that is used to validate experimental records

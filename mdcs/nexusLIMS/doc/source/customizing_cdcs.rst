@@ -1,4 +1,6 @@
-Tips for Customizing CDCS
+:tocdepth: 3
+
+Tips for customizing CDCS
 =========================
 
     `Originally written by: Joshua Taillon -- ODI`

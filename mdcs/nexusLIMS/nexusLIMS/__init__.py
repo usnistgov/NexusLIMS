@@ -25,12 +25,12 @@
 #  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
-"""The NexusLIMS backend software.
+"""The NexusLIMS back-end software.
 
 This module contains the software required to monitor a database for sessions
 logged by users on instruments that are part of the NIST Electron Microscopy
 Nexus Facility. Based off this information, records representing individual
-experiments are automatically generated and uploaded to the frontend NexusLIMS
+experiments are automatically generated and uploaded to the front-end NexusLIMS
 CDCS instance for users to browse, query, and edit.
 
 Example
@@ -75,7 +75,7 @@ you are running using ``pipenv``).
 `nexusLIMS_path`
     The root path used by NexusLIMS for various needs. This folder is used to
     store the NexusLIMS database, generated records, individual file metadata
-    dumps and preview images, and anything else that is needed by the backend
+    dumps and preview images, and anything else that is needed by the back-end
     system.
 
 .. _nexusLIMS-db-path:
