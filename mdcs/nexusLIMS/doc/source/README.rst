@@ -63,6 +63,26 @@ diffraction pattern of a quasicrystal as inspiration for the NexusLIMS
 logo due to its significance in the electron microscopy and
 crystallography communities, together with its storied NIST heritage:
 
-.. image:: _static/logo_inspiration.png
-   :width: 85%
+..  figure:: _static/logo_inspiration.png
+    :figwidth: 80%
+    :align: center
+    :alt: NexusLIMS Logo Inspiration
+    :figclass: align-center
 
+About the developers
+--------------------
+
+NexusLIMS has been developed through a great deal of work by a number of people
+including:
+
+- `Joshua Taillon <https://www.nist.gov/people/joshua-taillon>`_ - Office of Data and Informatics
+- `June Lau <https://www.nist.gov/people/june-w-lau>`_ - Materials Science and Engineering Division
+- `Marcus Newrock <https://www.nist.gov/people/marcus-william-newrock>`_ - Office of Data and Informatics
+- `Ray Plante <https://www.nist.gov/people/raymond-plante>`_ - Office of Data and Informatics
+- `Gretchen Greene <https://www.nist.gov/people/gretchen-greene>`_ - Office of Data and Informatics
+
+As well as multiple SURF students/undergraduate interns:
+
+- Rachel Devers - Montgomery College/University of Maryland College Park
+- Thomas Bina - Pennsylvania State University
+- Sarita Upreti - Montgomery College
