@@ -9,6 +9,7 @@
    session_logger_app
    record_building
    development
+   taxonomy
    schema_documentation
    customizing_cdcs
    api

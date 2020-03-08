@@ -19,6 +19,7 @@ well as a detailed description of how a record of a given experiment
 :doc:`is built <record_building>`, from beginning to end.
 There is also additional documentation about the practices used
 in :doc:`developing NexusLIMS <development>`, the
+:doc:`taxonomy <taxonomy>` used when discussing NexusLIMS, the
 :doc:`schema <schema_documentation>` used to represent Experiment records,
 and :doc:`customizations <customizing_cdcs>` that were made to
 the `CDCS <https://cdcs.nist.gov>`_ platform to create the NexusLIMS front-end.
