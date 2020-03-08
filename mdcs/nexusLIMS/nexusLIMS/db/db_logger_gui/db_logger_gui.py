@@ -22,7 +22,7 @@ def check_singleton():
             for proc in psutil.process_iter():
                 try:
                     pinfo = proc.as_dict(attrs=['pid', 'name', 'username'])
-                    if pinfo['name'] == 'db_logger_gui.exe':
+                    if pinfo['name'] == 'NexusLIMS Session Logger.exe':
                         db_logger_exe_count += 1
                 except psutil.NoSuchProcess:
                     pass
@@ -32,7 +32,8 @@ def check_singleton():
             # if we see more than that, we know there's already an instance
             # running
             if db_logger_exe_count > 2:
-                raise OSError('Only one instance of db_logger_gui allowed')
+                raise OSError('Only one instance of NexusLIMS Session Logger '
+                              'allowed')
         else:
             # we're not running as an .exe, so use tendo
             return tendo_singleton()
