@@ -624,8 +624,11 @@
             .sidebar-btn-tooltip .tooltip-arrow{
                 top: 50% !important;
             }
+            #edit-record-btn, #btn-previous-page {
+            margin: 0.25em;
+            }
             @media screen and (max-width: 768px) {
-            #edit-record-btn, #previous-page-btn {
+            #edit-record-btn, #btn-previous-page {
                 font-size: 10px;
             }
             }
@@ -772,7 +775,7 @@
                   title="Manually edit the contents of this record (login required)">
                   <i class="fa fa-file-text"></i> Edit this record
               </button>
-              <button id="previous-page-btn" type="button" class="btn btn-default pull-right"
+              <button id="btn-previous-page" type="button" class="btn btn-default pull-right"
                   data-toggle="tooltip" data-placement="top" 
                   title="Go back to the previous page">
                   <i class="fa fa-arrow-left"></i> Back to previous
