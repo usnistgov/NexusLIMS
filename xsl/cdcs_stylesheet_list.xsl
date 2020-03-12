@@ -379,7 +379,10 @@
           <xsl:attribute name="data-placement">bottom</xsl:attribute>
           <xsl:choose>
             <xsl:when test="$input = 'dm3'">
-              <xsl:attribute name="title">Gatan DigitalMicrograph file</xsl:attribute>
+              <xsl:attribute name="title">Gatan DigitalMicrograph file (v3)</xsl:attribute>
+            </xsl:when>
+            <xsl:when test="$input = 'dm4'">
+              <xsl:attribute name="title">Gatan DigitalMicrograph file (v4)</xsl:attribute>
             </xsl:when>
             <xsl:when test="$input = 'tif'">
               <xsl:attribute name="title">Tiff-format image</xsl:attribute>

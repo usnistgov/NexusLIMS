@@ -91,685 +91,703 @@
                 </xsl:with-param>
             </xsl:call-template>
         </xsl:variable>
-      <div style="width:95%;">        
-        <!-- ============ CSS Styling ============ --> 
-        <style>
-            .scrollDisabled { /* class to prevent scrolling when modal is shown */
-                position: fixed; 
-                width: 100%;
-                overflow-y:scroll;
-            }
-            
-            .main, .sidebar { /* Set the font style for the page */
-                /*font-family: "Lato", sans-serif;*/
-            }
-            
-            #nav { /* Make sure top nav does not get overlayed */
-                z-index: 100000 !important;
-            }
-
-            /* Link colors */
-            a:link {
-                color: #3865a3;
-            }
-            a:visited {
-                color: #3865a3;
-            }
-            a:hover {
-                color: #5e7ca3;
-            }
-
-            button { 
-                cursor: pointer; /* Changes cursor type when hovering over a button */
-                font-size: 12px;
-            }
-
-            /* Override bootstrap button outline styling */
-            .btn:focus,.btn:active {
-                outline: none !important;
-                box-shadow: none;
-                background-color: #ccc;
-            }
-            
-            th,td {
-                font-size: 14px;
-            }
-            
-            .aa_header {
-                font-size: 19px;
-                text-decoration: none;
-                color: black;
-            }
-            
-            .aa_header:hover {
-                cursor: default;
-                color: black;
-            }
-
-            /* makes it so link does not get hidden behind the header */ 
-            a.aa_anchor { 
-                display: block;
-                position: relative;
-                top: -3.5em;
-                visibility: hidden; 
-            }
-            
-            /* Hide for mobile, show later */
-            .sidebar {
-              display: block;
-              position: fixed;
-              left: -400px;
-              width: 180px;
-              font-size: 14px;
-              -webkit-transition: all 0.5s ease-in-out 0s;
-              -moz-transition: all 0.5s ease-in-out 0s;
-              -o-transition: all 0.5s ease-in-out 0s;
-              transition: all 0.5s ease-in-out 0s;
-              height: 90vh;
-            }
-            @media (min-width: 768px) {
-                .sidebar {
-                     position: fixed;
-                     top: 5em;
-                     bottom: 0;
-                     left: 0;
-                     z-index: 1000;
-                     display: block;
-                     padding: 20px;
-                     overflow-x: visible;
-                     overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
-                     /* border-right: 1px solid #eee; */
+        <div style="width:95%;">        
+            <!-- ============ CSS Styling ============ --> 
+            <style>
+                .scrollDisabled { /* class to prevent scrolling when modal is shown */
+                    position: fixed; 
+                    width: 100%;
+                    overflow-y:scroll;
                 }
-            }
-            
-            .sidebar.side-expanded {
-                left: 0;
-                padding: 20px;
-                background-color: white;
-                z-index: 100;
-                border: 1px solid #eee;
-            }
-
-            .sidebar {
-                visibility: hidden; /* Make hidden, to be revealed when jQuery is done paginating results */    
-            }
-
-            .sidebar::-webkit-scrollbar { /* WebKit */
-                width: 0px;
-            }
-            
-            /* Parameters for the acquisition activity links and headers within the sidebar */
-            .sidebar a, .sidebar h1 { 
-                text-decoration: none;
-                font-weight: bold;
-            }
-
-            .sidebar .pagination > li > a, .pagination > li > span {
-                padding: 6px 10px;
-            }
-
-            /* for sidenav table paginator */
-            .sidebar .cdatatableDetails {
-                float: left;
-                margin: 0 0.5em;
-            }
-
-            .sidebar div.dataTables_paginate {
-                text-align: center !important;
-            }
-            
-            .sidebar div { /* Parameters for other text found in the sidebar (e.g. start time) */
-                font-size: 12px;
-            }
-
-            #close-accords-btn, #open-accords-btn, #to-top-btn {
-                margin: 0.5em auto;
-                display: block;
-                width: 100%;
-                font-size: 12px;
-                z-index: 101;
-            }
-
-            #to-top-btn { /* Parameters for the button which jumps to the top of the page when clicked */
-                visibility: hidden; /* Set button to hidden on default so that it will appear when the page is scrolled */
-                opacity: 0;
-                -webkit-transition: visibility 0.25s linear, opacity 0.25s linear;
-                -moz-transition: visibility 0.25s linear, opacity 0.25s linear;
-                -o-transition: visibility 0.25s linear, opacity 0.25s linear;
-                transition: visibility 0.25s linear, opacity 0.25s linear;
-            }
-     
-            .slide {
-                display: none;
-            }
-            
-            .slideshow-container {
-                position: relative;
-                margin: auto;
-                margin-bottom: 2em;
-            }
-          
-            img.nx-img {
-               max-height: 500px;
-               max-width: 100%;
-               margin-left: auto; /* Center justify images */
-               margin-right: auto;
-               display: block;
-            }
-            
-            img.nx-img.aa-img {
-                display: block;
-                width: 400px;
-            }
-            
-            img.nx-img.aa-img.hidden {
-                display: none;
-            }
-            
-            
-            .gal-nav { /* Parameters for the 'next' and 'prev' buttons on the slideshow gallery */
-
-            }
-            
-            div#img_gallery { /* make entire gallery unselectable to prevent highlighting when clicking nav buttons */
-              -webkit-touch-callout: none;
-              -webkit-user-select: none;
-              -khtml-user-select: none;
-              -moz-user-select: none;
-              -ms-user-select: none;
-              user-select: none;
-            }
-            
-            div#img_gallery .fa-stack-2x{
-                color: #aaa;
-                -webkit-transition: color 0.25s linear;
-                -moz-transition: color 0.25s linear;
-                -o-transition: color 0.25s linear;
-                transition: color 0.25s linear;
-            }
-            
-            div#img_gallery:hover .fa-stack-2x {
-                color: #337ab7;
-            }
-            
-            div#img_gallery .fa-stack:hover .fa-stack-2x {
-                color: #23527c;
-            }
-            
-            .gal-prev:hover, .gal-next:hover { /* Have a background appear when the prev/next buttons are hovered over */
-            }
-            
-            .no-top-padding { /* class to remove padding and margin from bootstrap columns */
-                padding-top: 0 !important;
-                margin-top: 0 !important;
-            }
-            
-            .nx-caption .row {
-                margin: 0;
-            }
-            .nx-caption .row > * {
-                padding: 0;
-            }
-
-            .nx-caption { /* Parameters for the caption text displayed in the image gallery */
-                color: black;
-                font-size: 14px;
-                padding: 8px 12px;
-                width: 100%;
-                text-align: center;
-                margin-top: -1em;
-                line-height: 150%;
-            }
-
-            .aa_header_row {
-                /* width: 95%; */
-                margin-bottom: .5em;
-                margin-top: -35px;
-            }
-
-            .accordion { /* Parameters for accordions used to hide parameter / metadata tables */
-                background-color: #eee;
-                color: #444;
-                cursor: pointer;
-                padding: 18px;
-                width: 95%;
-                border: none;
-                text-align: left;
-                outline: none;
-                font-size: 15px;
-                -webkit-transition: 0.4s;
-                -moz-transition: 0.4s;
-                -o-transition: 0.4s;
-                transition: 0.4s;
-            }
-            
-            .active-accordian, .accordion:hover { /* Change color of the accordion when it is active or hovered over */
-                background-color: #ccc;
-            }
-            
-            .accordion:after { /* Parameters for the accordion header while it is open */
-                content: '\002B';
-                color: #777;
-                font-weight: bold;
-                float: right;
-                margin-left: 5px;
-            }
-            
-            .active-accordion:after {
-                content: '\2212';
-            }
-            
-            .panel { /* Parameters for the contents of the accordion */
-                background-color: white;
-                max-height: 0;
-                overflow: hidden;
-                -webkit-transition: max-height 0.2s ease-out; 
-                -moz-transition: max-height 0.2s ease-out; 
-                -o-transition: max-height 0.2s ease-out;
-                transition: max-height 0.2s ease-out;
-                width: 95%;
-            }
-
-            img.dataset-preview-img {
-                display: block;
-                width: 100%;
-                height: auto;
-                max-height: 400px;
-                max-width: 400px;
-            }
-            
-            .modal { /* Parameters for modal boxes */
-                display: block;
-                position: fixed;
-                z-index: 1001;
-                padding-top: 100px;
-                left: 0;
-                top: 0;
-                width: 100%;
-                height: 100%;
-                overflow: auto;
-                background-color: rgba(209,203,203,0.7);
-                -webkit-transition: all 0.25s linear;
-                -moz-transition: all 0.25s linear;
-                -o-transition: all 0.25s linear;
-                transition: all 0.25s linear;
-                visibility: hidden;
-                opacity: 0;
-            }
-            
-            .modal-content { /* Parameters for content within modal boxes */
-                background-color: #fefefe;
-                margin: auto;
-                padding: 20px;
-                border: 1px solid #888;
-                width: max-content;
-            }
-            
-            .close-modal { /* Parameters for 'X' used to close the modal box */
-                color: #000;
-                float: right;
-                font-size: 28px;
-                font-weight: bold;
-            }
-            
-            .close-modal:hover, /* Changes color of close button and cursor type when hovering over it */
-                .close-modal:focus {
-                color: #525252;
-                text-decoration: none;
-                cursor: pointer;
-            }
-            
-            /*
-            * Main content
-            */
-            
-            .main {
-                padding: 20px;
-                -webkit-transition: padding 0.5s ease-in-out 0s;
-                -moz-transition: padding 0.5s ease-in-out 0s;
-                -o-transition: padding 0.5s ease-in-out 0s;
-                transition: padding 0.5s ease-in-out 0s;
-                padding-top: 5px;
-            }
-            @media (min-width: 768px) {
-            .main {
-                padding-right: 40px;
-                padding-left: 220px; /* 180 + 40 */
-            }
-            }
-            .main .page-header {
-                margin-top: 0;
-                border-bottom: none;`
-            }
-            
-
-            .main h1 {
-                font-size: 1.5em;
-            }
-
-            .main h3 {
-                font-size: 1.1em;
-                margin-bottom: 0.1em;
-            }
-            
-            table#summary-table > tbody > tr > * {
-                border: 0;
-                padding: 1px;
-                line-height: 1.25;
-            }
-
-            table.preview-and-table {
-                margin: 2em auto;
-            }
-
-            table.preview-and-table td {
-                vertical-align: middle;
-                font-size: 0.9em;
-            }
-
-            table.meta-table, 
-            table.aa-table {
-                border-collapse: collapse;
-
-            }
-
-            table.meta-table td, table.meta-table th, 
-            table.aa-table td, table.aa-table th {
-                padding: 0.3em;
-            }
-
-            table.meta-table th, 
-            table.aa-table th {
-                background-color: #3a65a2;
-                border-color: black;
-                color: white;
-            }
-            
-            th.parameter-name {
-                font-weight: bold;
-            }
-
-/* Fix for margins getting messed up inside the AA panels */ 
-            .main .dataTables_wrapper .row {
-                margin: 0;
-                /*display: flex;*/
-                align-items: center;
-                margin-top: 0.5em;
-                }
-            .main .dataTables_wrapper .row > * {
-                padding: 0;
-            }
-            .main .dataTables_wrapper ul.pagination > li > a {
-                padding: 0px 8px;
-                }
-
-            .main .dataTables_wrapper label {
-                font-size: smaller;
-            }
-            
-            .modal div.dataTables_wrapper div.dataTables_paginate ul.pagination {
-                margin-left: 1em;
-                white-space: nowrap;
-            }
-            
-            .modal table{
-              margin: 0 auto;
-              width: auto;
-              clear: both;
-              border-collapse: collapse;
-              table-layout: fixed;
-              word-wrap: break-word;
-            }
-
-            /* For loading screen */
-            #loading {
-                visibility: visible;
-                opacity: 1;
-                position: fixed;
-                top: 0;
-                left: 0;
-                z-index: 500;
-                width: 100vw;
-                height: 100vh;
-                background: #f7f7f7 url(static/img/bg01.png);
-            }
-
-            #loading img {
-                position: absolute;
-                top: 50%;
-                left: 50%;
-                width: 400px;
-                margin-top: -200px;
-                margin-left: -200px;
-                animation: spinner 1.5s ease infinite;
-            }
-            
-            @media screen and (max-width: 680px) {
-            #loading img {
-                width: 200px;
-                margin-top: -100px;
-                margin-left:-100px;
-            }
-            }
-
-            @keyframes spinner {
-            to {transform: rotate(360deg);}
-            }
- 
-            .xslt_render {
-                visibility: hidden;
-                opacity: 0;
-            }
-            
-            /* Fix spacing between components */
-            .main .row {
-            }
-
-            .motivation-text, #session_info_column {
-                margin-top: -40px;
-            }
-            @media screen and (max-width: 1680px) {
-            .motivation-text, #session_info_column {
-                margin-top: -35px;
-            }
-            }
-            @media screen and (max-width: 1280px) {
-            .motivation-text, #session_info_column {
-            margin-top: -25px;
-            }
-            }
-            @media screen and (max-width: 980px) {
-            .motivation-text, #session_info_column {
-            margin-top: -20px;
-            }
-            }
-            @media screen and (max-width: 736px) {
-            .motivation-text, #session_info_column {
-            margin-top: -15px;
-            }
-            }
-            @media screen and (max-width: 480px) {
-            .motivation-text, #session_info_column {
-            margin-top: -10px;
-            margin-right: 50px;
-            }
-            .experimenter-and-date {
-            margin-right: 50px;
-            }
-            #top-button-div {
-            margin-right: 50px;
-            }
-            }
-            .tooltip {
-                z-index: 100001;
-                position: fixed; 
-                -webkit-touch-callout: none;
-                -webkit-user-select: none;
-                -khtml-user-select: none;
-                -moz-user-select: none;
-                -ms-user-select: none;
-                user-select: none;
-                -webkit-transition: opacity 0.25s linear;
-                -moz-transition: opacity 0.25s linear;
-                -o-transition: opacity 0.25s linear;
-                transition: opacity 0.25s linear;
-                white-space: pre-wrap;
-            }
-            .tooltip-inner {
-                white-space: pre-wrap;
-            }
-            .sidebar-btn-tooltip {
-                top: 69px !important;
-            }
-            .sidebar-btn-tooltip .tooltip-arrow{
-                top: 50% !important;
-            }
-            #edit-record-btn, #btn-previous-page {
-            margin: 0.25em;
-            }
-            @media screen and (max-width: 768px) {
-            #edit-record-btn, #btn-previous-page {
-                font-size: 10px;
-            }
-            }
-            #sidebar-btn {
-                visibility: hidden;
-                opacity: 0;
-                position: fixed;
-                top: 69px;
-                left: 20px;
-                font-size: 20px;
-                -webkit-transition: opacity 0.5s ease-in-out 0s;
-                -moz-transition: opacity 0.5s ease-in-out 0s;
-                -o-transition: opacity 0.5s ease-in-out 0s;
-                transition: opacity 0.5s ease-in-out 0s;
-                z-index: 50;
-                }
-            @media screen and (max-width: 768px) {
-            #sidebar-btn {
-                visibility: visible;
-                opacity: 1;
-            }
-            }
-            
-            .slideshow-col {
-                padding: 0;
-            }
-            
-            .badge a {
-                color: #fff;
-            }
-            
-            .help-tip {
-                color: #eee;
-            }
-            .help-tip:hover {
-                color: #aaa;
-            }
-            
-            .warning-tip {
-                color: #f5c636;
-            }
-            .warning-tip:hover {
-            
-            }
-            
-            td.has-warning {
-                color:  #a3a3a3;
-            }
-            
-            .no-cal-warning {
-                color: #a94442;
-                font-style: italic;
-            }
-            .sup-link {
-                font-size: 0.5em; 
-                top: -1em;
-            }
-            
-            i.param-button {
-                margin-left: 0.5em; 
-                font-size: medium;
-                color: #aaa;
-                border: solid 0.1em #eee;
-                -webkit-transition: color 0.25s linear, border 0.25s linear, background 0.25s linear;
-                -moz-transition: color 0.25s linear, border 0.25s linear, background 0.25s linear;
-                -o-transition: color 0.25s linear, border 0.25s linear, background 0.25s linear;
-                transition: color 0.25s linear, border 0.25s linear, background 0.25s linear;
-            }
-            i.param-button:hover {
-               margin-left: 0.5em; 
-               font-size: medium;
-               color: #5e7ca3;
-               border: solid 0.1em #999;
-               background: #eee;
-            }
-            
-            .row.vertical-align {
-                display: flex;
-                align-items: center;
-                width: 100%;
-            }
-            
-            .dataTables_paginate {
-                font-size: 14px;
-            }
-            .pager-col {
-                padding-top: 20px;
-            }
-            .aa-img-col {
-                padding-top: 10px;
-            }
-            .aa_header_row > .col-md-12 {
-                padding-top: 10px;
-            }
-        </style>
-
-        <div id="loading">
-            <img src="static/img/logo_bare.png"/>
-        </div>
-
-        <!-- ============= Main Generation of the Page ============= -->
-        <!-- Add sidebar to the page -->
-        <div class="sidebar">
-            <table id="nav-table" class="table table-condensed table-hover">
-                <!-- Procedurally generate unique id numbers which relate each acquisition event to its position on
-                    the webpage such that it will jump there when the link is clicked -->
-                <thead>
-                    <tr><th>Explore record:</th></tr>
-                </thead>
-                <tbody>
-                <xsl:for-each select="acquisitionActivity">
-                    <tr><td>
-                    <a class="link" href="#{generate-id(current())}">
-                        Activity <xsl:value-of select="@seqno+1"/>
-                    </a>
-                        <div><xsl:call-template name="parse-activity-contents"></xsl:call-template></div>
-                    </td></tr>
-                </xsl:for-each>
-                </tbody>
-                </table>
-    
-                <!--
-                <button id="open-accords-btn" class="btn btn-default" onclick="openAccords()">
-                    <i class="fa fa-plus-square-o"></i> Expand All Panels
-                </button>
                 
-                <button id="close-accords-btn" class="btn btn-default" onclick="closeAccords()">
-                    <i class="fa fa-minus-square-o"></i> Collapse All Panels
-                </button>-->
+                .main, .sidebar { /* Set the font style for the page */
+                    /*font-family: "Lato", sans-serif;*/
+                }
+                
+                #nav { /* Make sure top nav does not get overlayed */
+                    z-index: 100000 !important;
+                }
+                
+                /* Link colors */
+                a:link {
+                    color: #3865a3;
+                }
+                a:visited {
+                    color: #3865a3;
+                }
+                a:hover {
+                    color: #5e7ca3;
+                }
+                
+                button { 
+                    cursor: pointer; /* Changes cursor type when hovering over a button */
+                    font-size: 12px;
+                }
+                
+                /* Override bootstrap button outline styling */
+                .btn:focus,.btn:active {
+                    outline: none !important;
+                    box-shadow: none;
+                    background-color: #ccc;
+                }
+                
+                th,td {
+                    font-size: 14px;
+                }
+                
+                .aa_header {
+                    font-size: 19px;
+                    text-decoration: none;
+                    color: black;
+                }
+                
+                .aa_header:hover {
+                    cursor: default;
+                    color: black;
+                }
+                
+                /* makes it so link does not get hidden behind the header */ 
+                a.aa_anchor { 
+                    display: block;
+                    position: relative;
+                    top: -3.5em;
+                    visibility: hidden; 
+                }
+                
+                /* Hide for mobile, show later */
+                .sidebar {
+                  display: block;
+                  position: fixed;
+                  left: -400px;
+                  width: 180px;
+                  font-size: 14px;
+                  -webkit-transition: all 0.5s ease-in-out 0s;
+                  -moz-transition: all 0.5s ease-in-out 0s;
+                  -o-transition: all 0.5s ease-in-out 0s;
+                  transition: all 0.5s ease-in-out 0s;
+                  height: 90vh;
+                }
+                @media (min-width: 768px) {
+                    .sidebar {
+                         position: fixed;
+                         top: 5em;
+                         bottom: 0;
+                         left: 0;
+                         z-index: 1000;
+                         display: block;
+                         padding: 20px;
+                         overflow-x: visible;
+                         overflow-y: auto; /* Scrollable contents if viewport is shorter than content. */
+                         /* border-right: 1px solid #eee; */
+                    }
+                }
+                
+                .sidebar.side-expanded {
+                    left: 0;
+                    padding: 20px;
+                    background-color: white;
+                    z-index: 100;
+                    border: 1px solid #eee;
+                }
+                
+                .sidebar {
+                    visibility: hidden; /* Make hidden, to be revealed when jQuery is done paginating results */    
+                }
+                
+                .sidebar::-webkit-scrollbar { /* WebKit */
+                    width: 0px;
+                }
+                
+                /* Parameters for the acquisition activity links and headers within the sidebar */
+                .sidebar a, .sidebar h1 { 
+                    text-decoration: none;
+                    font-weight: bold;
+                }
+                
+                .sidebar .pagination > li > a, .pagination > li > span {
+                    padding: 6px 10px;
+                }
+                
+                /* for sidenav table paginator */
+                .sidebar .cdatatableDetails {
+                    float: left;
+                    margin: 0 0.5em;
+                }
+                
+                .sidebar div.dataTables_paginate {
+                    text-align: center !important;
+                }
+                
+                .sidebar div { /* Parameters for other text found in the sidebar (e.g. start time) */
+                    font-size: 12px;
+                }
+                
+                #close-accords-btn, #open-accords-btn, #to-top-btn {
+                    margin: 0.5em auto;
+                    display: block;
+                    width: 100%;
+                    font-size: 12px;
+                    z-index: 101;
+                }
+                
+                #to-top-btn { /* Parameters for the button which jumps to the top of the page when clicked */
+                    visibility: hidden; /* Set button to hidden on default so that it will appear when the page is scrolled */
+                    opacity: 0;
+                    -webkit-transition: visibility 0.25s linear, opacity 0.25s linear;
+                    -moz-transition: visibility 0.25s linear, opacity 0.25s linear;
+                    -o-transition: visibility 0.25s linear, opacity 0.25s linear;
+                    transition: visibility 0.25s linear, opacity 0.25s linear;
+                }
+                
+                .slide {
+                    display: none;
+                }
+                
+                .slideshow-container {
+                    position: relative;
+                    margin: auto;
+                    margin-bottom: 2em;
+                }
+                
+                img.nx-img {
+                   max-height: 500px;
+                   max-width: 100%;
+                   margin-left: auto; /* Center justify images */
+                   margin-right: auto;
+                   display: block;
+                }
+                
+                img.nx-img.aa-img {
+                    display: block;
+                    width: 400px;
+                }
+                
+                img.nx-img.aa-img.hidden {
+                    display: none;
+                }
+                
+                
+                .gal-nav { /* Parameters for the 'next' and 'prev' buttons on the slideshow gallery */
+                
+                }
+                
+                div#img_gallery { /* make entire gallery unselectable to prevent highlighting when clicking nav buttons */
+                  -webkit-touch-callout: none;
+                  -webkit-user-select: none;
+                  -khtml-user-select: none;
+                  -moz-user-select: none;
+                  -ms-user-select: none;
+                  user-select: none;
+                }
+                
+                div#img_gallery .fa-stack-2x{
+                    color: #aaa;
+                    -webkit-transition: color 0.25s linear;
+                    -moz-transition: color 0.25s linear;
+                    -o-transition: color 0.25s linear;
+                    transition: color 0.25s linear;
+                }
+                
+                div#img_gallery:hover .fa-stack-2x {
+                    color: #337ab7;
+                }
+                
+                div#img_gallery .fa-stack:hover .fa-stack-2x {
+                    color: #23527c;
+                }
+                
+                .gal-prev:hover, .gal-next:hover { /* Have a background appear when the prev/next buttons are hovered over */
+                }
+                
+                .no-top-padding { /* class to remove padding and margin from bootstrap columns */
+                    padding-top: 0 !important;
+                    margin-top: 0 !important;
+                }
+                
+                .nx-caption .row {
+                    margin: 0;
+                }
+                .nx-caption .row > * {
+                    padding: 0;
+                }
+                
+                .nx-caption { /* Parameters for the caption text displayed in the image gallery */
+                    color: black;
+                    font-size: 14px;
+                    padding: 8px 12px;
+                    width: 100%;
+                    text-align: center;
+                    margin-top: -1em;
+                    line-height: 150%;
+                }
+                
+                .aa_header_row {
+                    /* width: 95%; */
+                    margin-bottom: .5em;
+                    margin-top: -35px;
+                }
+                
+                .accordion { /* Parameters for accordions used to hide parameter / metadata tables */
+                    background-color: #eee;
+                    color: #444;
+                    cursor: pointer;
+                    padding: 18px;
+                    width: 95%;
+                    border: none;
+                    text-align: left;
+                    outline: none;
+                    font-size: 15px;
+                    -webkit-transition: 0.4s;
+                    -moz-transition: 0.4s;
+                    -o-transition: 0.4s;
+                    transition: 0.4s;
+                }
+                
+                .active-accordian, .accordion:hover { /* Change color of the accordion when it is active or hovered over */
+                    background-color: #ccc;
+                }
+                
+                .accordion:after { /* Parameters for the accordion header while it is open */
+                    content: '\002B';
+                    color: #777;
+                    font-weight: bold;
+                    float: right;
+                    margin-left: 5px;
+                }
+                
+                .active-accordion:after {
+                    content: '\2212';
+                }
+                
+                .panel { /* Parameters for the contents of the accordion */
+                    background-color: white;
+                    max-height: 0;
+                    overflow: hidden;
+                    -webkit-transition: max-height 0.2s ease-out; 
+                    -moz-transition: max-height 0.2s ease-out; 
+                    -o-transition: max-height 0.2s ease-out;
+                    transition: max-height 0.2s ease-out;
+                    width: 95%;
+                }
+                
+                img.dataset-preview-img {
+                    display: block;
+                    width: 100%;
+                    height: auto;
+                    max-height: 400px;
+                    max-width: 400px;
+                }
+                
+                .modal { /* Parameters for modal boxes */
+                    display: block;
+                    position: fixed;
+                    z-index: 1001;
+                    padding-top: 100px;
+                    left: 0;
+                    top: 0;
+                    width: 100%;
+                    height: 100%;
+                    overflow: auto;
+                    background-color: rgba(209,203,203,0.7);
+                    -webkit-transition: all 0.25s linear;
+                    -moz-transition: all 0.25s linear;
+                    -o-transition: all 0.25s linear;
+                    transition: all 0.25s linear;
+                    visibility: hidden;
+                    opacity: 0;
+                }
+                
+                .modal-content { /* Parameters for content within modal boxes */
+                    background-color: #fefefe;
+                    margin: auto;
+                    padding: 20px;
+                    border: 1px solid #888;
+                    width: max-content;
+                }
+                
+                .close-modal { /* Parameters for 'X' used to close the modal box */
+                    color: #000;
+                    float: right;
+                    font-size: 28px;
+                    font-weight: bold;
+                }
+                
+                .close-modal:hover, /* Changes color of close button and cursor type when hovering over it */
+                    .close-modal:focus {
+                    color: #525252;
+                    text-decoration: none;
+                    cursor: pointer;
+                }
+                
+                .modal-expTitle {
+                    font-size: smaller;
+                    font-weight: normal;
+                }
+                
+                .modal-expDate {
+                    font-size: smaller;
+                    font-style: oblique;
+                }
+                
+                code {
+                    font-family: "Menlo", "DejaVu Sans Mono", "Liberation Mono", "Consolas", "Ubuntu Mono", "Courier New", "andale mono", "lucida console", monospace;
+                    font-size: small;
+                }
+                
+                /*
+                * Main content
+                */
+                
+                .main {
+                    padding: 20px;
+                    -webkit-transition: padding 0.5s ease-in-out 0s;
+                    -moz-transition: padding 0.5s ease-in-out 0s;
+                    -o-transition: padding 0.5s ease-in-out 0s;
+                    transition: padding 0.5s ease-in-out 0s;
+                    padding-top: 5px;
+                }
+                @media (min-width: 768px) {
+                .main {
+                    padding-right: 40px;
+                    padding-left: 220px; /* 180 + 40 */
+                }
+                }
+                .main .page-header {
+                    margin-top: 0;
+                    border-bottom: none;`
+                }
+                
+                
+                .main h1 {
+                    font-size: 1.5em;
+                }
+                
+                .main h3 {
+                    font-size: 1.1em;
+                    margin-bottom: 0.1em;
+                }
+                
+                table#summary-table > tbody > tr > * {
+                    border: 0;
+                    padding: 1px;
+                    line-height: 1.25;
+                }
+                
+                table.preview-and-table {
+                    margin: 2em auto;
+                }
+                
+                table.preview-and-table td {
+                    vertical-align: middle;
+                    font-size: 0.9em;
+                }
+                
+                table.meta-table, 
+                table.aa-table,
+                table.filelist-table {
+                    border-collapse: collapse;
+                
+                }
+                
+                table.meta-table td, table.meta-table th, 
+                table.aa-table td, table.aa-table th,
+                table.filelist-table td, table.filelist-table th{
+                    padding: 0.3em;
+                }
+                
+                table.meta-table th, 
+                table.aa-table th,
+                table.filelist-table th{
+                    background-color: #3a65a2;
+                    border-color: black;
+                    color: white;
+                }
+                
+                th.parameter-name {
+                    font-weight: bold;
+                }
+                
+                /* Fix for margins getting messed up inside the AA panels */ 
+                .main .dataTables_wrapper .row {
+                    margin: 0;
+                    /*display: flex;*/
+                    align-items: center;
+                    margin-top: 0.5em;
+                    }
+                .main .dataTables_wrapper .row > * {
+                    padding: 0;
+                }
+                .main .dataTables_wrapper ul.pagination > li > a {
+                    padding: 0px 8px;
+                    }
+                
+                .main .dataTables_wrapper label {
+                    font-size: smaller;
+                }
+                
+                .modal div.dataTables_wrapper div.dataTables_paginate ul.pagination {
+                    margin-left: 1em;
+                    white-space: nowrap;
+                }
+                
+                .modal table{
+                  margin: 0 auto;
+                  width: auto;
+                  clear: both;
+                  border-collapse: collapse;
+                  table-layout: fixed;
+                  word-wrap: break-word;
+                }
+                
+                /* For loading screen */
+                #loading {
+                    visibility: visible;
+                    opacity: 1;
+                    position: fixed;
+                    top: 0;
+                    left: 0;
+                    z-index: 500;
+                    width: 100vw;
+                    height: 100vh;
+                    background: #f7f7f7 url(static/img/bg01.png);
+                }
+                
+                #loading img {
+                    position: absolute;
+                    top: 50%;
+                    left: 50%;
+                    width: 400px;
+                    margin-top: -200px;
+                    margin-left: -200px;
+                    animation: spinner 1.5s ease infinite;
+                }
+                
+                @media screen and (max-width: 680px) {
+                #loading img {
+                    width: 200px;
+                    margin-top: -100px;
+                    margin-left:-100px;
+                }
+                }
+                
+                @keyframes spinner {
+                to {transform: rotate(360deg);}
+                }
+                
+                .xslt_render {
+                    visibility: hidden;
+                    opacity: 0;
+                }
+                
+                /* Fix spacing between components */
+                .main .row {
+                }
+                
+                .motivation-text, #session_info_column {
+                    margin-top: -40px;
+                }
+                @media screen and (max-width: 1680px) {
+                .motivation-text, #session_info_column {
+                    margin-top: -35px;
+                }
+                }
+                @media screen and (max-width: 1280px) {
+                .motivation-text, #session_info_column {
+                margin-top: -25px;
+                }
+                }
+                @media screen and (max-width: 980px) {
+                .motivation-text, #session_info_column {
+                margin-top: -20px;
+                }
+                }
+                @media screen and (max-width: 736px) {
+                .motivation-text, #session_info_column {
+                margin-top: -15px;
+                }
+                }
+                @media screen and (max-width: 480px) {
+                .motivation-text, #session_info_column {
+                margin-top: -10px;
+                margin-right: 50px;
+                }
+                .experimenter-and-date {
+                margin-right: 50px;
+                }
+                #top-button-div {
+                margin-right: 50px;
+                }
+                }
+                .tooltip {
+                    z-index: 100001;
+                    position: fixed; 
+                    -webkit-touch-callout: none;
+                    -webkit-user-select: none;
+                    -khtml-user-select: none;
+                    -moz-user-select: none;
+                    -ms-user-select: none;
+                    user-select: none;
+                    -webkit-transition: opacity 0.25s linear;
+                    -moz-transition: opacity 0.25s linear;
+                    -o-transition: opacity 0.25s linear;
+                    transition: opacity 0.25s linear;
+                    white-space: pre-wrap;
+                }
+                .tooltip-inner {
+                    white-space: pre-wrap;
+                }
+                .sidebar-btn-tooltip {
+                    top: 69px !important;
+                }
+                .sidebar-btn-tooltip .tooltip-arrow{
+                    top: 50% !important;
+                }
+                #edit-record-btn, #btn-previous-page {
+                margin: 0.25em;
+                }
+                @media screen and (max-width: 768px) {
+                #edit-record-btn, #btn-previous-page {
+                    font-size: 10px;
+                }
+                }
+                #sidebar-btn {
+                    visibility: hidden;
+                    opacity: 0;
+                    position: fixed;
+                    top: 69px;
+                    left: 20px;
+                    font-size: 20px;
+                    -webkit-transition: opacity 0.5s ease-in-out 0s;
+                    -moz-transition: opacity 0.5s ease-in-out 0s;
+                    -o-transition: opacity 0.5s ease-in-out 0s;
+                    transition: opacity 0.5s ease-in-out 0s;
+                    z-index: 50;
+                    }
+                @media screen and (max-width: 768px) {
+                #sidebar-btn {
+                    visibility: visible;
+                    opacity: 1;
+                }
+                }
+                
+                .slideshow-col {
+                    padding: 0;
+                }
+                
+                .badge a {
+                    color: #fff;
+                }
+                
+                .help-tip {
+                    color: #eee;
+                }
+                .help-tip:hover {
+                    color: #aaa;
+                }
+                
+                .warning-tip {
+                    color: #f5c636;
+                }
+                .warning-tip:hover {
+                
+                }
+                
+                td.has-warning {
+                    color:  #a3a3a3;
+                }
+                
+                .no-cal-warning {
+                    color: #a94442;
+                    font-style: italic;
+                }
+                .sup-link {
+                    font-size: 0.5em; 
+                    top: -1em;
+                }
+                
+                i.param-button {
+                    margin-left: 0.5em; 
+                    font-size: medium;
+                    color: #aaa;
+                    border: solid 0.1em #eee;
+                    -webkit-transition: color 0.25s linear, border 0.25s linear, background 0.25s linear;
+                    -moz-transition: color 0.25s linear, border 0.25s linear, background 0.25s linear;
+                    -o-transition: color 0.25s linear, border 0.25s linear, background 0.25s linear;
+                    transition: color 0.25s linear, border 0.25s linear, background 0.25s linear;
+                }
+                i.param-button:hover {
+                   margin-left: 0.5em; 
+                   font-size: medium;
+                   color: #5e7ca3;
+                   border: solid 0.1em #999;
+                   background: #eee;
+                }
+                
+                .row.vertical-align {
+                    display: flex;
+                    align-items: center;
+                    width: 100%;
+                }
+                
+                .dataTables_paginate {
+                    font-size: 14px;
+                }
+                .pager-col {
+                    padding-top: 20px;
+                }
+                .aa-img-col {
+                    padding-top: 10px;
+                }
+                .aa_header_row > .col-md-12 {
+                    padding-top: 10px;
+                }
+            </style>
+
+            <div id="loading">
+                <img src="static/img/logo_bare.png"/>
+            </div>
+
+            <!-- ============= Main Generation of the Page ============= -->
+            <!-- Add sidebar to the page -->
+            <div class="sidebar">
+                <table id="nav-table" class="table table-condensed table-hover">
+                    <!-- Procedurally generate unique id numbers which relate each acquisition event to its position on
+                        the webpage such that it will jump there when the link is clicked -->
+                    <thead>
+                        <tr><th>Explore record:</th></tr>
+                    </thead>
+                    <tbody>
+                    <xsl:for-each select="acquisitionActivity">
+                        <tr><td>
+                        <a class="link" href="#{generate-id(current())}">
+                            Activity <xsl:value-of select="@seqno+1"/>
+                        </a>
+                            <div><xsl:call-template name="parse-activity-contents"></xsl:call-template></div>
+                        </td></tr>
+                    </xsl:for-each>
+                    </tbody>
+                    </table>
+            
+                    <!--
+                    <button id="open-accords-btn" class="btn btn-default" onclick="openAccords()">
+                        <i class="fa fa-plus-square-o"></i> Expand All Panels
+                    </button>
+                    
+                    <button id="close-accords-btn" class="btn btn-default" onclick="closeAccords()">
+                        <i class="fa fa-minus-square-o"></i> Collapse All Panels
+                    </button>-->
+            
+                    <!-- Create button which jumps to the top of the page when clicked -->
+                    <button id="to-top-btn" type="button" class="btn btn-primary" value="Top" onclick="toTop()">
+                        <i class="fa fa-arrow-up"></i> Scroll to Top
+                    </button>
+            </div>
+            <div id="sidebar-btn" data-toggle="tooltip" data-placement="right" 
+                 title="Click to explore record contents">
+                <a><i class="fa fa-toggle-right"></i></a>
+            </div>
     
-                <!-- Create button which jumps to the top of the page when clicked -->
-                <button id="to-top-btn" type="button" class="btn btn-primary" value="Top" onclick="toTop()">
-                    <i class="fa fa-arrow-up"></i> Scroll to Top
-                </button>
-        </div>
-          <div id="sidebar-btn" data-toggle="tooltip" data-placement="right" 
-              title="Click to explore record contents">
-             <a><i class="fa fa-toggle-right"></i></a>
-         </div>
-    
-          <div class="main col-md-push-2" style="padding: 0;" id="top-button-div">
+            <div class="main col-md-push-2" style="padding: 0;" id="top-button-div">
               <button id="edit-record-btn" type="button" class="btn btn-default pull-right"
                   data-toggle="tooltip" data-placement="top" 
                   title="Manually edit the contents of this record (login required)">
@@ -780,22 +798,24 @@
                   title="Go back to the previous page">
                   <i class="fa fa-arrow-left"></i> Back to previous
               </button>
-          </div>
-    
+            </div>
+            
             <div class="main col-sm-pull-10" id="main-column">                        
-                
+                <xsl:variable name="expTitle">
+                    <xsl:choose>
+                        <xsl:when test="$title = 'No matching calendar event found'">
+                            <xsl:text>Untitled experiment</xsl:text>
+                            <span class='no-cal-warning'> (No matching calendar event found)</span>
+                        </xsl:when>
+                        <xsl:otherwise>
+                            <xsl:value-of select="$title"/>
+                        </xsl:otherwise>
+                    </xsl:choose>
+                </xsl:variable>
                 <div id='summary-info'>
                     <span class="list-record-title page-header">
                         <i class="fa fa-file-text results-icon"/>
-                        <xsl:choose>
-                            <xsl:when test="$title = 'No matching calendar event found'">
-                                <xsl:text>Untitled experiment</xsl:text>
-                                <span class='no-cal-warning'> (No matching calendar event found)</span>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                <xsl:value-of select="$title"/>
-                            </xsl:otherwise>
-                        </xsl:choose>
+                        <xsl:value-of select="$expTitle"/>
                     </span>
                     <br/>
                     <xsl:variable name="instr-pid">
@@ -827,18 +847,15 @@
                     </span>
                     <span class="badge list-record-badge">
                         <xsl:element name="a">
-                            <xsl:attribute name="target">_blank</xsl:attribute>
                             <xsl:attribute name="href">
-                                <xsl:value-of select="$datasetBaseUrl"/>
-                                <xsl:call-template name="get-path-of-file">
-                                    <xsl:with-param name="absolute_filename">
-                                        <xsl:value-of select="//dataset[1]/location"/>
-                                    </xsl:with-param>
-                                </xsl:call-template>
+                                javascript:void(0);
+                            </xsl:attribute>
+                            <xsl:attribute name="onclick">
+                                openModal('filelist-modal');
                             </xsl:attribute>
                             <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
                             <xsl:attribute name="data-placement">bottom</xsl:attribute> 
-                            <xsl:attribute name="title">Click to view file listing of this record in the browser</xsl:attribute>
+                            <xsl:attribute name="title">Click to view a file listing of this record</xsl:attribute>
                             <xsl:value-of select="count(//dataset)"/> data file<xsl:if test="count(//dataset)>1">s</xsl:if> in <xsl:value-of select="count(//acquisitionActivity)"/> activit<xsl:choose>
                                 <xsl:when test="count(//acquisitionActivity) = 1">y</xsl:when>
                                 <xsl:otherwise>ies</xsl:otherwise>
@@ -852,6 +869,40 @@
                         <xsl:with-param name="global-count">true</xsl:with-param>
                     </xsl:call-template>
                 </div>
+                <xsl:variable name="date">
+                    <xsl:choose>
+                        <xsl:when test="$reservation-date-part != ''">
+                            <xsl:call-template name="localize-date">
+                                <xsl:with-param name="date">
+                                    <xsl:value-of select="$reservation-date-part"/>
+                                </xsl:with-param>
+                            </xsl:call-template>
+                            <xsl:text> </xsl:text>
+                            <sup class="sup-link"
+                                data-toggle='tooltip' data-placement='right'
+                                title='Click to view associated record on the Sharepoint calendar'>
+                                <xsl:element name="a">
+                                    <xsl:attribute name="target">_blank</xsl:attribute>
+                                    <xsl:attribute name="href">
+                                        <xsl:call-template name="get-calendar-event-link">
+                                            <xsl:with-param name="instrument" select="summary/instrument"></xsl:with-param>
+                                            <xsl:with-param name="event-id" select="id"></xsl:with-param>
+                                        </xsl:call-template>
+                                    </xsl:attribute><xsl:text> </xsl:text>
+                                    <i class='fa fa-calendar'/>
+                                </xsl:element></sup>
+                        </xsl:when>
+                        <xsl:when test="$firstfile-date-part != ''">
+                            <xsl:call-template name="localize-date">
+                                <xsl:with-param name="date">
+                                    <xsl:value-of select="$firstfile-date-part"/>
+                                </xsl:with-param>
+                            </xsl:call-template>
+                            <span style="font-size:small; font-style:italic;"> (taken from file timestamps)</span>
+                        </xsl:when>
+                        <xsl:otherwise>Unknown date</xsl:otherwise>
+                    </xsl:choose>
+                </xsl:variable>
                 <div class="row">
                         <div class="experimenter-and-date">
                             <span class="list-record-experimenter">
@@ -863,42 +914,7 @@
                                 </xsl:choose>
                             </span>
                             <xsl:text> - </xsl:text>
-                            <span class="list-record-date">
-                                <i>
-                                    <xsl:choose>
-                                        <xsl:when test="$reservation-date-part != ''">
-                                            <xsl:call-template name="localize-date">
-                                                <xsl:with-param name="date">
-                                                    <xsl:value-of select="$reservation-date-part"/>
-                                                </xsl:with-param>
-                                            </xsl:call-template>
-                                            <xsl:text> </xsl:text>
-                                            <sup class="sup-link"
-                                                data-toggle='tooltip' data-placement='right'
-                                                title='Click to view associated record on the Sharepoint calendar'>
-                                                <xsl:element name="a">
-                                                <xsl:attribute name="target">_blank</xsl:attribute>
-                                                <xsl:attribute name="href">
-                                                    <xsl:call-template name="get-calendar-event-link">
-                                                        <xsl:with-param name="instrument" select="summary/instrument"></xsl:with-param>
-                                                        <xsl:with-param name="event-id" select="id"></xsl:with-param>
-                                                    </xsl:call-template>
-                                                </xsl:attribute><xsl:text> </xsl:text>
-                                                <i class='fa fa-calendar'/>
-                                                </xsl:element></sup>
-                                        </xsl:when>
-                                        <xsl:when test="$firstfile-date-part != ''">
-                                            <xsl:call-template name="localize-date">
-                                                <xsl:with-param name="date">
-                                                    <xsl:value-of select="$firstfile-date-part"/>
-                                                </xsl:with-param>
-                                            </xsl:call-template>
-                                            <span style="font-size:small; font-style:italic;"> (taken from file timestamps)</span>
-                                        </xsl:when>
-                                        <xsl:otherwise>Unknown date</xsl:otherwise>
-                                    </xsl:choose>
-                                </i>
-                            </span>
+                            <span class="list-record-date"><i><xsl:value-of select="$date"/></i></span>
                         </div>
                 </div>
                 <div class="row">
@@ -1464,429 +1480,603 @@
                         </div>
                     </div>
                 </xsl:for-each>
+                <div id="filelist-modal" class="modal">
+                    <div class="modal-content">
+                        <div class="container-fluid">
+                            <div class="row">
+                                <div class="col-med-11">
+                                    <b>Complete filelisting for:</b><br/>
+                                    <span class='modal-expTitle'>
+                                        <i class="fa fa-file-text-o results-icon"/>
+                                        <xsl:value-of select="$expTitle"/>
+                                    </span> - <span class='modal-expDate'><xsl:value-of select="$date"/></span><br/>
+                                    <span class='modal-expTitle'>Root path: </span><code id='filelist-rootpath'></code>
+                                </div>
+                                <div class="col-xs-1">
+                                    <i class="close-modal fa fa-close" onclick="closeModal('filelist-modal')"/>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class='col-xs-12' style="padding-top: 10px;">
+                                    <!-- Generate the table with setup conditions for each acquisition activity -->
+                                    <table class="table table-condensed table-hover filelist-table compact" border="1" style="">
+                                        <thead>
+                                            <tr>
+                                                <th>
+                                                    Dataset Name
+                                                    <xsl:call-template name="help-tip">
+                                                        <xsl:with-param name="tip-placement">top</xsl:with-param>
+                                                        <xsl:with-param name="tip-text">The name given to the dataset (typically the filename)</xsl:with-param>
+                                                    </xsl:call-template>
+                                                </th>
+                                                <th>
+                                                    Path
+                                                    <xsl:call-template name="help-tip">
+                                                        <xsl:with-param name="tip-placement">top</xsl:with-param>
+                                                        <xsl:with-param name="tip-text">The path (relative to root path, above) containing this dataset</xsl:with-param>
+                                                    </xsl:call-template>
+                                                </th>
+                                                <th>
+                                                    Type
+                                                    <xsl:call-template name="help-tip">
+                                                        <xsl:with-param name="tip-placement">top</xsl:with-param>
+                                                        <xsl:with-param name="tip-text">A label indicating the data type of this dataset (taken from a controlled list)</xsl:with-param>
+                                                    </xsl:call-template>
+                                                </th>
+                                                <xsl:choose>
+                                                    <xsl:when test="//dataset/format/text()">
+                                                        <th>
+                                                            Format
+                                                            <xsl:call-template name="help-tip">
+                                                                <xsl:with-param name="tip-placement">top</xsl:with-param>
+                                                                <xsl:with-param name="tip-text">A string (can be a MIME type) indicating the format of the dataset (e.g. TIFF, DICOM, Excel)</xsl:with-param>
+                                                            </xsl:call-template>
+                                                        </th>
+                                                    </xsl:when>
+                                                </xsl:choose>
+                                                <th class='text-center' style='padding-right: 1%'>Meta</th>
+                                                <th class='text-center' style='padding-right: 1%'>D/L</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <xsl:for-each select="//dataset">
+                                                <tr>
+                                                    <xsl:element name="td">
+                                                        <xsl:value-of select="name"/>
+                                                    </xsl:element>
+                                                    <td class='filepath'>
+                                                        <xsl:call-template name="get-path-of-file">
+                                                            <xsl:with-param name="absolute_filename">
+                                                                <xsl:value-of select="location"/>
+                                                            </xsl:with-param>
+                                                        </xsl:call-template>
+                                                    </td>
+                                                    <xsl:variable name="dataset-type">
+                                                        <xsl:choose>
+                                                            <xsl:when test="string(@type) = 'SpectrumImage'">Spectrum Image</xsl:when>
+                                                            <xsl:otherwise><xsl:value-of select="@type"/></xsl:otherwise>
+                                                        </xsl:choose>
+                                                    </xsl:variable>
+                                                    <td><xsl:value-of select="$dataset-type"/></td>
+                                                    <xsl:choose>
+                                                        <xsl:when test="../dataset/format/text()">
+                                                            <td><xsl:value-of select="format/text()"/></td>
+                                                        </xsl:when>
+                                                    </xsl:choose>
+                                                    <td class='text-center'>
+                                                        <xsl:variable name="json-tmp"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:variable>
+                                                        <xsl:variable name="json-location"><xsl:value-of select="substring-before($json-tmp, '.thumb.png')"/>.json</xsl:variable>
+                                                        <xsl:element name='a'>
+                                                            <xsl:attribute name="href"><xsl:value-of select="$json-location"/></xsl:attribute>
+                                                            <xsl:attribute name="onclick">
+                                                                $(this).blur()
+                                                            </xsl:attribute>
+                                                            <xsl:attribute name="target">_blank</xsl:attribute>
+                                                            <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                                                            <xsl:attribute name="data-placement">right</xsl:attribute>
+                                                            <xsl:attribute name="data-html">true</xsl:attribute>
+                                                            <xsl:attribute name="title">Click to download this dataset's metadata in JSON format</xsl:attribute>
+                                                            <i class='fa fa-download fa-border param-button' style='margin-left:0;'/>
+                                                        </xsl:element>
+                                                    </td>
+                                                    <td class='text-center'>
+                                                        <xsl:element name='a'>
+                                                            <xsl:attribute name="href"><xsl:value-of select="$datasetBaseUrl"/><xsl:value-of select="location"/></xsl:attribute>
+                                                            <xsl:attribute name="onclick">
+                                                                $(this).blur()
+                                                            </xsl:attribute>
+                                                            <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                                                            <xsl:attribute name="data-placement">right</xsl:attribute>
+                                                            <xsl:attribute name="data-html">true</xsl:attribute>
+                                                            <xsl:attribute name="title">Click to download &#013;<xsl:value-of select='name'/></xsl:attribute>
+                                                            <i class='fa fa-download fa-border param-button' style='margin-left:0;'/>
+                                                        </xsl:element>
+                                                    </td>
+                                                </tr>
+                                            </xsl:for-each>
+                                        </tbody>
+                                    </table>   
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
 
-        <!-- Javascript which supports some capabilities on the generated page -->
-        <script language="javascript">
-            <![CDATA[
-            
-            // Functions to enable/disable scrolling and add appropriate classes
-            var $body = $('body'),
-                scrollDisabled = false,
-                scrollTop;
+            <!-- Javascript which supports some capabilities on the generated page -->
+            <script language="javascript">
+                <![CDATA[
                 
-            function scrollDisable() {
-                if (scrollDisabled) {
-                    return;
-                }
-           
-                scrollTop = $(window).scrollTop();
-           
-                $body.addClass('scrollDisabled').css({
-                   top: -1 * scrollTop
-                });
-           
-                scrollDisabled = true;
-            }
-
-            function scrollEnable() {
-                if (!scrollDisabled) {
-                    return;
-                }
-            
-                $body.removeClass('scrollDisabled');
-                $(window).scrollTop(scrollTop);
-            
-                scrollDisabled = false;
-            }
-            
-            //Function which scrolls to the top of the page
-            function toTop(){
-                document.body.scrollTop = document.documentElement.scrollTop = 0;
-            }               
-
-            //Function checks where the page is scrolled to and either shows or hides the button which jumps to the top.
-            //If the page is scrolled within 30px of the top, the button is hidden (it is hidden when the page loads).
-            window.onscroll = function() {showButtonOnScroll()};
-            
-            function showButtonOnScroll() {
-                var header_pos = $('.list-record-experimenter').first().position()['top'];
-                if (document.body.scrollTop > header_pos || document.documentElement.scrollTop > header_pos) {
-                    document.getElementById("to-top-btn").style.visibility = "visible";
-                    document.getElementById("to-top-btn").style.opacity = 1;
-                } 
-                else {
-                    document.getElementById("to-top-btn").style.visibility = "hidden";
-                    document.getElementById("to-top-btn").style.opacity = 0;
-                }
-            }
-
-            //Function to open a modal box with id 'name' and prevent scrolling while the box is open
-            function openModal(name){
-                var modal = document.getElementById(name); 
-                modal.style.opacity = 1;
-                modal.style.visibility = "visible";
+                // Function to find common path from list of paths (https://www.rosettacode.org/wiki/Find_common_directory_path#JavaScript)
+                /**
+                 * Given an array of strings, return an array of arrays, containing the
+                 * strings split at the given separator
+                 * @param {!Array<!string>} a
+                 * @param {string} sep
+                 * @returns {!Array<!Array<string>>}
+                 */
+                const splitStrings = (a, sep = '/') => a.map(i => i.split(sep));
+                 
+                /**
+                 * Given an index number, return a function that takes an array and returns the
+                 * element at the given index
+                 * @param {number} i
+                 * @return {function(!Array<*>): *}
+                 */
+                const elAt = i => a => a[i];
+                 
+                /**
+                 * Transpose an array of arrays:
+                 * Example:
+                 * [['a', 'b', 'c'], ['A', 'B', 'C'], [1, 2, 3]] ->
+                 * [['a', 'A', 1], ['b', 'B', 2], ['c', 'C', 3]]
+                 * @param {!Array<!Array<*>>} a
+                 * @return {!Array<!Array<*>>}
+                 */
+                const rotate = a => a[0].map((e, i) => a.map(elAt(i)));
+                 
+                /**
+                 * Checks of all the elements in the array are the same.
+                 * @param {!Array<*>} arr
+                 * @return {boolean}
+                 */
+                const allElementsEqual = arr => arr.every(e => e === arr[0]);
+                function commonPath(input, sep = '/') {
+                    return rotate(splitStrings(input, sep)).filter(allElementsEqual).map(elAt(0)).join(sep);
+                 }
                 
-                scrollDisable();
-                
-                window.onclick = function(event) {
-                    // console.log(event.target);
-                    if (event.target == modal) {
-                        closeModal(name);
+                // Functions to enable/disable scrolling and add appropriate classes
+                var $body = $('body'),
+                    scrollDisabled = false,
+                    scrollTop;
+                    
+                function scrollDisable() {
+                    if (scrollDisabled) {
+                        return;
                     }
-                };
-            }
-
-            //Function to close a modal box with id 'name' and re-allow page scrolling
-            function closeModal(name){
-                var modal = document.getElementById(name); 
-                modal.style.opacity = 0;
-                modal.style.visibility = "hidden";
-                
-                scrollEnable();                
-            }
-            
-            // Function to get width of scrollbar for padding offset above 
-            // (from https://stackoverflow.com/a/13382873/1435788)
-            function getScrollbarWidth() {
-              // Creating invisible container
-              const outer = document.createElement('div');
-              outer.style.visibility = 'hidden';
-              outer.style.overflow = 'scroll'; // forcing scrollbar to appear
-              outer.style.msOverflowStyle = 'scrollbar'; // needed for WinJS apps
-              document.body.appendChild(outer);
-            
-              // Creating inner element and placing it in the container
-              const inner = document.createElement('div');
-              outer.appendChild(inner);
-            
-              // Calculating difference between container's full width and the child width
-              const scrollbarWidth = (outer.offsetWidth - inner.offsetWidth);
-            
-              // Removing temporary elements from the DOM
-              outer.parentNode.removeChild(outer);
-            
-              return scrollbarWidth;
-            }
-            
-            //Handler for accordions used to hide parameter and metadata tables
-            var acc = document.getElementsByClassName("accordion");
-            var i;
-
-            for (i = 0; i < acc.length; i++) {
-                acc[i].addEventListener("click", function() {
-                    togglePanel($(this));
-                });
-            }
-
-            // Function to close an accordion panel
-            function closePanel(acc) {
-                // acc is a jquery object
-                var panel = acc.next();
-                acc.removeClass("active-accordion");
-                panel.css('maxHeight', 0);
-            }
-
-            // Function to open an accordion panel
-            function openPanel(acc) {
-                // acc is a jquery object
-                var panel = acc.next();
-                acc.addClass("active-accordion");
-                panel.css('maxHeight', panel.prop('scrollHeight') + "px");
-            }
-
-            // Function to toggle an accordion panel
-            function togglePanel(acc) {
-                // acc is a jquery object
-                if (acc.hasClass("active-accordion")) {
-                    closePanel(acc);
-                } else {
-                    openPanel(acc);
+               
+                    scrollTop = $(window).scrollTop();
+               
+                    $body.addClass('scrollDisabled').css({
+                       top: -1 * scrollTop
+                    });
+               
+                    scrollDisabled = true;
                 }
-            }
-
-            //Function to close all open accordions
-            function closeAccords() {
-                $('button[id*=idm]').each(function(){
-                    toggleAA($(this).prop('id'), force_open=false, force_close=true);
-                });
-            }
-
-            //Function to open all accordions 
-            function openAccords() {
-               $('button[id*=idm]').each(function(){
-                    toggleAA($(this).prop('id'), force_open=true, force_close=false);
-                });
-            }
-
-            // Function to toggle an aquisition activity section
-            function toggleAA(btn_id, force_open=false, force_close=false) {
-                // btn_id is like "idm45757030174584-btn"
-                
-                // strings
-                var collapse_str = "<i class='fa fa-minus-square-o'></i> Collapse Activity"
-                var expand_str = "<i class='fa fa-plus-square-o'></i> Expand Activity"
-
-                // get jquery object
-                var btn = $('#' + btn_id);
-                
-                // determine what to do
-                var action_is_expand = btn.text().includes('Expand');
-                if ( force_close ) {
-                    action_is_expand = false;
-                }
-
-                // get list of accordions to toggle
-                var acc = btn.parents().eq(2).nextUntil('.container-fluid').filter('.accordion');
-                
-                // loop through all accordions, and toggle
-                acc.each(function( index ) {
-                    var panel = $(this).next();
-                    if (action_is_expand || force_open) {   
-                        // expand panel
-                        openPanel($(this));
-
-                        // change button to collapse
-                        btn.html(collapse_str)
-                        btn.addClass('btn-danger')
-                        btn.removeClass('btn-success')
-                    } else if (!(action_is_expand) || force_close) { // collapse
-                        closePanel($(this));
-
-                        // change button to expand
-                        btn.html(expand_str)
-                        btn.addClass('btn-success')
-                        btn.removeClass('btn-danger')
+            
+                function scrollEnable() {
+                    if (!scrollDisabled) {
+                        return;
                     }
-                });
-            };
+                
+                    $body.removeClass('scrollDisabled');
+                    $(window).scrollTop(scrollTop);
+                
+                    scrollDisabled = false;
+                }
+                
+                //Function which scrolls to the top of the page
+                function toTop(){
+                    document.body.scrollTop = document.documentElement.scrollTop = 0;
+                }               
             
-            //Handler for moving through an image gallery
-            var slideIndex = 1;
-            showSlides(slideIndex);
+                //Function checks where the page is scrolled to and either shows or hides the button which jumps to the top.
+                //If the page is scrolled within 30px of the top, the button is hidden (it is hidden when the page loads).
+                window.onscroll = function() {showButtonOnScroll()};
+                
+                function showButtonOnScroll() {
+                    var header_pos = $('.list-record-experimenter').first().position()['top'];
+                    if (document.body.scrollTop > header_pos || document.documentElement.scrollTop > header_pos) {
+                        document.getElementById("to-top-btn").style.visibility = "visible";
+                        document.getElementById("to-top-btn").style.opacity = 1;
+                    } 
+                    else {
+                        document.getElementById("to-top-btn").style.visibility = "hidden";
+                        document.getElementById("to-top-btn").style.opacity = 0;
+                    }
+                }
             
-            function plusSlide(n) {
-                showSlides(slideIndex += n);
-            }
+                //Function to open a modal box with id 'name' and prevent scrolling while the box is open
+                function openModal(name){
+                    var modal = document.getElementById(name); 
+                    modal.style.opacity = 1;
+                    modal.style.visibility = "visible";
+                    
+                    scrollDisable();
+                    
+                    window.onclick = function(event) {
+                        // console.log(event.target);
+                        if (event.target == modal) {
+                            closeModal(name);
+                        }
+                    };
+                }
             
-            function currentSlide(n) {
-                showSlides(slideIndex = n);
-            }
-            
-            function showSlides(n) {
+                //Function to close a modal box with id 'name' and re-allow page scrolling
+                function closeModal(name){
+                    var modal = document.getElementById(name); 
+                    modal.style.opacity = 0;
+                    modal.style.visibility = "hidden";
+                    
+                    scrollEnable();                
+                }
+                
+                // Function to get width of scrollbar for padding offset above 
+                // (from https://stackoverflow.com/a/13382873/1435788)
+                function getScrollbarWidth() {
+                  // Creating invisible container
+                  const outer = document.createElement('div');
+                  outer.style.visibility = 'hidden';
+                  outer.style.overflow = 'scroll'; // forcing scrollbar to appear
+                  outer.style.msOverflowStyle = 'scrollbar'; // needed for WinJS apps
+                  document.body.appendChild(outer);
+                
+                  // Creating inner element and placing it in the container
+                  const inner = document.createElement('div');
+                  outer.appendChild(inner);
+                
+                  // Calculating difference between container's full width and the child width
+                  const scrollbarWidth = (outer.offsetWidth - inner.offsetWidth);
+                
+                  // Removing temporary elements from the DOM
+                  outer.parentNode.removeChild(outer);
+                
+                  return scrollbarWidth;
+                }
+                
+                //Handler for accordions used to hide parameter and metadata tables
+                var acc = document.getElementsByClassName("accordion");
                 var i;
-                var slides = document.getElementsByClassName("slide");
-                if (slides.length === 0) {
-                    document.getElementById('img_gallery').remove()
-                } else {
-                    if (n > slides.length) {slideIndex = 1}    
-                    if (n < 1) {slideIndex = slides.length}
-                    for (i = 0; i < slides.length; i++) {
-                        slides[i].style.display = "none";  
+            
+                for (i = 0; i < acc.length; i++) {
+                    acc[i].addEventListener("click", function() {
+                        togglePanel($(this));
+                    });
+                }
+            
+                // Function to close an accordion panel
+                function closePanel(acc) {
+                    // acc is a jquery object
+                    var panel = acc.next();
+                    acc.removeClass("active-accordion");
+                    panel.css('maxHeight', 0);
+                }
+            
+                // Function to open an accordion panel
+                function openPanel(acc) {
+                    // acc is a jquery object
+                    var panel = acc.next();
+                    acc.addClass("active-accordion");
+                    panel.css('maxHeight', panel.prop('scrollHeight') + "px");
+                }
+            
+                // Function to toggle an accordion panel
+                function togglePanel(acc) {
+                    // acc is a jquery object
+                    if (acc.hasClass("active-accordion")) {
+                        closePanel(acc);
+                    } else {
+                        openPanel(acc);
                     }
-                    slides[slideIndex-1].style.display = "block";
                 }
-            }
-
-            //Function which adds a new slide to the overall image gallery for each dataset [WAITING ON THUMBNAILS TO BE ABLE TO TEST]
-            function addSlide(source) {
-                var slide = document.createElement("div");
-                slide.class = "slide";                    
-                var image = document.createElement("img");
-                image.src = source;
-                var text = document.createElement("div");
-                text.class = "text"
-                text.innerHTML = source;
-                
-                slide.innerHTML = image + source;
-                
-                document.getElementById("img_gallery").appendChild(slide);
-            }
             
-            // Function to disable gallery tooltips
-            function disable_gallery_tooltips() {
-                $('#img_gallery a.gal-nav[data-toggle=tooltip]').tooltip('disable');
-            }
+                //Function to close all open accordions
+                function closeAccords() {
+                    $('button[id*=idm]').each(function(){
+                        toggleAA($(this).prop('id'), force_open=false, force_close=true);
+                    });
+                }
             
-            function activate_metadata_tooltips(){
-                // activate tooltips (on demand)
-                $('table.meta-table [data-toggle="tooltip"]').tooltip({trigger: 'hover'}); 
-            }
-
-            // Key handlers
-            document.onkeydown = function(evt) {
-                evt = evt || window.event;
-                var isLeft = false;
-                var isRight = false;
-                var isEscape = false;
-                isLeft = (evt.keyCode === 37);
-                isRight = (evt.keyCode === 39);
-                isEscape = (evt.keyCode === 27);
-                if (isLeft) {
-                    plusSlide(-1);
+                //Function to open all accordions 
+                function openAccords() {
+                   $('button[id*=idm]').each(function(){
+                        toggleAA($(this).prop('id'), force_open=true, force_close=false);
+                    });
                 }
-                if (isRight) {
-                    plusSlide(1);
+            
+                // Function to toggle an aquisition activity section
+                function toggleAA(btn_id, force_open=false, force_close=false) {
+                    // btn_id is like "idm45757030174584-btn"
+                    
+                    // strings
+                    var collapse_str = "<i class='fa fa-minus-square-o'></i> Collapse Activity"
+                    var expand_str = "<i class='fa fa-plus-square-o'></i> Expand Activity"
+            
+                    // get jquery object
+                    var btn = $('#' + btn_id);
+                    
+                    // determine what to do
+                    var action_is_expand = btn.text().includes('Expand');
+                    if ( force_close ) {
+                        action_is_expand = false;
+                    }
+            
+                    // get list of accordions to toggle
+                    var acc = btn.parents().eq(2).nextUntil('.container-fluid').filter('.accordion');
+                    
+                    // loop through all accordions, and toggle
+                    acc.each(function( index ) {
+                        var panel = $(this).next();
+                        if (action_is_expand || force_open) {   
+                            // expand panel
+                            openPanel($(this));
+            
+                            // change button to collapse
+                            btn.html(collapse_str)
+                            btn.addClass('btn-danger')
+                            btn.removeClass('btn-success')
+                        } else if (!(action_is_expand) || force_close) { // collapse
+                            closePanel($(this));
+            
+                            // change button to expand
+                            btn.html(expand_str)
+                            btn.addClass('btn-success')
+                            btn.removeClass('btn-danger')
+                        }
+                    });
+                };
+                
+                //Handler for moving through an image gallery
+                var slideIndex = 1;
+                showSlides(slideIndex);
+                
+                function plusSlide(n) {
+                    showSlides(slideIndex += n);
                 }
-                if (isEscape) {
+                
+                function currentSlide(n) {
+                    showSlides(slideIndex = n);
+                }
+                
+                function showSlides(n) {
                     var i;
-                    for (i = 0; i < document.getElementsByClassName("modal").length; i++) {
-                      closeModal(document.getElementsByClassName("modal")[i].id);
+                    var slides = document.getElementsByClassName("slide");
+                    if (slides.length === 0) {
+                        document.getElementById('img_gallery').remove()
+                    } else {
+                        if (n > slides.length) {slideIndex = 1}    
+                        if (n < 1) {slideIndex = slides.length}
+                        for (i = 0; i < slides.length; i++) {
+                            slides[i].style.display = "none";  
+                        }
+                        slides[slideIndex-1].style.display = "block";
                     }
                 }
-            }
-
-            /* Prevent buttons from getting focus property when clicking */
-            /* https://stackoverflow.com/a/30949767/1435788 */
-            $('button').on('mousedown', 
-                /** @param {!jQuery.Event} event */ 
-                function(event) {
-                    event.preventDefault();
+            
+                //Function which adds a new slide to the overall image gallery for each dataset [WAITING ON THUMBNAILS TO BE ABLE TO TEST]
+                function addSlide(source) {
+                    var slide = document.createElement("div");
+                    slide.class = "slide";                    
+                    var image = document.createElement("img");
+                    image.src = source;
+                    var text = document.createElement("div");
+                    text.class = "text"
+                    text.innerHTML = source;
+                    
+                    slide.innerHTML = image + source;
+                    
+                    document.getElementById("img_gallery").appendChild(slide);
                 }
-            );
-
-            /* Add navigation to sidenav using DataTables */
-            $(document).ready(function(){
-                var navTable = $('#nav-table').DataTable({
-                                destroy: true,
-                                pagingType: "simple",
-                                info: false,
-                                ordering: false,
-                                processing: false,
-                                searching: false,
-                                lengthChange: false,
-                                pageLength: 5,
-                                language: {
-                                            paginate: {
-                                                previous: "<i class='fa fa-angle-double-left'></i>",
-                                                next: "<i class='fa fa-angle-double-right'></i>"
-                                            }
-                                        },
-                                    "bInfo" : false,
-                                    select: 'single',
-                                    responsive: true,
-                                    altEditor: false,    
-                                    drawCallback: function(){
-                                        $('.paginate_button.next', this.api().table().container())          
-                                            .on('click', function(){
-                                            var info = navTable.page.info();
-                                                $('.cdatatableDetails').remove();
-                                                $('.sidebar .paginate_button.next').before($('<span>',{
-                                                'text':' Page '+ (info.page+1) +' of '+info.pages + ' ',
-                                                class:'cdatatableDetails'
-                                                }));
-                                            $('.sidebar .pagination').first().addClass('vertical-align');
-                                            });    
-                                            $('.paginate_button.previous', this.api().table().container())          
-                                            .on('click', function(){
-                                            var info = navTable.page.info();
-                                                $('.cdatatableDetails').remove();
-                                                $('.sidebar .paginate_button.next').before($('<span>',{
-                                                'text':'Page '+ (info.page+1) +' of '+info.pages,
-                                                class:'cdatatableDetails'
-                                                }));
-                                                $('.sidebar .pagination').first().addClass('vertical-align');
-                                            }); 
-                                    },
+                
+                // Function to disable gallery tooltips
+                function disable_gallery_tooltips() {
+                    $('#img_gallery a.gal-nav[data-toggle=tooltip]').tooltip('disable');
+                }
+                
+                function activate_metadata_tooltips(){
+                    // activate tooltips (on demand)
+                    $('table.meta-table [data-toggle="tooltip"]').tooltip({trigger: 'hover'}); 
+                }
+            
+                // Key handlers
+                document.onkeydown = function(evt) {
+                    evt = evt || window.event;
+                    var isLeft = false;
+                    var isRight = false;
+                    var isEscape = false;
+                    isLeft = (evt.keyCode === 37);
+                    isRight = (evt.keyCode === 39);
+                    isEscape = (evt.keyCode === 27);
+                    if (isLeft) {
+                        plusSlide(-1);
+                    }
+                    if (isRight) {
+                        plusSlide(1);
+                    }
+                    if (isEscape) {
+                        var i;
+                        for (i = 0; i < document.getElementsByClassName("modal").length; i++) {
+                          closeModal(document.getElementsByClassName("modal")[i].id);
+                        }
+                    }
+                }
+            
+                /* Prevent buttons from getting focus property when clicking */
+                /* https://stackoverflow.com/a/30949767/1435788 */
+                $('button').on('mousedown', 
+                    /** @param {!jQuery.Event} event */ 
+                    function(event) {
+                        event.preventDefault();
+                    }
+                );
+            
+                // Things to do when document is ready
+                $(document).ready(function(){
+                    /* Add navigation to sidenav using DataTables */
+                    var navTable = $('#nav-table').DataTable({
+                                    destroy: true,
+                                    pagingType: "simple",
+                                    info: false,
                                     ordering: false,
-                                    "dom": 'pt'
-                                });
-                                
-                var info = navTable.page.info();
-                $('.sidebar .paginate_button.next').before($('<span>',{
-                    'text':' Page '+ (info.page+1) +' of '+info.pages + ' ' ,
-                    class:'cdatatableDetails'
-                }));
-                $('.sidebar .pagination').first().addClass('vertical-align');
-
-
-                // Make dataset metadata tables DataTables
-                $('.meta-table').each(function() {
-                    $(this).DataTable({
-                        destroy: true,
-                        pagingType: "simple_numbers",
-                        info: false,
-                        ordering: false,
-                        processing: true,
-                        searching: true,
-                        lengthChange: false,
-                        pageLength: 10,
-                        language: {
-                            paginate: {
-                                previous: "<i class='fa fa-angle-double-left'></i>",
-                                next: "<i class='fa fa-angle-double-right'></i>"
-                            }
-                        },
-                        select: 'single',
-                        responsive: true,
-                        ordering: false,
-                        dom: "<'row'<'col-sm-4'f><'col-sm-8'p>><'row'<'col-sm-12't>>",
-                        drawCallback: function(){
-                                        $('.paginate_button.next', this.api().table().container())          
-                                            .on('click', activate_metadata_tooltips());    
-                                            $('.paginate_button.previous', this.api().table().container())          
-                                            .on('click', activate_metadata_tooltips()); 
-                                    },
+                                    processing: false,
+                                    searching: false,
+                                    lengthChange: false,
+                                    pageLength: 5,
+                                    language: {
+                                                paginate: {
+                                                    previous: "<i class='fa fa-angle-double-left'></i>",
+                                                    next: "<i class='fa fa-angle-double-right'></i>"
+                                                }
+                                            },
+                                        "bInfo" : false,
+                                        select: 'single',
+                                        responsive: true,
+                                        altEditor: false,    
+                                        drawCallback: function(){
+                                            $('.paginate_button.next', this.api().table().container())          
+                                                .on('click', function(){
+                                                var info = navTable.page.info();
+                                                    $('.cdatatableDetails').remove();
+                                                    $('.sidebar .paginate_button.next').before($('<span>',{
+                                                    'text':' Page '+ (info.page+1) +' of '+info.pages + ' ',
+                                                    class:'cdatatableDetails'
+                                                    }));
+                                                $('.sidebar .pagination').first().addClass('vertical-align');
+                                                });    
+                                                $('.paginate_button.previous', this.api().table().container())          
+                                                .on('click', function(){
+                                                var info = navTable.page.info();
+                                                    $('.cdatatableDetails').remove();
+                                                    $('.sidebar .paginate_button.next').before($('<span>',{
+                                                    'text':'Page '+ (info.page+1) +' of '+info.pages,
+                                                    class:'cdatatableDetails'
+                                                    }));
+                                                    $('.sidebar .pagination').first().addClass('vertical-align');
+                                                }); 
+                                        },
+                                        ordering: false,
+                                        "dom": 'pt'
+                                    });
+                                    
+                    var info = navTable.page.info();
+                    $('.sidebar .paginate_button.next').before($('<span>',{
+                        'text':' Page '+ (info.page+1) +' of '+info.pages + ' ' ,
+                        class:'cdatatableDetails'
+                    }));
+                    $('.sidebar .pagination').first().addClass('vertical-align');
+            
+            
+                    // Make dataset metadata tables DataTables
+                    $('.meta-table').each(function() {
+                        $(this).DataTable({
+                            destroy: true,
+                            pagingType: "simple_numbers",
+                            info: false,
+                            ordering: false,
+                            processing: true,
+                            searching: true,
+                            lengthChange: false,
+                            pageLength: 10,
+                            language: {
+                                paginate: {
+                                    previous: "<i class='fa fa-angle-double-left'></i>",
+                                    next: "<i class='fa fa-angle-double-right'></i>"
+                                }
+                            },
+                            select: 'single',
+                            responsive: true,
+                            ordering: false,
+                            dom: "<'row'<'col-sm-4'f><'col-sm-8'p>><'row'<'col-sm-12't>>",
+                            drawCallback: function(){
+                                            $('.paginate_button.next', this.api().table().container())          
+                                                .on('click', activate_metadata_tooltips());    
+                                                $('.paginate_button.previous', this.api().table().container())          
+                                                .on('click', activate_metadata_tooltips()); 
+                                        },
+                        });
                     });
+                    
+                    // Make AA filelist tables DataTables
+                    $('.aa-table').each(function() {
+                        var this_table = $(this).DataTable({
+                            destroy: true,
+                            pagingType: "simple_numbers",
+                            info: false,
+                            ordering: false,
+                            processing: true,
+                            searching: true,
+                            lengthChange: false,
+                            pageLength: 5,
+                            language: {
+                                paginate: {
+                                    previous: "<i class='fa fa-angle-double-left'></i>",
+                                    next: "<i class='fa fa-angle-double-right'></i>"
+                                }
+                            },
+                            select: 'single',
+                            responsive: true,
+                            ordering: false,
+                            dom: "<'row table-row't><'row pager-row'<'col-xs-12 pager-col text-right'p>>",
+                        });
+                        
+                        // controls to reveal appropriate image on row hover
+                        $(this).on('mouseenter', '> tbody > tr', function() {
+                            // get the id of the correct image by looking at the row's img-id attribute
+                            var this_rows_img = $(this).first().attr('img-id');
+                            // the image we want to show is the one with that id
+                            var img_to_show = $('#' + this_rows_img);
+                            // get any img that have the visible class (so we can hide them)
+                            var img_to_hide = img_to_show.siblings('.aa-img.visible');
+                            // show/hide by adding and removing appropriate classes
+                            img_to_hide.addClass('hidden');
+                            img_to_hide.removeClass('visible');
+                            img_to_show.addClass('visible');
+                            img_to_show.removeClass('hidden');
+                        });
+                        
+                        var new_container = $(this).closest('.aa-content-row').next('.dt_paginate_container');
+                        var to_move = $(this).closest('.table-row').next('.pager-row').find('.pager-col');
+                        //debugger;
+                        new_container.append(to_move);
+                        //debugger;
+                        
+                    });
+                    
+                    // Get array of filepaths from filelist-modal using jQuery:
+                    $('div#filelist-modal').each(function() {
+                      var paths = $('td.filepath').map(function() {
+                              return $(this).text();
+                          }).get();
+                      var rootPath = commonPath(paths, '/');
+                      $('td.filepath').each(function() {
+                        curText = $(this).text();
+                        // replace common path with blank, and remove leading slash from each file's path
+                        $(this).text(curText.replace(rootPath, '').replace(/\//g, ''));
+                      });
+                      // put root path text into modal header
+                      $('code#filelist-rootpath').text(rootPath);
+                    });
+                    
+                    // Make sidebar visible after everything is done loading:
+                    $('.sidebar').first().css('visibility', 'visible');
+                    
+                    // Fade out the loading screen
+                    $('#loading').fadeOut('slow');                
                 });
-                
-                // Make AA filelist tables DataTables
-                $('.aa-table').each(function() {
-                    var this_table = $(this).DataTable({
-                        destroy: true,
-                        pagingType: "simple_numbers",
-                        info: false,
-                        ordering: false,
-                        processing: true,
-                        searching: true,
-                        lengthChange: false,
-                        pageLength: 5,
-                        language: {
-                            paginate: {
-                                previous: "<i class='fa fa-angle-double-left'></i>",
-                                next: "<i class='fa fa-angle-double-right'></i>"
-                            }
-                        },
-                        select: 'single',
-                        responsive: true,
-                        ordering: false,
-                        dom: "<'row table-row't><'row pager-row'<'col-xs-12 pager-col text-right'p>>",
-                    });
-                    
-                    // controls to reveal appropriate image on row hover
-                    $(this).on('mouseenter', '> tbody > tr', function() {
-                        // get the id of the correct image by looking at the row's img-id attribute
-                        var this_rows_img = $(this).first().attr('img-id');
-                        // the image we want to show is the one with that id
-                        var img_to_show = $('#' + this_rows_img);
-                        // get any img that have the visible class (so we can hide them)
-                        var img_to_hide = img_to_show.siblings('.aa-img.visible');
-                        // show/hide by adding and removing appropriate classes
-                        img_to_hide.addClass('hidden');
-                        img_to_hide.removeClass('visible');
-                        img_to_show.addClass('visible');
-                        img_to_show.removeClass('hidden');
-                    });
-                    
-                    var new_container = $(this).closest('.aa-content-row').next('.dt_paginate_container');
-                    var to_move = $(this).closest('.table-row').next('.pager-row').find('.pager-col');
-                    //debugger;
-                    new_container.append(to_move);
-                    //debugger;
-                    
-                });
-                
-                
-                // Make sidebar visible after everything is done loading:
-                $('.sidebar').first().css('visibility', 'visible');
-                
-                // Fade out the loading screen
-                $('#loading').fadeOut('slow');                
-            });
-
-            ]]>
-        </script>
-      </div>
+            
+                ]]>
+            </script>
+        </div>
     </xsl:template>
 
     <!--
@@ -2090,7 +2280,10 @@
                     <xsl:attribute name="data-placement">bottom</xsl:attribute>
                     <xsl:choose>
                         <xsl:when test="$input = 'dm3'">
-                            <xsl:attribute name="title">Gatan DigitalMicrograph file</xsl:attribute>
+                            <xsl:attribute name="title">Gatan DigitalMicrograph file (v3)</xsl:attribute>
+                        </xsl:when>
+                        <xsl:when test="$input = 'dm4'">
+                            <xsl:attribute name="title">Gatan DigitalMicrograph file (v4)</xsl:attribute>
                         </xsl:when>
                         <xsl:when test="$input = 'tif'">
                             <xsl:attribute name="title">Tiff-format image</xsl:attribute>
