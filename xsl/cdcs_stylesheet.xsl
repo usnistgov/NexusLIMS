@@ -1484,15 +1484,24 @@
                     <div class="modal-content">
                         <div class="container-fluid">
                             <div class="row">
-                                <div class="col-med-11">
+                                <div class="col-med-11 pull-left">
                                     <b>Complete filelisting for:</b><br/>
                                     <span class='modal-expTitle'>
                                         <i class="fa fa-file-text-o results-icon"/>
                                         <xsl:value-of select="$expTitle"/>
                                     </span> - <span class='modal-expDate'><xsl:value-of select="$date"/></span><br/>
-                                    <span class='modal-expTitle'>Root path: </span><code id='filelist-rootpath'></code>
+                                    <span class='modal-expTitle'>Root path: </span><code id='filelist-rootpath'><a>
+                                        <xsl:attribute name="href">
+                                            <xsl:value-of select="$datasetBaseUrl"/>
+                                        </xsl:attribute>
+                                        <xsl:attribute name="target">_blank</xsl:attribute>
+                                        <xsl:attribute name="class">help-tip</xsl:attribute>
+                                        <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                                        <xsl:attribute name="data-placement">top</xsl:attribute>
+                                        <xsl:attribute name="title">Click to view directory struture directly in the browser</xsl:attribute>
+                                    </a></code>
                                 </div>
-                                <div class="col-xs-1">
+                                <div class="col-xs-1 pull-right">
                                     <i class="close-modal fa fa-close" onclick="closeModal('filelist-modal')"/>
                                 </div>
                             </div>
@@ -2060,11 +2069,14 @@
                       var rootPath = commonPath(paths, '/');
                       $('td.filepath').each(function() {
                         curText = $(this).text();
-                        // replace common path with blank, and remove leading slash from each file's path
-                        $(this).text(curText.replace(rootPath, '').replace(/\//g, ''));
+                        // replace common path with blank in each file's path
+                        $(this).text(curText.replace(rootPath, ''));
                       });
-                      // put root path text into modal header
-                      $('code#filelist-rootpath').text(rootPath);
+                      // put root path text into modal header link
+                      $('code#filelist-rootpath > a').each(function() {
+                        $(this).text(rootPath);
+                        $(this).attr("href", $(this).attr("href") + rootPath);
+                      });
                     });
                     
                     // Make sidebar visible after everything is done loading:
