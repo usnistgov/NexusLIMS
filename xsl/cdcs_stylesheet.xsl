@@ -1522,7 +1522,7 @@
                                                     Path
                                                     <xsl:call-template name="help-tip">
                                                         <xsl:with-param name="tip-placement">top</xsl:with-param>
-                                                        <xsl:with-param name="tip-text">The path (relative to root path, above) containing this dataset</xsl:with-param>
+                                                        <xsl:with-param name="tip-text">The path (relative to root path, above) containing this dataset (click to view directly in browser)</xsl:with-param>
                                                     </xsl:call-template>
                                                 </th>
                                                 <th>
@@ -1554,11 +1554,19 @@
                                                         <xsl:value-of select="name"/>
                                                     </xsl:element>
                                                     <td class='filepath'>
-                                                        <xsl:call-template name="get-path-of-file">
-                                                            <xsl:with-param name="absolute_filename">
-                                                                <xsl:value-of select="location"/>
-                                                            </xsl:with-param>
-                                                        </xsl:call-template>
+                                                        <code>
+                                                            <a>
+                                                                <xsl:attribute name="href">
+                                                                    <xsl:value-of select="$datasetBaseUrl"/>
+                                                                </xsl:attribute>
+                                                                <xsl:attribute name="target">_blank</xsl:attribute>
+                                                                <xsl:call-template name="get-path-of-file">
+                                                                    <xsl:with-param name="absolute_filename">
+                                                                        <xsl:value-of select="location"/>
+                                                                    </xsl:with-param>
+                                                                </xsl:call-template>
+                                                            </a>
+                                                        </code>
                                                     </td>
                                                     <xsl:variable name="dataset-type">
                                                         <xsl:choose>
@@ -2067,10 +2075,15 @@
                               return $(this).text();
                           }).get();
                       var rootPath = commonPath(paths, '/');
-                      $('td.filepath').each(function() {
+                      $('td.filepath > code > a').each(function() {
                         curText = $(this).text();
                         // replace common path with blank in each file's path
-                        $(this).text(curText.replace(rootPath, ''));
+                        newText = curText.replace(rootPath, '');
+                        if (newText.length == 0) {
+                            newText = '/';
+                        }
+                        $(this).text(newText);
+                        $(this).attr("href", $(this).attr("href") + rootPath + newText);
                       });
                       // put root path text into modal header link
                       $('code#filelist-rootpath > a').each(function() {
