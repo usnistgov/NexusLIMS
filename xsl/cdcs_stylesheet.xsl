@@ -413,10 +413,36 @@
                 }
                 
                 .close-modal:hover, /* Changes color of close button and cursor type when hovering over it */
-                    .close-modal:focus {
+                .close-modal:focus {
                     color: #525252;
                     text-decoration: none;
                     cursor: pointer;
+                }
+                
+                .help-filelist-modal {
+                    font-size: 20px;
+                    font-weight: bold;
+                    margin-top: 4.5px;
+                    vertical-align: top;
+                }
+                
+                i.help-filelist-modal ~ div.tooltip.in {
+                    opacity: 1;
+                }
+                i.help-filelist-modal ~ div.tooltip > div.tooltip-arrow {
+                    border-bottom-color: #3a65a2;
+                }
+                i.help-filelist-modal ~ div.tooltip > div.tooltip-inner {
+                    background-color: #e5ecf6;
+                    color: #474747;
+                    max-width: unset;
+                    border: solid #3a65a2 3px;
+                    font-size: large;
+                    /* font-weight: bold; */
+                    padding-left: 1.5em;
+                    padding-right: 1.5em;
+                    text-align: justify;
+                    width: 500px;
                 }
                 
                 .modal-expTitle {
@@ -433,6 +459,63 @@
                     font-family: "Menlo", "DejaVu Sans Mono", "Liberation Mono", "Consolas", "Ubuntu Mono", "Courier New", "andale mono", "lucida console", monospace;
                     font-size: small;
                 }
+                
+                /* Datatables selected row background) */
+                table.filelist-table.dataTable tbody>tr.selected, table.dataTable tbody>tr>.selected {
+                background-color: #e5ecf6;
+                }
+                /* Datatables selected row text color (gray, same as normal) */
+                table.filelist-table.dataTable tbody tr.selected, table.dataTable tbody th.selected, 
+                table.filelist-table.dataTable tbody td.selected {
+                    color: #474747;
+                }
+                /* Datatables selection download buttons */
+                table.filelist-table.dataTable tbody tr.selected i {
+                    border: solid 0.1em #ddd;
+                    -webkit-transition: none;
+                    -moz-transition: none;
+                    -o-transition: none;
+                    transition: none;
+                    transition-property: none;
+                }
+                table.filelist-table.dataTable tbody tr i {
+                    border: solid 0.1em #ddd;
+                    -webkit-transition: none;
+                    -moz-transition: none;
+                    -o-transition: none;
+                    transition: none;
+                    transition-property: none;
+                }
+                /* Datatables selected row link color (same as normal) */
+                table.filelist-table.dataTable tbody tr.selected a, table.dataTable tbody th.selected a,
+                table.filelist-table.dataTable tbody td.selected a {
+                    color: #3865a3;
+                }
+                /* Datatables download button color */
+                
+                /* Filelisting modal table info styling */
+                div#filelist-table_info {
+                    font-size: smaller;
+                    font-style: italic;
+                    padding-top: 0;
+                }
+                #filelist_info_row {
+                    /* Remove spacing before info row to keep things tighter */
+                    margin-top: 0;
+                }
+                #filelist-table_wrapper > .row {
+                    margin: 0;
+                    align-items: center;
+                    margin-top: 0.1em;
+                }
+                /* Filelist table buttons: */
+                div.dt-buttons.btn-group > button {
+                    font-size: small;
+                    padding-top: 4px;
+                    padding-bottom: 4px;
+                }
+                
+                
                 
                 /*
                 * Main content
@@ -465,6 +548,11 @@
                 .main h3 {
                     font-size: 1.1em;
                     margin-bottom: 0.1em;
+                }
+                
+                table.meta-table,
+                table.filelist-table {
+                    min-width: 25vw;
                 }
                 
                 table#summary-table > tbody > tr > * {
@@ -636,21 +724,21 @@
                 .tooltip-inner {
                     white-space: pre-wrap;
                 }
-                .sidebar-btn-tooltip {
+                .btn-sidebar-tooltip {
                     top: 69px !important;
                 }
-                .sidebar-btn-tooltip .tooltip-arrow{
+                .btn-sidebar-tooltip .tooltip-arrow{
                     top: 50% !important;
                 }
-                #edit-record-btn, #btn-previous-page {
+                #btn-edit-record, #btn-previous-page, #btn-filelisting {
                 margin: 0.25em;
                 }
                 @media screen and (max-width: 768px) {
-                #edit-record-btn, #btn-previous-page {
+                #btn-edit-record, #btn-previous-page, #btn-filelisting {
                     font-size: 10px;
                 }
                 }
-                #sidebar-btn {
+                #btn-sidebar {
                     visibility: hidden;
                     opacity: 0;
                     position: fixed;
@@ -664,7 +752,7 @@
                     z-index: 50;
                     }
                 @media screen and (max-width: 768px) {
-                #sidebar-btn {
+                #btn-sidebar {
                     visibility: visible;
                     opacity: 1;
                 }
@@ -782,22 +870,28 @@
                         <i class="fa fa-arrow-up"></i> Scroll to Top
                     </button>
             </div>
-            <div id="sidebar-btn" data-toggle="tooltip" data-placement="right" 
+            <div id="btn-sidebar" data-toggle="tooltip" data-placement="right" 
                  title="Click to explore record contents">
                 <a><i class="fa fa-toggle-right"></i></a>
             </div>
     
             <div class="main col-md-push-2" style="padding: 0;" id="top-button-div">
-              <button id="edit-record-btn" type="button" class="btn btn-default pull-right"
-                  data-toggle="tooltip" data-placement="top" 
-                  title="Manually edit the contents of this record (login required)">
-                  <i class="fa fa-file-text"></i> Edit this record
-              </button>
-              <button id="btn-previous-page" type="button" class="btn btn-default pull-right"
-                  data-toggle="tooltip" data-placement="top" 
-                  title="Go back to the previous page">
-                  <i class="fa fa-arrow-left"></i> Back to previous
-              </button>
+                <button id="btn-edit-record" type="button" class="btn btn-default pull-right"
+                        data-toggle="tooltip" data-placement="top" 
+                        title="Manually edit the contents of this record (login required)">
+                    <i class="fa fa-file-text"></i> Edit this record
+                </button>
+                <button id="btn-filelisting" type="button" class="btn btn-default pull-right"
+                        data-toggle="tooltip" data-placement="top" 
+                        title="View a file listing (and download the files) of this record"
+                        onclick="openModal('filelist-modal');">
+                    <i class="fa fa-cloud-download"></i> Download files
+                </button>
+                <button id="btn-previous-page" type="button" class="btn btn-default pull-right"
+                        data-toggle="tooltip" data-placement="top" 
+                        title="Go back to the previous page">
+                    <i class="fa fa-arrow-left"></i> Back to previous
+                </button>
             </div>
             
             <div class="main col-sm-pull-10" id="main-column">                        
@@ -1484,7 +1578,7 @@
                     <div class="modal-content">
                         <div class="container-fluid">
                             <div class="row">
-                                <div class="col-med-11 pull-left">
+                                <div class="col-med-10 pull-left" style=''>
                                     <b>Complete filelisting for:</b><br/>
                                     <span class='modal-expTitle'>
                                         <i class="fa fa-file-text-o results-icon"/>
@@ -1501,16 +1595,32 @@
                                         <xsl:attribute name="title">Click to view directory struture directly in the browser</xsl:attribute>
                                     </a></code>
                                 </div>
-                                <div class="col-xs-1 pull-right">
+                                <div class="col-xs-2 pull-right">
+                                    <i class="help-filelist-modal fa fa-question-circle">
+                                        <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                                        <xsl:attribute name="data-placement">bottom</xsl:attribute>
+                                        <xsl:attribute name="title">
+This window shows all the datasets identified as part of this record.
+
+Rows of the table can be selected using the mouse, holding down Ctrl or Shift to select multiple rows.
+
+The files associated with the selected datasets (or every dataset, if none are selected) can be downloaded by clicking on the "Download selected" or "Download all" button (warning, this may take some time for large amounts of data).
+
+The textual data from the selected rows (not the actual files) can also be exported to the clipboard, a CSV file, an Excel file, or printed to PDF by using the respective buttons as well.
+                                        </xsl:attribute>
+                                    </i>
                                     <i class="close-modal fa fa-close" onclick="closeModal('filelist-modal')"/>
                                 </div>
                             </div>
                             <div class="row">
-                                <div class='col-xs-12' style="padding-top: 10px;">
+                                <div class='col-xs-12' style="padding-top: 5px;">
                                     <!-- Generate the table with setup conditions for each acquisition activity -->
-                                    <table class="table table-condensed table-hover filelist-table compact" border="1" style="">
+                                    <table id="filelist-table" 
+                                           class="table table-condensed table-hover filelist-table compact" 
+                                           border="1" style="">
                                         <thead>
                                             <tr>
+                                                <th></th>
                                                 <th>
                                                     Dataset Name
                                                     <xsl:call-template name="help-tip">
@@ -1550,6 +1660,7 @@
                                         <tbody>
                                             <xsl:for-each select="//dataset">
                                                 <tr>
+                                                    <td></td>
                                                     <xsl:element name="td">
                                                         <xsl:value-of select="name"/>
                                                     </xsl:element>
@@ -1956,7 +2067,6 @@
                                                 }
                                             },
                                         "bInfo" : false,
-                                        select: 'single',
                                         responsive: true,
                                         altEditor: false,    
                                         drawCallback: function(){
@@ -2010,10 +2120,9 @@
                                     next: "<i class='fa fa-angle-double-right'></i>"
                                 }
                             },
-                            select: 'single',
                             responsive: true,
                             ordering: false,
-                            dom: "<'row'<'col-sm-4'f><'col-sm-8'p>><'row'<'col-sm-12't>>",
+                            dom: "<'row'<'col-sm-6'f><'col-sm-6'p>><'row'<'col-sm-12't>>",
                             drawCallback: function(){
                                             $('.paginate_button.next', this.api().table().container())          
                                                 .on('click', activate_metadata_tooltips());    
@@ -2040,7 +2149,6 @@
                                     next: "<i class='fa fa-angle-double-right'></i>"
                                 }
                             },
-                            select: 'single',
                             responsive: true,
                             ordering: false,
                             dom: "<'row table-row't><'row pager-row'<'col-xs-12 pager-col text-right'p>>",
@@ -2090,6 +2198,49 @@
                         $(this).text(rootPath);
                         $(this).attr("href", $(this).attr("href") + rootPath);
                       });
+                    });
+                    
+                    // DataTables for filelist-modal table
+                    $('table#filelist-table').DataTable({
+                        dom: "<'row'<'col-sm-6'f><'col-sm-6'p>><'row'<'#button-col.col-sm-12 text-center'B>><'row'<'col-sm-12't>><'#filelist_info_row.row'<'col-sm-12'i>>",
+                        ordering: false,
+                        buttons: [
+                            'selectAll',
+                            'selectNone', 
+                            'copy', 
+                            'csv', 
+                            'excel', 
+                            'print'
+                        ],
+                        select: {
+                            style:    'os',
+                            //selector: 'td:first-child'
+                        },
+                        columnDefs: [ {
+                            orderable: false,
+                            className: 'select-checkbox',
+                            targets:   0
+                        } ],
+                        language: {
+                            info: "Showing _START_ to _END_ of _TOTAL_ datasets",
+                            paginate: {
+                                previous: "<i class='fa fa-angle-double-left'></i>",
+                                next: "<i class='fa fa-angle-double-right'></i>"
+                            },
+                            select: {
+                                rows: {
+                                    0: "",
+                                    _: "%d datasets selected",
+                                    1: "1 dataset selected"
+                                }
+                            },
+                            buttons: {
+                                copy: "<i class='fa fa-copy menu-fa'/> Copy",
+                                csv: "<i class='fa fa-file-code-o menu-fa'/> CSV",
+                                excel: "<i class='fa fa-file-excel-o menu-fa'/> Excel",
+                                print: "<i class='fa fa-print menu-fa'/> Print",
+                            },
+                        },
                     });
                     
                     // Make sidebar visible after everything is done loading:
