@@ -3,7 +3,8 @@
     xmlns:nx="https://data.nist.gov/od/dm/nexus/experiment/v1.0"
     version="1.0">
     <xsl:output method="html" indent="yes" encoding="UTF-8"/>
-
+    
+    <xsl:param name="xmlName" select="''"/>
     <xsl:variable name="datasetBaseUrl">https://***REMOVED***/mmfnexus/</xsl:variable>
     <xsl:variable name="previewBaseUrl">https://***REMOVED***/nexusLIMS/mmfnexus/</xsl:variable>
     <xsl:variable name="sharepointBaseUrl">https://***REMOVED***/Div/msed/MSED-MMF/Lists/</xsl:variable>
@@ -894,6 +895,9 @@
                 </button>
             </div>
             
+            <!-- Main content -->
+            <span id='xmlName' style='visibility:hidden;'><xsl:value-of select="$xmlName"/></span>
+            
             <div class="main col-sm-pull-10" id="main-column">                        
                 <xsl:variable name="expTitle">
                     <xsl:choose>
@@ -915,7 +919,7 @@
                     <xsl:variable name="instr-pid">
                         <xsl:value-of select="string(summary/instrument/@pid)"/>
                     </xsl:variable>
-                    <span class="badge list-record-badge">
+                    <span id='instr-badge' class="badge list-record-badge">
                         <xsl:choose>
                             <xsl:when test="summary/instrument/text()">
                                 <xsl:attribute name="style">background-color:<xsl:for-each select="document('')">
@@ -2183,6 +2187,7 @@ The textual data from the selected rows (not the actual files) can also be expor
                               return $(this).text();
                           }).get();
                       var rootPath = commonPath(paths, '/');
+                      window.rootPath = rootPath;
                       $('td.filepath > code > a').each(function() {
                         curText = $(this).text();
                         // replace common path with blank in each file's path
@@ -2201,17 +2206,25 @@ The textual data from the selected rows (not the actual files) can also be expor
                     });
                     
                     // DataTables for filelist-modal table
-                    $('table#filelist-table').DataTable({
+                    var filelist_dt = $('table#filelist-table').DataTable({
                         dom: "<'row'<'col-sm-6'f><'col-sm-6'p>><'row'<'#button-col.col-sm-12 text-center'B>><'row'<'col-sm-12't>><'#filelist_info_row.row'<'col-sm-12'i>>",
                         ordering: false,
                         buttons: [
                             'selectAll',
-                            'selectNone', 
-                            'copy', 
-                            'csv', 
-                            'excel', 
-                            'print'
-                        ],
+                            'selectNone',
+                            {
+                                text: "<i class='fa fa-archive menu-fa'/> Download all",
+                                action: function ( e, dt, node, config ) {
+                                    alert( 'Download all button clicked' );
+                                }
+                            },
+                            {
+                                extend: 'selected',
+                                text: "<i class='fa fa-file-archive-o menu-fa'/> Download selected",
+                                action: function ( e, dt, node, config ) {
+                                    alert( 'Download selected button clicked' );
+                                }
+                            }],
                         select: {
                             style:    'os',
                             //selector: 'td:first-child'
@@ -2234,14 +2247,80 @@ The textual data from the selected rows (not the actual files) can also be expor
                                     1: "1 dataset selected"
                                 }
                             },
-                            buttons: {
-                                copy: "<i class='fa fa-copy menu-fa'/> Copy",
-                                csv: "<i class='fa fa-file-code-o menu-fa'/> CSV",
-                                excel: "<i class='fa fa-file-excel-o menu-fa'/> Excel",
-                                print: "<i class='fa fa-print menu-fa'/> Print",
-                            },
                         },
                     });
+                    
+                    var d = new Date($('span.list-record-date').text());
+                    var ye = new Intl.DateTimeFormat('en', { year: 'numeric' }).format(d);
+                    var mo = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(d);
+                    var da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(d);
+                    var record_title = $('span#xmlName').text();
+                    var record_header = 'NexusLIMS Experiment: ' + $('span.list-record-title').text() + '\n' +
+                                        'Instrument: ' + $('span#instr-badge').text() + '\n' + 
+                                        'Experimenter: ' + $('span.list-record-experimenter').text() + '\n' + 
+                                        'Date: ' + $('span.list-record-date').text();
+                                        
+                    var buttonCommon = {
+                        exportOptions: {
+                            format: {
+                                body: function ( data, row, column, node ) {
+                                    // Make path column include root path
+                                    if ( column === 2 ){
+                                        return window.rootPath + $(data).text().replace('/','');
+                                    } else if ( column === 4 || column === 5 ) {
+                                        return $(data).attr('href').replace('mmfnexus//','mmfnexus/');;
+                                    } else {
+                                        return data;
+                                    }
+                                }
+                            }
+                        }
+                    };                                        
+                                        
+                    // Add second group of buttons for export
+                    new $.fn.dataTable.Buttons( filelist_dt, {
+                        buttons: [
+                            $.extend( true, {}, buttonCommon, {
+                                extend: 'copy',
+                                title: record_title,
+                                messageTop: record_header,
+                                text: "<i class='fa fa-copy menu-fa'/> Copy"
+                            }),
+                            $.extend( true, {}, buttonCommon, {
+                                extend: 'csv',
+                                title: record_title,
+                                messageTop: record_header,
+                                text: "<i class='fa fa-file-code-o menu-fa'/> CSV"
+                            }),
+                            $.extend( true, {}, buttonCommon, {
+                                extend: 'excel',
+                                title: record_title,
+                                messageTop: record_header,
+                                text: "<i class='fa fa-file-excel-o menu-fa'/> Excel"
+                            }),
+                            $.extend( true, {}, buttonCommon, {
+                                extend: 'print',
+                                title: record_title,
+                                exportOptions: {
+                                    columns: [ 0, 1, 2, 3 ]
+                                },
+                                messageTop: function () {
+                                    // replace newlines with html break:
+                                    return record_header.split("\n").join("<br/>");
+                                },
+                                text: "<i class='fa fa-print menu-fa'/> Print"
+                            })
+                        ]
+                    });
+                    
+                    // Explicitly insert a row containing the second group after the first group's row:
+                    var first_btn_row = filelist_dt.buttons( 0, null ).container().closest('.row');
+                    first_btn_row.after(
+                        '<div class="row"><div id="button-col" class="col-sm-12 text-center"><div id="second-btn-group" class="dt-buttons btn-group"></div></div></div>'
+                    );
+                    filelist_dt.buttons( 1, null ).container().appendTo(
+                        $('#second-btn-group')
+                    );
                     
                     // Make sidebar visible after everything is done loading:
                     $('.sidebar').first().css('visibility', 'visible');
