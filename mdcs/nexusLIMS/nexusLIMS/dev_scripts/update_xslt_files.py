@@ -100,6 +100,11 @@ if __name__ == '__main__':
         description='Upload XSLs to a CDCS instance')
     parser.add_argument('--production',
                         help='Upload to production server rather than local '
+                             'Docker instance. This option has highest '
+                             'priority of all.',
+                        action='store_true')
+    parser.add_argument('--poole',
+                        help='Upload to poole test server rather than local '
                              'Docker instance',
                         action='store_true')
 
@@ -109,6 +114,10 @@ if __name__ == '__main__':
         username = _os.environ['nexusLIMS_user']
         password = _os.environ['nexusLIMS_pass']
         _cdcs_url = 'https://***REMOVED***'
+    elif args.poole:
+        username = 'admin'
+        password = 'admin'
+        _cdcs_url = 'https://***REMOVED***/'
     else:
         username = 'admin'
         password = 'admin'
