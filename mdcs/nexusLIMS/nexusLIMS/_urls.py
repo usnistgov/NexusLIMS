@@ -28,4 +28,5 @@
 
 calendar_root_url = 'https://***REMOVED***/Div/msed/MSED-MMF/'
 ldap_url = 'ldap://***REMOVED***:389'
+#cdcs_url = 'https://***REMOVED***/'
 cdcs_url = 'https://***REMOVED***/'
