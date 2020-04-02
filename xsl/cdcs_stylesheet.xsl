@@ -2933,7 +2933,7 @@ The textual data from the selected rows (not the actual files) can also be expor
                                 text: "<i class='fa fa-square-o menu-fa'/> Select none"
                             },
                             {
-                                text: "<i class='fa fa-archive menu-fa'/> Download all",
+                                text: "<i class='fa fa-archive menu-fa'/> Download all as .zip",
                                 className: 'btn-dl-all dl-btns',
                                 action: function ( e, dt, node, config ) {
                                     var data_urls = dt.rows().data().map(x => $(x.data_dl).attr('href'));
@@ -2952,7 +2952,7 @@ The textual data from the selected rows (not the actual files) can also be expor
                             },
                             {
                                 extend: 'selected',
-                                text: "<i class='fa fa-file-archive-o menu-fa'/> Download selected",
+                                text: "<i class='fa fa-file-archive-o menu-fa'/> Download selected as .zip",
                                 attr:  {
                                     'data-toggle': 'tooltip',
                                     'data-placement': 'top',
