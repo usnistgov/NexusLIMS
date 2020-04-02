@@ -3,10 +3,18 @@
     xmlns:nx="https://data.nist.gov/od/dm/nexus/experiment/v1.0"
     version="1.0">
     <xsl:output method="html" indent="yes" encoding="UTF-8"/>
+
     
     <xsl:param name="xmlName" select="''"/>
+    <!-- 
     <xsl:variable name="datasetBaseUrl">https://***REMOVED***/mmfnexus/</xsl:variable>
-    <xsl:variable name="previewBaseUrl">https://***REMOVED***/nexusLIMS/mmfnexus/</xsl:variable>
+    <xsl:variable name="previewBaseUrl">https://***REMOVED***/nexusLIMS/mmfnexus/</xsl:variable> 
+    
+    Temporary change while teleworking:
+    -->
+    <xsl:variable name="datasetBaseUrl">https://***REMOVED***:1443/mmfnexus/</xsl:variable>
+    <xsl:variable name="previewBaseUrl">https://***REMOVED***:1443/nexusLIMS/mmfnexus/</xsl:variable>
+    
     <xsl:variable name="sharepointBaseUrl">https://***REMOVED***/Div/msed/MSED-MMF/Lists/</xsl:variable>
 
     <xsl:variable name="month-num-dictionary">
