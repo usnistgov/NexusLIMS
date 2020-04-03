@@ -777,11 +777,11 @@
                 .btn-sidebar-tooltip .tooltip-arrow{
                     top: 50% !important;
                 }
-                #btn-edit-record, #btn-previous-page, #btn-filelisting {
-                margin: 0.25em;
+                .btn-top-group {
+                    margin: 0.25em;
                 }
                 @media screen and (max-width: 768px) {
-                #btn-edit-record, #btn-previous-page, #btn-filelisting {
+                .btn-top-group {
                     font-size: 10px;
                 }
                 }
@@ -923,21 +923,26 @@
             </div>
     
             <div class="main col-md-push-2" style="padding: 0;" id="top-button-div">
-                <button id="btn-edit-record" type="button" class="btn btn-default pull-right"
+                <button id="btn-edit-record" type="button" class="btn btn-default pull-right btn-top-group"
                         data-toggle="tooltip" data-placement="top" 
                         title="Manually edit the contents of this record (login required)">
-                    <i class="fa fa-file-text"></i> Edit this record
+                    <i class="fa fa-file-text menu-fa"></i> Edit this record
                 </button>
-                <button id="btn-filelisting" type="button" class="btn btn-default pull-right"
+                <button id="btn-xml-dl" type="button" class="btn btn-default pull-right btn-top-group"
+                    data-toggle="tooltip" data-placement="top" 
+                    title="Download metadata contents of this record as XML">
+                    <i class="fa fa-code menu-fa"></i> Download XML
+                </button>
+                <button id="btn-filelisting" type="button" class="btn btn-default pull-right btn-top-group"
                         data-toggle="tooltip" data-placement="top" 
                         title="View a file listing (and download the files) of this record"
                         onclick="openModal('filelist-modal');">
-                    <i class="fa fa-cloud-download"></i> Download files
+                    <i class="fa fa-cloud-download menu-fa"></i> Download files
                 </button>
-                <button id="btn-previous-page" type="button" class="btn btn-default pull-right"
+                <button id="btn-previous-page" type="button" class="btn btn-default pull-right btn-top-group"
                         data-toggle="tooltip" data-placement="top" 
                         title="Go back to the previous page">
-                    <i class="fa fa-arrow-left"></i> Back to previous
+                    <i class="fa fa-arrow-left menu-fa"></i> Back to previous
                 </button>
             </div>
             
@@ -3102,6 +3107,46 @@ The textual data from the selected rows (not the actual files) can also be expor
                     $('#dl-result-row').hide();
                     $('#dl-extra-row').hide();
                     $('#btn-cancel-row').hide();
+                    
+                    
+                    // function to "prettify" XML export response using regex (from https://stackoverflow.com/a/49458964/1435788)                    
+                    function formatXml(xml, tab) { 
+                         var formatted = '', indent= '';
+                         tab = tab || '\t';
+                         xml.split(/>\s*</).forEach(function(node) {
+                             if (node.match( /^\/\w/ )) indent = indent.substring(tab.length); // decrease indent by one 'tab'
+                             formatted += indent + '<' + node + '>\r\n';
+                             if (node.match( /^<?\w[^>]*[^\/]$/ )) indent += tab;              // increase indent
+                         });
+                         // remove double spaces, which seem to be common in response
+                         formatted = formatted.split('  ').join(' ');
+                         return formatted.substring(1, formatted.length-3);
+                     }
+                    
+                    // function to do XML export download
+                    const downloadXML = function() {
+                        let id = new URLSearchParams(window.location.search).get('id');
+                        let xml_url = '/rest/data/download/' + id + '/';
+                        
+                        fetch(xml_url)
+                        .then(resp => resp.text())
+                        // get text of response from CDCS API, run it through
+                        // prettifier, and then return a blob so we can download it
+                        .then(text => 
+                            new Blob([formatXml(text)], {type:'text/xml'}))
+                        // save blob to disk
+                        .then(blob => {
+                            const url = window.URL.createObjectURL(blob);
+                            const a = document.createElement('a');
+                            a.style.display = 'none';
+                            a.href = url;
+                            a.download = $('#xmlName').text();
+                            document.body.appendChild(a);
+                            a.click();
+                            window.URL.revokeObjectURL(url); 
+                        });
+                    }
+                    $("#btn-xml-dl").on('click', downloadXML);                    
                     
                     // Make sidebar visible after everything is done loading:
                     $('.sidebar').first().css('visibility', 'visible');
