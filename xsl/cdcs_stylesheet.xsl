@@ -961,63 +961,6 @@
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
-                <div id='summary-info'>
-                    <span class="list-record-title page-header">
-                        <i class="fa fa-file-text results-icon"/>
-                        <xsl:value-of select="$expTitle"/>
-                    </span>
-                    <br/>
-                    <xsl:variable name="instr-pid">
-                        <xsl:value-of select="string(summary/instrument/@pid)"/>
-                    </xsl:variable>
-                    <span id='instr-badge' class="badge list-record-badge">
-                        <xsl:choose>
-                            <xsl:when test="summary/instrument/text()">
-                                <xsl:attribute name="style">background-color:<xsl:for-each select="document('')">
-                                    <xsl:value-of select="key('lookup.instr.color', $instr-pid)"/>
-                                </xsl:for-each> !important;</xsl:attribute>
-                                <xsl:element name="a">
-                                    <xsl:attribute name="target">_blank</xsl:attribute>
-                                    <xsl:attribute name="href">
-                                        <xsl:call-template name="get-calendar-link">
-                                            <xsl:with-param name="instrument" select="summary/instrument"></xsl:with-param>
-                                        </xsl:call-template></xsl:attribute>
-                                    <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
-                                    <xsl:attribute name="data-placement">bottom</xsl:attribute> 
-                                    <xsl:attribute name="title">Click to view this instrument on the Sharepoint calendar</xsl:attribute>
-                                    <xsl:value-of select="summary/instrument"/>
-                                </xsl:element>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                Unknown instrument
-                            </xsl:otherwise>
-                        </xsl:choose>
-                        
-                    </span>
-                    <span class="badge list-record-badge">
-                        <xsl:element name="a">
-                            <xsl:attribute name="href">
-                                javascript:void(0);
-                            </xsl:attribute>
-                            <xsl:attribute name="onclick">
-                                openModal('filelist-modal');
-                            </xsl:attribute>
-                            <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
-                            <xsl:attribute name="data-placement">bottom</xsl:attribute> 
-                            <xsl:attribute name="title">Click to view a file listing of this record</xsl:attribute>
-                            <xsl:value-of select="count(//dataset)"/> data file<xsl:if test="count(//dataset)>1">s</xsl:if> in <xsl:value-of select="count(//acquisitionActivity)"/> activit<xsl:choose>
-                                <xsl:when test="count(//acquisitionActivity) = 1">y</xsl:when>
-                                <xsl:otherwise>ies</xsl:otherwise>
-                            </xsl:choose>
-                        </xsl:element>
-                    </span>
-                    <i class="fa fa-cubes" style="margin-left:0.75em; font-size: small;"
-                       data-toggle="tooltip" data-placement="bottom" title="Filetypes present in record"/><span style="font-size: small;"><xsl:text>: </xsl:text></span>
-                    <xsl:call-template name="extensions-to-badges">
-                        <xsl:with-param name="input"><xsl:value-of select="$unique-extensions"/></xsl:with-param>
-                        <xsl:with-param name="global-count">true</xsl:with-param>
-                    </xsl:call-template>
-                </div>
                 <xsl:variable name="date">
                     <xsl:choose>
                         <xsl:when test="$reservation-date-part != ''">
@@ -1052,38 +995,97 @@
                         <xsl:otherwise>Unknown date</xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
-                <div class="row">
-                        <div class="experimenter-and-date">
-                            <span class="list-record-experimenter">
-                                <xsl:choose>
-                                    <xsl:when test="summary/experimenter">
-                                        <xsl:value-of select="summary/experimenter"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>Unknown experimenter</xsl:otherwise>
-                                </xsl:choose>
-                            </span>
-                            <xsl:text> - </xsl:text>
-                            <span class="list-record-date"><i><xsl:value-of select="$date"/></i></span>
-                        </div>
-                </div>
-                <div class="row">
-                        <div class="motivation-text">
-                           
-                                <xsl:choose>
-                                    <xsl:when test="summary/motivation/text()">
-                                        <span style="font-style:italic;">Motivation: </span><xsl:value-of select="summary/motivation"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        No motivation provided
-                                        <xsl:call-template name="help-tip">
-                                            <xsl:with-param name="tip-placement">right</xsl:with-param>
-                                            <xsl:with-param name="tip-text">This value is pulled from the "Experiment Purpose" field of a Sharepoint calendar reservation</xsl:with-param>
-                                        </xsl:call-template>
-                                    </xsl:otherwise>
-                                </xsl:choose>
+                <div id='record-header'>
+                    <div id='summary-info'>
+                        <span class="list-record-title page-header">
+                            <i class="fa fa-file-text results-icon"/>
+                            <xsl:value-of select="$expTitle"/>
+                        </span>
+                        <br/>
+                        <xsl:variable name="instr-pid">
+                            <xsl:value-of select="string(summary/instrument/@pid)"/>
+                        </xsl:variable>
+                        <span id='instr-badge' class="badge list-record-badge">
+                            <xsl:choose>
+                                <xsl:when test="summary/instrument/text()">
+                                    <xsl:attribute name="style">background-color:<xsl:for-each select="document('')">
+                                        <xsl:value-of select="key('lookup.instr.color', $instr-pid)"/>
+                                    </xsl:for-each> !important;</xsl:attribute>
+                                    <xsl:element name="a">
+                                        <xsl:attribute name="target">_blank</xsl:attribute>
+                                        <xsl:attribute name="href">
+                                            <xsl:call-template name="get-calendar-link">
+                                                <xsl:with-param name="instrument" select="summary/instrument"></xsl:with-param>
+                                            </xsl:call-template></xsl:attribute>
+                                        <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                                        <xsl:attribute name="data-placement">bottom</xsl:attribute> 
+                                        <xsl:attribute name="title">Click to view this instrument on the Sharepoint calendar</xsl:attribute>
+                                        <xsl:value-of select="summary/instrument"/>
+                                    </xsl:element>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    Unknown instrument
+                                </xsl:otherwise>
+                            </xsl:choose>
                             
-                        </div>
-                </div>            
+                        </span>
+                        <span class="badge list-record-badge">
+                            <xsl:element name="a">
+                                <xsl:attribute name="href">
+                                    javascript:void(0);
+                                </xsl:attribute>
+                                <xsl:attribute name="onclick">
+                                    openModal('filelist-modal');
+                                </xsl:attribute>
+                                <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                                <xsl:attribute name="data-placement">bottom</xsl:attribute> 
+                                <xsl:attribute name="title">Click to view a file listing of this record</xsl:attribute>
+                                <xsl:value-of select="count(//dataset)"/> data file<xsl:if test="count(//dataset)>1">s</xsl:if> in <xsl:value-of select="count(//acquisitionActivity)"/> activit<xsl:choose>
+                                    <xsl:when test="count(//acquisitionActivity) = 1">y</xsl:when>
+                                    <xsl:otherwise>ies</xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:element>
+                        </span>
+                        <i class="fa fa-cubes" style="margin-left:0.75em; font-size: small;"
+                           data-toggle="tooltip" data-placement="bottom" title="Filetypes present in record"/><span style="font-size: small;"><xsl:text>: </xsl:text></span>
+                        <xsl:call-template name="extensions-to-badges">
+                            <xsl:with-param name="input"><xsl:value-of select="$unique-extensions"/></xsl:with-param>
+                            <xsl:with-param name="global-count">true</xsl:with-param>
+                        </xsl:call-template>
+                    </div>
+                    <div class="row">
+                            <div class="experimenter-and-date">
+                                <span class="list-record-experimenter">
+                                    <xsl:choose>
+                                        <xsl:when test="summary/experimenter">
+                                            <xsl:value-of select="summary/experimenter"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>Unknown experimenter</xsl:otherwise>
+                                    </xsl:choose>
+                                </span>
+                                <xsl:text> - </xsl:text>
+                                <span class="list-record-date"><i><xsl:value-of select="$date"/></i></span>
+                            </div>
+                    </div>
+                    <div class="row">
+                            <div class="motivation-text">
+                               
+                                    <xsl:choose>
+                                        <xsl:when test="summary/motivation/text()">
+                                            <span style="font-style:italic;">Motivation: </span><xsl:value-of select="summary/motivation"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            No motivation provided
+                                            <xsl:call-template name="help-tip">
+                                                <xsl:with-param name="tip-placement">right</xsl:with-param>
+                                                <xsl:with-param name="tip-text">This value is pulled from the "Experiment Purpose" field of a Sharepoint calendar reservation</xsl:with-param>
+                                            </xsl:call-template>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                
+                            </div>
+                    </div>           
+                </div>
                 <div class="row">    
                     <div class="col-md-6 no-top-padding" id="session_info_column">
                         <span style='line-height: 0.5em;'><br/></span>
@@ -1420,7 +1422,7 @@
                                                             <td><xsl:value-of select="format/text()"/></td>
                                                         </xsl:when>
                                                     </xsl:choose>
-                                                    <td class='text-center'>
+                                                    <td class='text-center aa-meta-col'>
                                                         <!-- Modal content inside of table, since it needs to be in the context of this dataset -->
                                                         <a href='javascript:void(0)' onclick="$(this).blur(); openModal('{generate-id(current())}-modal');"
                                                         data-toggle='tooltip' data-placement='left'
@@ -1518,7 +1520,7 @@
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td class='text-center'>
+                                                    <td class='text-center aa-dl-col'>
                                                         <xsl:element name='a'>
                                                             <xsl:attribute name="href"><xsl:value-of select="$datasetBaseUrl"/><xsl:value-of select="location"/></xsl:attribute>
                                                             <xsl:attribute name="onclick">
@@ -3147,6 +3149,90 @@ The textual data from the selected rows (not the actual files) can also be expor
                         });
                     }
                     $("#btn-xml-dl").on('click', downloadXML);                    
+                    
+                    
+                    // add IDs for use with intro.js
+                    $('.a-result').first().attr('id', 'example-record');
+                    $('input#id_keywords ~ ul').attr('id', 'search-field');
+                    $('.pagination-container').attr('id', 'pagination-container');
+                    
+                    var our_steps = [
+                    {
+                        intro: "The <em>detail</em> page shows all the details of a record generated from an Experiment on one of the Nexus Facility instruments. Click <em>Next</em> for a tour of the features of this record.",
+                        step: "1"
+                    },
+                    {
+                        element: document.getElementById("record-header"),
+                        intro: "The top of the record contains basic information, such as the title of the experiment (taken from the calendar reservation), the instrument that was used, the number and types of files contained within, the user, date, and experimental motivation. This utility of this section relies heavily on the quality of data inputted into the reservation form.",
+                        step: "2"
+                    },
+                    {
+                        element: document.getElementById("session_info_column"),
+                        intro: "The session summary section contains further details about the experiment, such as the precise date and time (from the calendar), the sample information and ID, and any sample description.",
+                        step: "3"
+                    },
+                    {
+                        element: document.getElementById("img_gallery"),
+                        intro: "The gallery shows a preview image of each dataset contained within the experiment's record. These can be browsed using the mouse buttons, or via the left and right arrow keys on the keyboard.",
+                        step: "4"
+                    },
+                    {
+                        element: $('.aa_header_row')[0],
+                        intro: "The remainder of the record contains details about the various \"activities\" that were detected in the records (determined via file creation times). Click <em>Next</em> for further details about the contents of each activity.",
+                        step: "5"
+                    },
+                    {
+                        element: $('.aa_header_row .param-button')[0],
+                        intro: "The setup parameters button will show you the metadata extracted from the raw files that is common to all the datasets contained in this activity",
+                        step: "6"
+                    },
+                    {
+                        element: $('.aa_header_row .aa-img-col')[0],
+                        intro: "Another preview of the datasets in this activity is show here. Mouse over a dataset in the accompanying table to view its preview",
+                        step: "7"
+                    },
+                    {
+                        element: $('.aa_header_row .aa-table-col')[0],
+                        intro: "The activity details table lists each dataset contained in this activty with some basic information such as the dataset's name, its creation time, the type of data contained, and its role.",
+                        step: "8"
+                    },
+                    {
+                        element: $('.aa_header_row .aa-table-col .aa-meta-col')[0],
+                        intro: "The metadata column allows you to view the metadata unique to this dataset using the left button, or you can download the entire extracted metadata using the button on the right in JSON format.",
+                        step: "9"
+                    },
+                    {
+                        element: $('.aa_header_row .aa-table-col .aa-dl-col')[0],
+                        intro: "The final column provides a link to download this single file in its native format (Note: there is a bulk file downloader at the top of the record)",
+                        step: "10"
+                    },
+                    ]
+                    
+                    if ( $('.sidebar').position()['left'] === 0 ){
+                        our_steps.push({
+                            element: $('.sidebar')[0],
+                            intro: "The sidebar provides an easy way to navigate through the different activities in the record, and also provides a button to return to the top of the page",
+                            step: "11"
+                        })
+                    } else {
+                        our_steps.push({
+                            element: $('#btn-sidebar')[0],
+                            intro: "The sidebar provides an easy way to navigate through the different activities in the record, and also provides a button to return to the top of the page. If the window is too narrow, the side bar is hidden from view. Click this button to show it.",
+                            step: "11"
+                        })
+                    }
+                    if ( $('.pagination-container').length > 0 ) {
+                        our_steps.push({
+                            
+                        })
+                    }
+                    
+                    // setup intro.js for explore page
+                    window.intro.setOptions({
+                        steps: our_steps,
+                        showBullets: true,
+                        disableInteraction: true
+                    }); 
                     
                     // Make sidebar visible after everything is done loading:
                     $('.sidebar').first().css('visibility', 'visible');

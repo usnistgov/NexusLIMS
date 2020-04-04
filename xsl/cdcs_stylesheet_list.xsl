@@ -163,20 +163,62 @@
         </xsl:when>
       </xsl:choose>
      
-      <!-- Javascript which supports some capabilities on the generated page -->
-      <script language="javascript">
-        <![CDATA[
+        <!-- Javascript which supports some capabilities on the generated page -->
+        <script language="javascript">
+            <![CDATA[
             $('.a-result').click(function() {
-              window.location = $(this).find('a').attr('href');
-              return false;
+                window.location = $(this).find('a').attr('href');
+                return false;
             });
             
             $( document ).ready(function() {
-              $('[data-toggle="tooltip"]').tooltip(
-              {container:'body'}); // toggle all tooltips with default
+                $('[data-toggle="tooltip"]').tooltip(
+                    {container:'body'}); // toggle all tooltips with default
+              
+                // add IDs for use with intro.js
+                $('.a-result').first().attr('id', 'example-record');
+                $('input#id_keywords ~ ul').attr('id', 'search-field');
+                $('.pagination-container').attr('id', 'pagination-container');
+              
+                var our_steps = [
+                    {
+                        intro: "The <em>explore</em> page allows you to browse and search through the records contained in the NexusLIMS repository.",
+                        step: "1"
+                    },
+                    {
+                        element: document.getElementById("search-field"),
+                        intro: "Use the search box to do a full-text search on all the records (can search by username, date, instrument, etc.). Leave the box empty to return all results from the database.",
+                        step: "2"
+                    },
+                    {
+                        element: document.getElementById("example-record"),
+                        intro: "Each listing in the results area represents one record in the database and provides some basic summary information about the record's contents. Click anywhere on the listing to view the record details.",
+                        step: "3"
+                    },
+                    {
+                        element: document.getElementById("result-button-filter"),
+                        intro: "By default, the records are sorted with the most recently added records first. Use the sort button to change the sorting order.",
+                        step: "4"
+                    },
+                ]
+                
+                if ( $('.pagination-container').length > 0 ) {
+                    our_steps.push({
+                        element: document.getElementById("pagination-container"),
+                        intro: "If your search returns more items than fit on one page, use the paging controls at the bottom to browse through the records",
+                        step: "5"
+                    })
+                }
+              
+                // setup intro.js for explore page
+                window.intro.setOptions({
+                    steps: our_steps,
+                    showBullets: false,
+                    disableInteraction: true
+                }); 
             });
             ]]>
-      </script>
+        </script>
     </div>
   </xsl:template>
 
