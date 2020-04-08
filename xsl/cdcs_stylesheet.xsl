@@ -428,6 +428,10 @@
                     cursor: pointer;
                 }
                 
+                #filelist-modal .modal-body .filelist-header-row {
+                    
+                }
+                
                 .help-filelist-modal {
                     font-size: 20px;
                     font-weight: bold;
@@ -639,6 +643,10 @@
                 
                 th.parameter-name {
                     font-weight: bold;
+                }
+                
+                td.aa-meta-col {
+                    white-space: nowrap;
                 }
                 
                 /* Fix for margins getting messed up inside the AA panels */ 
@@ -961,63 +969,6 @@
                         </xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
-                <div id='summary-info'>
-                    <span class="list-record-title page-header">
-                        <i class="fa fa-file-text results-icon"/>
-                        <xsl:value-of select="$expTitle"/>
-                    </span>
-                    <br/>
-                    <xsl:variable name="instr-pid">
-                        <xsl:value-of select="string(summary/instrument/@pid)"/>
-                    </xsl:variable>
-                    <span id='instr-badge' class="badge list-record-badge">
-                        <xsl:choose>
-                            <xsl:when test="summary/instrument/text()">
-                                <xsl:attribute name="style">background-color:<xsl:for-each select="document('')">
-                                    <xsl:value-of select="key('lookup.instr.color', $instr-pid)"/>
-                                </xsl:for-each> !important;</xsl:attribute>
-                                <xsl:element name="a">
-                                    <xsl:attribute name="target">_blank</xsl:attribute>
-                                    <xsl:attribute name="href">
-                                        <xsl:call-template name="get-calendar-link">
-                                            <xsl:with-param name="instrument" select="summary/instrument"></xsl:with-param>
-                                        </xsl:call-template></xsl:attribute>
-                                    <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
-                                    <xsl:attribute name="data-placement">bottom</xsl:attribute> 
-                                    <xsl:attribute name="title">Click to view this instrument on the Sharepoint calendar</xsl:attribute>
-                                    <xsl:value-of select="summary/instrument"/>
-                                </xsl:element>
-                            </xsl:when>
-                            <xsl:otherwise>
-                                Unknown instrument
-                            </xsl:otherwise>
-                        </xsl:choose>
-                        
-                    </span>
-                    <span class="badge list-record-badge">
-                        <xsl:element name="a">
-                            <xsl:attribute name="href">
-                                javascript:void(0);
-                            </xsl:attribute>
-                            <xsl:attribute name="onclick">
-                                openModal('filelist-modal');
-                            </xsl:attribute>
-                            <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
-                            <xsl:attribute name="data-placement">bottom</xsl:attribute> 
-                            <xsl:attribute name="title">Click to view a file listing of this record</xsl:attribute>
-                            <xsl:value-of select="count(//dataset)"/> data file<xsl:if test="count(//dataset)>1">s</xsl:if> in <xsl:value-of select="count(//acquisitionActivity)"/> activit<xsl:choose>
-                                <xsl:when test="count(//acquisitionActivity) = 1">y</xsl:when>
-                                <xsl:otherwise>ies</xsl:otherwise>
-                            </xsl:choose>
-                        </xsl:element>
-                    </span>
-                    <i class="fa fa-cubes" style="margin-left:0.75em; font-size: small;"
-                       data-toggle="tooltip" data-placement="bottom" title="Filetypes present in record"/><span style="font-size: small;"><xsl:text>: </xsl:text></span>
-                    <xsl:call-template name="extensions-to-badges">
-                        <xsl:with-param name="input"><xsl:value-of select="$unique-extensions"/></xsl:with-param>
-                        <xsl:with-param name="global-count">true</xsl:with-param>
-                    </xsl:call-template>
-                </div>
                 <xsl:variable name="date">
                     <xsl:choose>
                         <xsl:when test="$reservation-date-part != ''">
@@ -1052,38 +1003,97 @@
                         <xsl:otherwise>Unknown date</xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
-                <div class="row">
-                        <div class="experimenter-and-date">
-                            <span class="list-record-experimenter">
-                                <xsl:choose>
-                                    <xsl:when test="summary/experimenter">
-                                        <xsl:value-of select="summary/experimenter"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>Unknown experimenter</xsl:otherwise>
-                                </xsl:choose>
-                            </span>
-                            <xsl:text> - </xsl:text>
-                            <span class="list-record-date"><i><xsl:value-of select="$date"/></i></span>
-                        </div>
-                </div>
-                <div class="row">
-                        <div class="motivation-text">
-                           
-                                <xsl:choose>
-                                    <xsl:when test="summary/motivation/text()">
-                                        <span style="font-style:italic;">Motivation: </span><xsl:value-of select="summary/motivation"/>
-                                    </xsl:when>
-                                    <xsl:otherwise>
-                                        No motivation provided
-                                        <xsl:call-template name="help-tip">
-                                            <xsl:with-param name="tip-placement">right</xsl:with-param>
-                                            <xsl:with-param name="tip-text">This value is pulled from the "Experiment Purpose" field of a Sharepoint calendar reservation</xsl:with-param>
-                                        </xsl:call-template>
-                                    </xsl:otherwise>
-                                </xsl:choose>
+                <div id='record-header'>
+                    <div id='summary-info'>
+                        <span class="list-record-title page-header">
+                            <i class="fa fa-file-text results-icon"/>
+                            <xsl:value-of select="$expTitle"/>
+                        </span>
+                        <br/>
+                        <xsl:variable name="instr-pid">
+                            <xsl:value-of select="string(summary/instrument/@pid)"/>
+                        </xsl:variable>
+                        <span id='instr-badge' class="badge list-record-badge">
+                            <xsl:choose>
+                                <xsl:when test="summary/instrument/text()">
+                                    <xsl:attribute name="style">background-color:<xsl:for-each select="document('')">
+                                        <xsl:value-of select="key('lookup.instr.color', $instr-pid)"/>
+                                    </xsl:for-each> !important;</xsl:attribute>
+                                    <xsl:element name="a">
+                                        <xsl:attribute name="target">_blank</xsl:attribute>
+                                        <xsl:attribute name="href">
+                                            <xsl:call-template name="get-calendar-link">
+                                                <xsl:with-param name="instrument" select="summary/instrument"></xsl:with-param>
+                                            </xsl:call-template></xsl:attribute>
+                                        <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                                        <xsl:attribute name="data-placement">bottom</xsl:attribute> 
+                                        <xsl:attribute name="title">Click to view this instrument on the Sharepoint calendar</xsl:attribute>
+                                        <xsl:value-of select="summary/instrument"/>
+                                    </xsl:element>
+                                </xsl:when>
+                                <xsl:otherwise>
+                                    Unknown instrument
+                                </xsl:otherwise>
+                            </xsl:choose>
                             
-                        </div>
-                </div>            
+                        </span>
+                        <span class="badge list-record-badge">
+                            <xsl:element name="a">
+                                <xsl:attribute name="href">
+                                    javascript:void(0);
+                                </xsl:attribute>
+                                <xsl:attribute name="onclick">
+                                    openModal('filelist-modal');
+                                </xsl:attribute>
+                                <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                                <xsl:attribute name="data-placement">bottom</xsl:attribute> 
+                                <xsl:attribute name="title">Click to view a file listing of this record</xsl:attribute>
+                                <xsl:value-of select="count(//dataset)"/> data file<xsl:if test="count(//dataset)>1">s</xsl:if> in <xsl:value-of select="count(//acquisitionActivity)"/> activit<xsl:choose>
+                                    <xsl:when test="count(//acquisitionActivity) = 1">y</xsl:when>
+                                    <xsl:otherwise>ies</xsl:otherwise>
+                                </xsl:choose>
+                            </xsl:element>
+                        </span>
+                        <i class="fa fa-cubes" style="margin-left:0.75em; font-size: small;"
+                           data-toggle="tooltip" data-placement="bottom" title="Filetypes present in record"/><span style="font-size: small;"><xsl:text>: </xsl:text></span>
+                        <xsl:call-template name="extensions-to-badges">
+                            <xsl:with-param name="input"><xsl:value-of select="$unique-extensions"/></xsl:with-param>
+                            <xsl:with-param name="global-count">true</xsl:with-param>
+                        </xsl:call-template>
+                    </div>
+                    <div class="row">
+                            <div class="experimenter-and-date">
+                                <span class="list-record-experimenter">
+                                    <xsl:choose>
+                                        <xsl:when test="summary/experimenter">
+                                            <xsl:value-of select="summary/experimenter"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>Unknown experimenter</xsl:otherwise>
+                                    </xsl:choose>
+                                </span>
+                                <xsl:text> - </xsl:text>
+                                <span class="list-record-date"><i><xsl:value-of select="$date"/></i></span>
+                            </div>
+                    </div>
+                    <div class="row">
+                            <div class="motivation-text">
+                               
+                                    <xsl:choose>
+                                        <xsl:when test="summary/motivation/text()">
+                                            <span style="font-style:italic;">Motivation: </span><xsl:value-of select="summary/motivation"/>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            No motivation provided
+                                            <xsl:call-template name="help-tip">
+                                                <xsl:with-param name="tip-placement">right</xsl:with-param>
+                                                <xsl:with-param name="tip-text">This value is pulled from the "Experiment Purpose" field of a Sharepoint calendar reservation</xsl:with-param>
+                                            </xsl:call-template>
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                
+                            </div>
+                    </div>           
+                </div>
                 <div class="row">    
                     <div class="col-md-6 no-top-padding" id="session_info_column">
                         <span style='line-height: 0.5em;'><br/></span>
@@ -1420,7 +1430,7 @@
                                                             <td><xsl:value-of select="format/text()"/></td>
                                                         </xsl:when>
                                                     </xsl:choose>
-                                                    <td class='text-center'>
+                                                    <td class='text-center aa-meta-col'>
                                                         <!-- Modal content inside of table, since it needs to be in the context of this dataset -->
                                                         <a href='javascript:void(0)' onclick="$(this).blur(); openModal('{generate-id(current())}-modal');"
                                                         data-toggle='tooltip' data-placement='left'
@@ -1518,7 +1528,7 @@
                                                             </div>
                                                         </div>
                                                     </td>
-                                                    <td class='text-center'>
+                                                    <td class='text-center aa-dl-col'>
                                                         <xsl:element name='a'>
                                                             <xsl:attribute name="href"><xsl:value-of select="$datasetBaseUrl"/><xsl:value-of select="location"/></xsl:attribute>
                                                             <xsl:attribute name="onclick">
@@ -1633,14 +1643,34 @@
                 <div id="filelist-modal" class="modal">
                     <div class="modal-content">
                         <div class="modal-body">
-                            <div class="row">
-                                <div class="col-med-10 pull-left" style=''>
+                            <div class="row row-no-gutters">
+                                <div class="col-xs-2 pull-right" style="padding-top: 30px;">
+                                    <i class="help-filelist-modal fa fa-question-circle">
+                                        <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                                        <xsl:attribute name="data-placement">bottom</xsl:attribute>
+                                        <xsl:attribute name="title">
+<!-- Do not indent this text, as it affects the tooltip display -->                                            
+This window shows all the datasets identified as part of this record.
+                                            
+Rows of the table can be selected using the mouse, holding down Ctrl or Shift to select multiple rows.
+                                            
+The files (and metadata) associated with the selected datasets can be downloaded by clicking on the "Download selected" or "Download all" button (warning, this may take some time for large amounts of data). You can close this dialoge (but not the browser tab!) while the download is processing without interrupting its progress. Do not navigate away from the page, or the download will cancel!
+                                            
+The textual data from the selected rows (not the actual files) can also be exported to the clipboard, a CSV file, an Excel file, or printed to PDF by using the respective buttons as well.
+                                        </xsl:attribute>
+                                    </i>
+                                    <i class="close-modal fa fa-close" onclick="closeModal('filelist-modal')"/>
+                                </div>
+                            </div>
+                            <div class="row filelist-header-row">
+                                <div class="col-med-12" style="padding-top: 0px; max-width: 600px">
                                     <b>Complete filelisting for:</b><br/>
                                     <span class='modal-expTitle'>
                                         <i class="fa fa-file-text-o results-icon"/>
                                         <xsl:value-of select="$expTitle"/>
                                     </span> - <span class='modal-expDate'><xsl:value-of select="$date"/></span><br/>
-                                    <span class='modal-expTitle'>Root path: </span><code id='filelist-rootpath'><a>
+                                    <span class='modal-expTitle' style="white-space: pre-line;">Root path:  </span><code id='filelist-rootpath'
+                                        style="line-height: 1.25em; display: inline-block;"><a>
                                         <xsl:attribute name="href">
                                             <xsl:value-of select="$datasetBaseUrl"/>
                                         </xsl:attribute>
@@ -1651,22 +1681,6 @@
                                         <xsl:attribute name="data-placement">top</xsl:attribute>
                                         <xsl:attribute name="title">Click to view directory struture directly in the browser</xsl:attribute>
                                     </a></code>
-                                </div>
-                                <div class="col-xs-2 pull-right">
-                                    <i class="help-filelist-modal fa fa-question-circle">
-                                        <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
-                                        <xsl:attribute name="data-placement">bottom</xsl:attribute>
-                                        <xsl:attribute name="title">
-This window shows all the datasets identified as part of this record.
-
-Rows of the table can be selected using the mouse, holding down Ctrl or Shift to select multiple rows.
-
-The files (and metadata) associated with the selected datasets can be downloaded by clicking on the "Download selected" or "Download all" button (warning, this may take some time for large amounts of data). You can close this dialoge (but not the browser tab!) while the download is processing without interrupting its progress. Do not navigate away from the page, or the download will cancel!
-
-The textual data from the selected rows (not the actual files) can also be exported to the clipboard, a CSV file, an Excel file, or printed to PDF by using the respective buttons as well.
-                                        </xsl:attribute>
-                                    </i>
-                                    <i class="close-modal fa fa-close" onclick="closeModal('filelist-modal')"/>
                                 </div>
                             </div>
                             <!-- Download progressbar row ((hidden by default by jQuery) -->
@@ -2143,10 +2157,22 @@ The textual data from the selected rows (not the actual files) can also be expor
                     isRight = (evt.keyCode === 39);
                     isEscape = (evt.keyCode === 27);
                     if (isLeft) {
-                        plusSlide(-1);
+                        // if we're in a tutorial, go back a step
+                        if (Shepherd.activeTour) {
+                            Shepherd.activeTour.back();
+                            } else {
+                            // otherwise send arrow key to gallery
+                            plusSlide(-1);
+                        }
                     }
                     if (isRight) {
-                        plusSlide(1);
+                        // if we're in a tutorial, advance a step
+                        if (Shepherd.activeTour) {
+                            Shepherd.activeTour.next();
+                        } else {
+                            // otherwise send arrow key to gallery
+                            plusSlide(1);
+                        }
                     }
                     if (isEscape) {
                         var i;
@@ -2164,6 +2190,403 @@ The textual data from the selected rows (not the actual files) can also be expor
                         event.preventDefault();
                     }
                 );
+            
+                // Shepherd tutorial code
+                function create_detail_tour() {
+                    
+                    // check if any modals are visible, and if so close them and
+                    // remember it to reopen at the end
+                    var already_open_modal = false;
+                    $('.modal').each(function(index, val){
+                        if ($(val).css('visibility') === 'visible') {
+                            closeModal(val.id);
+                            already_open_modal = val.id;
+                        }
+                    })
+                
+                    var topScrollHandler = function (element, offset) {
+                        if (!offset) {
+                            offset = 75;
+                        }
+                        if (element) {
+                            var $element = $(element);
+                            var topOfElement = $element.offset().top;
+                            var heightOfElement = $element.height() + offset;
+                            $('html, body').animate({
+                                scrollTop: topOfElement - heightOfElement
+                            }, {
+                                duration: 500
+                            });
+                        }
+                    };
+                
+                    var detail_tour = new Shepherd.Tour({
+                        useModalOverlay: true,
+                        // keyboard navigation is taken care of by the keyboard
+                        // handler so we can send it to tour or gallery as needed
+                        // search for "plusSlide(" to see where that happens
+                        keyboardNavigation: false,
+                        defaultStepOptions: {
+                            when: {
+                                show() {
+                                    showStepNumber()
+                                }
+                            },
+                            modalOverlayOpeningPadding: 25,
+                            scrollTo: true,
+                            scrollToHandler: topScrollHandler,
+                            canClickTarget: false,
+                        }
+                    });
+                
+                    showStepNumber = () => {
+                        $("<span style='font-size: small'></span>")
+                            .insertBefore('.shepherd-footer .btn-primary')
+                            .html(`${detail_tour.steps.indexOf(detail_tour.currentStep) + 1}/${detail_tour.steps.length}`);
+                    }
+                
+                    end_button = {
+                        text: 'End',
+                        classes: 'btn btn-danger',
+                        action: detail_tour.next,
+                        label: 'End'
+                    }
+                
+                    next_button = {
+                        text: 'Next <i class="fa fa-arrow-right menu-fa"></i>',
+                        classes: 'btn btn-primary',
+                        action: detail_tour.next,
+                        label: 'Next'
+                    }
+                
+                    var back_button = (enabled) => {
+                        return {
+                            text: '<i class="fa fa-arrow-left menu-fa"></i> Back',
+                            classes: 'btn btn-default',
+                            disabled: (!enabled),
+                            action: detail_tour.back,
+                            label: 'Back'
+                        }
+                    }
+                
+                    var stacked_aa_row = $('.aa_header_row .aa-img-col').position().top !== $('.aa_header_row .aa-table-col').position().top;
+
+                    // add steps to tour
+                    detail_tour.addStep({
+                        id: 'tut-welcome',
+                        title: 'This is the record detail page',
+                        text: 'The <em>detail</em> page shows all the details of a record generated from an Experiment on one of the Nexus Facility instruments. Click <em>Next</em> for a tour of the features of this record. You can also use the keyboard arrow keys to navigate through the tutorial.',
+                        buttons: [
+                            back_button(false),
+                            next_button
+                        ],
+                    });
+                
+                    detail_tour.addStep({
+                        id: 'tut-record-header',
+                        title: 'The record header',
+                        text: 'The top of the record contains basic information, such as the title of the experiment (taken from the calendar reservation), the instrument that was used, the number and types of files contained within, the user, date, and experimental motivation. This utility of this section relies heavily on the quality of data inputted into the reservation form.',
+                        attachTo: {
+                            element: '#record-header',
+                            on: 'bottom'
+                        },
+                        buttons: [
+                            back_button(true),
+                            next_button
+                        ],
+                        popperOptions: {
+                            modifiers: [{
+                                name: 'offset',
+                                options: {
+                                    offset: [0, 25]
+                                }
+                            }]
+                        }
+                    });
+                
+                    detail_tour.addStep({
+                        id: 'tut-session_info_column',
+                        title: 'Session summary information',
+                        text: 'The session summary section contains further details about the experiment, such as the precise date and time (from the calendar), the sample information and ID, and any sample description.',
+                        attachTo: {
+                            element: '#session_info_column',
+                            on: 'bottom'
+                        },
+                        scrollTo: false,
+                        buttons: [
+                            back_button(true),
+                            next_button
+                        ],
+                        popperOptions: {
+                            modifiers: [{
+                                name: 'offset',
+                                options: {
+                                    offset: [0, 25]
+                                }
+                            }]
+                        }
+                    });
+                
+                    detail_tour.addStep({
+                        id: 'tut-img_gallery',
+                        title: 'Image gallery',
+                        text: "The gallery shows a preview image of each dataset contained within the experiment's record. These can be browsed using the mouse buttons, or via the left and right arrow keys on the keyboard.",
+                        attachTo: {
+                            element: '#img_gallery',
+                            on: 'left'
+                        },
+                        scrollTo: false,
+                        buttons: [
+                            back_button(true),
+                            next_button
+                        ],
+                        popperOptions: {
+                            modifiers: [{
+                                name: 'offset',
+                                options: {
+                                    offset: [0, 25]
+                                }
+                            }]
+                        }
+                    });
+                
+                    detail_tour.addStep({
+                        id: 'tut-aa',
+                        title: 'Acquisition activities',
+                        text: 'The remainder of the record contains details about the various "activities" that were detected in the records (determined via file creation times). Click <em>Next</em> for further details about the contents of each activity.',
+                        attachTo: {
+                            element: $('.aa_header_row')[0],
+                            on: 'left'
+                        },
+                        buttons: [
+                            back_button(true),
+                            next_button
+                        ],
+                        scrollToHandler: (element) => {topScrollHandler(element, -1 * $(element).height() + 75)},
+                    });
+                
+                    detail_tour.addStep({
+                        id: 'tut-setup-params',
+                        title: 'Setup parameters',
+                        text: 'The setup parameters button will show you the metadata extracted from the raw files that is common to all the datasets contained in this activity. Clicking here will open a dialog box showing the setup parameters for this activity',
+                        attachTo: {
+                            element: $('.aa_header_row .param-button')[0],
+                            on: 'bottom'
+                        },
+                        buttons: [
+                            back_button(true),
+                            next_button
+                        ],
+                        scrollTo: false,     
+                        canClickTarget: false,
+                        modalOverlayOpeningPadding: 15,
+                        popperOptions: {
+                            modifiers: [{
+                                name: 'offset',
+                                options: {
+                                    offset: [0, 15]
+                                }
+                            }]
+                        }
+                    });
+                    
+                    detail_tour.addStep({
+                        id: 'tut-aa-gallery',
+                        title: 'Activity image gallery',
+                        text: "Another preview of the datasets in this activity is shown here. Mouse over a dataset in the accompanying table to view its preview",
+                        attachTo: {
+                            element: $('.aa_header_row .aa-img-col')[0],
+                            on: 'bottom'
+                        },
+                        scrollTo: false,
+                        buttons: [
+                            back_button(true),
+                            next_button
+                        ]
+                    });
+                
+                    detail_tour.addStep({
+                        id: 'tut-aa-table',
+                        title: 'Activity dataset table',
+                        text: "The activity details table lists each dataset contained in this activty with some basic information such as the dataset's name, its creation time, the type of data contained, and its role.",
+                        attachTo: {
+                            element: $('.aa_header_row .aa-table-col')[0],
+                            on: 'bottom'
+                        },
+                        scrollTo: false,
+                        buttons: [
+                            back_button(true),
+                            next_button
+                        ]
+                    });
+                
+                    detail_tour.addStep({
+                        id: 'tut-aa-meta',
+                        title: 'Metadata viewer/downloader',
+                        text: "The metadata column allows you to view the metadata unique to this dataset using the left button, or you can download the entire extracted metadata using the button on the right in JSON format.",
+                        attachTo: {
+                            element: $('.aa_header_row .aa-table-col .aa-meta-col')[0],
+                            on: 'left'
+                        },
+                        buttons: [
+                            back_button(true),
+                            next_button
+                        ],
+                        scrollTo: false,
+                        modalOverlayOpeningPadding: 5,
+                        popperOptions: {
+                            modifiers: [{
+                                name: 'offset',
+                                options: {
+                                    offset: [0, 10]
+                                }
+                            }]
+                        }
+                    });
+                
+                    detail_tour.addStep({
+                        id: 'tut-aa-dl',
+                        title: 'Individual file downloader',
+                        text: "The final column provides a link to download this single file in its native format (Note: there is a bulk file downloader at the top of the record)",
+                        attachTo: {
+                            element: $('.aa_header_row .aa-table-col .aa-dl-col')[0],
+                            on: 'left'
+                        },
+                        buttons: [
+                            back_button(true),
+                            next_button
+                        ],
+                        scrollTo: false,
+                        modalOverlayOpeningPadding: 5,
+                        popperOptions: {
+                            modifiers: [{
+                                name: 'offset',
+                                options: {
+                                    offset: [0, 10]
+                                }
+                            }]
+                        }
+                    });
+                
+                    var sidebar_vis = $('.sidebar').position()['left'] === 0;
+                    var sidebar_text = "The sidebar provides an easy way to navigate through the different activities in the record, and also provides a button to return to the top of the page.";
+                    if (!sidebar_vis) {
+                        sidebar_text += " If the window is too narrow, the sidebar is hidden from view. Clicking this button will show it.";
+                    }
+                
+                    detail_tour.addStep({
+                        id: 'tut-sidebar',
+                        title: 'Record navigation sidebar',
+                        text: sidebar_text,
+                        attachTo: {
+                            element: sidebar_vis ? $('.sidebar')[0] : $('#btn-sidebar')[0],
+                            on: 'right'
+                        },
+                        scrollTo: false,
+                        buttons: [
+                            back_button(true),
+                            next_button
+                        ]
+                    });
+                    
+                    detail_tour.addStep({
+                        id: 'tut-filelisting',
+                        title: 'Record file listing and downloader',
+                        text: "The <i class='fa fa-cloud-download menu-fa'></i> <em>Download files</em> button provides an overview of all the dataset files in this record, and provides a means to download all (or a selected number of) files as a .zip archive. This dialogue also allows you to export a list of files into a variety of formats.",
+                        attachTo: {
+                            element: '#btn-filelisting',
+                            on: 'bottom'
+                        },
+                        scrollTo: true,
+                        buttons: [
+                            back_button(true),
+                            next_button
+                        ],
+                        modalOverlayOpeningPadding: 5,
+                        popperOptions: {
+                            modifiers: [{
+                                name: 'offset',
+                                options: {
+                                    offset: [0, 10]
+                                }
+                            }]
+                        }
+                    });
+                    
+                    detail_tour.addStep({
+                        id: 'tut-xml-dl',
+                        title: 'Record exporter',
+                        text: "The <i class='fa fa-code menu-fa'></i> <em>Download XML</em> button will download the metadata record (not the actual datafiles) in an structured format for additional analysis, if desired.",
+                        attachTo: {
+                            element: '#btn-xml-dl',
+                            on: 'bottom'
+                        },
+                        scrollTo: false,
+                        buttons: [
+                            back_button(true),
+                            next_button
+                        ],
+                        modalOverlayOpeningPadding: 5,
+                        popperOptions: {
+                            modifiers: [{
+                                name: 'offset',
+                                options: {
+                                    offset: [0, 10]
+                                }
+                            }]
+                        }
+                    });
+                    
+                    detail_tour.addStep({
+                        id: 'tut-edit-record',
+                        title: 'Record editor',
+                        text: "The <i class='fa fa-file-text menu-fa'></i> <em>Edit this record</em> button will allow you (if logged in and you have ownership of this record) to edit the metadata information contained within. Currently, this process is a bit cumbersome, but an improvement to the interface is on the NexusLIMS team's roadmap.",
+                        attachTo: {
+                            element: '#btn-edit-record',
+                            on: 'bottom'
+                        },
+                        scrollTo: false,
+                        buttons: [
+                            back_button(true),
+                            end_button
+                        ],
+                        modalOverlayOpeningPadding: 5,
+                        popperOptions: {
+                            modifiers: [{
+                                name: 'offset',
+                                options: {
+                                    offset: [0, 10]
+                                }
+                            }]
+                        }
+                    });
+                
+                    let cur_pos = $(document).scrollTop();
+                    
+                    function clean_up_on_exit(modal_to_open) {
+                        // return to initial position on page if we're not there,
+                        // otherwise just re-open the modal if needed
+                        if ( $(document).scrollTop() === cur_pos ) {
+                            if (modal_to_open) { openModal(modal_to_open) } 
+                        } else {
+                            $('html, body').animate({
+                                scrollTop: cur_pos
+                            }, {
+                                duration: 500,
+                                // if there was already a modal dialogue open, re-open it when the animation is finished
+                                complete: modal_to_open ? () => {openModal(modal_to_open)} : null
+                            });
+                        }
+                    }
+                    
+                    // set clean up function to trigger when tutorial is closed
+                    detail_tour.on('complete', () => clean_up_on_exit(already_open_modal));
+                    detail_tour.on('cancel', () => clean_up_on_exit(already_open_modal));
+                    detail_tour.on('hide', () => clean_up_on_exit(already_open_modal));
+                    
+                    $('.shepherd-modal-overlay-container').on('click', () => detail_tour.cancel());
+                    detail_tour.start()
+                }
             
                 // Things to do when document is ready
                 $(document).ready(function(){
@@ -2312,14 +2735,14 @@ The textual data from the selected rows (not the actual files) can also be expor
                             newText = '/';
                         }
                         newText = addEndingSlash(newText);
-                        $(this).text(newText);
                         $(this).attr("href", $(this).attr("href") + rootPath + newText);
+                        $(this).text(decodeURIComponent(newText));
                       });
                       
                       rootPath = addEndingSlash(rootPath);
                       // put root path text into modal header link
                       $('code#filelist-rootpath > a').each(function() {
-                        $(this).text(rootPath);
+                        $(this).text(decodeURIComponent(rootPath));
                         $(this).attr("href", $(this).attr("href") + rootPath);
                       });
                       
@@ -3147,6 +3570,7 @@ The textual data from the selected rows (not the actual files) can also be expor
                         });
                     }
                     $("#btn-xml-dl").on('click', downloadXML);                    
+                    $('a#menu-tutorial').on('click', () => create_detail_tour());
                     
                     // Make sidebar visible after everything is done loading:
                     $('.sidebar').first().css('visibility', 'visible');
