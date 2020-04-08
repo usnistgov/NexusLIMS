@@ -171,6 +171,156 @@
                 return false;
             });
             
+            // Shepherd tutorial code
+            function create_tour() {
+                var topScrollHandler = function(element){
+                    if (element) {
+                        var $element = $(element);
+                        var topOfElement = $element.offset().top;
+                        var heightOfElement = $element.height() + 75;
+                        $('html, body').animate({
+                            scrollTop: topOfElement - heightOfElement
+                        },{
+                            duration: 500
+                        });
+                    }
+                };
+
+                var list_tour = new Shepherd.Tour({
+                    useModalOverlay: true,
+                    defaultStepOptions: {
+                        when: { show() { showStepNumber() } },
+                        scrollTo: true,
+                        scrollToHandler: topScrollHandler
+                    }
+                });
+            
+                showStepNumber = () => {
+                    $("<span style='font-size: small'></span>")
+                        .insertAfter('.shepherd-footer .btn-default')
+                        .html(`${list_tour.steps.indexOf(list_tour.currentStep) + 1}/${list_tour.steps.length}`);
+                }
+                
+                end_button = {
+                    text: 'End',
+                    classes: 'btn btn-danger',
+                    action: list_tour.next,
+                    label: 'End'
+                }
+                
+                next_button = {
+                    text: 'Next <i class="fa fa-arrow-right menu-fa"></i>',
+                    classes: 'btn btn-primary',
+                    action: list_tour.next,
+                    label: 'Next'
+                }
+                
+                var back_button = (enabled) => {
+                    return {
+                        text: '<i class="fa fa-arrow-left menu-fa"></i> Back',
+                        classes: 'btn btn-default',
+                        disabled: (! enabled),
+                        action: list_tour.back,
+                        label: 'Back'}
+                }
+            
+                list_tour.addStep({
+                    id: 'tut-welcome',
+                    title: 'This is the record explorer page',
+                    text: 'The <em>explore</em> page allows you to browse and search through the records contained in the NexusLIMS repository. Click <em>Next</em> for a brief tour of the features of this page. You can also use the keyboard arrow keys to navigate through the tutorial.',
+                    buttons: [
+                        back_button(false),
+                        next_button
+                    ],
+                });
+            
+                list_tour.addStep({
+                    id: 'tut-search-field',
+                    title: 'The search bar',
+                    text: 'Use the search box to do a full-text search on all the records (can search by username, date, instrument, etc.). Leave the box empty to return all results from the database.',
+                    attachTo: {
+                        element: '#search-field',
+                        on: 'bottom'
+                    },
+                    buttons: [
+                        back_button(true),
+                        next_button
+                    ],
+                });
+            
+                list_tour.addStep({
+                    id: 'tut-example-record',
+                    title: 'An example record listing',
+                    text: 'Each listing in the results area represents one record in the database and provides some basic summary information about the record\'s contents. Click anywhere on the listing to view the record details.',
+                    attachTo: {
+                        element: '#example-record',
+                        on: 'bottom'
+                    },
+                    scrollTo: false,
+                    buttons: [
+                        back_button(true),
+                        next_button
+                    ],
+                });
+            
+                
+            
+                list_tour.addStep({
+                    id: 'tut-result-button-filter',
+                    title: 'Record sorting',
+                    text: 'By default, the records are sorted with the most recently added records first. Use this sort button to change the sorting order.',
+                    attachTo: {
+                        element: '#result-button-filter',
+                        on: 'left'
+                    },
+                    scrollTo: false,
+                    buttons: [
+                        back_button(true),
+                        $('.pagination-container').length > 0 ? next_button : end_button
+                    ],
+                    modalOverlayOpeningPadding: 15,
+                    popperOptions: {
+                        modifiers: [{
+                            name: 'offset',
+                            options: {
+                                offset: [0, 15]
+                            }
+                        }]
+                    }
+                });
+            
+                if ( $('.pagination-container').length > 0 ) {
+                    list_tour.addStep({
+                        id: 'tut-pagination-container',
+                        title: 'Browsing many records',
+                        text: 'If your search returns more items than fit on one page, use the paging controls at the bottom to browse through the records',
+                        attachTo: {
+                            element: '#pagination-container',
+                            on: 'bottom'
+                        },
+                        when: { show() { showStepNumber() } },
+                        buttons: [
+                            back_button(true),
+                            end_button
+                        ]
+                    });
+                }
+            
+                var scroll_to_start = function() {
+                    $('html, body').animate(
+                        {scrollTop: cur_pos}, 
+                        {duration: 500}
+                    );
+                }
+            
+                let cur_pos = $(document).scrollTop();
+                list_tour.on('complete', scroll_to_start)
+                list_tour.on('cancel', scroll_to_start)
+                list_tour.on('hide', scroll_to_start)
+                $('.shepherd-modal-overlay-container').on('click', () => list_tour.cancel());
+                list_tour.start()
+            }              
+
             $( document ).ready(function() {
                 $('[data-toggle="tooltip"]').tooltip(
                     {container:'body'}); // toggle all tooltips with default
@@ -179,43 +329,6 @@
                 $('.a-result').first().attr('id', 'example-record');
                 $('input#id_keywords ~ ul').attr('id', 'search-field');
                 $('.pagination-container').attr('id', 'pagination-container');
-              
-                var our_steps = [
-                    {
-                        intro: "The <em>explore</em> page allows you to browse and search through the records contained in the NexusLIMS repository.",
-                        step: "1"
-                    },
-                    {
-                        element: document.getElementById("search-field"),
-                        intro: "Use the search box to do a full-text search on all the records (can search by username, date, instrument, etc.). Leave the box empty to return all results from the database.",
-                        step: "2"
-                    },
-                    {
-                        element: document.getElementById("example-record"),
-                        intro: "Each listing in the results area represents one record in the database and provides some basic summary information about the record's contents. Click anywhere on the listing to view the record details.",
-                        step: "3"
-                    },
-                    {
-                        element: document.getElementById("result-button-filter"),
-                        intro: "By default, the records are sorted with the most recently added records first. Use the sort button to change the sorting order.",
-                        step: "4"
-                    },
-                ]
-                
-                if ( $('.pagination-container').length > 0 ) {
-                    our_steps.push({
-                        element: document.getElementById("pagination-container"),
-                        intro: "If your search returns more items than fit on one page, use the paging controls at the bottom to browse through the records",
-                        step: "5"
-                    })
-                }
-              
-                // setup intro.js for explore page
-                window.intro.setOptions({
-                    steps: our_steps,
-                    showBullets: false,
-                    disableInteraction: true
-                }); 
             });
             ]]>
         </script>
