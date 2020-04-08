@@ -2159,7 +2159,7 @@ The textual data from the selected rows (not the actual files) can also be expor
                     if (isLeft) {
                         // if we're in a tutorial, go back a step
                         if (Shepherd.activeTour) {
-                            // do nothing since arrow is already handled by tour
+                            Shepherd.activeTour.back();
                             } else {
                             // otherwise send arrow key to gallery
                             plusSlide(-1);
@@ -2168,7 +2168,7 @@ The textual data from the selected rows (not the actual files) can also be expor
                     if (isRight) {
                         // if we're in a tutorial, advance a step
                         if (Shepherd.activeTour) {
-                            // do nothing since arrow is already handled by tour
+                            Shepherd.activeTour.next();
                         } else {
                             // otherwise send arrow key to gallery
                             plusSlide(1);
@@ -2222,6 +2222,10 @@ The textual data from the selected rows (not the actual files) can also be expor
                 
                     var detail_tour = new Shepherd.Tour({
                         useModalOverlay: true,
+                        // keyboard navigation is taken care of by the keyboard
+                        // handler so we can send it to tour or gallery as needed
+                        // search for "plusSlide(" to see where that happens
+                        keyboardNavigation: false,
                         defaultStepOptions: {
                             when: {
                                 show() {
