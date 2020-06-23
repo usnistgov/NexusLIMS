@@ -49,6 +49,7 @@ from nexusLIMS.utils import get_nested_dict_value_by_path as \
 from nexusLIMS.utils import set_nested_dict_value as _set_nest_dict_val
 from nexusLIMS.utils import try_getting_dict_value as _try_get_dict_val
 from nexusLIMS.utils import _sort_dict
+from nexusLIMS.utils import _remove_dtb_element
 
 from struct import error as _struct_error
 
@@ -1103,33 +1104,6 @@ def process_tecnai_microscope_info(microscope_info, delimiter=u'\u2028'):
         _logger.info('Filter settings not found in Tecnai microscope info')
 
     return info_dict
-
-
-def _remove_dtb_element(tree, path):
-    """
-    Helper method that uses exec to delete a specific leaf of a
-    DictionaryTreeBrowser using a string
-
-    Parameters
-    ----------
-    tree : :py:class:`~hyperspy.misc.utils.DictionaryTreeBrowser`
-        the ``DictionaryTreeBrowser`` object to remove the object from
-    path : str
-        period-delimited path to a DTB element
-
-    Returns
-    -------
-    tree : :py:class:`~hyperspy.misc.utils.DictionaryTreeBrowser`
-    """
-    to_del = 'tree.{}'.format(path)
-    try:
-
-        exec('del {}'.format(to_del))
-    except AttributeError as _:
-        # Log the failure and continue
-        _logger.debug('_remove_dtb_element: Could not find {}'.format(to_del))
-
-    return tree
 
 
 def _zero_data_in_dm3(filename, out_filename=None, compress=True):

@@ -5,11 +5,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import hyperspy.api as hs
 import logging
+from datetime import datetime as dt
 
 import nexusLIMS
 from nexusLIMS import instruments
 from nexusLIMS.tests.utils import tars, files
 from nexusLIMS.extractors import digital_micrograph
+from nexusLIMS.extractors import fei_emi
 from nexusLIMS.extractors.quanta_tif import get_quanta_metadata
 from nexusLIMS.extractors import thumbnail_generator
 from nexusLIMS.extractors import parse_metadata, flatten_dict
@@ -26,7 +28,7 @@ class TestThumbnailGenerator:
         cls.twod_s = hs.stack([cls.oned_s * i for i in np.arange(.1, 1, .3)],
                               new_axis_name='y')
         cls.threed_s = hs.stack([cls.twod_s * i for i in
-                                np.arange(.1, 1, .3)], new_axis_name='z')
+                                 np.arange(.1, 1, .3)], new_axis_name='z')
 
     @pytest.mark.mpl_image_compare(style='default')
     def test_0d_spectrum(self):
@@ -52,7 +54,7 @@ class TestThumbnailGenerator:
     @pytest.mark.mpl_image_compare(style='default')
     def test_2d_spectrum_image_nav_under_9(self):
         self.twod_s.metadata.General.title = 'Dummy 2D spectrum image'
-        fig = sig_to_thumbnail(self.twod_s.inav[:2,:2], f'output.png',)
+        fig = sig_to_thumbnail(self.twod_s.inav[:2, :2], f'output.png', )
         os.remove('output.png')
         return fig
 
@@ -144,6 +146,7 @@ class TestThumbnailGenerator:
     def test_annotation_error(self, monkeypatch):
         def monkey_get_annotation(a, b):
             raise ValueError("Mocked error for testing")
+
         monkeypatch.setattr(thumbnail_generator,
                             "_get_markers_dict", monkey_get_annotation)
         thumbnail_generator.add_annotation_markers(hs.load(files['643_SURVEY']))
@@ -172,7 +175,7 @@ class TestThumbnailGenerator:
 
     @pytest.mark.mpl_image_compare(style='default')
     def test_downsample_image_32_bit(self):
-        fig = down_sample_image(files['QUANTA_32BIT'],
+        fig = down_sample_image(files['QUANTA_32BIT'][0],
                                 'output.png', factor=2)
         os.remove('output.png')
         return fig
@@ -187,7 +190,8 @@ class TestThumbnailGenerator:
 
 class TestExtractorModule:
     def test_parse_metadata_642_titan(self):
-        meta, thumb_fname = parse_metadata(fname=files['PARSE_META_642_TITAN'])
+        meta, thumb_fname = parse_metadata(fname=files[
+            'PARSE_META_642_TITAN'][0])
         assert meta['nx_meta']['Acquisition Device'] == 'BM-UltraScan'
         assert meta['nx_meta']['Actual Magnification'] == 17677.0
         assert meta['nx_meta']['Cs(mm)'] == 1.2
@@ -200,7 +204,7 @@ class TestExtractorModule:
         os.remove(thumb_fname.replace('thumb.png', 'json'))
 
     def test_parse_metadata_list_signal(self):
-        meta, thumb_fname = parse_metadata(fname=files['LIST_SIGNAL'])
+        meta, thumb_fname = parse_metadata(fname=files['LIST_SIGNAL'][0])
         assert meta['nx_meta']['Acquisition Device'] == 'DigiScan'
         assert meta['nx_meta']['STEM Camera Length'] == 77.0
         assert meta['nx_meta']['Cs(mm)'] == 1.0
@@ -213,11 +217,11 @@ class TestExtractorModule:
         os.remove(thumb_fname.replace('thumb.png', 'json'))
 
     def test_parse_metadata_overwrite_false(self, caplog):
-        thumb_fname = files['LIST_SIGNAL'] + '.thumb.png'
+        thumb_fname = files['LIST_SIGNAL'][0] + '.thumb.png'
         # create the thumbnail file so we can't overwrite
         open(thumb_fname, 'a').close()
         nexusLIMS.extractors._logger.setLevel(logging.INFO)
-        meta, thumb_fname = parse_metadata(fname=files['LIST_SIGNAL'],
+        meta, thumb_fname = parse_metadata(fname=files['LIST_SIGNAL'][0],
                                            overwrite=False)
         assert 'Preview already exists' in caplog.text
         os.remove(thumb_fname)
@@ -226,20 +230,30 @@ class TestExtractorModule:
     def test_parse_metadata_quanta(self, monkeypatch):
         def mock_instr(_):
             return instruments.instrument_db['FEI-Quanta200-ESEM-633137']
+
         monkeypatch.setattr(nexusLIMS.extractors,
                             "_get_instr", mock_instr)
 
-        meta, thumb_fname = parse_metadata(fname=files['QUANTA_TIF'])
+        meta, thumb_fname = parse_metadata(fname=files['QUANTA_TIF'][0])
         os.remove(thumb_fname)
         os.remove(thumb_fname.replace('thumb.png', 'json'))
 
     def test_parse_metadata_tif_other_instr(self, monkeypatch):
         def mock_instr(_):
             return None
+
         monkeypatch.setattr(nexusLIMS.extractors,
                             "_get_instr", mock_instr)
 
-        meta, thumb_fname = parse_metadata(fname=files['QUANTA_TIF'])
+        meta, thumb_fname = parse_metadata(fname=files['QUANTA_TIF'][0])
+        os.remove(thumb_fname)
+        os.remove(thumb_fname.replace('thumb.png', 'json'))
+
+    def test_parse_metadata_ser(self, ):
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***1_***REMOVED***_14.59.36 Scanning Acquire_dataZeroed_1.ser")
+        meta, thumb_fname = parse_metadata(fname=TEST_FILE)
         os.remove(thumb_fname)
         os.remove(thumb_fname.replace('thumb.png', 'json'))
 
@@ -247,7 +261,7 @@ class TestExtractorModule:
         monkeypatch.setitem(nexusLIMS.extractors.extension_reader_map,
                             'tif', lambda x: {'nx_meta': {'key': 'val'}})
 
-        meta, thumb_fname = parse_metadata(fname=files['QUANTA_TIF'])
+        meta, thumb_fname = parse_metadata(fname=files['QUANTA_TIF'][0])
         assert meta['nx_meta']['DatasetType'] == 'Misc'
         assert meta['nx_meta']['Data Type'] == 'Miscellaneous'
         assert meta['nx_meta']['key'] == 'val'
@@ -279,11 +293,12 @@ class TestDigitalMicrographExtractor:
         # monkeypatch so DM extractor thinks this file came from FEI Titan TEM
         def mock_instr(_):
             return instruments.instrument_db['FEI-Titan-TEM-635816']
+
         monkeypatch.setattr(digital_micrograph,
                             "_get_instr", mock_instr)
 
         metadata = digital_micrograph.get_dm3_metadata(
-            files['LIST_SIGNAL'])
+            files['LIST_SIGNAL'][0])
 
         assert metadata['nx_meta']['Data Type'] == 'STEM_Imaging'
         assert metadata['nx_meta']['Imaging Mode'] == 'DIFFRACTION'
@@ -294,23 +309,24 @@ class TestDigitalMicrographExtractor:
         # monkeypatch so DM extractor thinks this file came from FEI Titan TEM
         def mock_instr(_):
             return instruments.instrument_db['FEI-Titan-TEM-635816']
+
         monkeypatch.setattr(digital_micrograph,
                             "_get_instr", mock_instr)
 
-        meta = digital_micrograph.get_dm3_metadata(files['642_STEM_DIFF'])
+        meta = digital_micrograph.get_dm3_metadata(files['642_STEM_DIFF'][0])
         assert meta['nx_meta']['Data Type'] == 'STEM_Diffraction'
         assert meta['nx_meta']['Imaging Mode'] == 'DIFFRACTION'
         assert meta['nx_meta']['Microscope'] == 'MSED Titan'
         assert meta['nx_meta']['Voltage'] == 300000.0
 
         meta = digital_micrograph.get_dm3_metadata(files[
-                                                       '642_OPMODE_DIFF'])
+                                                       '642_OPMODE_DIFF'][0])
         assert meta['nx_meta']['Data Type'] == 'TEM_Diffraction'
         assert meta['nx_meta']['Imaging Mode'] == 'DIFFRACTION'
         assert meta['nx_meta']['Microscope'] == 'MSED Titan'
         assert meta['nx_meta']['Voltage'] == 300000.0
 
-        meta = digital_micrograph.get_dm3_metadata(files['642_EELS_PROC_1'])
+        meta = digital_micrograph.get_dm3_metadata(files['642_EELS_PROC_1'][0])
         assert meta['nx_meta']['Data Type'] == 'STEM_EELS'
         assert meta['nx_meta']['Imaging Mode'] == 'DIFFRACTION'
         assert meta['nx_meta']['Microscope'] == 'MSED Titan'
@@ -319,7 +335,8 @@ class TestDigitalMicrographExtractor:
             'Aligned parent SI By Peak, Extracted from SI'
         assert meta['nx_meta']['EELS']['Spectrometer Aperture label'] == '2mm'
 
-        meta = digital_micrograph.get_dm3_metadata(files['642_EELS_SI_DRIFT'])
+        meta = digital_micrograph.get_dm3_metadata(
+            files['642_EELS_SI_DRIFT'][0])
         assert meta['nx_meta']['Data Type'] == 'EELS_Spectrum_Imaging'
         assert meta['nx_meta']['Imaging Mode'] == 'DIFFRACTION'
         assert meta['nx_meta']['Microscope'] == 'MSED Titan'
@@ -330,7 +347,7 @@ class TestDigitalMicrographExtractor:
             'Spatial drift correction every 100 seconds'
         assert meta['nx_meta']['Spectrum Imaging']['Pixel time (s)'] == 0.05
 
-        meta = digital_micrograph.get_dm3_metadata(files['642_TECNAI_MAG'])
+        meta = digital_micrograph.get_dm3_metadata(files['642_TECNAI_MAG'][0])
         assert meta['nx_meta']['Data Type'] == 'TEM_Imaging'
         assert meta['nx_meta']['Imaging Mode'] == 'IMAGING'
         assert meta['nx_meta']['Microscope'] == 'MSED Titan'
@@ -345,7 +362,7 @@ class TestDigitalMicrographExtractor:
 
         monkeypatch.setattr(digital_micrograph,
                             "_get_instr", mock_instr)
-        meta = digital_micrograph.get_dm3_metadata(files['643_EFTEM_DIFF'])
+        meta = digital_micrograph.get_dm3_metadata(files['643_EFTEM_DIFF'][0])
         assert meta['nx_meta']['Data Type'] == 'TEM_EFTEM_Diffraction'
         assert meta['nx_meta']['DatasetType'] == 'Diffraction'
         assert meta['nx_meta']['Imaging Mode'] == 'EFTEM DIFFRACTION'
@@ -353,7 +370,7 @@ class TestDigitalMicrographExtractor:
         assert meta['nx_meta']['STEM Camera Length'] == 5.0
         assert meta['nx_meta']['EELS']['Spectrometer Aperture label'] == '5 mm'
 
-        meta = digital_micrograph.get_dm3_metadata(files['643_EELS_SI'])
+        meta = digital_micrograph.get_dm3_metadata(files['643_EELS_SI'][0])
         assert meta['nx_meta']['Data Type'] == 'EELS_Spectrum_Imaging'
         assert meta['nx_meta']['DatasetType'] == 'SpectrumImage'
         assert meta['nx_meta']['Imaging Mode'] == 'DIFFRACTION'
@@ -367,7 +384,7 @@ class TestDigitalMicrographExtractor:
             == 605
 
         meta = digital_micrograph.get_dm3_metadata(
-            files['643_EELS_PROC_INT_BG'])
+            files['643_EELS_PROC_INT_BG'][0])
         assert meta['nx_meta']['Data Type'] == 'STEM_EELS'
         assert meta['nx_meta']['DatasetType'] == 'Spectrum'
         assert meta['nx_meta']['Analytic Signal'] == 'EELS'
@@ -378,7 +395,8 @@ class TestDigitalMicrographExtractor:
         assert meta['nx_meta']['EELS']['Processing Steps'] == \
             'Background Removal, Signal Integration'
 
-        meta = digital_micrograph.get_dm3_metadata(files['643_EELS_PROC_THICK'])
+        meta = digital_micrograph.get_dm3_metadata(
+            files['643_EELS_PROC_THICK'][0])
         assert meta['nx_meta']['Data Type'] == 'STEM_EELS'
         assert meta['nx_meta']['DatasetType'] == 'Spectrum'
         assert meta['nx_meta']['Analytic Signal'] == 'EELS'
@@ -391,7 +409,7 @@ class TestDigitalMicrographExtractor:
         assert meta['nx_meta']['EELS']['Thickness (absolute) [nm]'] == \
             pytest.approx(85.29884338378906, 0.1)
 
-        meta = digital_micrograph.get_dm3_metadata(files['643_EDS_SI'])
+        meta = digital_micrograph.get_dm3_metadata(files['643_EDS_SI'][0])
         assert meta['nx_meta']['Data Type'] == 'EDS_Spectrum_Imaging'
         assert meta['nx_meta']['DatasetType'] == 'SpectrumImage'
         assert meta['nx_meta']['Analytic Signal'] == 'X-ray'
@@ -404,9 +422,10 @@ class TestDigitalMicrographExtractor:
         assert meta['nx_meta']['Spectrum Imaging']['Pixel time (s)'] == 1.0
         assert meta['nx_meta']['Spectrum Imaging']['Scan Mode'] == 'LineScan'
         assert meta['nx_meta']['Spectrum Imaging'][
-            'Spatial Sampling (Horizontal)'] == 100
+                   'Spatial Sampling (Horizontal)'] == 100
 
-        meta = digital_micrograph.get_dm3_metadata(files['643_EELS_SI_DRIFT'])
+        meta = digital_micrograph.get_dm3_metadata(
+            files['643_EELS_SI_DRIFT'][0])
         assert meta['nx_meta']['Data Type'] == 'EELS_Spectrum_Imaging'
         assert meta['nx_meta']['DatasetType'] == 'SpectrumImage'
         assert meta['nx_meta']['Analytic Signal'] == 'EELS'
@@ -416,13 +435,13 @@ class TestDigitalMicrographExtractor:
         assert meta['nx_meta']['STEM Camera Length'] == 100.0
         assert meta['nx_meta']['EELS']['Exposure (s)'] == 0.5
         assert meta['nx_meta']['EELS']['Number of frames'] == 1
-        assert meta['nx_meta']['Spectrum Imaging']['Acquisition Duration (s)']\
+        assert meta['nx_meta']['Spectrum Imaging']['Acquisition Duration (s)'] \
             == 2173
         assert meta['nx_meta']['Spectrum Imaging']['Artefact Correction'] == \
             'Spatial drift correction every 1 row'
         assert meta['nx_meta']['Spectrum Imaging']['Scan Mode'] == '2D Array'
 
-        meta = digital_micrograph.get_dm3_metadata(files['643_STEM_STACK'])
+        meta = digital_micrograph.get_dm3_metadata(files['643_STEM_STACK'][0])
         assert meta['nx_meta']['Data Type'] == 'STEM_Imaging'
         assert meta['nx_meta']['DatasetType'] == 'Image'
         assert meta['nx_meta']['Acquisition Device'] == 'DigiScan'
@@ -439,7 +458,7 @@ class TestDigitalMicrographExtractor:
         monkeypatch.setattr(digital_micrograph,
                             "_get_instr", mock_instr)
 
-        meta = digital_micrograph.get_dm3_metadata(files['JEOL3010_DIFF'])
+        meta = digital_micrograph.get_dm3_metadata(files['JEOL3010_DIFF'][0])
         assert meta['nx_meta']['Data Type'] == 'TEM_Diffraction'
         assert meta['nx_meta']['DatasetType'] == 'Diffraction'
         assert meta['nx_meta']['Acquisition Device'] == 'Orius '
@@ -490,7 +509,7 @@ class TestDigitalMicrographExtractor:
 
 
 class TestQuantaExtractor:
-    QUANTA_TEST_FILE = files['QUANTA_TIF']
+    QUANTA_TEST_FILE = files['QUANTA_TIF'][0]
     QUANTA_BAD_MDATA = os.path.join(os.path.dirname(__file__),
                                     "files", "quanta_bad_metadata.tif")
     QUANTA_MODDED_MDATA = os.path.join(os.path.dirname(__file__),
@@ -549,3 +568,554 @@ class TestQuantaExtractor:
         assert metadata['nx_meta']['Tilt Correction Angle'] == 0.0121551
         assert metadata['nx_meta']['Specimen Temperature (K)'] == 'j'
         assert len(metadata['nx_meta']['Chamber Pressure (mPa)']) == 7000
+
+
+class TestSerEmiExtractor:
+    def test_642_stem_image_1(self):
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***1_***REMOVED***_14.59.36 Scanning Acquire_dataZeroed_1.ser")
+        meta = fei_emi.get_ser_metadata(TEST_FILE)
+        assert meta['nx_meta']['DatasetType'] == 'Image'
+        assert meta['nx_meta']['Data Type'] == 'STEM_Imaging'
+        assert meta['nx_meta']['Data Dimensions'] == '(1024, 1024)'
+        assert meta['nx_meta']['Creation Time'] == \
+            dt(year=2018, month=11, day=13, hour=15, minute=00,
+               second=31).isoformat()
+        assert meta['nx_meta']['Magnification (x)'] == 28500
+        assert meta['nx_meta']['Mode'] == 'STEM nP SA Zoom Diffraction'
+        assert meta['nx_meta']['Stage Position'] == {
+            'A (°)': -0.84,
+            'B (°)': 0.0,
+            'X (μm)': -195.777,
+            'Y (μm)': -132.325,
+            'Z (μm)': 128.364}
+        assert meta['nx_meta']['User'] == 'MBK1'
+        assert meta['nx_meta']['C2 Lens (%)'] == 22.133
+
+    def test_642_stem_image_2(self):
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***1_***REMOVED***_14.59.36 Scanning Acquire_dataZeroed_2.ser")
+        meta = fei_emi.get_ser_metadata(TEST_FILE)
+        assert meta['nx_meta']['Defocus (μm)'] == 0
+        assert meta['nx_meta']['Data Dimensions'] == '(1024, 1024)'
+        assert meta['nx_meta']['Gun Lens'] == 6
+        assert meta['nx_meta']['Gun Type'] == 'FEG'
+        assert meta['nx_meta']['C2 Aperture (μm)'] == 50.0
+        assert meta['nx_meta']['DatasetType'] == 'Image'
+        assert meta['nx_meta']['Data Type'] == 'STEM_Imaging'
+        assert meta['nx_meta']['Creation Time'] == \
+            dt(year=2018, month=11, day=13, hour=15, minute=00,
+               second=31).isoformat()
+
+    def test_642_single_stem_image(self):
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***2_***REMOVED***_HAADF_dataZeroed_1.ser")
+        meta = fei_emi.get_ser_metadata(TEST_FILE)
+        assert meta['nx_meta']['DatasetType'] == 'Image'
+        assert meta['nx_meta']['Data Type'] == 'STEM_Imaging'
+        assert meta['nx_meta']['Data Dimensions'] == '(1024, 1024)'
+        assert meta['nx_meta']['Creation Time'] == \
+            dt(year=2019, month=6, day=28, hour=15, minute=53,
+               second=31).isoformat()
+        assert meta['nx_meta']['C1 Aperture (μm)'] == 2000
+        assert meta['nx_meta']['Mode'] == 'STEM nP SA Zoom Image'
+        assert meta['nx_meta']['Stage Position'] == {
+            'A (°)': 0.0,
+            'B (°)': 0.0,
+            'X (μm)': -31.415,
+            'Y (μm)': 42.773,
+            'Z (μm)': -10.576}
+        assert meta['nx_meta']['SA Aperture'] == 'retracted'
+        assert meta['ObjectInfo']['Uuid'] == \
+            'cb7d82b8-5405-42fc-aa71-7680721a6e32'
+
+    def test_642_eds_spectrum_image(self):
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***3_***REMOVED***_13.50.23 Spectrum image_dataZeroed_1.ser")
+        meta = fei_emi.get_ser_metadata(TEST_FILE)
+        assert meta['nx_meta']['DatasetType'] == 'SpectrumImage'
+        assert meta['nx_meta']['Data Type'] == 'STEM_EDS_Spectrum_Imaging'
+        assert meta['nx_meta']['Data Dimensions'] == '(9, 10, 3993)'
+        assert meta['nx_meta']['Creation Time'] == \
+            dt(year=2019, month=7, day=17, hour=13, minute=50,
+               second=22).isoformat()
+        assert meta['nx_meta']['Microscope Accelerating Voltage (V)'] == 300000
+        assert meta['nx_meta']['Camera Length (m)'] == 0.195
+        assert meta['nx_meta']['Stage Position'] == {
+            'A (°)': 9.57,
+            'B (°)': 0.0,
+            'X (μm)': -505.273,
+            'Y (μm)': -317.978,
+            'Z (μm)': 15.525}
+        assert meta['nx_meta']['Spot Size'] == 6
+        assert meta['nx_meta']['Magnification (x)'] == 14000.0
+
+    def test_642_eds_line_scan_1(self):
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***4_***REMOVED***_15.42.57 Spectrum profile_dataZeroed_1.ser")
+        meta = fei_emi.get_ser_metadata(TEST_FILE)
+        assert meta['nx_meta']['DatasetType'] == 'SpectrumImage'
+        assert meta['nx_meta']['Data Type'] == 'STEM_EDS_Spectrum_Imaging'
+        assert meta['nx_meta']['Data Dimensions'] == '(100, 3993)'
+        assert meta['nx_meta']['Creation Time'] == \
+            dt(year=2019, month=11, day=1, hour=15, minute=42,
+               second=16).isoformat()
+        assert meta['nx_meta']['Dwell Time Path (s)'] == 6e-6
+        assert meta['nx_meta']['Defocus (μm)'] == -1.12
+        assert meta['nx_meta']['Stage Position'] == {
+            'A (°)': 7.32,
+            'B (°)': -3.57,
+            'X (μm)': 20.528,
+            'Y (μm)': 243.295,
+            'Z (μm)': 45.491}
+        assert meta['nx_meta']['STEM Rotation Correction (°)'] == -12.3
+        assert meta['nx_meta']['Frame Time (s)'] == 1.88744
+
+    def test_642_eds_line_scan_2(self):
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***4_***REMOVED***_15.43.21 Spectrum positions_dataZeroed_1.ser")
+        meta = fei_emi.get_ser_metadata(TEST_FILE)
+        assert meta['nx_meta']['DatasetType'] == 'SpectrumImage'
+        assert meta['nx_meta']['Data Type'] == 'STEM_EDS_Spectrum_Imaging'
+        assert meta['nx_meta']['Data Dimensions'] == '(6, 3993)'
+        assert meta['nx_meta']['Creation Time'] == \
+            dt(year=2019, month=7, day=17, hour=15, minute=43,
+               second=21).isoformat()
+        assert meta['nx_meta']['Diffraction Lens (%)'] == 34.922
+        assert meta['nx_meta']['Defocus (μm)'] == -0.145
+        assert meta['nx_meta']['Stage Position'] == {
+            'A (°)': 9.57,
+            'B (°)': 0,
+            'X (μm)': -565.778,
+            'Y (μm)': -321.364,
+            'Z (μm)': 17.126}
+        assert meta['nx_meta']['Manufacturer'] == 'FEI (ISAS)'
+        assert meta['nx_meta']['Microscope'] == 'Microscope Titan 300 ' \
+                                                'kV D3188 SuperTwin'
+
+    def test_642_eds_spectrum(self):
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***5_***REMOVED***_16.02.37 EDX Acquire_dataZeroed_1.ser")
+        meta = fei_emi.get_ser_metadata(TEST_FILE)
+        assert meta['nx_meta']['DatasetType'] == 'Spectrum'
+        assert meta['nx_meta']['Data Type'] == 'TEM_EDS_Spectrum'
+        assert meta['nx_meta']['Data Dimensions'] == '(3993,)'
+        assert meta['nx_meta']['Creation Time'] == \
+            dt(year=2019, month=12, day=11, hour=16, minute=2,
+               second=38).isoformat()
+        assert meta['nx_meta']['Energy Resolution (eV)'] == 10
+        assert meta['nx_meta']['Integration Time (s)'] == 25
+        assert meta['nx_meta']['Stage Position'] == {
+            'A (°)': 0,
+            'B (°)': 0.11,
+            'X (μm)': -259.807,
+            'Y (μm)': 18.101,
+            'Z (μm)': 7.06}
+        assert meta['nx_meta']['Manufacturer'] == 'EDAX'
+        assert meta['nx_meta']['Emission (μA)'] == 145.0
+
+    def test_642_diffraction(self):
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***6_igor_saed2_1a(-28p57_-1p4)_dl300_dataZeroed_1.ser")
+        meta = fei_emi.get_ser_metadata(TEST_FILE)
+        assert meta['nx_meta']['DatasetType'] == 'Diffraction'
+        assert meta['nx_meta']['Data Type'] == 'TEM_Diffraction'
+        assert meta['nx_meta']['Data Dimensions'] == '(2048, 2048)'
+        assert meta['nx_meta']['Creation Time'] == \
+            dt(year=2018, month=10, day=30, hour=17, minute=1,
+               second=3).isoformat()
+        assert meta['nx_meta']['Camera Name Path'] == 'BM-UltraScan'
+        assert meta['nx_meta']['Camera Length (m)'] == 0.3
+        assert meta['nx_meta']['Stage Position'] == {
+            'A (°)': -28.59,
+            'B (°)': 0.0,
+            'X (μm)': -91.527,
+            'Y (μm)': -100.11,
+            'Z (μm)': 210.133}
+        assert meta['nx_meta']['Manufacturer'] == 'FEI'
+        assert meta['nx_meta']['Extraction Voltage (V)'] == 4400
+
+    def test_642_image_stack_1(self):
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***7_igor_haadfseries1_dataZeroed_1.ser")
+        meta = fei_emi.get_ser_metadata(TEST_FILE)
+        assert meta['nx_meta']['DatasetType'] == 'Image'
+        assert meta['nx_meta']['Data Type'] == 'STEM_Imaging'
+        assert meta['nx_meta']['Data Dimensions'] == '(20, 2048, 2048)'
+        assert meta['nx_meta']['Creation Time'] == \
+            dt(year=2019, month=3, day=28, hour=21, minute=14,
+               second=16).isoformat()
+        assert meta['nx_meta']['Dwell Time Path (s)'] == 0.000002
+        assert meta['nx_meta']['C2 Aperture (μm)'] == 50.0
+        assert meta['nx_meta']['Stage Position'] == {
+            'A (°)': 2.9,
+            'B (°)': 0.0,
+            'X (μm)': -207.808,
+            'Y (μm)': 111.327,
+            'Z (μm)': 74.297}
+        assert meta['nx_meta']['Gun Type'] == 'FEG'
+        assert meta['nx_meta']['Diffraction Lens (%)'] == 38.91
+
+    def test_642_image_stack_2(self):
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***7_igor_haadfseries3_dataZeroed_1.ser")
+        meta = fei_emi.get_ser_metadata(TEST_FILE)
+        assert meta['nx_meta']['DatasetType'] == 'Image'
+        assert meta['nx_meta']['Data Type'] == 'STEM_Imaging'
+        assert meta['nx_meta']['Data Dimensions'] == '(20, 2048, 2048)'
+        assert meta['nx_meta']['Creation Time'] == \
+            dt(year=2019, month=3, day=28, hour=22, minute=41,
+               second=0).isoformat()
+        assert meta['nx_meta']['Frame Time (s)'] == 10
+        assert meta['nx_meta']['C1 Aperture (μm)'] == 2000
+        assert meta['nx_meta']['Stage Position'] == {
+            'A (°)': 4.53,
+            'B (°)': 0.0,
+            'X (μm)': -207.438,
+            'Y (μm)': 109.996,
+            'Z (μm)': 76.932}
+        assert meta['nx_meta']['Gun Lens'] == 5
+        assert meta['nx_meta']['Tecnai Filter']['Mode'] is None
+
+    def test_642_diffraction_stack(self):
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***7_v***REMOVED***_2***REMOVED*** "
+            "D245mm SAED 7b0 fx27k TEM6g 4s_dataZeroed_1.ser")
+        meta = fei_emi.get_ser_metadata(TEST_FILE)
+        assert meta['nx_meta']['DatasetType'] == 'Diffraction'
+        assert meta['nx_meta']['Data Type'] == 'TEM_Diffraction'
+        assert meta['nx_meta']['Data Dimensions'] == '(33, 1024, 1024)'
+        assert meta['nx_meta']['Creation Time'] == \
+            dt(year=2018, month=12, day=13, hour=13, minute=33,
+               second=47).isoformat()
+        assert meta['nx_meta']['C2 Lens (%)'] == 43.465
+        assert meta['nx_meta']['C2 Aperture (μm)'] == 100
+        assert meta['nx_meta']['Stage Position'] == {
+            'A (°)': 1.86,
+            'B (°)': 0.0,
+            'X (μm)': -179.33,
+            'Y (μm)': -31.279,
+            'Z (μm)': -158.512}
+        assert meta['nx_meta']['OBJ Aperture'] == 'retracted'
+        assert meta['nx_meta']['Mode'] == 'TEM uP SA Zoom Diffraction'
+
+    def test_642_emi_list_image_spectrum_1(self):
+        TEST_FILE_1 = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***8_igor_eds1_dataZeroed_1.ser")
+        TEST_FILE_2 = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***8_igor_eds1_dataZeroed_2.ser")
+        meta_1 = fei_emi.get_ser_metadata(TEST_FILE_1)
+        meta_2 = fei_emi.get_ser_metadata(TEST_FILE_2)
+
+        assert meta_1['nx_meta']['DatasetType'] == 'Image'
+        assert meta_1['nx_meta']['Data Type'] == 'STEM_Imaging'
+        assert meta_1['nx_meta']['Data Dimensions'] == '(2048, 2048)'
+        assert meta_1['nx_meta']['High Tension (kV)'] == 300
+        assert meta_1['nx_meta']['Gun Lens'] == 6
+        assert meta_1['nx_meta']['Stage Position'] == {
+            'A (°)': 9.21,
+            'B (°)': 0.0,
+            'X (μm)': -202.298,
+            'Y (μm)': -229.609,
+            'Z (μm)': 92.45}
+
+        assert meta_2['nx_meta']['DatasetType'] == 'Spectrum'
+        assert meta_2['nx_meta']['Data Type'] == 'STEM_EDS_Spectrum'
+        assert meta_2['nx_meta']['Data Dimensions'] == '(3993,)'
+        assert meta_2['nx_meta']['Beam Position (μm)'] == '(-0.99656, 0.74289)'
+        assert meta_2['nx_meta']['Diffraction Lens (%)'] == 37.347
+        assert meta_2['nx_meta']['Objective Lens (%)'] == 87.987
+        assert meta_2['nx_meta']['Stage Position'] == {
+            'A (°)': 9.21,
+            'B (°)': 0.0,
+            'X (μm)': -202.296,
+            'Y (μm)': -229.616,
+            'Z (μm)': 92.45}
+
+    def test_642_emi_list_image_spectrum_2(self):
+        TEST_FILE_1 = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***8_igor_eds2a_dataZeroed_1.ser")
+        TEST_FILE_2 = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***8_igor_eds2a_dataZeroed_2.ser")
+        TEST_FILE_3 = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***8_igor_eds2a_dataZeroed_3.ser")
+        TEST_FILE_4 = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***8_igor_eds2a_dataZeroed_4.ser")
+        TEST_FILE_5 = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***8_igor_eds2a_dataZeroed_5.ser")
+        meta_1 = fei_emi.get_ser_metadata(TEST_FILE_1)
+        meta_2 = fei_emi.get_ser_metadata(TEST_FILE_2)
+        meta_3 = fei_emi.get_ser_metadata(TEST_FILE_3)
+        meta_4 = fei_emi.get_ser_metadata(TEST_FILE_4)
+        meta_5 = fei_emi.get_ser_metadata(TEST_FILE_5)
+
+        assert meta_1['nx_meta']['DatasetType'] == 'Image'
+        assert meta_1['nx_meta']['Data Type'] == 'STEM_Imaging'
+        assert meta_1['nx_meta']['Data Dimensions'] == '(512, 512)'
+        assert meta_1['nx_meta']['Creation Time'] == \
+            dt(year=2019, month=6, day=13, hour=19, minute=52,
+               second=6).isoformat()
+        assert meta_1['nx_meta']['Diffraction Lens (%)'] == 37.347
+        assert meta_1['nx_meta']['Spot Size'] == 7
+        assert meta_1['nx_meta']['Manufacturer'] == 'FEI (ISAS)'
+        assert meta_1['nx_meta']['Stage Position'] == {
+            'A (°)': 9.21,
+            'B (°)': 0.0,
+            'X (μm)': -202.296,
+            'Y (μm)': -229.618,
+            'Z (μm)': 92.45}
+
+        # the remaining spectra don't have metadata, only a UUID
+        for m, u in \
+            zip([meta_2, meta_3, meta_4, meta_5],
+                ['5bb5972e-276a-40c3-87c5-eb9ef3f4cb12',
+                 '36c60afe-f7e4-4356-b351-f329347fb464',
+                 '76e6b908-f988-48cb-adab-2c64fd6de24e',
+                 '9eabdd9d-6cb7-41c3-b234-bb44670a14f6']):
+            assert m['nx_meta']['DatasetType'] == 'Spectrum'
+            assert m['nx_meta']['Data Type'] == 'STEM_EDS_Spectrum'
+            assert m['nx_meta']['Data Dimensions'] == '(3993,)'
+            assert m['ObjectInfo']['Uuid'] == u
+            assert 'Manufacturer' not in m['nx_meta']
+
+    def test_642_emi_list_haadf_diff_stack(self):
+        TEST_FILE_1 = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***9_v***REMOVED***_92118 ***REMOVED*** x10k TEM10d2 "
+            "large w  f saed10_dataZeroed_1.ser")
+        TEST_FILE_2 = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***9_v***REMOVED***_92118 ***REMOVED*** x10k TEM10d2 "
+            "large w  f saed10_dataZeroed_2.ser")
+        meta_1 = fei_emi.get_ser_metadata(TEST_FILE_1)
+        meta_2 = fei_emi.get_ser_metadata(TEST_FILE_2)
+
+        assert meta_1['nx_meta']['DatasetType'] == 'Diffraction'
+        assert meta_1['nx_meta']['Data Type'] == 'TEM_Diffraction'
+        assert meta_1['nx_meta']['Data Dimensions'] == '(77, 1024, 1024)'
+        assert meta_1['nx_meta']['Creation Time'] == \
+            dt(year=2018, month=9, day=21, hour=14, minute=17,
+               second=25).isoformat()
+        assert meta_1['nx_meta']['Binning'] == 2
+        assert meta_1['nx_meta']['Tecnai Filter']['Mode'] == 'Spectroscopy'
+        assert meta_1['nx_meta']['Tecnai Filter']['Selected Aperture'] == '3mm'
+        assert meta_1['nx_meta']['Image Shift X (μm)'] == 0.003
+        assert meta_1['nx_meta']['Mode'] == 'TEM uP SA Zoom Diffraction'
+        assert meta_1['nx_meta']['Stage Position'] == {
+            'A (°)': 0,
+            'B (°)': 0,
+            'X (μm)': -135.782,
+            'Y (μm)': 637.285,
+            'Z (μm)': 77.505}
+
+        assert meta_2['nx_meta']['DatasetType'] == 'Image'
+        assert meta_2['nx_meta']['Data Type'] == 'TEM_Imaging'
+        assert meta_2['nx_meta']['Data Dimensions'] == '(4, 1024, 1024)'
+        assert meta_2['nx_meta']['Creation Time'] == \
+            dt(year=2018, month=9, day=21, hour=14, minute=25,
+               second=11).isoformat()
+        assert meta_2['nx_meta']['Dwell Time Path (s)'] == 0.8
+        assert meta_2['nx_meta']['Emission (μA)'] == 135.0
+        assert meta_2['nx_meta']['Magnification (x)'] == 10000
+        assert meta_2['nx_meta']['Image Shift X (μm)'] == 0.003
+        assert meta_2['nx_meta']['Mode'] == 'TEM uP SA Zoom Image'
+        assert meta_2['nx_meta']['Stage Position'] == {
+            'A (°)': 0,
+            'B (°)': 0,
+            'X (μm)': -135.787,
+            'Y (μm)': 637.281,
+            'Z (μm)': 77.505}
+
+    def test_642_emi_list_four_images(self):
+        TEST_FILE_1 = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***10_v***REMOVED***_***REMOVED*** Si membUS100_C35Q33 "
+            "l2266CL130mmx160kSTEM lw15corner_dataZeroed_1.ser")
+        TEST_FILE_2 = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***10_v***REMOVED***_***REMOVED*** Si membUS100_C35Q33 "
+            "l2266CL130mmx160kSTEM lw15corner_dataZeroed_2.ser")
+        TEST_FILE_3 = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***10_v***REMOVED***_***REMOVED*** Si membUS100_C35Q33 "
+            "l2266CL130mmx160kSTEM lw15corner_dataZeroed_3.ser")
+        TEST_FILE_4 = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***10_v***REMOVED***_***REMOVED*** Si membUS100_C35Q33 "
+            "l2266CL130mmx160kSTEM lw15corner_dataZeroed_4.ser")
+
+        for m in [fei_emi.get_ser_metadata(f) for f in [TEST_FILE_1,
+                                                        TEST_FILE_2,
+                                                        TEST_FILE_3,
+                                                        TEST_FILE_4]]:
+            assert m['nx_meta']['DatasetType'] == 'Image'
+            assert m['nx_meta']['Data Type'] == 'STEM_Imaging'
+            assert m['nx_meta']['Data Dimensions'] == '(2048, 2048)'
+
+            assert m['nx_meta']['Creation Time'] == \
+                dt(year=2018, month=11, day=14, hour=17, minute=9,
+                   second=55).isoformat()
+            assert m['nx_meta']['Frame Time (s)'] == 30.199
+            assert m['nx_meta']['Tecnai Filter']['Selected Dispersion ('
+                                                 'eV/Channel)'] == 0.1
+            assert m['nx_meta']['Microscope'] == 'Microscope Titan 300 kV ' \
+                                                 'D3188 SuperTwin'
+            assert m['nx_meta']['Mode'] == 'STEM nP SA Zoom Diffraction'
+            assert m['nx_meta']['Spot Size'] == 8
+            assert m['nx_meta']['Gun Lens'] == 5
+            assert m['nx_meta']['Gun Type'] == 'FEG'
+            assert m['nx_meta']['Stage Position'] == {
+                'A (°)': 0,
+                'B (°)': 0,
+                'X (μm)': -116.939,
+                'Y (μm)': -65.107,
+                'Z (μm)': 79.938}
+
+    def test_643_stem_image(self):
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files",
+            "643Titan_1_a***REMOVED***_09.45.36 Scanning Acquire_dataZeroed_1.ser")
+        meta = fei_emi.get_ser_metadata(TEST_FILE)
+        assert meta['nx_meta']['DatasetType'] == 'Image'
+        assert meta['nx_meta']['Data Type'] == 'STEM_Imaging'
+        assert meta['nx_meta']['Data Dimensions'] == '(1024, 1024)'
+        assert meta['nx_meta']['Creation Time'] == \
+            dt(year=2011, month=11, day=16, hour=9, minute=46,
+               second=13).isoformat()
+        assert meta['nx_meta']['C2 Lens (%)'] == 8.967
+        assert meta['nx_meta']['C2 Aperture (μm)'] == 40
+        assert meta['nx_meta']['Stage Position'] == {
+            'A (°)': 0,
+            'B (°)': 0,
+            'X (μm)': 46.293,
+            'Y (μm)': -14.017,
+            'Z (μm)': -127.155}
+        assert meta['nx_meta']['STEM Rotation Correction (°)'] == 12.4
+        assert meta['nx_meta']['User'] == 'SUPERVISOR'
+        assert meta['nx_meta']['Microscope'] == 'Microscope Titan 300 kV ' \
+                                                'D3094 SuperTwin'
+
+    def test_643_eds_and_eels_spectrum_image(self):
+        TEST_FILE_EDS = os.path.join(
+            os.path.dirname(__file__), "files",
+            "643Titan_2_a***REMOVED***_16.10.32 Spectrum image_dataZeroed_1.ser")
+        TEST_FILE_EELS = os.path.join(
+            os.path.dirname(__file__), "files",
+            "643Titan_2_a***REMOVED***_16.10.32 Spectrum image_dataZeroed_2.ser")
+        meta_1 = fei_emi.get_ser_metadata(TEST_FILE_EDS)
+        meta_2 = fei_emi.get_ser_metadata(TEST_FILE_EELS)
+
+        assert meta_1['nx_meta']['DatasetType'] == 'SpectrumImage'
+        assert meta_1['nx_meta']['Data Type'] == 'STEM_EDS_Spectrum_Imaging'
+        assert meta_1['nx_meta']['Data Dimensions'] == '(40, 70, 4000)'
+        assert meta_1['nx_meta']['Creation Time'] == \
+            dt(year=2011, month=11, day=16, hour=16, minute=8,
+               second=54).isoformat()
+        assert meta_1['nx_meta']['Frame Time (s)'] == 10
+        assert meta_1['nx_meta']['Emission (μA)'] == 237.3
+        assert meta_1['nx_meta']['Tecnai Filter']['Selected '
+                                                  'Aperture'] == '2.5 mm'
+        assert meta_1['nx_meta']['Tecnai Filter']['Slit '
+                                                  'State'] == 'Retracted'
+
+        assert meta_2['nx_meta']['DatasetType'] == 'SpectrumImage'
+        assert meta_2['nx_meta']['Data Type'] == 'STEM_EELS_Spectrum_Imaging'
+        assert meta_2['nx_meta']['Data Dimensions'] == '(40, 70, 2048)'
+        assert meta_2['nx_meta']['Creation Time'] == \
+            dt(year=2011, month=11, day=16, hour=16, minute=32,
+               second=27).isoformat()
+        assert meta_2['nx_meta']['Energy Resolution (eV)'] == 10
+        assert meta_2['nx_meta']['Integration Time (s)'] == 0.5
+        assert meta_2['nx_meta']['Extraction Voltage (V)'] == 4500
+        assert meta_2['nx_meta']['Camera Length (m)'] == 0.06
+        assert meta_2['nx_meta']['C2 Lens (%)'] == 8.967
+        assert meta_2['nx_meta']['C3 Aperture (μm)'] == 1000
+
+    def test_643_image_stack(self):
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files",
+            "643Titan_3_a***REMOVED***_17.08.14 Scanning Acquire_Before Full 360 "
+            "Dataset_2_dataZeroed_1.ser")
+        meta = fei_emi.get_ser_metadata(TEST_FILE)
+        assert meta['nx_meta']['DatasetType'] == 'Image'
+        assert meta['nx_meta']['Data Type'] == 'STEM_Imaging'
+        assert meta['nx_meta']['Data Dimensions'] == '(5, 1024, 1024)'
+        assert meta['nx_meta']['Creation Time'] == \
+            dt(year=2012, month=1, day=31, hour=13, minute=43,
+               second=40).isoformat()
+        assert meta['nx_meta']['Frame Time (s)'] == 2.0
+        assert meta['nx_meta']['C1 Aperture (μm)'] == 2000
+        assert meta['nx_meta']['C2 Lens (%)'] == 14.99
+        assert meta['nx_meta']['Defocus (μm)'] == -2.593
+        assert meta['nx_meta']['Microscope'] == 'Microscope Titan 300 kV ' \
+                                                'D3094 SuperTwin'
+        assert meta['nx_meta']['Mode'] == 'STEM nP SA Zoom Diffraction'
+        assert meta['nx_meta']['Magnification (x)'] == 80000
+
+    def test_643_image_stack_2_newer(self):
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files",
+            "643Titan_4_a***REMOVED***_005_STEM_80kXemi_dataZeroed_1.ser")
+        meta = fei_emi.get_ser_metadata(TEST_FILE)
+        assert meta['nx_meta']['DatasetType'] == 'Image'
+        assert meta['nx_meta']['Data Type'] == 'STEM_Imaging'
+        assert meta['nx_meta']['Data Dimensions'] == '(2, 512, 512)'
+        assert meta['nx_meta']['Creation Time'] == \
+            dt(year=2020, month=3, day=11, hour=16, minute=33,
+               second=38).isoformat()
+        assert meta['nx_meta']['Frame Time (s)'] == 6.34179
+        assert meta['nx_meta']['Dwell Time Path (s)'] == 0.000001
+        assert meta['nx_meta']['C2 Aperture (μm)'] == 10
+        assert meta['nx_meta']['C3 Lens (%)'] == -37.122
+        assert meta['nx_meta']['Defocus (μm)'] == -0.889
+        assert meta['nx_meta']['Microscope'] == 'Microscope Titan 300 kV ' \
+                                                'D3094 SuperTwin'
+        assert meta['nx_meta']['Mode'] == 'STEM nP SA Zoom Diffraction'
+        assert meta['nx_meta']['Magnification (x)'] == 80000
+        assert meta['nx_meta']['STEM Rotation (°)'] == -90.0
+
+    def test_bad_emi(self, caplog):
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***11_bad_emi_dataZeroed_1.ser")
+        meta = fei_emi.get_ser_metadata(TEST_FILE)
+        assert 'ValueError' in caplog.text
+
+    def test_emi_io_error(self, monkeypatch, caplog):
+        def monkey_hs_load(a, lazy, only_valid_data):
+            # returning an int should trigger the IOError branch in
+            # fei_emi.get_ser_metadata
+            return 5
+
+        monkeypatch.setattr(fei_emi,
+                            "_hs_load", monkey_hs_load)
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***11_bad_emi_dataZeroed_1.ser")
+        meta = fei_emi.get_ser_metadata(TEST_FILE)
+        assert 'Did not understand format of .emi file' in caplog.text
+
+    def test_no_emi_error(self, caplog):
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***12_no_accompanying_emi_dataZeroed_1.ser")
+        meta = fei_emi.get_ser_metadata(TEST_FILE)
+        assert 'Could not find .emi file with expected name' in caplog.text

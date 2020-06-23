@@ -28,7 +28,9 @@
 
 import nexusLIMS.utils
 from nexusLIMS.utils import *
-from nexusLIMS.utils import find_dirs_by_mtime
+from nexusLIMS.utils import find_dirs_by_mtime, _zero_bytes
+from nexusLIMS.extractors import extension_reader_map as _ext
+from nexusLIMS.extractors import quanta_tif
 from datetime import datetime
 import os
 import sys
@@ -87,9 +89,11 @@ class TestUtils:
         files = gnu_find_files_by_mtime(
             os.path.join(os.environ["mmfnexus_path"], "Titan"),
             dt_from=datetime.fromisoformat("2018-11-13T13:00:00.000"),
-            dt_to=datetime.fromisoformat("2018-11-13T16:00:00.000"))
+            dt_to=datetime.fromisoformat("2018-11-13T16:00:00.000"),
+            extensions=_ext.keys()
+        )
 
-        assert len(files) == 42
+        assert len(files) == 37
 
     def test_gnu_and_pure_find_together(self):
         # both file-finding methods should return the same list (when sorted
@@ -97,7 +101,8 @@ class TestUtils:
         path = os.path.join(os.environ["mmfnexus_path"], "JEOL3010")
         dt_from = datetime.fromisoformat("2019-07-24T11:00:00.000")
         dt_to = datetime.fromisoformat("2019-07-24T16:00:00.000")
-        gnu_files = gnu_find_files_by_mtime(path, dt_from=dt_from, dt_to=dt_to)
+        gnu_files = gnu_find_files_by_mtime(path, dt_from=dt_from,
+                                            dt_to=dt_to, extensions=_ext.keys())
         find_files = find_files_by_mtime(path, dt_from=dt_from, dt_to=dt_to)
 
         gnu_files = sorted(gnu_files)
@@ -114,7 +119,8 @@ class TestUtils:
             files = gnu_find_files_by_mtime(
                 os.path.join(os.environ["mmfnexus_path"], "643Titan"),
                 dt_from=datetime.fromisoformat("2019-11-06T15:00:00.000"),
-                dt_to=datetime.fromisoformat("2019-11-06T18:00:00.000"))
+                dt_to=datetime.fromisoformat("2019-11-06T18:00:00.000"),
+                extensions=_ext.keys())
 
     def test_gnu_find_not_on_path(self, monkeypatch):
         monkeypatch.setenv('PATH', '.')
@@ -123,7 +129,8 @@ class TestUtils:
             files = gnu_find_files_by_mtime(
                 os.path.join(os.environ["mmfnexus_path"], "643Titan"),
                 dt_from=datetime.fromisoformat("2019-11-06T15:00:00.000"),
-                dt_to=datetime.fromisoformat("2019-11-06T18:00:00.000"))
+                dt_to=datetime.fromisoformat("2019-11-06T18:00:00.000"),
+                extensions=_ext.keys())
         assert str(e.value) == 'find command was not found on the system PATH'
 
     def test_gnu_find_stderr(self):
@@ -132,5 +139,49 @@ class TestUtils:
             files = gnu_find_files_by_mtime(
                 '...............',
                 dt_from=datetime.fromisoformat("2019-11-06T15:00:00.000"),
-                dt_to=datetime.fromisoformat("2019-11-06T18:00:00.000"))
+                dt_to=datetime.fromisoformat("2019-11-06T18:00:00.000"),
+                extensions=_ext.keys())
         assert '...............' in str(e.value)
+
+    def test_zero_bytes(self):
+        import gzip
+        import shutil
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files", "quad1image_001.tif")
+
+        new_fname = _zero_bytes(TEST_FILE, 0, 973385)
+
+        # try compressing old and new to ensure size is improved
+        new_gz = new_fname + '.gz'
+        old_gz = TEST_FILE + '.gz'
+        with open(TEST_FILE, 'rb') as f_in:
+            with gzip.open(old_gz, 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
+        with open(new_fname, 'rb') as f_in:
+            with gzip.open(new_gz, 'wb') as f_out:
+                shutil.copyfileobj(f_in, f_out)
+        new_gz_size = os.stat(new_gz).st_size
+        old_gz_size = os.stat(old_gz).st_size
+        assert new_gz_size < old_gz_size
+
+        # check to ensure metadata remains the same
+        mdata_new = quanta_tif.get_quanta_metadata(new_fname)
+        mdata_old = quanta_tif.get_quanta_metadata(TEST_FILE)
+        del mdata_old['nx_meta']['Creation Time']
+        del mdata_new['nx_meta']['Creation Time']
+        assert mdata_new == mdata_old
+
+        os.remove(new_gz)
+        os.remove(new_fname)
+        os.remove(old_gz)
+
+    def test_zero_bytes_ser_processing(self):
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***12_no_accompanying_emi_dataZeroed_1.ser")
+        # zero a selection of bytes (doesn't matter which ones)
+        new_fname = _zero_bytes(TEST_FILE, 0, 973385)
+        assert new_fname == os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***12_no_accompanying_emi_dataZeroed_dataZeroed_1.ser")
+        os.remove(new_fname)

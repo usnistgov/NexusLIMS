@@ -1,12 +1,28 @@
 """
 This module contains the code used to harvest metadata from various file types
 generated from instruments in the Electron Microscopy Nexus facility.
+
+Extractors should return a dictionary containing the values to be displayed
+in NexusLIMS as a sub-dictionary under the key ``nx_meta``. The remaining keys
+will be for the metadata as extracted. Under ``nx_meta``, a few keys are
+expected (although not enforced):
+
+* ``'Creation Time'`` - ISO format date and time as a string
+* ``'Data Type'`` - a human-readable description of the data type separated by
+  underscores - e.g "STEM_Imaging", "TEM_EDS", etc.
+* ``'DatasetType'`` - determines the value of the Type attribute for the dataset
+  (defined in the schema)
+* ``'Data Dimensions'`` - dimensions of the dataset, surrounded by parentheses,
+  separated by commas as a string- e.g. '(12, 1024, 1024)'
+* ``'Instrument ID'`` - instrument PID pulled from the instrument database
 """
 import os as _os
 import json as _json
 import pathlib as _pathlib
+import numpy as _np
 from .quanta_tif import get_quanta_metadata
 from .digital_micrograph import get_dm3_metadata
+from .fei_emi import get_ser_metadata
 from .thumbnail_generator import sig_to_thumbnail as _s2thumb
 from .thumbnail_generator import down_sample_image as _down_sample
 from nexusLIMS.instruments import get_instr_from_filepath as _get_instr
@@ -19,7 +35,8 @@ _logger = _logging.getLogger(__name__)
 extension_reader_map = {
     'dm3': get_dm3_metadata,
     'dm4': get_dm3_metadata,
-    'tif': get_quanta_metadata
+    'tif': get_quanta_metadata,
+    'ser': get_ser_metadata
 }
 
 
@@ -83,7 +100,8 @@ def parse_metadata(fname, write_output=True, generate_preview=True,
                         out_dict[k] = v
                 with open(out_fname, 'w') as f:
                     _logger.debug(f'Dumping metadata to {out_fname}')
-                    _json.dump(out_dict, f, sort_keys=False, indent=2)
+                    _json.dump(out_dict, f, sort_keys=False,
+                               indent=2, cls=_CustomEncoder)
 
         if generate_preview:
             preview_fname = fname.replace(_os.environ["mmfnexus_path"], _os.environ["nexusLIMS_path"]) + '.thumb.png'
@@ -103,7 +121,11 @@ def parse_metadata(fname, write_output=True, generate_preview=True,
                                  factor=factor)
 
             else:
-                s = _hs.load(fname, lazy=True)
+                load_options = {'lazy': True}
+                if extension == 'ser':
+                    load_options['only_valid_data'] = True
+
+                s = _hs.load(fname, **load_options)
 
                 # If s is a list of signals, use just the first one for
                 # our purposes
@@ -114,6 +136,10 @@ def parse_metadata(fname, write_output=True, generate_preview=True,
                     s.metadata.General.title = \
                         s.metadata.General.title + \
                         f' (1 of {num_sigs} total signals in file "{fname}")'
+                elif s.metadata.General.title == '':
+                    s.metadata.General.title = \
+                        s.metadata.General.original_filename.replace(
+                            extension, '').strip('.')
 
                 # only generate the preview if it doesn't exist, or overwrite
                 # parameter is explicitly provided
@@ -166,3 +192,22 @@ def flatten_dict(d, parent_key='', separator=' '):
     flattened_dict = dict(items)
 
     return flattened_dict
+
+
+class _CustomEncoder(_json.JSONEncoder):
+    """
+    A custom JSON Encoder class that will allow certain types to be
+    serialized that are not able to be by default (taken from
+    https://stackoverflow.com/a/27050186)
+    """
+    def default(self, obj):
+        if isinstance(obj, _np.integer):
+            return int(obj)
+        elif isinstance(obj, _np.floating):
+            return float(obj)
+        elif isinstance(obj, _np.ndarray):
+            return obj.tolist()
+        elif isinstance(obj, _np.bytes_):
+            return obj.decode()
+        else:
+            return super(_CustomEncoder, self).default(obj)

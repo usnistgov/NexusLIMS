@@ -406,7 +406,7 @@ def find_files_by_mtime(path, dt_from, dt_to):
     return files
 
 
-def gnu_find_files_by_mtime(path, dt_from, dt_to):
+def gnu_find_files_by_mtime(path, dt_from, dt_to, extensions):
     """
     Given two timestamps, find files under a path that were
     last modified between the two. Uses the system-provided GNU ``find``
@@ -422,6 +422,8 @@ def gnu_find_files_by_mtime(path, dt_from, dt_to):
         The "starting" point of the search timeframe
     dt_to : datetime.datetime
         The "ending" point of the search timeframe
+    extensions : :obj:`list` of :obj:`str`
+        A list of strings representing the extensions to find
 
     Returns
     -------
@@ -466,8 +468,11 @@ def gnu_find_files_by_mtime(path, dt_from, dt_to):
 
     # Actually run find command (ignoring mib files if specified by
     # environment variable):
+    filetype_regex = '|'.join(extensions)
     cmd = f'find {_os.path.join(_os.environ["mmfnexus_path"], path)} ' + \
           f'-type f ' + \
+          f'-regextype posix-egrep ' + \
+          f'-regex ".*\\.({filetype_regex})$" ' + \
           f'-newermt "{dt_from.isoformat()}" ' + \
           f'\\! -newermt "{dt_to.isoformat()}" ' + \
           (f'\\! -name "*.mib" ' if 'ignore_mib' in _os.environ else '') + \
@@ -496,3 +501,71 @@ def gnu_find_files_by_mtime(path, dt_from, dt_to):
 def _sort_dict(item):
     return {k: _sort_dict(v) if isinstance(v, dict) else v
             for k, v in sorted(item.items())}
+
+
+def _remove_dtb_element(tree, path):
+    """
+    Helper method that uses exec to delete a specific leaf of a
+    DictionaryTreeBrowser using a string
+
+    Parameters
+    ----------
+    tree : :py:class:`~hyperspy.misc.utils.DictionaryTreeBrowser`
+        the ``DictionaryTreeBrowser`` object to remove the object from
+    path : str
+        period-delimited path to a DTB element
+
+    Returns
+    -------
+    tree : :py:class:`~hyperspy.misc.utils.DictionaryTreeBrowser`
+    """
+    to_del = 'tree.{}'.format(path)
+    try:
+
+        exec('del {}'.format(to_del))
+    except AttributeError as _:
+        # Log the failure and continue
+        _logger.debug('_remove_dtb_element: Could not find {}'.format(to_del))
+
+    return tree
+
+
+def _zero_bytes(fname, bytes_from, bytes_to):
+    """
+    A helper method to set certain byte locations within a file to zero,
+    which can help for creating highly-compressible test files
+
+    Parameters
+    ----------
+    fname : str
+    bytes_from : int or :obj:`list` of str
+        The position of the file (in decimal) at which to start zeroing
+    bytes_to : int or :obj:`list` of str
+        The position of the file (in decimal) at which to stop zeroing. If
+        list, must be the same length as list given in ``bytes_from``
+
+    Returns
+    -------
+    new_fname : str
+        The modified file that has it's bytes zeroed
+    """
+    from shutil import copyfile
+    filename, ext = _os.path.splitext(fname)
+    if fname.endswith('.ser'):
+        index = int(filename.split('_')[-1])
+        basename = '_'.join(filename.split('_')[:-1])
+        new_fname = f'{basename}_dataZeroed_{index}{ext}'
+    else:
+        new_fname = f'{filename}_dataZeroed{ext}'
+    copyfile(fname, new_fname)
+
+    if isinstance(bytes_from, int):
+        bytes_from = [bytes_from]
+        bytes_to = [bytes_to]
+
+    with open(new_fname, 'r+b') as f:
+        for bf, bt in zip(bytes_from, bytes_to):
+            f.seek(bf)
+            f.write(b'\0' * (bt - bf))
+
+    return new_fname

@@ -3,3 +3,8 @@ omit =
     mdcs/nexusLIMS/nexusLIMS/dev_scripts/*
     mdcs/nexusLIMS/nexusLIMS/db/migrate_db.py
     mdcs/nexusLIMS/nexusLIMS/tests/conftest.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    class _CustomEncoder

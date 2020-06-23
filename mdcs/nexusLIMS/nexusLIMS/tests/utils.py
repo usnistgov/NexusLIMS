@@ -26,6 +26,7 @@
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
 import os
+import tarfile
 
 tars = \
     {'CORRUPTED': 'test_corrupted.dm3.tar.gz',
@@ -56,6 +57,7 @@ tars = \
      'QUANTA_32BIT': 'quad1image_001_32bit.tif.tar.gz',
      '4D_STEM': '4d_stem.hdf5.tar.gz',
      'PARSE_META_642_TITAN': '01 - 13k - 30um obj.dm3.tar.gz',
+     'FEI_SER': 'fei_emi_ser_test_files.tar.gz',
      'DB': 'test_db.sqlite.tar.gz',
      'RECORD': '2018-11-13_FEI-Titan-TEM-635816_7de34313.xml.tar.gz'
      }
@@ -66,4 +68,6 @@ for name, f in tars.items():
 
 files = {}
 for k, v in tars.items():
-    files[k] = v.strip('.tar.gz')
+    with tarfile.open(v, 'r:gz') as tar:
+        files[k] = [os.path.join(os.path.dirname(__file__), 'files', i) for i
+                    in tar.getnames()]

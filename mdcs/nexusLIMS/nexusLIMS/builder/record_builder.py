@@ -215,7 +215,7 @@ def build_acq_activities(instrument, dt_from, dt_to,
                                           instrument.filestore_path))
     _logger.info(f'Starting new file-finding in {path}')
     try:
-        files = _gnu_find_files(path, dt_from, dt_to)
+        files = _gnu_find_files(path, dt_from, dt_to, _ext.keys())
     except (NotImplementedError, RuntimeError) as e:
         _logger.warning(f'GNU find returned error: {e}\nFalling back to pure '
                         f'Python implementation')
