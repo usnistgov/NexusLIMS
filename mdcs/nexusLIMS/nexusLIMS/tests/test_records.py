@@ -66,8 +66,8 @@ class TestRecordBuilder:
         expected = {
             '2018-11-13_FEI-Titan-TEM-635816_7de34313.xml': {
                 '/title': '***REMOVED***',
-                '//acquisitionActivity': 2,
-                '//dataset': 27,
+                '//acquisitionActivity': 4,
+                '//dataset': 37,
                 '/summary/motivation': '***REMOVED***!',
                 '/summary/instrument': 'FEI-Titan-TEM-635816'
             },
@@ -212,7 +212,7 @@ class TestActivity:
                                      fix_mountain_time,
                                      gnu_find_activities):
         # force the GNU find method to fail
-        def mock_gnu_find(x, y, z):
+        def mock_gnu_find(x, y, z, q):
             raise RuntimeError('Mock failure for GNU find method')
 
         monkeypatch.setattr(_rb, '_gnu_find_files', mock_gnu_find)
@@ -256,11 +256,12 @@ class TestActivity:
                             lambda fname, generate_preview: (None, ''))
         orig_activity_file_length = \
             len(gnu_find_activities['activities_list'][0].files)
-        gnu_find_activities['activities_list'][0].add_file(files['643_EELS_SI'])
+        gnu_find_activities['activities_list'][0].add_file(
+            files['643_EELS_SI'][0])
         assert len(gnu_find_activities['activities_list'][0].files) == \
             orig_activity_file_length + 1
         assert f"Could not parse metadata of " \
-               f"{files['643_EELS_SI']}" in caplog.text
+               f"{files['643_EELS_SI'][0]}" in caplog.text
 
     def test_add_file_bad_file(self, gnu_find_activities):
         with pytest.raises(FileNotFoundError):
@@ -316,12 +317,13 @@ class TestSession:
 
 class TestCDCS:
     def test_upload_and_delete_record(self):
-        files_uploaded, record_ids = cdcs.upload_record_files([files['RECORD']])
+        files_uploaded, record_ids = cdcs.upload_record_files(
+            [files['RECORD'][0]])
         cdcs.delete_record(record_ids[0])
 
     def test_upload_and_delete_record_glob(self):
         prev_dir = os.getcwd()
-        os.chdir(os.path.dirname(files['RECORD']))
+        os.chdir(os.path.dirname(files['RECORD'][0]))
         files_uploaded, record_ids = cdcs.upload_record_files(None)
         for id in record_ids:
             cdcs.delete_record(id)
@@ -329,7 +331,7 @@ class TestCDCS:
 
     def test_upload_no_files_glob(self):
         prev_dir = os.getcwd()
-        os.chdir(os.path.join(os.path.dirname(files['RECORD']), 'figs'))
+        os.chdir(os.path.join(os.path.dirname(files['RECORD'][0]), 'figs'))
         with pytest.raises(ValueError):
             files_uploaded, record_ids = cdcs.upload_record_files(None)
         os.chdir(prev_dir)
@@ -342,10 +344,11 @@ class TestCDCS:
                             text='This is a fake request error!'), 'dummy_id'
         monkeypatch.setattr(cdcs, 'upload_record_content', mock_upload)
 
-        files_uploaded, record_ids = cdcs.upload_record_files([files['RECORD']])
+        files_uploaded, record_ids = cdcs.upload_record_files(
+            [files['RECORD'][0]])
         assert len(files_uploaded) == 0
         assert len(record_ids) == 0
-        assert f'Could not upload {os.path.basename(files["RECORD"])}'
+        assert f'Could not upload {os.path.basename(files["RECORD"][0])}'
 
     def test_bad_auth(self, monkeypatch):
         monkeypatch.setenv('nexusLIMS_user', 'baduser')

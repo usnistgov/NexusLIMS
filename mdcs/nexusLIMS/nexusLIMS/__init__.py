@@ -94,6 +94,8 @@ import logging as _logging
 def _filter_hyperspy_messages(record):
     """Filter to be used with logging class to hide HyperSpy API import
     warnings within the NexusLIMS codebase"""
+    # this only triggers if the hs.preferences.GUIs.warn_if_guis_are_missing
+    # preference is set to True
     if record.msg.startswith('The ipywidgets GUI') or \
             record.msg.startswith('The traitsui GUI'):
         return False

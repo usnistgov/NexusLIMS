@@ -47,6 +47,7 @@ import logging as _logging
 _logger = _logging.getLogger(__name__)
 _logger.setLevel(_logging.INFO)
 _dir_path = _os.path.dirname(_os.path.realpath(__file__))
+_mpl.use('Agg')
 
 
 def _full_extent(ax, items, pad=0.0):
@@ -572,7 +573,8 @@ def sig_to_thumbnail(s, out_path, dpi=92):
         # we're looking at an image stack
         elif s.axes_manager.navigation_dimension == 1:
             _plt.figure()
-            _plt.imshow(_project_image_stack(s, dpi=dpi))
+            _plt.imshow(_project_image_stack(
+                s, num=min(5, s.axes_manager.navigation_size), dpi=dpi))
             ax = _plt.gca()
             ax.set_position([0, 0, 1, .8])
             ax.set_axis_off()
@@ -580,7 +582,6 @@ def sig_to_thumbnail(s, out_path, dpi=92):
             ax.set_title(ax.get_title() + '\n' +
                          r"$\bf{" + str(s.axes_manager.navigation_size) +
                          r'-member' + r'\ Image\ Series}$')
-            _plt.show()
             # use _full_extent to determine the bounding box needed to pick
             # out just the items we're interested in
             extent = _full_extent(ax, [ax, ax.title], pad=0.1).transformed(
@@ -609,7 +610,7 @@ def sig_to_thumbnail(s, out_path, dpi=92):
             chunk_size = s.axes_manager.navigation_size // num_to_plot
             for i in range(num_to_plot):
                 if square_n == 1:
-                    im_list =[s]
+                    im_list = [s]
                 else:
                     im_list[i] = s.inav[i * chunk_size:
                                         (i+1) * chunk_size].inav[chunk_size//2]
@@ -619,7 +620,6 @@ def sig_to_thumbnail(s, out_path, dpi=92):
                                              per_row=square_n, fig=f)
 
             # Make sure scalebar is fully on plot:
-            _plt.show()
             txt = axlist[0].texts[0]
             left_extent = txt.get_window_extent().transformed(
                           axlist[0].transData.inverted()).bounds[0]

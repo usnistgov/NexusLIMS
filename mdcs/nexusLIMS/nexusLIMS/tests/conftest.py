@@ -41,7 +41,7 @@ import nexusLIMS.utils
 # os.environ['mmfnexus_path'] = os.path.join(os.path.dirname(__file__), 'files')
 
 # use our test database for all tests (don't want to impact real one)
-os.environ['nexusLIMS_db_path'] = files['DB']
+os.environ['nexusLIMS_db_path'] = files['DB'][0]
 
 
 def pytest_configure(config):
@@ -76,8 +76,9 @@ def pytest_sessionfinish(session, exitstatus):
 
     Remove the unpacked test files.
     """
-    for _, fn in files.items():
-        os.remove(fn)
+    for _, fn_list in files.items():
+        for fn in fn_list:
+            os.remove(fn)
 
 
 @pytest.fixture(scope='session')
