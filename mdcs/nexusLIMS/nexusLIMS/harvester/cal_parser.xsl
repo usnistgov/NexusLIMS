@@ -45,6 +45,33 @@
       </xsl:otherwise>
     </xsl:choose>
   </xsl:template>
+    
+    <xsl:template match="m:properties">
+        <xsl:element name="user">
+            <xsl:element name="userName">
+                <xsl:value-of select="d:UserName"/>
+            </xsl:element>
+            <xsl:element name="name">
+                <xsl:value-of select="d:Name"/>
+            </xsl:element>
+            <xsl:element name="email">
+                <xsl:value-of select="d:WorkEmail"/>
+            </xsl:element>
+            <xsl:element name="phone">
+                <xsl:value-of select="d:WorkPhone"/>
+            </xsl:element>
+            <xsl:element name="office">
+                <xsl:value-of select="d:Office"/>
+            </xsl:element>
+            <xsl:element name="link">
+                <xsl:value-of select="../../id"/>
+            </xsl:element>
+            <xsl:element name="userId">
+                <xsl:value-of select="d:Id"/>
+            </xsl:element>
+        </xsl:element>
+    </xsl:template>
+    
 
 <xsl:template match="entry">
   <xsl:element name="event">
@@ -63,29 +90,14 @@
       <xsl:value-of select="../link[@rel='self']/@title"/>
       <!--<xsl:value-of select="substring-before(link[@rel='edit']/@title,'EventsItem')"/>-->
     </xsl:element>
-    <xsl:element name="user">
-      <xsl:element name="userName">
-        <xsl:value-of select="link/m:inline/entry/content/m:properties/d:UserName"/>
-      </xsl:element>
-      <xsl:element name="name">
-        <xsl:value-of select="link/m:inline/entry/content/m:properties/d:Name"/>
-      </xsl:element>
-      <xsl:element name="email">
-        <xsl:value-of select="link/m:inline/entry/content/m:properties/d:WorkEmail"/>
-      </xsl:element>
-      <xsl:element name="phone">
-        <xsl:value-of select="link/m:inline/entry/content/m:properties/d:WorkPhone"/>
-      </xsl:element>
-      <xsl:element name="office">
-        <xsl:value-of select="link/m:inline/entry/content/m:properties/d:Office"/>
-      </xsl:element>
-      <xsl:element name="link">
-        <xsl:value-of select="link/m:inline/entry/id"/>
-      </xsl:element>
-      <xsl:element name="userId">
-        <xsl:value-of select="link/m:inline/entry/content/m:properties/d:Id"/>
-      </xsl:element>
-    </xsl:element>
+    <xsl:choose>
+        <xsl:when test="link[@title='UserName']/m:inline/feed/entry/content/m:properties">
+            <xsl:apply-templates select="link[@title='UserName']/m:inline/feed/entry/content/m:properties"/>
+        </xsl:when>
+        <xsl:otherwise>
+            <xsl:apply-templates select="link[@title='CreatedBy']/m:inline/entry/content/m:properties"/>
+        </xsl:otherwise>
+    </xsl:choose>
     <xsl:element name="purpose">
       <xsl:value-of select="content/m:properties/d:ExperimentPurpose"/>
     </xsl:element>
