@@ -37,6 +37,7 @@ import urllib as _urllib
 import nexusLIMS
 from requests_ntlm import HttpNtlmAuth as _HttpNtlmAuth
 from dateparser import parse as _dp_parse
+from lxml import etree as _etree
 import ldap3 as _ldap3
 from datetime import datetime as _datetime
 from datetime import timedelta as _timedelta
@@ -45,6 +46,7 @@ from nexusLIMS.instruments import Instrument as _Instrument
 from nexusLIMS.instruments import instrument_db as _instr_db
 from nexusLIMS.utils import parse_xml as _parse_xml
 from nexusLIMS.utils import nexus_req as _nexus_req
+from nexusLIMS.utils import _get_timespan_overlap
 
 _logger = _logging.getLogger(__name__)
 XSLT_PATH = _os.path.join(_os.path.dirname(__file__), "cal_parser.xsl")
@@ -220,7 +222,7 @@ def get_auth(filename="credentials.ini", basic=False):
     return auth 
 
 
-def fetch_xml(instrument, date=None):
+def fetch_xml(instrument, dt_from=None, dt_to=None):
     """
     Get the XML responses from the Nexus Sharepoint calendar for one,
     multiple, or all instruments.
@@ -232,16 +234,39 @@ def fetch_xml(instrument, date=None):
         one of the NexusLIMS instruments contained in the
         :py:attr:`~nexusLIMS.instruments.instrument_db` database.
         Controls what instrument calendar is used to get events
-    date : str or None
-        If provided, fetch only events from a particular day (to limit the
-        number of events that need to be returned). ``date`` string must be
-        formatted as YYYY-MM-DD.
+    dt_from : :py:class:`~datetime.datetime` or None
+        A :py:class:`~datetime.datetime` object representing the start of a
+        calendar event to search for.
+        If ``dt_from`` and ``dt_to`` are `None`, no date filtering will be done.
+        If just ``dt_from`` is `None`, all events from the beginning of the
+        calendar record will be returned up until ``dt_to``.
+    dt_to : :py:class:`~datetime.datetime` or None
+        A :py:class:`~datetime.datetime` object representing the end of
+        calendar event to search for.
+        If ``dt_from`` and ``dt_to`` are `None`, no date filtering will be done.
+        If just ``dt_to`` is `None`, all events from the ``dt_from`` to the
+        present will be returned.
 
     Returns
     -------
     api_response : list
-        A list of strings containing the XML calendar information for each
-        instrument requested, stripped of the empty default namespace
+        A string containing the XML calendar information for each
+        instrument requested, stripped of the empty default namespace. If
+        ``dt_from`` and ``dt_to`` are provided, it will contain just one
+        `"entry"` representing a single event on the calendar
+
+    Notes
+    -----
+    To find the right event, an API request to the Sharepoint Calendar will
+    be made for all events starting on the same day as ``dt_from``. This
+    could result in multiple events being returned if there is more than one
+    session scheduled on that microscope for that day. To find the right one,
+    the timespan between each event's ``StartTime`` and ``EndTime`` returned
+    from the calendar will be compared with the timespan between ``dt_from`` and
+    ``dt_to``. The event with the greatest overlap will be taken as the
+    correct one. This approach should allow for some flexibility in terms of
+    non-exact matching between the reserved timespans and those recorded by
+    the session logger.
     """
 
     # Paths for Nexus Instruments that can be booked through sharepoint
@@ -267,14 +292,24 @@ def fetch_xml(instrument, date=None):
 
     api_response = ''
 
-    instr_url = instrument.api_url + '?$expand=CreatedBy'
+    instr_url = instrument.api_url + '?$expand=CreatedBy,UserName'
 
-    if date:
-        dt = _datetime.strptime(date, '%Y-%m-%d')
-        datestr_1 = date
-        datestr_2 = (dt + _timedelta(days=1)).strftime('%Y-%m-%d')
-        instr_url += f"&$filter=EndTime ge DateTime'{datestr_1}' and " \
-                     f"EndTime lt DateTime'{datestr_2}'"
+    # build the date filtering string depending on datetime input
+    if dt_from is None and dt_to is None:
+        pass
+    elif dt_from is None:
+        # for API, we need to add a day to dt_to so we can use "lt" as filter
+        to_str = (dt_to + _timedelta(days=1)).strftime('%Y-%m-%d')
+        instr_url += f"&$filter=StartTime lt DateTime'{to_str}'"
+    elif dt_to is None:
+        from_str = dt_from.strftime('%Y-%m-%d')
+        instr_url += f"&$filter=StartTime ge DateTime'{from_str}'"
+    else:
+        # we ask the API for all events that start on same day as dt_from
+        from_str = dt_from.strftime('%Y-%m-%d')
+        to_str = (dt_from + _timedelta(days=1)).strftime('%Y-%m-%d')
+        instr_url += f"&$filter=StartTime ge DateTime'{from_str}' and " \
+                     f"StartTime lt DateTime'{to_str}'"
 
     _logger.info("Fetching Nexus calendar events from {}".format(instr_url))
     r = _nexus_req(instr_url, _requests.get)
@@ -304,10 +339,49 @@ def fetch_xml(instrument, date=None):
             ConnectionError('Could not access Nexus SharePoint Calendar '
                             'API at "{}"'.format(instr_url))
 
+    # identify which event matches the one we searched for (if there's more
+    # than one, and we supplied both dt_from and dt_to) and remove the other
+    # events from the api response as needed
+    if dt_from is not None and dt_to is not None:
+        doc = _etree.fromstring(api_response)
+        entries = doc.findall('entry')
+        # more than one calendar event was found for this date
+        if len(entries) > 1:
+            starts, ends = [], []
+            for e in entries:
+                ns = _etree.fromstring(xml).nsmap
+                starts.append(e.find('.//d:StartTime', namespaces=ns).text)
+                ends.append(e.find('.//d:EndTime', namespaces=ns).text)
+            starts = [_datetime.fromisoformat(s) for s in starts]
+            ends = [_datetime.fromisoformat(e) for e in ends]
+
+            # starts and ends are lists of datetimes representing the start and
+            # end of each event returned by the API, so get how much each
+            # range overlaps with the range dt_from to dt_to
+            overlaps = [_get_timespan_overlap((dt_from, dt_to), (s, e))
+                        for s, e in zip(starts, ends)]
+
+            # find which 'entry' is the one that matches our timespan
+            max_overlap = overlaps.index(max(overlaps))
+            # create a list of entry indices to remove by excluding the one
+            # with maximal overlap
+            to_remove = list(range(len(overlaps)))
+            del to_remove[max_overlap]
+
+            # loop through in reverse order so we don't mess up the numbering
+            # of the entry elements
+            for idx in to_remove[::-1]:
+                # XPath numbering starts at 1, so add one to idx
+                doc.remove(doc.find(f'entry[{idx + 1}]'))
+
+            # api_response will now have non-relevant entry items removed
+            api_response = _etree.tostring(doc)
+
     return api_response
 
 
-# DONE: split up fetching calendar from server and parsing XML response
+#TODO: fix get_events and dump_calendars to use dt_from/dt_to API and update
+# tests
 def get_events(instrument=None,
                date=None,
                user=None,

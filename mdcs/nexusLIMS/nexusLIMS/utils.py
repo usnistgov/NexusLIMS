@@ -569,3 +569,30 @@ def _zero_bytes(fname, bytes_from, bytes_to):
             f.write(b'\0' * (bt - bf))
 
     return new_fname
+
+
+def _get_timespan_overlap(range_1, range_2):
+    """
+    Find the amount of overlap between two time spans. Adapted from
+    https://stackoverflow.com/a/9044111
+
+    Parameters
+    ----------
+    range_1 : :obj:`tuple` of :py:class:`~datetime.datetime`
+        Tuple of length 2 of datetime objects: first is the start of the time
+        range and the second is the end of the time range
+    range_2
+        Tuple of length 2 of datetime objects: first is the start of the time
+        range and the second is the end of the time range
+
+    Returns
+    -------
+    overlap : :py:class:`~datetime.timedelta`
+        The amount of overlap between the time ranges
+    """
+    latest_start = max(range_1[0], range_2[0])
+    earliest_end = min(range_1[1], range_2[1])
+    delta = earliest_end - latest_start
+    overlap = max(_timedelta(0), delta)
+
+    return overlap

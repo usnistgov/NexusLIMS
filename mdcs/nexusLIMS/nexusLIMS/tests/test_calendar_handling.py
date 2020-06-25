@@ -2,6 +2,7 @@ import os
 import pytest
 import requests
 from lxml import etree
+from datetime import datetime as dt
 from nexusLIMS.harvester import sharepoint_calendar as sc
 from nexusLIMS.utils import parse_xml as _parse_xml
 from nexusLIMS.utils import nexus_req as _nexus_req
@@ -97,9 +98,25 @@ class TestCalendarHandling:
     def test_download_with_date(self):
         doc = etree.fromstring(
             sc.fetch_xml(instrument=instrument_db['FEI-Titan-TEM-635816'],
-                         date='2018-11-13'))
+                         dt_from=dt.fromisoformat('2018-11-13T00:00:00'),
+                         dt_to=dt.fromisoformat('2018-11-13T23:59:59')))
         # This day should have one entry:
         assert len(doc.findall('entry')) == 1
+
+    def test_download_date_w_multiple_entries(self):
+        # This should return an event by '***REMOVED***' from 1PM to 5PM on 11/20/2019
+        doc = etree.fromstring(
+            sc.fetch_xml(instrument=instrument_db['FEI-Titan-TEM-635816'],
+                         dt_from=dt.fromisoformat('2019-11-20T13:40:20'),
+                         dt_to=dt.fromisoformat('2019-11-20T17:30:00'))
+        )
+        # This day should have one entry (pared down from three):
+        assert len(doc.findall('entry')) == 1
+        # entry should be user ***REMOVED*** and title "NexusLIMS computer testing"
+        assert doc.find('entry/title').text == "NexusLIMS computer testing"
+        assert doc.find('entry/link[@title="UserName"]/'
+                        'm:inline/feed/entry/content/m:properties/d:UserName',
+                        namespaces=doc.nsmap).text == "***REMOVED***"
 
     def test_downloading_bad_calendar(self):
         with pytest.raises(KeyError):
