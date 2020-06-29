@@ -184,6 +184,22 @@ class TestCalendarHandling:
             with pytest.raises(ValueError):
                 sc.fetch_xml(instrument=5)
 
+    def test_fetch_xml_only_dt_from(self):
+        # at the time of writing this code (2020-06-26), there were 8 records
+        # on the Hitachi S4700 after Jan 1. 2020, which should only increase
+        # over time
+        xml = sc.fetch_xml(instrument_db['Hitachi-S4700-SEM-606559'],
+                           dt_from=dt.fromisoformat('2020-01-01T00:00:00'))
+        doc = etree.fromstring(xml)
+        assert len(doc.findall('entry')) >= 8
+
+    def test_fetch_xml_only_dt_to(self):
+        # There are five events prior to May 1, 2016 on the Hitachi S4700
+        xml = sc.fetch_xml(instrument_db['Hitachi-S4700-SEM-606559'],
+                           dt_to=dt.fromisoformat('2016-05-01T00:00:00'))
+        doc = etree.fromstring(xml)
+        assert len(doc.findall('entry')) == 5
+
     def test_dump_calendars(self, tmp_path):
         from nexusLIMS.harvester.sharepoint_calendar import dump_calendars
         f = os.path.join(tmp_path, 'cal_output.xml')
@@ -192,7 +208,8 @@ class TestCalendarHandling:
     def test_division_group_lookup(self):
         from nexusLIMS.harvester.sharepoint_calendar import get_events
         events = get_events(instrument='FEI-Titan-TEM-635816',
-                            date='2019-03-06',
+                            dt_from=dt.fromisoformat('2019-03-06T09:00:00'),
+                            dt_to=dt.fromisoformat('2019-03-06T11:00:00'),
                             user='***REMOVED***')
         doc = etree.fromstring(events)
         assert doc.find('event/project/division').text == '642'
@@ -201,24 +218,11 @@ class TestCalendarHandling:
     def test_get_events_good_date(self):
         from nexusLIMS.harvester.sharepoint_calendar import get_events
         events_1 = get_events(instrument='FEI-Titan-TEM-635816',
-                              date='2019-03-13')
-        events_2 = get_events(instrument='FEI-Titan-TEM-635816',
-                              date='March 13th, 2019')
-        doc1 = etree.fromstring(events_1)
-        doc2 = etree.fromstring(events_2)
-
-        # test to make sure we extracted same event
-        for el1, el2 in zip(doc1.find('event[1]').getchildren(),
-                            doc2.find('event[1]').getchildren()):
-            assert el1.text == el2.text
-
-    def test_get_events_bad_date(self, caplog):
-        from nexusLIMS.harvester.sharepoint_calendar import get_events
-
-        get_events(instrument='FEI-Titan-TEM-635816', date='The Ides of March')
-
-        assert 'Entered date could not be parsed; reverting to None...' in \
-               caplog.text
+                              dt_from=dt.fromisoformat('2019-03-13T08:00:00'),
+                              dt_to=dt.fromisoformat('2019-03-13T16:00:00'))
+        doc = etree.fromstring(events_1)
+        assert doc.find('event/user/userName').text == '***REMOVED***'
+        assert doc.find('event/title').text == '***REMOVED***'
 
     def test_calendar_parsing_event_number(self, parse_xml):
         """
@@ -359,3 +363,15 @@ class TestCalendarHandling:
 
         for k, v in user_dict.items():
             assert user.find(k).text == v
+
+    def test_get_sharepoint_date_string(self):
+        date_str = sc._get_sharepoint_date_string(
+            dt(year=2020, month=6, day=29, hour=1, minute=23, second=48))
+        assert date_str == '2020-06-28T21:23:48'
+
+    def test_get_sharepoint_date_string_no_env_var(self, monkeypatch):
+        with monkeypatch.context() as m:
+            # remove environment variable to test error raising
+            m.delenv('nexusLIMS_timezone')
+            with pytest.raises(EnvironmentError):
+                sc._get_sharepoint_date_string(dt.now())

@@ -36,7 +36,8 @@ import urllib as _urllib
 
 import nexusLIMS
 from requests_ntlm import HttpNtlmAuth as _HttpNtlmAuth
-from dateparser import parse as _dp_parse
+import pytz as _pytz
+from pytz import timezone as _timezone
 from lxml import etree as _etree
 import ldap3 as _ldap3
 from datetime import datetime as _datetime
@@ -302,11 +303,14 @@ def fetch_xml(instrument, dt_from=None, dt_to=None):
         to_str = (dt_to + _timedelta(days=1)).strftime('%Y-%m-%d')
         instr_url += f"&$filter=StartTime lt DateTime'{to_str}'"
     elif dt_to is None:
-        from_str = dt_from.strftime('%Y-%m-%d')
+        # for API, we subtract day from dt_from to ensure we don't miss any
+        # sessions close to the UTC offset (mostly for sessions scheduled at
+        # midnight)
+        from_str = (dt_from - _timedelta(days=1)).strftime('%Y-%m-%d')
         instr_url += f"&$filter=StartTime ge DateTime'{from_str}'"
     else:
         # we ask the API for all events that start on same day as dt_from
-        from_str = dt_from.strftime('%Y-%m-%d')
+        from_str = (dt_from - _timedelta(days=1)).strftime('%Y-%m-%d')
         to_str = (dt_from + _timedelta(days=1)).strftime('%Y-%m-%d')
         instr_url += f"&$filter=StartTime ge DateTime'{from_str}' and " \
                      f"StartTime lt DateTime'{to_str}'"
@@ -380,10 +384,9 @@ def fetch_xml(instrument, dt_from=None, dt_to=None):
     return api_response
 
 
-#TODO: fix get_events and dump_calendars to use dt_from/dt_to API and update
-# tests
 def get_events(instrument=None,
-               date=None,
+               dt_from=None,
+               dt_to=None,
                user=None,
                division=None,
                group=None,
@@ -399,13 +402,18 @@ def get_events(instrument=None,
         :py:attr:`~nexusLIMS.instruments.instrument_db` database.
         Controls what instrument calendar is used to get events. If string,
         value should be one of the instrument PIDs from the Nexus facility.
-    date : None or str
-        Either None or a YYYY-MM-DD date string indicating the date from
-        which events should be fetched (note: the start time of each entry
-        is what will be compared). If None, no date filtering will be
-        performed. Date will be parsed by :py:func:`dateparser.parse`,
-        but providing the date in the ISO standard format is preferred for
-        consistent behavior.
+    dt_from : :py:class:`~datetime.datetime` or None
+        A :py:class:`~datetime.datetime` object representing the start of a
+        calendar event to search for, as in :py:func:`~.fetch_xml`.
+        If ``dt_from`` and ``dt_to`` are `None`, no date filtering will be done.
+        If just ``dt_from`` is `None`, all events from the beginning of the
+        calendar record will be returned up until ``dt_to``.
+    dt_to : :py:class:`~datetime.datetime` or None
+        A :py:class:`~datetime.datetime` object representing the end of
+        calendar event to search for, as in :py:func:`~.fetch_xml`.
+        If ``dt_from`` and ``dt_to`` are `None`, no date filtering will be done.
+        If just ``dt_to`` is `None`, all events from the ``dt_from`` to the
+        present will be returned.
     user : None or str
         Either None or a valid NIST username (the short format: e.g. ``"ear1"``
         instead of ernst.august.ruska@nist.gov). If None, no user filtering
@@ -434,27 +442,18 @@ def get_events(instrument=None,
         description, and date/time information.
     """
 
-    # DONE: parsing of date
-    # Use dateparser to get python datetime input, and return as YYYY-MM-DD
-    if date is not None:
-        date_datetime = _dp_parse(date, settings={'STRICT_PARSING': True})
-        if date_datetime:
-            date = _datetime.strftime(date_datetime, '%Y-%m-%d')
-        else:
-            _logger.warning("Entered date could not be parsed; reverting to "
-                            "None...")
-            date = None
-
     output = ''
-    xml = fetch_xml(instrument, date=date)
+    xml = fetch_xml(instrument, dt_from=dt_from, dt_to=dt_to)
 
     if not division and not group and user:
         _logging.info('Querying LDAP for division and group info')
         division, group = get_div_and_group(user)
 
     # parse the xml into a string, and then indent
+    # date parsing is no longer necessary because fetch_xml should return
+    # only one event if both dt_from and dt_to are provided
     output += INDENT + str(_parse_xml(xml, XSLT_PATH,
-                                      date=date, user=user,
+                                      user=user,
                                       division=division,
                                       group=group)).replace('\n', '\n' +
                                                             INDENT)
@@ -494,7 +493,7 @@ def _wrap_events(events_string):
     return result
 
 
-def dump_calendars(instrument=None, user=None, date=None,
+def dump_calendars(instrument=None, user=None, dt_from=None, dt_to=None,
                    group=None, division=None,
                    filename='cal_events.xml'):
     """
@@ -508,13 +507,18 @@ def dump_calendars(instrument=None, user=None, date=None,
         Controls what instrument calendar is used to get events. If value is
         a string, it should be one of the instrument PIDs from the Nexus
         facility
-    date : None or str
-        Either None or a YYYY-MM-DD date string indicating the date from
-        which events should be fetched (note: the start time of each entry
-        is what will be compared). If None, no date filtering will be
-        performed. Date will be parsed by :py:func:`dateparser.parse`,
-        but providing the date in the ISO standard format is preferred for
-        consistent behavior.
+    dt_from : :py:class:`~datetime.datetime` or None
+        A :py:class:`~datetime.datetime` object representing the start of a
+        calendar event to search for, as in :py:func:`~.fetch_xml`.
+        If ``dt_from`` and ``dt_to`` are `None`, no date filtering will be done.
+        If just ``dt_from`` is `None`, all events from the beginning of the
+        calendar record will be returned up until ``dt_to``.
+    dt_to : :py:class:`~datetime.datetime` or None
+        A :py:class:`~datetime.datetime` object representing the end of
+        calendar event to search for, as in :py:func:`~.fetch_xml`.
+        If ``dt_from`` and ``dt_to`` are `None`, no date filtering will be done.
+        If just ``dt_to`` is `None`, all events from the ``dt_from`` to the
+        present will be returned.
     user : None or str
         Either None or a valid NIST username (the short format: e.g. ``"ear1"``
         instead of ernst.august.ruska@nist.gov). If None, no user filtering
@@ -534,6 +538,47 @@ def dump_calendars(instrument=None, user=None, date=None,
         The filename to which the events should be written
     """
     with open(filename, 'w') as f:
-        text = get_events(instrument=instrument, date=date, user=user,
-                          division=division, group=group, wrap=True)
+        text = get_events(instrument=instrument, dt_from=dt_from,
+                          dt_to=dt_to, user=user, division=division,
+                          group=group, wrap=True)
         f.write(text)
+
+
+def _get_sharepoint_date_string(dt):
+    """
+    Using the ``nexusLIMS_timezone`` environment variable, convert a "naive"
+    datetime object to a string with the proper offset to be correctly
+    handled by the Sharepoint API. This timezone should be one listed as part
+    of the
+    `tz database <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones_>`.
+
+    The reason this is necessary is that the Sharepoint calendar API uses UTC
+    datetime, but displays them in the local timezone, so we need to convert
+    our local datetime to UTC.  i.e. if you have an event that is
+    displayed on the calendar as starting at 2019-07-24T00:00:00 (midnight on
+    July 24th), an API query datetime greater than or equal to that time
+    will not work unless you convert to UTC (2019-07-23T20:00:00.000)
+
+
+    Parameters
+    ----------
+    dt : :py:class:`~datetime.datetime`
+        The "naive" local timezone datetime object (i.e. as displayed in the
+        sharepoint calendar)
+
+    Returns
+    -------
+    dt_str : str
+        The datetime formatted in ISO format, adjusted for the timezone
+        offset (for Eastern time, that's four hours during DST and 5 hours in
+        standard time)
+    """
+    if 'nexusLIMS_timezone' not in _os.environ:
+        raise EnvironmentError('Please make sure the "nexusLIMS_timezone" '
+                               'variable is set as part of your environment '
+                               'before using this function')
+
+    tz = _timezone(_os.environ['nexusLIMS_timezone'])
+    dt_str = _pytz.utc.localize(dt).astimezone(tz).strftime('%Y-%m-%dT%H:%M:%S')
+
+    return dt_str
