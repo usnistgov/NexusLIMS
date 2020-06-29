@@ -83,11 +83,13 @@ setup(
                       'requests',
                       'requests-ntlm',
                       'ntlm-auth',
-                      'dateparser',
                       'hyperspy',
                       'numpy',
                       'matplotlib',
-                      'scikit-image'],
+                      'ldap3',
+                      'pytz',
+                      'scikit-image',
+                      'scikit-learn'],
 
     # List additional groups of dependencies here (e.g. development
     # dependencies). You can install these using the following syntax,

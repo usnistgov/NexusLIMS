@@ -64,7 +64,6 @@ XSD_PATH = _os.path.join(_os.path.dirname(_activity.__file__),
 
 
 def build_record(instrument, dt_from, dt_to,
-                 date=None,
                  user=None,
                  sample_id=None,
                  generate_previews=True):
@@ -80,18 +79,18 @@ def build_record(instrument, dt_from, dt_to,
         :py:attr:`~nexusLIMS.instruments.instrument_db` database.
         Controls what instrument calendar is used to get events.
     dt_from : datetime.datetime
-        The starting timestamp that will be used to determine which files go
-        in this record
+
     dt_to : datetime.datetime
-        The ending timestamp used to determine the last point in time for
-        which files should be associated with this record
-    date : str or None
-        A YYYY-MM-DD date string indicating the date from which events should
-        be fetched (note: the start time of each entry is what will be
-        compared - as in :py:func:`~.sharepoint_calendar.get_events`). If
-        None, the date detected from the modified time of the folder will be
-        used (which may or may not be correct, but given that the folders on
-        ***REMOVED*** are read-only, should generally be able to be trusted).
+        The
+    dt_from : :py:class:`~datetime.datetime` or None
+        A :py:class:`~datetime.datetime` object representing the starting
+        timestamp that will be used to determine which files go in this
+        record, as in :py:func:`~.sharepoint_calendar.fetch_xml`.
+    dt_to : :py:class:`~datetime.datetime` or None
+        A :py:class:`~datetime.datetime` object representing the ending
+        timestamp used to determine the last point in time for which
+        files should be associated with this record, as in
+        :py:func:`~.sharepoint_calendar.fetch_xml`.
     user : str or None
         A valid NIST username (the short format: e.g. "ear1"
         instead of ernst.august.ruska@nist.gov). Controls the results
@@ -115,10 +114,6 @@ def build_record(instrument, dt_from, dt_to,
     if sample_id is None:
         sample_id = str(_uuid4())
 
-    # if an explicit date is not provided, use the start of the timespan
-    if date is None:
-        date = dt_from.strftime('%Y-%m-%d')
-
     # Insert XML prolog, XSLT reference, and namespaces.
     xml_record += "<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n"
     # TODO: Header elements may be changed once integration into CDCS determined
@@ -129,12 +124,11 @@ def build_record(instrument, dt_from, dt_to,
                   "https://data.nist.gov/od/dm/nexus/experiment/v1.0\">\n"
 
     _logger.info(f"Getting calendar events with instrument: {instrument.name}, "
-                 f"date: {date}, user: {user}")
-    events_str = _sp_cal.get_events(instrument=instrument, date=date,
-                                    user=user, wrap=True)
-    # TODO: Account for results from multiple sessions? This should only
-    #  happen if one user has multiple reservations on the same date. For now,
-    #  assume the first record is the right one:
+                 f"from {dt_from.isoformat()} to {dt_to.isoformat()}, "
+                 f"user: {user}")
+    events_str = _sp_cal.get_events(instrument=instrument, dt_from=dt_from,
+                                    dt_to=dt_to, user=user, wrap=True)
+
     # Apply XSLT to transform calendar events to single record format:
     output = _parse_xml(events_str, XSLT_PATH,
                         instrument_PID=instrument.name,
@@ -294,7 +288,6 @@ def dump_record(instrument,
                 dt_from,
                 dt_to,
                 filename=None,
-                date=None,
                 user=None,
                 generate_previews=True):
     """
@@ -317,9 +310,6 @@ def dump_record(instrument,
     filename : None or str
         The filename of the dumped xml file to write. If None, a default name
         will be generated from the other parameters
-    date : str
-        A string which corresponds to the event date from which events are going
-        to be fetched from
     user : str
         A string which corresponds to the NIST user who performed the
         microscopy experiment
@@ -334,12 +324,12 @@ def dump_record(instrument,
     if filename is None:
         filename = 'compiled_record' + \
                    (f'_{instrument.name}' if instrument else '') + \
-                   (f'_{date}' if date else dt_from.strftime('_%Y-%m-%d')) + \
+                   dt_from.strftime('_%Y-%m-%d') + \
                    (f'_{user}' if user else '') + '.xml'
     _pathlib.Path(_os.path.dirname(filename)).mkdir(parents=True, exist_ok=True)
     with open(filename, 'w') as f:
         text = build_record(instrument, dt_from, dt_to,
-                            date=date, user=user,
+                            user=user,
                             generate_previews=generate_previews)
         f.write(text)
     return filename

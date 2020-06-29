@@ -11,14 +11,13 @@ sphinx = "*"
 sphinx-bootstrap-theme = "*"
 nexuslims = {editable = true,path = "./mdcs/nexusLIMS"}
 pytest-mpl = "*"
-pytest-sugar = "*"
 
 [packages]
 lxml = "*"
 requests = "*"
 requests-ntlm = "*"
 ntlm-auth = "*"
-dateparser = "*"
+pytz = "*"
 ldap3 = "*"
 hyperspy = {editable = true,git = "https://github.com/hyperspy/hyperspy.git",ref = "RELEASE_next_patch"}
 #hyperspy = "1.5.2"
