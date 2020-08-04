@@ -6,15 +6,9 @@
 
     
     <xsl:param name="xmlName" select="''"/>
-    <!-- 
+
     <xsl:variable name="datasetBaseUrl">https://***REMOVED***/mmfnexus/</xsl:variable>
-    <xsl:variable name="previewBaseUrl">https://***REMOVED***/nexusLIMS/mmfnexus/</xsl:variable> 
-    
-    Temporary change while teleworking:
-    -->
-    <xsl:variable name="datasetBaseUrl">https://***REMOVED***:1443/mmfnexus/</xsl:variable>
-    <xsl:variable name="previewBaseUrl">https://***REMOVED***:1443/nexusLIMS/mmfnexus/</xsl:variable>
-    
+    <xsl:variable name="previewBaseUrl">https://***REMOVED***/nexusLIMS/mmfnexus/</xsl:variable>
     <xsl:variable name="sharepointBaseUrl">https://***REMOVED***/Div/msed/MSED-MMF/Lists/</xsl:variable>
 
     <xsl:variable name="month-num-dictionary">
