@@ -22,6 +22,7 @@ test_data/
 **/db_logger_gui/build
 mdcs/nexusLIMS/doc/source/api/*.rst
 _coverage_output
+.venv/
 
 # pip installation files
 *.egg-info
