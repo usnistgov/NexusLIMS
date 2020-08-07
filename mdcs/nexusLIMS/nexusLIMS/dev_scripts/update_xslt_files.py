@@ -52,12 +52,16 @@ def get_current_xslt_ids(names):
 
 
 def replace_xslt_files():
-    list_xsl_file = __file__.replace('mdcs/nexusLIMS/nexusLIMS/'
-                                     'dev_scripts/update_xslt_files.py',
-                                     'xsl/cdcs_stylesheet_list.xsl')
-    detail_xsl_file = __file__.replace('mdcs/nexusLIMS/nexusLIMS/'
-                                       'dev_scripts/update_xslt_files.py',
-                                       'xsl/cdcs_stylesheet.xsl')
+    list_xsl_file = _os.path.abspath(__file__).replace(
+        'mdcs/nexusLIMS/nexusLIMS/'
+        'dev_scripts/update_xslt_files.py',
+        'xsl/cdcs_stylesheet_list.xsl')
+    detail_xsl_file = _os.path.abspath(__file__).replace(
+        'mdcs/nexusLIMS/nexusLIMS/'
+        'dev_scripts/update_xslt_files.py',
+        'xsl/cdcs_stylesheet.xsl')
+    print(f'Using {list_xsl_file} and {detail_xsl_file}')
+    
     with open(list_xsl_file) as f:
         list_content = f.read()
     with open(detail_xsl_file) as f:
