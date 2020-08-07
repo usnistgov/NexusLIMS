@@ -19,7 +19,8 @@ nexusLIMS_tests:
     - source /opt/conda/bin/activate ${CONDA_ENV}
     - echo "install pipenv to build the actual environment"
     - pip install pipenv
-    - pipenv --rm
+    # try to remove the existing pipenv
+    - pipenv --rm || true
     - pipenv install --dev
   after_script:
     # cache the coverage results so they can be published, always returning true
