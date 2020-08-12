@@ -19,7 +19,8 @@ nexusLIMS_tests:
     - source /opt/conda/bin/activate ${CONDA_ENV}
     - echo "install pipenv to build the actual environment"
     - pip install pipenv
-    - pipenv --rm
+    # try to remove the existing pipenv
+    - pipenv --rm || true
     - pipenv install --dev
   after_script:
     # cache the coverage results so they can be published, always returning true
@@ -42,7 +43,8 @@ pages:
     - /opt/conda/bin/conda create -y -p ${CONDA_ENV} python=3.7.5
     - source /opt/conda/bin/activate ${CONDA_ENV}
     - pip install pipenv
-    - pipenv --rm
+    # try to remove the existing pipenv
+    - pipenv --rm || true
     - pipenv install --dev
   after_script:
     - /opt/conda/bin/conda remove -y -p ${CONDA_ENV} --all || true
