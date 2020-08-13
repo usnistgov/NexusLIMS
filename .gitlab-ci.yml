@@ -76,4 +76,4 @@ pages:
     paths:
       - public
   dependencies:
-    - nexusLIMS_tests
+    - nexusLIMS_tests_37
