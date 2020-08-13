@@ -2,7 +2,7 @@ cache:
   paths:
     - coverage.tar.gz
 
-nexusLIMS_tests:
+nexusLIMS_tests_37:
   stage: test
   script:
     # run tests with coverage and output coverage report to html
@@ -15,7 +15,7 @@ nexusLIMS_tests:
     - /opt/conda/bin/conda remove -y -p ${CONDA_ENV} --all || true
     # try to source the unpacked environment, and if we succeeded, continue, if not, create new environment and install pipenv
     - echo "Use conda to install the base python environment so we don't mess with system packages"
-    - /opt/conda/bin/conda create -y -p ${CONDA_ENV} python=3.7.5
+    - /opt/conda/bin/conda create -y -p ${CONDA_ENV} python=3.7
     - source /opt/conda/bin/activate ${CONDA_ENV}
     - echo "install pipenv to build the actual environment"
     - pip install pipenv
@@ -31,6 +31,30 @@ nexusLIMS_tests:
       - coverage
     expire_in: 30 days
 
+nexusLIMS_tests_38:
+  stage: test
+  script:
+    # run tests with coverage and output coverage report to html
+    - pipenv run pytest mdcs/nexusLIMS/nexusLIMS/tests --cov=mdcs/nexusLIMS/nexusLIMS --cov-report html:$(pwd)/coverage --cov-report term --mpl --mpl-baseline-path=mdcs/nexusLIMS/nexusLIMS/tests/files/figs
+  # Install the environment
+  before_script:
+    # before anything, try to remove the existing conda environment and replace
+    # with gitlab cache, returning true whether or not we succeeded
+    - echo "Removing conda environment at ${CONDA_ENV}"
+    - /opt/conda/bin/conda remove -y -p ${CONDA_ENV} --all || true
+    # try to source the unpacked environment, and if we succeeded, continue, if not, create new environment and install pipenv
+    - echo "Use conda to install the base python environment so we don't mess with system packages"
+    - /opt/conda/bin/conda create -y -p ${CONDA_ENV} python=3.8
+    - source /opt/conda/bin/activate ${CONDA_ENV}
+    - echo "install pipenv to build the actual environment"
+    - pip install pipenv
+    # try to remove the existing pipenv
+    - pipenv --rm || true
+    - pipenv install --dev
+  after_script:
+    # cache the coverage results so they can be published, always returning true
+    - /opt/conda/bin/conda remove -y -p ${CONDA_ENV} --all || true
+
 pages:
   stage: deploy
   script:
@@ -40,7 +64,7 @@ pages:
     # with gitlab cache, returning true whether or not we succeeded
     - /opt/conda/bin/conda remove -y -p ${CONDA_ENV} --all || true
     - tar -xzf coverage.tar.gz -C public/ || true
-    - /opt/conda/bin/conda create -y -p ${CONDA_ENV} python=3.7.5
+    - /opt/conda/bin/conda create -y -p ${CONDA_ENV} python=3.7
     - source /opt/conda/bin/activate ${CONDA_ENV}
     - pip install pipenv
     # try to remove the existing pipenv
