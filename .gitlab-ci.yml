@@ -11,12 +11,12 @@ nexusLIMS_tests_37:
   before_script:
     # before anything, try to remove the existing conda environment and replace
     # with gitlab cache, returning true whether or not we succeeded
-    - echo "Removing conda environment at ${CONDA_ENV}"
-    - /opt/conda/bin/conda remove -y -p ${CONDA_ENV} --all || true
+    - echo "Removing conda environment at ${CONDA_ENV}_37"
+    - /opt/conda/bin/conda remove -y -p ${CONDA_ENV}_37 --all || true
     # try to source the unpacked environment, and if we succeeded, continue, if not, create new environment and install pipenv
     - echo "Use conda to install the base python environment so we don't mess with system packages"
-    - /opt/conda/bin/conda create -y -p ${CONDA_ENV} python=3.7
-    - source /opt/conda/bin/activate ${CONDA_ENV}
+    - /opt/conda/bin/conda create -y -p ${CONDA_ENV}_37 python=3.7
+    - source /opt/conda/bin/activate ${CONDA_ENV}_37
     - echo "install pipenv to build the actual environment"
     - pip install pipenv
     # try to remove the existing pipenv
@@ -25,7 +25,7 @@ nexusLIMS_tests_37:
   after_script:
     # cache the coverage results so they can be published, always returning true
     - tar -czf coverage.tar.gz coverage || true
-    - /opt/conda/bin/conda remove -y -p ${CONDA_ENV} --all || true
+    - /opt/conda/bin/conda remove -y -p ${CONDA_ENV}_37 --all || true
   artifacts:
     paths:
       - coverage
@@ -40,12 +40,12 @@ nexusLIMS_tests_38:
   before_script:
     # before anything, try to remove the existing conda environment and replace
     # with gitlab cache, returning true whether or not we succeeded
-    - echo "Removing conda environment at ${CONDA_ENV}"
-    - /opt/conda/bin/conda remove -y -p ${CONDA_ENV} --all || true
+    - echo "Removing conda environment at ${CONDA_ENV}_38"
+    - /opt/conda/bin/conda remove -y -p ${CONDA_ENV}_38 --all || true
     # try to source the unpacked environment, and if we succeeded, continue, if not, create new environment and install pipenv
     - echo "Use conda to install the base python environment so we don't mess with system packages"
-    - /opt/conda/bin/conda create -y -p ${CONDA_ENV} python=3.8
-    - source /opt/conda/bin/activate ${CONDA_ENV}
+    - /opt/conda/bin/conda create -y -p ${CONDA_ENV}_38 python=3.8
+    - source /opt/conda/bin/activate ${CONDA_ENV}_38
     - echo "install pipenv to build the actual environment"
     - pip install pipenv
     # try to remove the existing pipenv
@@ -53,7 +53,7 @@ nexusLIMS_tests_38:
     - pipenv install --dev
   after_script:
     # cache the coverage results so they can be published, always returning true
-    - /opt/conda/bin/conda remove -y -p ${CONDA_ENV} --all || true
+    - /opt/conda/bin/conda remove -y -p ${CONDA_ENV}_38 --all || true
 
 pages:
   stage: deploy
@@ -62,16 +62,16 @@ pages:
   before_script:
     # before anything, remove the existing conda environment and rebuild
     # with gitlab cache, returning true whether or not we succeeded
-    - /opt/conda/bin/conda remove -y -p ${CONDA_ENV} --all || true
+    - /opt/conda/bin/conda remove -y -p ${CONDA_ENV}_37 --all || true
     - tar -xzf coverage.tar.gz -C public/ || true
-    - /opt/conda/bin/conda create -y -p ${CONDA_ENV} python=3.7
-    - source /opt/conda/bin/activate ${CONDA_ENV}
+    - /opt/conda/bin/conda create -y -p ${CONDA_ENV}_37 python=3.7
+    - source /opt/conda/bin/activate ${CONDA_ENV}_37
     - pip install pipenv
     # try to remove the existing pipenv
     - pipenv --rm || true
     - pipenv install --dev
   after_script:
-    - /opt/conda/bin/conda remove -y -p ${CONDA_ENV} --all || true
+    - /opt/conda/bin/conda remove -y -p ${CONDA_ENV}_37 --all || true
   artifacts:
     paths:
       - public
