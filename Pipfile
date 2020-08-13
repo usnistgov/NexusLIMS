@@ -9,7 +9,6 @@ pytest = "*"
 pytest-cov = "*"
 sphinx = "*"
 sphinx-bootstrap-theme = "*"
-nexuslims = {editable = true,path = "./mdcs/nexusLIMS"}
 pytest-mpl = "*"
 
 [packages]
@@ -20,6 +19,7 @@ ntlm-auth = "*"
 pytz = "*"
 ldap3 = "*"
 hyperspy = {editable = true,git = "https://github.com/hyperspy/hyperspy.git",ref = "RELEASE_next_patch"}
+nexuslims = {editable = true,path = "./mdcs/nexusLIMS"}
 #hyperspy = "1.5.2"
 tifffile = "==20***REMOVED***"
 scikit-learn = "*"
