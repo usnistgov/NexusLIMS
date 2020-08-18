@@ -25,7 +25,7 @@ import pytest
 class TestRecordBuilder:
 
     # have to do these before modifying the database with the actual run tests
-    def test_dry_run(self):
+    def test_dry_run(self, fix_mountain_time):
         files_per_session = _rb.dry_run_file_find()
         assert len(files_per_session) == 6
         assert [len(f) for f in files_per_session] == [28, 37, 38,
