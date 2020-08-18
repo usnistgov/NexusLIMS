@@ -45,6 +45,23 @@ _logger.setLevel(_logging.INFO)
 tz_offset = _timedelta(hours=0)
 
 
+def setup_loggers(log_level):
+    """
+    Set logging level of all NexusLIMS loggers
+
+    Parameters
+    ----------
+    log_level : int
+        The level of logging, such as ``logging.DEBUG``
+    """
+    _logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
+                         level=log_level)
+    loggers = [_logging.getLogger(name) for name in
+               _logging.root.manager.loggerDict if 'nexusLIMS' in name]
+    for logger in loggers:
+        logger.setLevel(log_level)
+
+
 def parse_xml(xml, xslt_file, **kwargs):
     """
     Parse and translate an XML string from the API into a nicer format

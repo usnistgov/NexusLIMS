@@ -40,6 +40,7 @@ import logging as _logging
 import pathlib as _pathlib
 import shutil as _shutil
 import sys as _sys
+import argparse as _ap
 from uuid import uuid4 as _uuid4
 from lxml import etree as _etree
 from datetime import datetime as _datetime
@@ -54,6 +55,7 @@ from nexusLIMS.utils import gnu_find_files_by_mtime as _gnu_find_files
 from nexusLIMS.extractors import extension_reader_map as _ext
 from nexusLIMS.db.session_handler import get_sessions_to_build as _get_sessions
 from nexusLIMS.cdcs import upload_record_files as _upload_record_files
+from nexusLIMS import version as _version
 from timeit import default_timer as _timer
 
 _logger = _logging.getLogger(__name__)
@@ -197,23 +199,14 @@ def build_acq_activities(instrument, dt_from, dt_to,
         The list of :py:class:`~nexusLIMS.schemas.activity.AcquisitionActivity`
         objects generated for the record
     """
-
-    _logger = _logging.getLogger(__name__)
-    _logger.setLevel(_logging.INFO)
-
     _logging.getLogger('hyperspy.io_plugins.digital_micrograph').setLevel(
         _logging.WARNING)
 
     start_timer = _timer()
     path = _os.path.abspath(_os.path.join(_os.environ['mmfnexus_path'],
                                           instrument.filestore_path))
-    _logger.info(f'Starting new file-finding in {path}')
-    try:
-        files = _gnu_find_files(path, dt_from, dt_to, _ext.keys())
-    except (NotImplementedError, RuntimeError) as e:
-        _logger.warning(f'GNU find returned error: {e}\nFalling back to pure '
-                        f'Python implementation')
-        files = _find_files(path, dt_from, dt_to)
+    # find the files to be included
+    files = get_files(path, dt_from, dt_to)
 
     # remove all files but those supported by nexusLIMS.extractors
     files = [f for f in files if _os.path.splitext(f)[1].strip('.') in
@@ -282,6 +275,38 @@ def build_acq_activities(instrument, dt_from, dt_to,
                                        indent_level=1, print_xml=False)
 
     return acq_activities_str, activities
+
+
+def get_files(path, dt_from, dt_to):
+    """
+    Get list of files under a path that were last modified between the two
+    given timestamps.
+
+    Parameters
+    ----------
+    path : str
+        The file path in which to search for files
+    dt_from : datetime.datetime
+        The starting timestamp that will be used to determine which files go
+        in this record
+    dt_to : datetime.datetime
+        The ending timestamp used to determine the last point in time for
+        which files should be associated with this record
+
+    Returns
+    -------
+    files : :obj:`list` of :obj:`str`
+        A list of the files that have modification times within the
+        time range provided (sorted by modification time)
+    """
+    _logger.info(f'Starting new file-finding in {path}')
+    try:
+        files = _gnu_find_files(path, dt_from, dt_to, _ext.keys())
+    except (NotImplementedError, RuntimeError) as e:
+        _logger.warning(f'GNU find returned error: {e}\nFalling back to pure '
+                        f'Python implementation')
+        files = _find_files(path, dt_from, dt_to)
+    return files
 
 
 def dump_record(instrument,
@@ -357,13 +382,21 @@ def validate_record(xml_filename):
     return validates
 
 
-def build_new_session_records():
+def build_new_session_records(dry_run=False):
     """
     Fetches new records that need to be built from the database (using
     :py:func:`~nexusLIMS.db.session_handler.get_sessions_to_build`), builds
     those records using
     :py:func:`build_record` (saving to the NexusLIMS folder), and returns a
     list of resulting .xml files to be uploaded to CDCS.
+
+    Parameters
+    ----------
+    dry_run : bool
+        Flag to control whether or not records will actually be built,
+        if ``dry_run`` is True, the method will instead return a list of lists
+        of strings, one list for each session, and each sublist will contain
+        strings representing the files found for that session.
 
     Returns
     -------
@@ -428,29 +461,118 @@ def build_new_session_records():
     return xml_files
 
 
-def process_new_records():
+def process_new_records(dry_run=False):
     """
     Using :py:meth:`build_new_session_records()`, process new records,
     save them to disk, and upload them to the NexusLIMS CDCS instance.
     """
-    xml_files = build_new_session_records()
-    files_uploaded, record_ids = _upload_record_files(xml_files)
-    for f in files_uploaded:
-        uploaded_dir = _os.path.abspath(_os.path.join(_os.path.dirname(f),
-                                                      'uploaded'))
-        _pathlib.Path(uploaded_dir).mkdir(parents=True, exist_ok=True)
+    if dry_run:
+        _logger.info("!!DRY RUN!! Only finding files, not building record")
+        dry_run_file_find()
+    else:
+        xml_files = build_new_session_records()   # type: list
+        if len(xml_files) == 0:
+            _logger.warning("No XML files built, so no files uploaded")
+        else:
+            files_uploaded, record_ids = _upload_record_files(xml_files)
+            for f in files_uploaded:
+                uploaded_dir = _os.path.abspath(_os.path.join(
+                    _os.path.dirname(f), 'uploaded'))
+                _pathlib.Path(uploaded_dir).mkdir(parents=True, exist_ok=True)
 
-        _shutil.copy2(f, uploaded_dir)
-        _os.remove(f)
-    files_not_uploaded = [f for f in xml_files if f not in files_uploaded]
+                _shutil.copy2(f, uploaded_dir)
+                _os.remove(f)
+            files_not_uploaded = [f for f in xml_files
+                                  if f not in files_uploaded]
 
-    if len(files_not_uploaded) > 0:
-        _logger.error(f'Some record files were not uploaded: '
-                      f'{files_not_uploaded}')
+            if len(files_not_uploaded) > 0:
+                _logger.error(f'Some record files were not uploaded: '
+                              f'{files_not_uploaded}')
 
 
-if __name__ == '__main__':
+def dry_run_file_find():
     """
-    If running as a module, process new records 
+    Get the files that would be included for any records to be created based
+    off the current state of the database
+
+    Returns
+    -------
+    files_per_session : list
+        A list of lists. Outer list contains as many elements as
+        there are sessions to be processed. Each inner list contains the
+        files that would be included for each record (if it were not a dry run)
     """
-    process_new_records()   # pragma: no cover
+    sessions = _get_sessions()
+    if not sessions:
+        _logger.warning("No 'TO_BE_BUILT' sessions were found. Exiting.")
+        return []
+    else:
+        files_per_session = []
+
+        for s in sessions:
+            path = _os.path.abspath(_os.path.join(_os.environ['mmfnexus_path'],
+                                                  s.instrument.filestore_path))
+            _logger.info(f'Searching for files in '
+                         f'{_os.path.abspath(path)} between '
+                         f'{s.dt_from.isoformat()} and '
+                         f'{s.dt_to.isoformat()}')
+            files = get_files(path, s.dt_from, s.dt_to)
+            files_per_session.append(files)
+
+        for s, f_list in zip(sessions, files_per_session):
+            if len(f_list) == 0:
+                _logger.warning('No files found for this session')
+            for f in f_list:
+                mtime = _datetime.fromtimestamp(
+                    _os.path.getmtime(f)).isoformat()
+                _logger.info(f'*mtime* {mtime} - {f}')
+        return files_per_session
+
+
+if __name__ == '__main__':   # pragma: no cover
+    """
+    If running as a module, process new records (with some control flags
+    """
+    from nexusLIMS.utils import setup_loggers
+    parser = _ap.ArgumentParser()
+
+    # Optional argument flag which defaults to False
+    parser.add_argument("-n", "--dry-run",
+                        action="store_true",
+                        dest='dry_run',
+                        default=False)
+
+    # Optional verbosity counter (eg. -v, -vv, -vvv, etc.)
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="count",
+        default=0,
+        help="Verbosity (-v, -vv); corresponds to python logging level. "
+             "0 is WARN, 1 (-v) is INFO, 2 (-vv) is DEBUG. ERROR and "
+             "CRITICAL are always shown.")
+
+    # Specify output of "--version"
+    parser.add_argument(
+        "--version",
+        action="version",
+        version=f"%(prog)s (version {_version})")
+
+    args = parser.parse_args()
+
+    # set up logging
+    logging_levels = {0: _logging.WARNING,
+                      1: _logging.INFO,
+                      2: _logging.DEBUG}
+
+    if args.dry_run:
+        if args.verbose <= 0:
+            _logger.warning('Increasing verbosity so output of "dry-run" '
+                            'will be shown')
+            args.verbose = 1
+
+    setup_loggers(logging_levels[args.verbose])
+    # when running as script, __name__ is "__main__", so we need to set level
+    # explicitly since the setup_loggers function won't find it
+    _logger.setLevel(logging_levels[args.verbose])
+    process_new_records(args.dry_run)

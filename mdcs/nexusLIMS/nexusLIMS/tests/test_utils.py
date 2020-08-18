@@ -37,6 +37,7 @@ import sys
 from io import BytesIO
 from lxml import etree
 import pytest
+import logging
 from datetime import timedelta as _td
 
 
@@ -185,3 +186,10 @@ class TestUtils:
             os.path.dirname(__file__), "files",
             "***REMOVED***12_no_accompanying_emi_dataZeroed_dataZeroed_1.ser")
         os.remove(new_fname)
+
+    def test_setup_loggers(self):
+        setup_loggers(logging.DEBUG)
+        assert logging.getLogger(
+            'nexusLIMS').getEffectiveLevel() == logging.DEBUG
+        assert logging.getLogger(
+            'nexusLIMS.extractors').getEffectiveLevel() == logging.DEBUG
