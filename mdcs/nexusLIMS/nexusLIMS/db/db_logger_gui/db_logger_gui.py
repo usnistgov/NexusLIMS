@@ -216,8 +216,12 @@ class MainApp(Tk):
         self.wm_iconphoto(True, self.icon)
 
         # Top NexusLIMS logo with tooltip
-
-        self.logo_img = PhotoImage(file=resource_path("logo_text_250x100.png"))
+        if os.path.isfile(resource_path("logo_text_250x100_version.png")):
+            fname = resource_path("logo_text_250x100_version.png")
+        else:
+            fname = resource_path("logo_text_250x100.png")
+        self.logo_img = PhotoImage(file=resource_path(
+            "logo_text_250x100_version.png"))
         self.logo_label = ttk.Label(self,
                                     background=self['background'],
                                     foreground="#000000",
@@ -288,14 +292,11 @@ class MainApp(Tk):
                                      justify='center',
                                      wraplength="250",
                                      text="Leave this window open while you "
-                                          "work!"
-                                          "\n\n"
+                                          "work!\n\n"
                                           "To end the session (after all data "
-                                          "has "
-                                          "been saved to the network share), "
-                                          "click "
-                                          "the \"End session\" button below or "
-                                          "close this window")
+                                          "has been saved to the network "
+                                          "share), click the \"End session\" "
+                                          "button below or close this window")
 
         # Buttons at bottom
 

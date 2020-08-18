@@ -5,6 +5,19 @@
 block_cipher = None
 options = [ ]
 
+# add current date to image
+from PIL import Image, ImageDraw
+from datetime import datetime
+datestr = datetime.now().strftime('v%Y.%m.%d')
+im = Image.open('resources\\logo_text_250x100.png')
+draw = ImageDraw.Draw(im)
+draw.multiline_text((182,90), datestr, fill='rgb(100,100,100)', align='right')
+#im.show()
+im.save('resources\\logo_text_250x100_version.png')
+
+with open('test_file.txt', 'w') as f:
+    f.write('test_content')
+
 a = Analysis(['db_logger_gui.py'],
              pathex=['Z:\\db'],
              binaries=[],
@@ -39,8 +52,8 @@ exe = EXE(pyz,
               ('file.png',
               'Z:\\db\\resources\\file.png',
               'DATA'),
-              ('logo_text_250x100.png',
-              'Z:\\db\\resources\\logo_text_250x100.png',
+              ('logo_text_250x100_version.png',
+              'Z:\\db\\resources\\logo_text_250x100_version.png',
               'DATA'),
               ('arrow-alt-circle-right.png',
               'Z:\\db\\resources\\arrow-alt-circle-right.png',
