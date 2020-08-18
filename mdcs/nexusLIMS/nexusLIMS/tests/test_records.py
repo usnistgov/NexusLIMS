@@ -24,6 +24,29 @@ import pytest
 
 class TestRecordBuilder:
 
+    # have to do these before modifying the database with the actual run tests
+    def test_dry_run(self, fix_mountain_time):
+        files_per_session = _rb.dry_run_file_find()
+        assert len(files_per_session) == 6
+        assert [len(f) for f in files_per_session] == [28, 37, 38,
+                                                       55,  0, 18]
+        assert f'{os.environ["mmfnexus_path"]}' \
+               f'/Titan/***REMOVED***/200204 - ***REMOVED*** - ***REMOVED*** ' \
+               f'- Titan/15 - 620k.dm3' in files_per_session[5]
+
+    def test_dry_run_no_sessions(self, monkeypatch, caplog):
+        monkeypatch.setattr(_rb, '_get_sessions', lambda: [])
+        _rb.dry_run_file_find()
+        assert "No 'TO_BE_BUILT' sessions were found." in caplog.text
+
+    def test_process_new_records_dry_run(self):
+        _rb.process_new_records(dry_run=True)
+
+    def test_process_new_records_no_files_warning(self, monkeypatch, caplog):
+        monkeypatch.setattr(_rb, "build_new_session_records", lambda: [])
+        _rb.process_new_records(dry_run=False)
+        assert "No XML files built, so no files uploaded" in caplog.text
+
     def test_new_session_processor(self, monkeypatch, fix_mountain_time):
         # make record uploader just pretend by returning all files provided (
         # as if they were actually uploaded)
