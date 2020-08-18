@@ -520,6 +520,8 @@ def dry_run_file_find():
             files_per_session.append(files)
 
         for s, f_list in zip(sessions, files_per_session):
+            _logger.info(f'\n\nResults for {s.session_identifier} on '
+                         f'{s.instrument}:')
             if len(f_list) == 0:
                 _logger.warning('No files found for this session')
             for f in f_list:
@@ -531,7 +533,7 @@ def dry_run_file_find():
 
 if __name__ == '__main__':   # pragma: no cover
     """
-    If running as a module, process new records (with some control flags
+    If running as a module, process new records (with some control flags)
     """
     from nexusLIMS.utils import setup_loggers
     parser = _ap.ArgumentParser()
