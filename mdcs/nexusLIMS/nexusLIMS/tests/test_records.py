@@ -25,22 +25,37 @@ import pytest
 class TestRecordBuilder:
 
     # have to do these before modifying the database with the actual run tests
-    def test_dry_run(self, fix_mountain_time):
-        files_per_session = _rb.dry_run_file_find()
-        assert len(files_per_session) == 6
-        assert [len(f) for f in files_per_session] == [28, 37, 38,
-                                                       55,  0, 18]
+    def test_dry_run_calendar(self):
+        sessions = session_handler.get_sessions_to_build()
+        cal_event = _rb.dry_run_get_calendar_event(sessions[0])
+        assert cal_event.project_id == '642.03.??'
+        assert cal_event.username == '***REMOVED***'
+        assert cal_event.title == 'Looking for Nickel Alloys'
+        assert cal_event.start_time == _dt.fromisoformat(
+            '2019-09-06T16:30:00-04:00')
+
+    def test_dry_run_file_find(self, fix_mountain_time):
+        sessions = session_handler.get_sessions_to_build()
+        correct_files_per_session = [28, 37, 38, 55,  0, 18]
+        file_list_list = []
+        for s, ans in zip(sessions, correct_files_per_session):
+            found_files = _rb.dry_run_file_find(s)
+            file_list_list.append(found_files)
+            # noinspection PyTypeChecker
+            assert len(found_files) == ans
+
         assert f'{os.environ["mmfnexus_path"]}' \
                f'/Titan/***REMOVED***/200204 - ***REMOVED*** - ***REMOVED*** ' \
-               f'- Titan/15 - 620k.dm3' in files_per_session[5]
-
-    def test_dry_run_no_sessions(self, monkeypatch, caplog):
-        monkeypatch.setattr(_rb, '_get_sessions', lambda: [])
-        _rb.dry_run_file_find()
-        assert "No 'TO_BE_BUILT' sessions were found." in caplog.text
+               f'- Titan/15 - 620k.dm3' in file_list_list[5]
 
     def test_process_new_records_dry_run(self):
+        # just running to ensure coverage, tests are included above
         _rb.process_new_records(dry_run=True)
+
+    def test_process_new_records_dry_run_no_sessions(self, monkeypatch, caplog):
+        monkeypatch.setattr(_rb, '_get_sessions', lambda: [])
+        _rb.process_new_records(dry_run=True)
+        assert "No 'TO_BE_BUILT' sessions were found. Exiting." in caplog.text
 
     def test_process_new_records_no_files_warning(self, monkeypatch, caplog):
         monkeypatch.setattr(_rb, "build_new_session_records", lambda: [])

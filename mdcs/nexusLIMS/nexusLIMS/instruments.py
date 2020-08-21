@@ -189,3 +189,32 @@ def get_instr_from_filepath(path):
             return v
 
     return None
+
+
+def get_instr_from_calendar_name(cal_name):
+    """
+    Using the NexusLIMS database, get an instrument object by a given path.
+
+    Parameters
+    ----------
+    cal_name : str
+        A calendar name (e.g. "FEITitanTEMEvents") that will be used to search
+        for a matching instrument in the ``api_url`` values
+
+    Returns
+    -------
+    instrument : Instrument or None
+        An `_Instrument` instance matching the path, or None if no match was
+        found
+
+    Examples
+    --------
+    >>> inst = get_instr_from_calendar_name('FEITitanTEMEvents')
+    >>> str(inst)
+    'FEI-Titan-TEM-635816 in ***REMOVED***'
+    """
+    for k, v in instrument_db.items():
+        if cal_name in v.api_url:
+            return v
+
+    return None

@@ -12,6 +12,7 @@ from nexusLIMS.instruments import instrument_db
 from collections import OrderedDict
 
 import warnings
+
 warnings.filterwarnings(
     action='ignore',
     message=r"DeprecationWarning: Using Ntlm()*",
@@ -37,7 +38,7 @@ class TestCalendarHandling:
     #  'xmlns="http://www.w3.org/2005/Atom"' from the top level element,
     #  since this is done by fetch_xml() in the actual processing
     instr_url = instrument_db['FEI-Titan-TEM-635816'].api_url + \
-        '?$expand=CreatedBy'
+                '?$expand=CreatedBy'
     xml_content = _nexus_req(instr_url, requests.get).text.replace(
         'xmlns="http://www.w3.org/2005/Atom"', '')
 
@@ -199,6 +200,44 @@ class TestCalendarHandling:
                            dt_to=dt.fromisoformat('2016-05-01T00:00:00'))
         doc = etree.fromstring(xml)
         assert len(doc.findall('entry')) == 5
+
+    def test_fetch_xml_calendar_event(self):
+        xml = \
+            sc.fetch_xml(instrument=instrument_db['FEI-Titan-TEM-635816'],
+                         dt_from=dt.fromisoformat('2018-11-13T00:00:00'),
+                         dt_to=dt.fromisoformat('2018-11-13T23:59:59'))
+        cal_event = sc.CalendarEvent.from_xml(xml)
+        assert cal_event.title == '***REMOVED***'
+        assert cal_event.sharepoint_id == 470
+        assert cal_event.username == '***REMOVED***'
+        assert cal_event.start_time == dt.fromisoformat(
+            '2018-11-13T09:00:00-05:00')
+
+    def test_fetch_xml_calendar_event_no_entry(self):
+        # tests when there is no matching event found
+        xml = \
+            sc.fetch_xml(instrument=instrument_db['FEI-Titan-TEM-635816'],
+                         dt_from=dt.fromisoformat('2010-01-01T00:00:00'),
+                         dt_to=dt.fromisoformat('2010-01-01T00:00:01'))
+        cal_event = sc.CalendarEvent.from_xml(xml)
+        assert cal_event is None
+
+    def test_calendar_event_repr(self):
+        s = dt(2020, 8, 20, 12, 0, 0)
+        e = dt(2020, 8, 20, 16, 0, 40)
+        c = sc.CalendarEvent('Test event',
+                             instrument_db['FEI-Titan-TEM-635816'],
+                             dt.now(), '***REMOVED***', '***REMOVED***', s, e, 'category',
+                             'purpose', 'sample details', 'projectID', 999)
+        assert c.__repr__() == 'Event for ***REMOVED*** on FEI-Titan-TEM-635816 from ' \
+                               '2020-08-20T12:00:00 to 2020-08-20T16:00:40'
+
+        c = sc.CalendarEvent()
+        assert c.__repr__() == 'No matching calendar event'
+
+        c = sc.CalendarEvent(instrument=instrument_db['FEI-Titan-TEM-635816'])
+        assert c.__repr__() == 'No matching calendar event for ' \
+                               'FEI-Titan-TEM-635816'
 
     def test_dump_calendars(self, tmp_path):
         from nexusLIMS.harvester.sharepoint_calendar import dump_calendars
@@ -375,3 +414,114 @@ class TestCalendarHandling:
             m.delenv('nexusLIMS_timezone')
             with pytest.raises(EnvironmentError):
                 sc._get_sharepoint_date_string(dt.now())
+
+    def test_get_sharepoint_tz(self, monkeypatch):
+        assert sc._get_sharepoint_tz() in ['America/New_York',
+                                           'America/Chicago',
+                                           'America/Denver',
+                                           'America/Los_Angeles',
+                                           'Pacific/Honolulu']
+
+        # Create a fake response object that will have the right xml (like
+        # would be returned if the server were in different time zones)
+        class MockResponse(object):
+            def __init__(self, text):
+                self.text = \
+                    """<?xml version="1.0" encoding="utf-8"?>
+<feed xml:base="https://***REMOVED***/Div/msed/MSED-MMF/_api/"
+      xmlns="http://www.w3.org/2005/Atom"
+      xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices"
+      xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"
+      xmlns:georss="http://www.georss.org/georss"
+      xmlns:gml="http://www.opengis.net/gml">
+""" + text + "</feed>"
+
+        def mock_get_et(url, req):
+            return MockResponse(text="""
+            <content type="application/xml">
+                <m:properties>
+                    <d:Description>(UTC-05:00) Eastern Time (US and 
+                    Canada)</d:Description>
+                    <d:Id m:type="Edm.Int32">11</d:Id>
+                    <d:Information m:type="SP.TimeZoneInformation">
+                        <d:Bias m:type="Edm.Int32">360</d:Bias>
+                        <d:DaylightBias m:type="Edm.Int32">-60</d:DaylightBias>
+                        <d:StandardBias m:type="Edm.Int32">0</d:StandardBias>
+                    </d:Information>
+                </m:properties>
+            </content>
+            """)
+
+        def mock_get_ct(url, req):
+            return MockResponse(text="""
+            <content type="application/xml">
+                <m:properties>
+                    <d:Description>(UTC-06:00) Central Time (US and 
+                    Canada)</d:Description>
+                    <d:Id m:type="Edm.Int32">11</d:Id>
+                    <d:Information m:type="SP.TimeZoneInformation">
+                        <d:Bias m:type="Edm.Int32">360</d:Bias>
+                        <d:DaylightBias m:type="Edm.Int32">-60</d:DaylightBias>
+                        <d:StandardBias m:type="Edm.Int32">0</d:StandardBias>
+                    </d:Information>
+                </m:properties>
+            </content>
+            """)
+
+        def mock_get_mt(url, req):
+            return MockResponse(text="""
+            <content type="application/xml">
+                <m:properties>
+                    <d:Description>(UTC-07:00) Mountain Time (US and 
+                    Canada)</d:Description>
+                    <d:Id m:type="Edm.Int32">12</d:Id>
+                    <d:Information m:type="SP.TimeZoneInformation">
+                        <d:Bias m:type="Edm.Int32">420</d:Bias>
+                        <d:DaylightBias m:type="Edm.Int32">-60</d:DaylightBias>
+                        <d:StandardBias m:type="Edm.Int32">0</d:StandardBias>
+                    </d:Information>
+            </m:properties>
+            </content>
+            """)
+
+        def mock_get_pt(url, req):
+            return MockResponse(text="""
+            <content type="application/xml">
+                <m:properties>
+                    <d:Description>(UTC-08:00) Pacific Time (US and 
+                    Canada)</d:Description>
+                    <d:Id m:type="Edm.Int32">13</d:Id>
+                    <d:Information m:type="SP.TimeZoneInformation">
+                        <d:Bias m:type="Edm.Int32">480</d:Bias>
+                        <d:DaylightBias m:type="Edm.Int32">-60</d:DaylightBias>
+                        <d:StandardBias m:type="Edm.Int32">0</d:StandardBias>
+                    </d:Information>
+                </m:properties>
+            </content>
+            """)
+
+        def mock_get_ht(url, req):
+            return MockResponse(text="""
+            <content type="application/xml">
+                <m:properties>
+                    <d:Description>(UTC-10:00) Hawaii</d:Description>
+                    <d:Id m:type="Edm.Int32">15</d:Id>
+                    <d:Information m:type="SP.TimeZoneInformation">
+                        <d:Bias m:type="Edm.Int32">600</d:Bias>
+                        <d:DaylightBias m:type="Edm.Int32">-60</d:DaylightBias>
+                        <d:StandardBias m:type="Edm.Int32">0</d:StandardBias>
+                    </d:Information>
+                </m:properties>
+            </content>
+            """)
+
+        monkeypatch.setattr(sc, '_nexus_req', mock_get_et)
+        assert sc._get_sharepoint_tz() == 'America/New_York'
+        monkeypatch.setattr(sc, '_nexus_req', mock_get_ct)
+        assert sc._get_sharepoint_tz() == 'America/Chicago'
+        monkeypatch.setattr(sc, '_nexus_req', mock_get_mt)
+        assert sc._get_sharepoint_tz() == 'America/Denver'
+        monkeypatch.setattr(sc, '_nexus_req', mock_get_pt)
+        assert sc._get_sharepoint_tz() == 'America/Los_Angeles'
+        monkeypatch.setattr(sc, '_nexus_req', mock_get_ht)
+        assert sc._get_sharepoint_tz() == 'Pacific/Honolulu'

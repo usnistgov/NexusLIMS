@@ -72,7 +72,7 @@ def parse_xml(xml, xslt_file, **kwargs):
         A string containing XML, such as that returned by :py:func:`~.fetch_xml`
     xslt_file : str or io.BytesIO
         Path to the XSLT file to use for transformation
-    **kwargs : dict, optional
+    **kwargs : str, optional
         Other keyword arguments are passed as parameters to the XSLT
         transformer. ``None`` values are converted to an empty string.
     Returns
