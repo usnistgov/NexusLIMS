@@ -30,6 +30,7 @@ nexusLIMS_tests_37:
     paths:
       - coverage
     expire_in: 30 days
+  needs: []
 
 nexusLIMS_tests_38:
   stage: test
@@ -53,6 +54,7 @@ nexusLIMS_tests_38:
     - pipenv install --dev
   after_script:
     - /opt/conda/bin/conda remove -y -p ${CONDA_ENV}_38 --all || true
+  needs: []
 
 pages:
   stage: deploy
@@ -76,3 +78,4 @@ pages:
       - public
   dependencies:
     - nexusLIMS_tests_37
+  needs: ['nexusLIMS_tests_37']

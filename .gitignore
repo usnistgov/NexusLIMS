@@ -12,6 +12,7 @@ gitlab_backup.log
 .coverage
 .env
 .directory
+test_db.sqlite
 
 # dev files
 *.pyc
