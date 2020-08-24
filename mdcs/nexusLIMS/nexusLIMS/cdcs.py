@@ -123,12 +123,15 @@ def upload_record_content(xml_content, title):
 
     # assign this record to the public workspace
     record_id = post_r.json()['id']
+    record_url = _urljoin(_cdcs_url,
+                          f'data?id={record_id}')
     wrk_endpoint = _urljoin(_cdcs_url,
                             f'rest/data/{record_id}/assign/'
                             f'{get_workspace_id()}')
 
     r = _nx_req(wrk_endpoint, _requests.patch, basic_auth=True)
 
+    _logger.info(f'Record "{title}" available at {record_url}')
     return post_r, record_id
 
 
@@ -156,7 +159,7 @@ def delete_record(record_id):
     return r
 
 
-def upload_record_files(files_to_upload):
+def upload_record_files(files_to_upload, progress=False):
     """
     Upload a list of .xml files (or all .xml files in the current directory)
     to the NexusLIMS CDCS instance using :py:meth:`upload_record_content`
@@ -166,6 +169,8 @@ def upload_record_files(files_to_upload):
     files_to_upload : list or None
         The list of .xml files to upload. If ``None``, all .xml files in the
         current directory will be used instead.
+    progress : bool
+        Whether or not to show a progress bar for uploading
 
     Returns
     -------
@@ -190,7 +195,8 @@ def upload_record_files(files_to_upload):
 
     files_uploaded = []
     record_ids = []
-    for f in _tqdm(files_to_upload):
+
+    for f in _tqdm(files_to_upload) if progress else files_to_upload:
         with open(f, 'r') as xml_file:
             xml_content = xml_file.read()
 
