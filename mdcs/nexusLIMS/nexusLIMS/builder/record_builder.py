@@ -540,6 +540,8 @@ def dry_run_file_find(s):
     _logger.info(f'Results for {s.session_identifier} on {s.instrument}:')
     if len(files) == 0:
         _logger.warning('No files found for this session')
+    else:
+        _logger.info(f'Found {len(files)} files for this session')
     for f in files:
         mtime = _datetime.fromtimestamp(
             _os.path.getmtime(f)).isoformat()
