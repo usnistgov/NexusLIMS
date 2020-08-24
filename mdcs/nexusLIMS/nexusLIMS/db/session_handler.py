@@ -191,7 +191,7 @@ def get_sessions_to_build():
 
     Returns
     -------
-    sessions : list
+    sessions : list of :py:class:`~nexusLIMS.db.session_handler.Session`
         A list of :py:class:`~nexusLIMS.db.session_handler.Session` objects
         containing the sessions that the need their record built. Will be an
         empty list if there's nothing to do.

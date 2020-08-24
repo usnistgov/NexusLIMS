@@ -45,6 +45,7 @@ from datetime import timedelta as _timedelta
 from configparser import ConfigParser as _ConfigParser
 from nexusLIMS.instruments import Instrument as _Instrument
 from nexusLIMS.instruments import instrument_db as _instr_db
+from nexusLIMS.instruments import get_instr_from_calendar_name as _from_cal
 from nexusLIMS.utils import parse_xml as _parse_xml
 from nexusLIMS.utils import nexus_req as _nexus_req
 from nexusLIMS.utils import _get_timespan_overlap
@@ -65,66 +66,148 @@ class AuthenticationError(Exception):
         self.message = message
 
 
-# TODO: we need a class here that represents one entry from the calendar
-# class CalendarEvent:
-#     """
-#      A representation of a single calendar event returned from the SharePoint
-#      API
-#
-#      Instances of this class correspond to AcquisitionActivity nodes in the
-#      `NexusLIMS schema <https://data.nist.gov/od/dm/nexus/experiment/v1.0>`_
-#
-#      Attributes
-#      ----------
-#      start : datetime.datetime
-#          The start point of this AcquisitionActivity
-#      end : datetime.datetime
-#          The end point of this AcquisitionActivity
-#      mode : str
-#          The microscope mode for this AcquisitionActivity (i.e. 'IMAGING',
-#          'DIFFRACTION', 'SCANNING', etc.)
-#      unique_params : set
-#          A set of dictionary keys that comprises all unique metadata keys
-#          contained within the files of this AcquisitionActivity
-#      setup_params : dict
-#          A dictionary containing metadata about the data that is shared
-#          amongst all data files in this AcquisitionActivity
-#      unique_meta : list
-#          A list of dictionaries (one for each file in this
-#          AcquisitionActivity) containing metadata key-value pairs that are
-#          unique to each file in ``files`` (i.e. those that could not be moved
-#          into ``setup_params`)
-#      files : list
-#          A list of filenames belonging to this AcquisitionActivity
-#      sigs : list
-#          A list of *lazy* (to minimize loading times) HyperSpy signals in this
-#          AcquisitionActivity. HyperSpy is used to facilitate metadata reading
-#      meta : list
-#          A list of dictionaries containing the "important" metadata for each
-#          signal/file in ``sigs`` and ``files``
-#      """
-#
-#     def __init__(self,
-#                  start=_datetime.now(),
-#                  end=_datetime.now(),
-#                  mode='',
-#                  unique_params=None,
-#                  setup_params=None,
-#                  unique_meta=None,
-#                  files=None,
-#                  sigs=None,
-#                  meta=None):
-#
-#         self.start = start
-#         self.end = end
-#         self.mode = mode
-#         self.unique_params = set() if unique_params is None else unique_params
-#         self.setup_params = setup_params
-#         self.unique_meta = unique_meta
-#         self.files = [] if files is None else files
-#         self.sigs = [] if sigs is None else sigs
-#         self.meta = [] if meta is None else meta
-#
+class CalendarEvent:
+    """
+    A representation of a single calendar "entry" returned from the SharePoint
+    API. Each attribute is mapped to a node in the XML API response, and will be
+    None if the node cannot be found in the XML. Timestamps are given in
+    either Zulu time (UTC) or with a local timestamp offset, so datetime
+    attributes should be timezone-aware.
+
+    Attributes
+    ----------
+    title : str
+        The title of the event (present at
+        ``/feed/entry/content/m:properties/d:TitleOfExperiment``)
+    instrument : ~nexusLIMS.instruments.Instrument
+        The instrument associated with this calendar entry (fetched using
+        the name of the calendar, present at ``/feed/title``)
+    updated : datetime.datetime
+        The time this event was last updated (present at
+        ``/feed/entry/updated``)
+    username : str
+        The NIST "short" username of the user indicated in this event (present
+        at ``/feed/entry/link[@title="UserName"]/m:inline/feed/entry/content
+        /m:properties/d:UserName``)
+    created_by : str
+        The NIST "short" username of the user that created this event (present
+        at ```/feed/entry/link[@title="CreatedBy"]/m:inline/feed/entry/content
+        /m:properties/d:UserName``)
+    start_time : datetime.datetime
+        The time this event was scheduled to start (present at
+        ``/feed/entry/content/m:properties/d:StartTime``)
+        The API response returns this value without a timezone, in the timezone
+        of the sharepoint server
+    end_time : datetime.datetime
+        The time this event was scheduled to end (present at
+        ``/feed/entry/content/m:properties/d:EndTime``)
+    category_value : str
+        The "type" or category of this event (such as User session, service,
+        etc.) (present at ``/feed/entry/content/m:properties/d:CategoryValue``)
+    experiment_purpose : str
+        The user-entered purpose of this experiment (present at
+        ``/feed/entry/content/m:properties/d:ExperimentPurpose``)
+    sample_details : str
+        The user-entered sample details for this experiment (present at
+        ``/feed/entry/content/m:properties/d:SampleDetails``)
+    project_id : str
+        The user-entered project identifier for this experiment (present at
+        ``/feed/entry/content/m:properties/d:ProjectID``)
+    sharepoint_id : int
+        The numeric identifier assigned to this event by SharePoint (present at
+        ``/feed/entry/content/m:properties/d:Id``)
+    """
+
+    def __init__(self, title=None, instrument=None, updated=None,
+                 username=None, created_by=None, start_time=None,
+                 end_time=None, category_value=None, experiment_purpose=None,
+                 sample_details=None, project_id=None, sharepoint_id=None):
+        self.title = title
+        self.instrument = instrument
+        self.updated = updated
+        self.username = username
+        self.created_by = created_by
+        self.start_time = start_time
+        self.end_time = end_time
+        self.category_value = category_value
+        self.experiment_purpose = experiment_purpose
+        self.sample_details = sample_details
+        self.project_id = project_id
+        self.sharepoint_id = sharepoint_id
+
+    @classmethod
+    def from_xml(cls, xml):
+        """
+        Alternative constructor that allows parsing of an xml response from
+        :py:func:`~.fetch_xml` rather than providing values directly
+
+        Parameters
+        ----------
+        xml : str
+            Output of an API query to the Sharepoint calendar that contains a
+            single event (which should be the case if start and end times were
+            provided to :py:func:`~.fetch_xml`)
+
+        Returns
+        -------
+        cal_event : CalendarEvent or None
+            An object representing an entry on the SharePoint calendar. Could
+            be None if no entry is found within the provided XML
+        """
+        def _get_el_text(xpath):
+            el = et.find(xpath, namespaces=et.nsmap)
+            if el is None:
+                return el
+            else:
+                return el.text
+
+        et = _etree.fromstring(xml)
+        if _get_el_text('entry') is None:
+            # no "entry" nodes were found, so return None
+            return None
+        title = _get_el_text('entry//d:TitleOfExperiment')
+        # get instrument from calendar title
+        instrument = _get_el_text('title')
+        if instrument is not None:
+            instrument = _from_cal(instrument)
+        sp_tz = _get_sharepoint_tz()
+        updated = _get_el_text('entry/updated')
+        if updated is not None:
+            updated = _datetime.fromisoformat(updated)
+        username = _get_el_text('entry/link[@title="UserName"]//d:UserName')
+        created_by = _get_el_text('entry/link[@title="CreatedBy"]//d:UserName')
+        start_time = _get_el_text('entry//d:StartTime')
+        if start_time is not None:
+            start_time = _timezone(sp_tz).localize(
+                _datetime.fromisoformat(start_time))
+        end_time = _get_el_text('entry//d:EndTime')
+        if end_time is not None:
+            end_time = _timezone(sp_tz).localize(
+                _datetime.fromisoformat(end_time))
+        category_value = _get_el_text('entry//d:CategoryValue')
+        sample_details = _get_el_text('entry//d:SampleDetails')
+        project_id = _get_el_text('entry//d:ProjectID')
+        sharepoint_id = _get_el_text('entry/content//d:Id')
+        if sharepoint_id is not None:
+            sharepoint_id = int(sharepoint_id)
+
+        return CalendarEvent(
+            title=title, instrument=instrument, updated=updated,
+            username=username, created_by=created_by, start_time=start_time,
+            end_time=end_time, category_value=category_value,
+            sample_details=sample_details, project_id=project_id,
+            sharepoint_id=sharepoint_id
+        )
+
+    def __repr__(self):
+        if self.username and self.start_time and self.end_time:
+            return f'Event for {self.username} on {self.instrument.name} ' \
+                   f'from {self.start_time.isoformat()} to ' \
+                   f'{self.end_time.isoformat()}'
+        else:
+            return f'No matching calendar event' + \
+                   (f' for {self.instrument.name}' if self.instrument else '')
+
 
 def get_div_and_group(username):
     """
@@ -250,7 +333,7 @@ def fetch_xml(instrument, dt_from=None, dt_to=None):
 
     Returns
     -------
-    api_response : list
+    api_response : str
         A string containing the XML calendar information for each
         instrument requested, stripped of the empty default namespace. If
         ``dt_from`` and ``dt_to`` are provided, it will contain just one
@@ -582,3 +665,38 @@ def _get_sharepoint_date_string(dt):
     dt_str = _pytz.utc.localize(dt).astimezone(tz).strftime('%Y-%m-%dT%H:%M:%S')
 
     return dt_str
+
+
+def _get_sharepoint_tz():
+    """
+    Based on the response from the Sharepoint API, get the timezone of the
+    server in tz database format (only implemented for US timezones, since
+    Sharepoint uses non-standard time zone names)
+
+    Returns
+    -------
+    timezone : str or None
+        The timezone in tz database format
+    """
+    cdcs_url = nexusLIMS._urls.calendar_root_url
+    r = _nexus_req(cdcs_url + '/_api/web/RegionalSettings/TimeZone',
+                   _requests.get)
+    et = _etree.fromstring(r.text.encode())
+    tz_description = et.find('.//d:Description', namespaces=et.nsmap)
+    if tz_description is not None:
+        tz_description = tz_description.text
+
+    timezone = None
+
+    if 'Eastern Time' in tz_description:
+        timezone = 'America/New_York'
+    elif 'Central Time' in tz_description:
+        timezone = 'America/Chicago'
+    elif 'Mountain Time' in tz_description:
+        timezone = 'America/Denver'
+    elif 'Pacific Time' in tz_description:
+        timezone = 'America/Los_Angeles'
+    elif 'Hawaii' in tz_description:
+        timezone = 'Pacific/Honolulu'
+
+    return timezone

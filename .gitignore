@@ -23,6 +23,7 @@ test_data/
 mdcs/nexusLIMS/doc/source/api/*.rst
 _coverage_output
 .venv/
+*.sqbpro
 
 # pip installation files
 *.egg-info

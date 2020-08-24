@@ -382,7 +382,7 @@ def validate_record(xml_filename):
     return validates
 
 
-def build_new_session_records(dry_run=False):
+def build_new_session_records():
     """
     Fetches new records that need to be built from the database (using
     :py:func:`~nexusLIMS.db.session_handler.get_sessions_to_build`), builds
@@ -390,17 +390,9 @@ def build_new_session_records(dry_run=False):
     :py:func:`build_record` (saving to the NexusLIMS folder), and returns a
     list of resulting .xml files to be uploaded to CDCS.
 
-    Parameters
-    ----------
-    dry_run : bool
-        Flag to control whether or not records will actually be built,
-        if ``dry_run`` is True, the method will instead return a list of lists
-        of strings, one list for each session, and each sublist will contain
-        strings representing the files found for that session.
-
     Returns
     -------
-    xml_files : list
+    xml_files : list of str
         A list of record files that were successfully built and saved to
         centralized storage
     """
@@ -467,10 +459,19 @@ def process_new_records(dry_run=False):
     save them to disk, and upload them to the NexusLIMS CDCS instance.
     """
     if dry_run:
-        _logger.info("!!DRY RUN!! Only finding files, not building record")
-        dry_run_file_find()
+        _logger.info("!!DRY RUN!! Only finding files, not building records")
+        sessions = _get_sessions()
+        if not sessions:
+            _logger.warning("No 'TO_BE_BUILT' sessions were found. Exiting.")
+            return None
+        for s in sessions:
+            _logger.info('')
+            _logger.info('')
+            dry_run_get_calendar_event(s)
+            dry_run_file_find(s)
     else:
-        xml_files = build_new_session_records()   # type: list
+        xml_files = build_new_session_records()
+        # noinspection PyTypeChecker
         if len(xml_files) == 0:
             _logger.warning("No XML files built, so no files uploaded")
         else:
@@ -490,48 +491,67 @@ def process_new_records(dry_run=False):
                               f'{files_not_uploaded}')
 
 
-def dry_run_file_find():
+def dry_run_get_calendar_event(s):
     """
-    Get the files that would be included for any records to be created based
-    off the current state of the database
+    Get the calendar event that would be used to create a record based off
+    the supplied session
+
+    Parameters
+    ----------
+    s : ~nexusLIMS.db.session_handler.Session
+        A session read from the database
 
     Returns
     -------
-    files_per_session : list
-        A list of lists. Outer list contains as many elements as
-        there are sessions to be processed. Each inner list contains the
-        files that would be included for each record (if it were not a dry run)
+    cal_event : ~nexusLIMS.harvester.sharepoint_calendar.CalendarEvent
+        A list of strings containing the files that would be included for the
+        record of this session (if it were not a dry run)
     """
-    sessions = _get_sessions()
-    if not sessions:
-        _logger.warning("No 'TO_BE_BUILT' sessions were found. Exiting.")
-        return []
+    xml = _sp_cal.fetch_xml(s.instrument, s.dt_from, s.dt_to)
+    cal_event = _sp_cal.CalendarEvent.from_xml(xml)
+    _logger.info(cal_event)
+    return cal_event
+
+
+def dry_run_file_find(s):
+    """
+    Get the files that would be included for any records to be created based
+    off the supplied session
+
+    Parameters
+    ----------
+    s : ~nexusLIMS.db.session_handler.Session
+        A session read from the database
+
+    Returns
+    -------
+    files : list of str
+        A list of strings containing the files that would be included for the
+        record of this session (if it were not a dry run)
+    """
+    path = _os.path.abspath(_os.path.join(_os.environ['mmfnexus_path'],
+                                          s.instrument.filestore_path))
+    _logger.info(f'Searching for files in '
+                 f'{_os.path.abspath(path)} between '
+                 f'{s.dt_from.isoformat()} and '
+                 f'{s.dt_to.isoformat()}')
+    files = get_files(path, s.dt_from, s.dt_to)
+
+    _logger.info(f'Results for {s.session_identifier} on {s.instrument}:')
+    if len(files) == 0:
+        _logger.warning('No files found for this session')
     else:
-        files_per_session = []
-
-        for s in sessions:
-            path = _os.path.abspath(_os.path.join(_os.environ['mmfnexus_path'],
-                                                  s.instrument.filestore_path))
-            _logger.info(f'Searching for files in '
-                         f'{_os.path.abspath(path)} between '
-                         f'{s.dt_from.isoformat()} and '
-                         f'{s.dt_to.isoformat()}')
-            files = get_files(path, s.dt_from, s.dt_to)
-            files_per_session.append(files)
-
-        for s, f_list in zip(sessions, files_per_session):
-            if len(f_list) == 0:
-                _logger.warning('No files found for this session')
-            for f in f_list:
-                mtime = _datetime.fromtimestamp(
-                    _os.path.getmtime(f)).isoformat()
-                _logger.info(f'*mtime* {mtime} - {f}')
-        return files_per_session
+        _logger.info(f'Found {len(files)} files for this session')
+    for f in files:
+        mtime = _datetime.fromtimestamp(
+            _os.path.getmtime(f)).isoformat()
+        _logger.info(f'*mtime* {mtime} - {f}')
+    return files
 
 
 if __name__ == '__main__':   # pragma: no cover
     """
-    If running as a module, process new records (with some control flags
+    If running as a module, process new records (with some control flags)
     """
     from nexusLIMS.utils import setup_loggers
     parser = _ap.ArgumentParser()
