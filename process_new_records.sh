@@ -330,6 +330,8 @@ function main() {
     if [[ -n ${dry_run-} ]]; then
         python_args+="-n -vv"
         echo "Running script as dry run, not performing any actions"
+        LOGPATH_rel="${nexusLIMS_path}/../logs/$(date +%Y%m%d-%H%M)_dryrun.log"
+        LOGPATH=$(get_abs_filename "${LOGPATH_rel}")
     else
         python_args="-vv"
     fi
