@@ -225,6 +225,11 @@
                     font-size: 12px;
                 }
                 
+                /* Make rows of sidebar nav table appear as links */
+                #nav-table tbody tr {
+                    cursor: pointer;
+                }
+                
                 #close-accords-btn, #open-accords-btn, #to-top-btn {
                     margin: 0.5em auto;
                     display: block;
@@ -2635,7 +2640,12 @@ The textual data from the selected rows (not the actual files) can also be expor
                         class:'cdatatableDetails'
                     }));
                     $('.sidebar .pagination').first().addClass('vertical-align');
-            
+                    
+                    // make each row in nav-table clickable as the header link 
+                    $('#nav-table tbody tr').click(function() { 
+                        window.location = $(this).find('a').attr('href'); 
+                        return false; 
+                    });
             
                     // Make dataset metadata tables DataTables
                     $('.meta-table').each(function() {
