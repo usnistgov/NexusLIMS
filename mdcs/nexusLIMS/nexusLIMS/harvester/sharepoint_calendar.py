@@ -527,6 +527,8 @@ def get_events(instrument=None,
 
     output = ''
     xml = fetch_xml(instrument, dt_from=dt_from, dt_to=dt_to)
+    cal_event = CalendarEvent.from_xml(xml)
+    _logger.info(cal_event)
 
     if not division and not group and user:
         _logging.info('Querying LDAP for division and group info')
