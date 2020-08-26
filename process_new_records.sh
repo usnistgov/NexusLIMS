@@ -303,7 +303,10 @@ From: ***REMOVED***
 Subject: ERROR in NexusLIMS record builder
 
 There was an error (or unusual output) in the record builder. Here is the
-output of ${LOGPATH}:
+output of ${LOGPATH}.
+To help you debug, the following "bad" strings were found in the output:
+
+${found_strings}
 
 $(cat "${LOGPATH}")
 EOF
@@ -320,18 +323,26 @@ function main() {
     parse_params "$@"
     colour_init
 
+    # echo "Sourcing ${script_dir}/.env"
     # shellcheck disable=SC1090
     source "${script_dir}/.env"
+    year=$(date +%Y)
+    month=$(date +%m)
+    day=$(date +%d)
     # shellcheck disable=SC2154
-    LOGPATH_rel="${nexusLIMS_path}/../logs/$(date +%Y%m%d-%H%M).log"
+    LOGPATH_rel="${nexusLIMS_path}/../logs/${year}/${month}/${day}/$(date +%Y%m%d-%H%M).log"
+    # make sure path to log file directory exists
+    mkdir -p "$(dirname "${LOGPATH_rel}")"
+    # echo "LOGPATH_rel is ${LOGPATH_rel}"
     LOGPATH=$(get_abs_filename "${LOGPATH_rel}")
+    # echo "LOGPATH is ${LOGPATH}"
 
     python_args=""
     if [[ -n ${dry_run-} ]]; then
         python_args+="-n -vv"
         echo "Running script as dry run, not performing any actions"
-        LOGPATH_rel="${nexusLIMS_path}/../logs/$(date +%Y%m%d-%H%M)_dryrun.log"
-        LOGPATH=$(get_abs_filename "${LOGPATH_rel}")
+        # replace end of log filepath with dryrun indicator
+        LOGPATH=${LOGPATH/%.log/_dryrun.log}
     else
         python_args="-vv"
     fi
@@ -339,10 +350,25 @@ function main() {
     # actually run record builder
     echo "Writing log to ${LOGPATH}"
     echo "Python args is ${python_args}"
-    cd "${script_dir}"
+    abs_script_dir=$(get_abs_filename "${script_dir}")
+    # echo "Abs script dir is ${abs_script_dir}"
+    cd "${abs_script_dir}"
     pipenv run python -m nexusLIMS.builder.record_builder ${python_args}  &> "${LOGPATH}"
 
-    if grep -q -i -E 'critical|error|exception|fatal|no_files_found'  "${LOGPATH}"; then
+    if grep -q -i -E 'critical|error|exception|fatal|no_files_found' "${LOGPATH}"; then
+      stringArr=()
+      # do some more detailed checks to allow us to specify which text was
+      # found in the output:
+      if grep -q -i -E 'critical' "${LOGPATH}"; then
+        stringArr+=("critical")
+      elif grep -q -i -E 'error' "${LOGPATH}"; then
+        stringArr+=("error")
+      elif grep -q -i -E 'fatal' "${LOGPATH}"; then
+        stringArr+=("fatal")
+      elif grep -q -i -E 'no_files_found' "${LOGPATH}"; then
+        stringArr+=("no_files_found")
+      fi
+      found_strings=$(IFS=, ; echo "${stringArr[*]}")
       send_email
     else
       # do nothing
