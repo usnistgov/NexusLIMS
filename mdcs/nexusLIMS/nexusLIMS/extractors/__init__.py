@@ -17,6 +17,7 @@ expected (although not enforced):
 * ``'Instrument ID'`` - instrument PID pulled from the instrument database
 """
 import os as _os
+import shutil as _sh
 import json as _json
 import pathlib as _pathlib
 import numpy as _np
@@ -31,6 +32,8 @@ import logging as _logging
 import collections as _collections
 
 _logger = _logging.getLogger(__name__)
+PLACEHOLDER_PREVIEW = _os.path.join(_os.path.dirname(__file__),
+                                    'extractor_error.png')
 
 extension_reader_map = {
     'dm3': get_dm3_metadata,
@@ -79,6 +82,8 @@ def parse_metadata(fname, write_output=True, generate_preview=True,
     nx_meta = extension_reader_map[extension](fname)
     preview_fname = None
 
+    # nx_meta should never be None, because the extractors are defensive and
+    # will always return _something_
     if nx_meta is not None:
         # Set the dataset type to Misc if it was not set by the file reader
         if 'DatasetType' not in nx_meta['nx_meta']:
@@ -86,7 +91,8 @@ def parse_metadata(fname, write_output=True, generate_preview=True,
             nx_meta['nx_meta']['Data Type'] = 'Miscellaneous'
 
         if write_output:
-            out_fname = fname.replace(_os.environ["mmfnexus_path"], _os.environ["nexusLIMS_path"]) + '.json'
+            out_fname = fname.replace(_os.environ["mmfnexus_path"],
+                                      _os.environ["nexusLIMS_path"]) + '.json'
             if not _os.path.isfile(out_fname) or overwrite:
                 # Create the directory for the metadata file, if needed
                 _pathlib.Path(_os.path.dirname(out_fname)).mkdir(parents=True,
@@ -103,56 +109,67 @@ def parse_metadata(fname, write_output=True, generate_preview=True,
                     _json.dump(out_dict, f, sort_keys=False,
                                indent=2, cls=_CustomEncoder)
 
-        if generate_preview:
-            preview_fname = fname.replace(_os.environ["mmfnexus_path"], _os.environ["nexusLIMS_path"]) + '.thumb.png'
-            if extension == 'tif':
-                instr = _get_instr(fname)
-                instr_name = instr.name if instr is not None else None
-                if instr_name == 'FEI-Quanta200-ESEM-633137':
-                    # we know the output size we want for the Quanta
-                    output_size = (512, 471)
-                    _down_sample(fname,
-                                 out_path=preview_fname,
-                                 output_size=output_size)
-                else:
-                    factor = 2
-                    _down_sample(fname,
-                                 out_path=preview_fname,
-                                 factor=factor)
-
+    if generate_preview:
+        preview_fname = fname.replace(_os.environ["mmfnexus_path"],
+                                      _os.environ["nexusLIMS_path"]) + \
+                        '.thumb.png'
+        if extension == 'tif':
+            instr = _get_instr(fname)
+            instr_name = instr.name if instr is not None else None
+            if instr_name == 'FEI-Quanta200-ESEM-633137':
+                # we know the output size we want for the Quanta
+                output_size = (512, 471)
+                _down_sample(fname,
+                             out_path=preview_fname,
+                             output_size=output_size)
             else:
-                load_options = {'lazy': True}
-                if extension == 'ser':
-                    load_options['only_valid_data'] = True
+                factor = 2
+                _down_sample(fname,
+                             out_path=preview_fname,
+                             factor=factor)
 
+        else:
+            load_options = {'lazy': True}
+            if extension == 'ser':
+                load_options['only_valid_data'] = True
+
+            try:
                 s = _hs.load(fname, **load_options)
+            except Exception as _:
+                _logger.warning('Signal could not be loaded by HyperSpy. '
+                                'Using placeholder image for preview.')
+                preview_fname = fname.replace(
+                    _os.environ["mmfnexus_path"],
+                    _os.environ["nexusLIMS_path"]) + '.thumb.png'
+                _sh.copyfile(PLACEHOLDER_PREVIEW, preview_fname)
+                return nx_meta, preview_fname
 
-                # If s is a list of signals, use just the first one for
-                # our purposes
-                if isinstance(s, list):
-                    num_sigs = len(s)
-                    fname = s[0].metadata.General.original_filename
-                    s = s[0]
-                    s.metadata.General.title = \
-                        s.metadata.General.title + \
-                        f' (1 of {num_sigs} total signals in file "{fname}")'
-                elif s.metadata.General.title == '':
-                    s.metadata.General.title = \
-                        s.metadata.General.original_filename.replace(
-                            extension, '').strip('.')
+            # If s is a list of signals, use just the first one for
+            # our purposes
+            if isinstance(s, list):
+                num_sigs = len(s)
+                fname = s[0].metadata.General.original_filename
+                s = s[0]
+                s.metadata.General.title = \
+                    s.metadata.General.title + \
+                    f' (1 of {num_sigs} total signals in file "{fname}")'
+            elif s.metadata.General.title == '':
+                s.metadata.General.title = \
+                    s.metadata.General.original_filename.replace(
+                        extension, '').strip('.')
 
-                # only generate the preview if it doesn't exist, or overwrite
-                # parameter is explicitly provided
-                if not _os.path.isfile(preview_fname) or overwrite:
-                    _logger.info(f'Generating preview: {preview_fname}')
-                    # Create the directory for the thumbnail, if needed
-                    _pathlib.Path(_os.path.dirname(preview_fname)).mkdir(
-                        parents=True, exist_ok=True)
-                    # Generate the thumbnail
-                    s.compute(progressbar=False)
-                    _s2thumb(s, out_path=preview_fname)
-                else:
-                    _logger.info(f'Preview already exists: {preview_fname}')
+            # only generate the preview if it doesn't exist, or overwrite
+            # parameter is explicitly provided
+            if not _os.path.isfile(preview_fname) or overwrite:
+                _logger.info(f'Generating preview: {preview_fname}')
+                # Create the directory for the thumbnail, if needed
+                _pathlib.Path(_os.path.dirname(preview_fname)).mkdir(
+                    parents=True, exist_ok=True)
+                # Generate the thumbnail
+                s.compute(progressbar=False)
+                _s2thumb(s, out_path=preview_fname)
+            else:
+                _logger.info(f'Preview already exists: {preview_fname}')
 
     return nx_meta, preview_fname
 

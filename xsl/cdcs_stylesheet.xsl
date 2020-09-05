@@ -1487,7 +1487,9 @@
                                                                                 </thead>
                                                                                 <tbody>
                                                                                     <xsl:for-each select="meta">
-                                                                                        <xsl:sort select="@name"/>
+<!--                                                                                        <xsl:sort select="@name"/>
+                                                                                            Don't sort here because xsl is case-sensitive, which isn't what we want
+-->
                                                                                         <tr>
                                                                                             <!-- Populate table values with the metadata name and value -->
                                                                                             <td><b><xsl:value-of select="@name"/></b>
@@ -1600,7 +1602,9 @@
                                                     </tr>
                                                     <!-- Loop through each setup value under the 'param' heading -->
                                                     <xsl:for-each select="setup/param">
-                                                        <xsl:sort select="@name"/>
+<!--                                                        <xsl:sort select="@name"/>
+                                                            Don't sort here because xsl is case-sensitive, which isn't what we want
+-->
                                                         <tr>
                                                             <!-- Populate setup table with parameter name and value -->
                                                             <td><b><xsl:value-of select="@name"/></b>
@@ -2589,6 +2593,13 @@ The textual data from the selected rows (not the actual files) can also be expor
             
                 // Things to do when document is ready
                 $(document).ready(function(){
+                    // make each row in nav-table clickable as the header link
+                    // before DataTables conversion
+                    $('#nav-table tbody tr').click(function() {
+                        window.location = $(this).find('a').attr('href');
+                        return false;
+                    });
+
                     /* Add navigation to sidenav using DataTables */
                     var navTable = $('#nav-table').DataTable({
                                     destroy: true,
@@ -2640,12 +2651,6 @@ The textual data from the selected rows (not the actual files) can also be expor
                         class:'cdatatableDetails'
                     }));
                     $('.sidebar .pagination').first().addClass('vertical-align');
-                    
-                    // make each row in nav-table clickable as the header link 
-                    $('#nav-table tbody tr').click(function() { 
-                        window.location = $(this).find('a').attr('href'); 
-                        return false; 
-                    });
             
                     // Make dataset metadata tables DataTables
                     $('.meta-table').each(function() {

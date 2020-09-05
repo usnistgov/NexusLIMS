@@ -29,6 +29,7 @@ import configparser as _cp
 import io as _io
 import os as _os
 from datetime import datetime as _dt
+import logging as _logging
 from math import degrees
 from decimal import Decimal as _Decimal
 from decimal import InvalidOperation as _invalidOp
@@ -37,6 +38,9 @@ from nexusLIMS.instruments import get_instr_from_filepath as _get_instr
 from nexusLIMS.utils import _sort_dict
 from nexusLIMS.utils import set_nested_dict_value as _set_nest_dict_val
 from nexusLIMS.utils import try_getting_dict_value as _try_get_dict_val
+
+_logger = _logging.getLogger(__name__)
+_logger.setLevel(_logging.INFO)
 
 
 def get_quanta_metadata(filename):
@@ -58,29 +62,8 @@ def get_quanta_metadata(filename):
     with open(filename, 'rb') as f:
         content = f.read()
     user_idx = content.find(b'[User]')
-    # if the user_idx is -1, it means the [User] tag was not found in the
-    # file, and so the metadata is missing (so we should just return 0)
-    if user_idx == -1:
-        return None
-    metadata_bytes = content[user_idx:]
-    metadata_str = metadata_bytes.decode().replace('\r\n', '\n')
-    buf = _io.StringIO(metadata_str)
-    config = _cp.ConfigParser()
-    # make ConfigParser respect upper/lowercase values
-    config.optionxform = lambda option: option
-    config.read_file(buf)
 
-    mdict = {}
-
-    for itm in config.items():
-        if itm[0] == 'DEFAULT':
-            pass
-        else:
-            mdict[itm[0]] = {}
-            for k, v in itm[1].items():
-                mdict[itm[0]][k] = v
-
-    mdict['nx_meta'] = {}
+    mdict = {'nx_meta': {}}
     # assume all datasets coming from Quanta are Images, currently
     mdict['nx_meta']['DatasetType'] = 'Image'
     mdict['nx_meta']['Data Type'] = 'SEM_Imaging'
@@ -95,6 +78,34 @@ def get_quanta_metadata(filename):
     mdict['nx_meta']['Instrument ID'] = instr_name
     mdict['nx_meta']['Creation Time'] = mtime_iso
     mdict['nx_meta']['warnings'] = []
+
+    # if the user_idx is -1, it means the [User] tag was not found in the
+    # file, and so the metadata is missing (so we should just return 0)
+    if user_idx == -1:
+        _logger.warning(f'Did not find expected FEI tags in .tif file: '
+                        f'{filename}')
+        mdict['nx_meta']['Data Type'] = 'Unknown'
+        mdict['nx_meta']['Extractor Warnings'] = 'Did not find expected FEI ' \
+                                                 'tags. Could not read metadata'
+        mdict['nx_meta'] = _sort_dict(mdict['nx_meta'])
+
+        return mdict
+
+    metadata_bytes = content[user_idx:]
+    metadata_str = metadata_bytes.decode().replace('\r\n', '\n')
+    buf = _io.StringIO(metadata_str)
+    config = _cp.ConfigParser()
+    # make ConfigParser respect upper/lowercase values
+    config.optionxform = lambda option: option
+    config.read_file(buf)
+
+    for itm in config.items():
+        if itm[0] == 'DEFAULT':
+            pass
+        else:
+            mdict[itm[0]] = {}
+            for k, v in itm[1].items():
+                mdict[itm[0]][k] = v
 
     mdict = parse_nx_meta(mdict)
 

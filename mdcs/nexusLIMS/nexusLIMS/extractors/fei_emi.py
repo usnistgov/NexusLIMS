@@ -27,6 +27,7 @@
 
 from hyperspy.io import load as _hs_load
 from hyperspy.signal import BaseSignal as _BaseSignal
+import numpy as _np
 import logging as _logging
 import os as _os
 from datetime import datetime as _dt
@@ -54,38 +55,97 @@ def get_ser_metadata(filename):
 
     Returns
     -------
-    metadata : dict or None
-        Metadata of interest which is extracted from the passed files. If None,
-        the file could not be opened
+    metadata : dict
+        Metadata of interest which is extracted from the passed files. If
+        files cannot be opened, at least basic metadata will be returned (
+        creation time, etc.)
     """
-    # Trees:
-    # ObjectInfo & ser_header_parameters
-
-    # Loads in each .ser file associated with the passed .emi file into a list
-    # Each .ser file contain the same information(?), so only need to work with
-    # the first list element, s[0]
+    # ObjectInfo present in emi; ser_header_parameters present in .ser
+    # ObjectInfo should contain all the interesting metadata,
+    # while ser_header_parameters is mostly technical stuff not really of
+    # interest to anyone
+    warning = None
+    emi_filename = None
+    ser_error = False
     try:
+        # approach here is for every .ser we want to examine, load the
+        # metadata from the corresponding .emi file. If multiple .ser files
+        # are related to this emi, HyperSpy returns a list, so we select out
+        # the right signal from that list if that's what is returned
+
         emi_filename, ser_index = get_emi_from_ser(filename)
-        # s = _hs_load(filename, lazy=True, only_valid_data=True)
+        # make sure to load with "only_valid_data" so data shape is correct
+        # loading the emi with HS will try loading the .ser too, so this will
+        # fail if there's an issue with the .ser file
         emi_s = _hs_load(emi_filename, lazy=True, only_valid_data=True)
+        emi_loaded = True
+
         # if there is more than one dataset, emi_s will be a list, so pick
         # out the matching signal from the list, which will be the "index"
         # from the filename minus 1:
         if isinstance(emi_s, list):
             s = emi_s[ser_index - 1]
+
         # otherwise we should just have a regular signal, so make s the same
         # as the data loaded from the .emi
         elif isinstance(emi_s, _BaseSignal):
             s = emi_s
-        else:
-            raise IOError(f"Did not understand format of .emi file: "
-                          f"{emi_filename}")
-    except Exception as e:
-        _logger.warning(f'File reader could not open {filename}, received '
-                        f'exception: {e.__repr__()}')
-        return None
+
+    except FileNotFoundError:
+        # if emi wasn't found, specifically mention that
+        warning = 'NexusLIMS could not find a corresponding .emi metadata ' + \
+                  'file for this .ser file. Metadata extraction will be ' + \
+                  'limited.'
+        _logger.warning(warning)
+        emi_loaded = False
+        emi_filename = None
+
+    except Exception:
+        # otherwise, HyperSpy could not load the .emi, so give generic warning
+        # that .emi could not be loaded for some reason:
+        warning = 'The .emi metadata file associated with this ' + \
+                  '.ser file could not be opened by NexusLIMS. ' + \
+                  'Metadata extraction will be limited.'
+        _logger.warning(warning)
+        emi_loaded = False
+
+    if not emi_loaded:
+        # if we couldn't load the emi, lets at least open the .ser to pull
+        # out the ser_header_info
+        try:
+            s = _hs_load(filename, only_valid_data=True, lazy=True)
+        except Exception:
+            warning = f'The .ser file could not be opened (perhaps file is ' + \
+                      f'corrupted?); Metadata extraction is not possible.'
+            _logger.warning(warning)
+            # set s to an empty signal just so we can process some basic
+            # metadata using same syntax as if we had read it correctly
+            s = _BaseSignal(_np.zeros(1))
+            ser_error = True
 
     metadata = s.original_metadata.as_dictionary()
+    metadata['nx_meta'] = {}
+
+    # if we've already encountered a warning, add that to the metadata,
+    if warning:
+        metadata['nx_meta']['Extractor Warning'] = warning
+    # otherwise check to ensure we actually have some metadata read from .emi
+    elif 'ObjectInfo' not in metadata or \
+            ('ExperimentalConditions' not in metadata['ObjectInfo'] and
+             'ExperimentalDescription' not in metadata['ObjectInfo']):
+        warning = 'No experimental metadata was found in the ' + \
+                  'corresponding .emi file for this .ser. ' + \
+                  'Metadata extraction will be limited.'
+        _logger.warning(warning)
+        metadata['nx_meta']['Extractor Warning'] = warning
+
+    # if we successfully found the .emi file, add it to the metadata
+    if emi_filename:
+        rel_emi_fname = emi_filename.replace(
+            _os.environ["mmfnexus_path"] + '/', '') if emi_filename else None
+        metadata['nx_meta']['emi Filename'] = rel_emi_fname
+    else:
+        metadata['nx_meta']['emi Filename'] = None
 
     # Get the instrument object associated with this file
     instr = _get_instr(filename)
@@ -95,12 +155,19 @@ def get_ser_metadata(filename):
 
     # if we found the instrument, then store the name as string, else None
     instr_name = instr.name if instr is not None else None
-    metadata['nx_meta'] = {}
     metadata['nx_meta']['fname'] = filename
-    # set type to STEM Image by default (this seems to be most common)
-    metadata['nx_meta']['DatasetType'] = 'Image'
-    metadata['nx_meta']['Data Type'] = 'STEM_Imaging'
     metadata['nx_meta']['Creation Time'] = mtime_iso
+    metadata['nx_meta']['Instrument ID'] = instr_name
+
+    # we could not read the signal, so add some basic metadata and return
+    if ser_error:
+        metadata['nx_meta']['DatasetType'] = 'Misc'
+        metadata['nx_meta']['Data Type'] = 'Unknown'
+        metadata['nx_meta']['warnings'] = []
+        # sort the nx_meta dictionary (recursively) for nicer display
+        metadata['nx_meta'] = _sort_dict(metadata['nx_meta'])
+        del metadata['nx_meta']['fname']
+        return metadata
 
     # try to set creation time to acquisition time from metadata
     acq_time = _try_get_dict_val(metadata, ['ObjectInfo', 'AcquireDate'])
@@ -115,8 +182,11 @@ def get_ser_metadata(filename):
             manufacturer
 
     metadata['nx_meta']['Data Dimensions'] = str(s.data.shape)
-    metadata['nx_meta']['Instrument ID'] = instr_name
     metadata['nx_meta']['warnings'] = []
+
+    # set type to STEM Image by default (this seems to be most common)
+    metadata['nx_meta']['DatasetType'] = 'Image'
+    metadata['nx_meta']['Data Type'] = 'STEM_Imaging'
 
     metadata = parse_acquire_info(metadata)
     metadata = parse_experimental_conditions(metadata)
@@ -435,28 +505,36 @@ def parse_data_type(s, metadata):
             instr_conf.append('STEM')
         elif 'TEM' in metadata['nx_meta']['Mode']:
             instr_conf.append('TEM')
+    # if there is no metadata read from .emi, make determination
+    # off of instrument (this is really a guess)
+    elif metadata['nx_meta']['Instrument ID'] is not None:
+        if 'STEM' in metadata['nx_meta']['Instrument ID']:
+            instr_conf.append('STEM')
+        else:
+            instr_conf.append('TEM')
     else:
-        # if there is no metadata read from .emi, assume STEM because it
-        # seems to happen most for spectra
-        instr_conf.append('STEM')
-
-    # instrument modality:
-    instr_mod = []
+        # default to TEM, (since STEM is technically a sub-technique of TEM)
+        instr_conf.append('TEM')
 
     # images have signal dimension of two:
-    if s.axes_manager.signal_dimension == 2 and 'Mode' in metadata['nx_meta']:
-        if 'Image' in metadata['nx_meta']['Mode']:
-            instr_mod.append('Imaging')
-            dataset_type = 'Image'
-        elif 'Diffraction' in metadata['nx_meta']['Mode']:
-            # Diffraction mode is only actually diffraction in TEM mode,
-            # In STEM, imaging happens in diffraction mode
-            if 'STEM' in metadata['nx_meta']['Mode']:
-                instr_mod.append('Imaging')
+    if s.axes_manager.signal_dimension == 2:
+        # default to an image dataset type for 2 dimensional signal
+        dataset_type = 'Image'
+        # instrument modality:
+        instr_mod = ['Imaging']
+        if 'Mode' in metadata['nx_meta']:
+            if 'Image' in metadata['nx_meta']['Mode']:
+                instr_mod = ['Imaging']
                 dataset_type = 'Image'
-            elif 'TEM' in metadata['nx_meta']['Mode']:
-                instr_mod.append('Diffraction')
-                dataset_type = 'Diffraction'
+            elif 'Diffraction' in metadata['nx_meta']['Mode']:
+                # Diffraction mode is only actually diffraction in TEM mode,
+                # In STEM, imaging happens in diffraction mode
+                if 'STEM' in metadata['nx_meta']['Mode']:
+                    instr_mod = ['Imaging']
+                    dataset_type = 'Image'
+                elif 'TEM' in metadata['nx_meta']['Mode']:
+                    instr_mod = ['Diffraction']
+                    dataset_type = 'Diffraction'
     # if signal dimension is 1, it's a spectrum and not an image
     elif s.axes_manager.signal_dimension == 1:
         instr_mod = ['Spectrum']
