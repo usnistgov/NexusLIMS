@@ -1511,14 +1511,21 @@
                                                                                                 <xsl:attribute name="class">
                                                                                                     <xsl:if test="@warning = 'true'">has-warning</xsl:if>
                                                                                                 </xsl:attribute>
-                                                                                                <!-- If metadata tag is "Data Type", then replace '_' with ' ' -->
                                                                                                 <xsl:choose>
+                                                                                                    <!-- If metadata tag is "Data Type", then replace '_' with ' ' -->
                                                                                                     <xsl:when test="@name = 'Data Type'">
                                                                                                         <xsl:call-template name="string-replace-all">
                                                                                                             <xsl:with-param name="text"><xsl:value-of select="current()"/></xsl:with-param>
                                                                                                             <xsl:with-param name="replace" select="'_'" />
                                                                                                             <xsl:with-param name="by" select="' '" />
                                                                                                         </xsl:call-template>
+                                                                                                    </xsl:when>
+                                                                                                    <!-- If Creation Time, format more nicely -->
+                                                                                                    <xsl:when test="@name = 'Creation Time'">
+                                                                                                        <xsl:variable name="dt" select="string(current())"/>
+                                                                                                        <xsl:value-of select="concat(
+                                                                                                            substring($dt,1,10),' ',
+                                                                                                            substring($dt,12,5))" />
                                                                                                     </xsl:when>
                                                                                                     <xsl:otherwise>
                                                                                                         <xsl:value-of select="current()"/>
@@ -1529,6 +1536,19 @@
                                                                                     </xsl:for-each>
                                                                                 </tbody>
                                                                             </table>   
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class='row'>
+                                                                        <div class='col-xs-12 text-center' style="padding-top: 10px;">
+                                                                            <xsl:element name='a'>
+                                                                                <xsl:attribute name='style'>font-size: 12pt; font-style: italic</xsl:attribute>
+                                                                                <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                                                                                <xsl:attribute name="data-placement">top</xsl:attribute>
+                                                                                <xsl:attribute name="data-html">true</xsl:attribute>
+                                                                                <xsl:attribute name="title">This table only shows metadata values unique to each dataset in this activity. All other metadata values that were common to all files in this activity can be viewed by clicking the "view metadata" button in the header for this activity (look for the <xsl:text disable-output-escaping="yes">&lt;i class="fa fa-tasks fa-border"&gt;&lt;/i&gt;</xsl:text> icon).</xsl:attribute>
+                                                                                <i class='fa fa-question-circle' style=''/>
+                                                                                Missing metadata?
+                                                                            </xsl:element>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -1645,6 +1665,19 @@
                                                     </xsl:for-each>
                                                 </tbody>
                                             </table>   
+                                        </div>
+                                    </div>
+                                    <div class='row'>
+                                        <div class='col-xs-12 text-center' style="padding-top: 10px;">
+                                            <xsl:element name='a'>
+                                                <xsl:attribute name='style'>font-size: 12pt; font-style: italic</xsl:attribute>
+                                                <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                                                <xsl:attribute name="data-placement">top</xsl:attribute>
+                                                <xsl:attribute name="data-html">true</xsl:attribute>
+                                                <xsl:attribute name="title">This table only shows metadata values common to all files in this activity. For metadata specific to each dataset, click the metadata table button for that dataset in the table below (look for the <xsl:text disable-output-escaping="yes">&lt;i class="fa fa-tasks fa-border"&gt;&lt;/i&gt;</xsl:text> icon).</xsl:attribute>
+                                                <i class='fa fa-question-circle' style=''/>
+                                                Missing metadata?
+                                            </xsl:element>
                                         </div>
                                     </div>
                                 </div>
