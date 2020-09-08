@@ -1408,10 +1408,16 @@
                                                     <xsl:element name="td">
                                                         <xsl:choose>
                                                             <xsl:when test="meta[@name = 'Creation Time']">
-                                                                <xsl:value-of select="string(meta[@name = 'Creation Time'])"/>
+                                                                <xsl:variable name="dt" select="string(meta[@name = 'Creation Time'])"/>
+                                                                <xsl:value-of select="concat(
+                                                                    substring($dt,1,10),' ',
+                                                                    substring($dt,12,5))" />
                                                             </xsl:when>
                                                             <xsl:when test="../setup/param[@name = 'Creation Time']">
-                                                                <xsl:value-of select="string(../setup/param[@name = 'Creation Time'])"/>
+                                                                <xsl:variable name="dt" select="string(../setup/param[@name = 'Creation Time'])"/>
+                                                                <xsl:value-of select="concat(
+                                                                    substring($dt,1,10),' ',
+                                                                    substring($dt,12,5))" />
                                                             </xsl:when>
                                                             <xsl:otherwise>---</xsl:otherwise>
                                                         </xsl:choose>
@@ -1593,11 +1599,14 @@
                                                     <tr>
                                                         <td><b>Start time</b></td>
                                                         <td>
-                                                            <xsl:call-template name="tokenize-select">
+                                                            <xsl:variable name="dt">
+                                                              <xsl:call-template name="tokenize-select">
                                                                 <xsl:with-param name="text" select="startTime"/>
                                                                 <xsl:with-param name="delim">T</xsl:with-param>
                                                                 <xsl:with-param name="i" select="2"/>
-                                                            </xsl:call-template>
+                                                              </xsl:call-template>
+                                                            </xsl:variable>
+                                                            <xsl:value-of select="substring($dt,1,8)" />
                                                         </td>
                                                     </tr>
                                                     <!-- Loop through each setup value under the 'param' heading -->
