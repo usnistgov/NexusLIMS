@@ -246,7 +246,7 @@ def build_acq_activities(instrument, dt_from, dt_to,
 
             # add this file to the AA
             _logger.info(
-                f'Adding file {i} '
+                f'Adding file {i}/{len(files)} '
                 f'{f.replace(_os.environ["mmfnexus_path"], "").strip("/")} '
                 f'to activity {aa_idx}')
             activities[aa_idx].add_file(f, generate_previews)

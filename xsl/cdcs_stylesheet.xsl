@@ -1408,10 +1408,16 @@
                                                     <xsl:element name="td">
                                                         <xsl:choose>
                                                             <xsl:when test="meta[@name = 'Creation Time']">
-                                                                <xsl:value-of select="string(meta[@name = 'Creation Time'])"/>
+                                                                <xsl:variable name="dt" select="string(meta[@name = 'Creation Time'])"/>
+                                                                <xsl:value-of select="concat(
+                                                                    substring($dt,1,10),' ',
+                                                                    substring($dt,12,5))" />
                                                             </xsl:when>
                                                             <xsl:when test="../setup/param[@name = 'Creation Time']">
-                                                                <xsl:value-of select="string(../setup/param[@name = 'Creation Time'])"/>
+                                                                <xsl:variable name="dt" select="string(../setup/param[@name = 'Creation Time'])"/>
+                                                                <xsl:value-of select="concat(
+                                                                    substring($dt,1,10),' ',
+                                                                    substring($dt,12,5))" />
                                                             </xsl:when>
                                                             <xsl:otherwise>---</xsl:otherwise>
                                                         </xsl:choose>
@@ -1487,7 +1493,9 @@
                                                                                 </thead>
                                                                                 <tbody>
                                                                                     <xsl:for-each select="meta">
-                                                                                        <xsl:sort select="@name"/>
+<!--                                                                                        <xsl:sort select="@name"/>
+                                                                                            Don't sort here because xsl is case-sensitive, which isn't what we want
+-->
                                                                                         <tr>
                                                                                             <!-- Populate table values with the metadata name and value -->
                                                                                             <td><b><xsl:value-of select="@name"/></b>
@@ -1503,14 +1511,21 @@
                                                                                                 <xsl:attribute name="class">
                                                                                                     <xsl:if test="@warning = 'true'">has-warning</xsl:if>
                                                                                                 </xsl:attribute>
-                                                                                                <!-- If metadata tag is "Data Type", then replace '_' with ' ' -->
                                                                                                 <xsl:choose>
+                                                                                                    <!-- If metadata tag is "Data Type", then replace '_' with ' ' -->
                                                                                                     <xsl:when test="@name = 'Data Type'">
                                                                                                         <xsl:call-template name="string-replace-all">
                                                                                                             <xsl:with-param name="text"><xsl:value-of select="current()"/></xsl:with-param>
                                                                                                             <xsl:with-param name="replace" select="'_'" />
                                                                                                             <xsl:with-param name="by" select="' '" />
                                                                                                         </xsl:call-template>
+                                                                                                    </xsl:when>
+                                                                                                    <!-- If Creation Time, format more nicely -->
+                                                                                                    <xsl:when test="@name = 'Creation Time'">
+                                                                                                        <xsl:variable name="dt" select="string(current())"/>
+                                                                                                        <xsl:value-of select="concat(
+                                                                                                            substring($dt,1,10),' ',
+                                                                                                            substring($dt,12,5))" />
                                                                                                     </xsl:when>
                                                                                                     <xsl:otherwise>
                                                                                                         <xsl:value-of select="current()"/>
@@ -1521,6 +1536,19 @@
                                                                                     </xsl:for-each>
                                                                                 </tbody>
                                                                             </table>   
+                                                                        </div>
+                                                                    </div>
+                                                                    <div class='row'>
+                                                                        <div class='col-xs-12 text-center' style="padding-top: 10px;">
+                                                                            <xsl:element name='a'>
+                                                                                <xsl:attribute name='style'>font-size: 12pt; font-style: italic</xsl:attribute>
+                                                                                <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                                                                                <xsl:attribute name="data-placement">top</xsl:attribute>
+                                                                                <xsl:attribute name="data-html">true</xsl:attribute>
+                                                                                <xsl:attribute name="title">This table only shows metadata values unique to each dataset in this activity. All other metadata values that were common to all files in this activity can be viewed by clicking the "view metadata" button in the header for this activity (look for the <xsl:text disable-output-escaping="yes">&lt;i class="fa fa-tasks fa-border"&gt;&lt;/i&gt;</xsl:text> icon).</xsl:attribute>
+                                                                                <i class='fa fa-question-circle' style=''/>
+                                                                                Missing metadata?
+                                                                            </xsl:element>
                                                                         </div>
                                                                     </div>
                                                                 </div>
@@ -1591,16 +1619,21 @@
                                                     <tr>
                                                         <td><b>Start time</b></td>
                                                         <td>
-                                                            <xsl:call-template name="tokenize-select">
+                                                            <xsl:variable name="dt">
+                                                              <xsl:call-template name="tokenize-select">
                                                                 <xsl:with-param name="text" select="startTime"/>
                                                                 <xsl:with-param name="delim">T</xsl:with-param>
                                                                 <xsl:with-param name="i" select="2"/>
-                                                            </xsl:call-template>
+                                                              </xsl:call-template>
+                                                            </xsl:variable>
+                                                            <xsl:value-of select="substring($dt,1,8)" />
                                                         </td>
                                                     </tr>
                                                     <!-- Loop through each setup value under the 'param' heading -->
                                                     <xsl:for-each select="setup/param">
-                                                        <xsl:sort select="@name"/>
+<!--                                                        <xsl:sort select="@name"/>
+                                                            Don't sort here because xsl is case-sensitive, which isn't what we want
+-->
                                                         <tr>
                                                             <!-- Populate setup table with parameter name and value -->
                                                             <td><b><xsl:value-of select="@name"/></b>
@@ -1632,6 +1665,19 @@
                                                     </xsl:for-each>
                                                 </tbody>
                                             </table>   
+                                        </div>
+                                    </div>
+                                    <div class='row'>
+                                        <div class='col-xs-12 text-center' style="padding-top: 10px;">
+                                            <xsl:element name='a'>
+                                                <xsl:attribute name='style'>font-size: 12pt; font-style: italic</xsl:attribute>
+                                                <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                                                <xsl:attribute name="data-placement">top</xsl:attribute>
+                                                <xsl:attribute name="data-html">true</xsl:attribute>
+                                                <xsl:attribute name="title">This table only shows metadata values common to all files in this activity. For metadata specific to each dataset, click the metadata table button for that dataset in the table below (look for the <xsl:text disable-output-escaping="yes">&lt;i class="fa fa-tasks fa-border"&gt;&lt;/i&gt;</xsl:text> icon).</xsl:attribute>
+                                                <i class='fa fa-question-circle' style=''/>
+                                                Missing metadata?
+                                            </xsl:element>
                                         </div>
                                     </div>
                                 </div>
@@ -2589,6 +2635,13 @@ The textual data from the selected rows (not the actual files) can also be expor
             
                 // Things to do when document is ready
                 $(document).ready(function(){
+                    // make each row in nav-table clickable as the header link
+                    // before DataTables conversion
+                    $('#nav-table tbody tr').click(function() {
+                        window.location = $(this).find('a').attr('href');
+                        return false;
+                    });
+
                     /* Add navigation to sidenav using DataTables */
                     var navTable = $('#nav-table').DataTable({
                                     destroy: true,
@@ -2640,12 +2693,6 @@ The textual data from the selected rows (not the actual files) can also be expor
                         class:'cdatatableDetails'
                     }));
                     $('.sidebar .pagination').first().addClass('vertical-align');
-                    
-                    // make each row in nav-table clickable as the header link 
-                    $('#nav-table tbody tr').click(function() { 
-                        window.location = $(this).find('a').attr('href'); 
-                        return false; 
-                    });
             
                     // Make dataset metadata tables DataTables
                     $('.meta-table').each(function() {
@@ -2778,7 +2825,11 @@ The textual data from the selected rows (not the actual files) can also be expor
                         .text(text);
                     }
                     function showExtraMessage(text, type) {
-                        let w = $('#download-result').width();
+                        // set message width to that of the table (sometimes the
+                        // table doesn't get rendered quite fast enough, so make
+                        // sure width is at least 500 px
+                        let w = Math.max($('#filelist-table').width(), 500);
+                        
                         $("#download-extra").closest('.row').slideDown();
                         $("#download-extra")
                         .removeClass('alert-warning alert-success alert-info alert-danger')
@@ -2880,359 +2931,447 @@ The textual data from the selected rows (not the actual files) can also be expor
                     // @param {String} zip_title: the name of the .zip to download
                     //
                     var downloadFn = function (data_urls, json_urls, paths, zip_title) {
-                        if (! (isChrome || isOpera || isFirefox || isEdgeChromium )){
-                            alert('Due to browser limitations, downloading of files ' + 
-                                  'into a zip archive is only supported in up-to-date versions of ' +
-                                  'the Chrome, Firefox, Opera, and Edge browsers. Please either download ' + 
-                                  'the files individually using the buttons in the table, or ' + 
-                                  'download them manually from the central file ' +
-                                  'server instead.');
-                            $('button.dl-btns').removeClass('disabled');
-                            filelist_dt.select.style('os');  
-                        } else {
-                            resetMessage();
-                            updatePercent(0);
-                            
-                            // show cancel button
-                            $('#btn-cancel-row').slideDown();
-                            
-                            // combinedObject will have items [data_url, json_url, path]
-                            let combinedObject = data_urls.map(function (e, i) {
-                                return [e, json_urls[i], paths[i]];
-                            });
-                            // combinedArray will be of type array, so it can looped through with forEach
-                            let combinedArray = $.map(combinedObject, function (value, index) {
-                                return [value];
-                            });
-                        
-                            // array of zips (not actually used besides as a counter)
-                            let zips = [];
-                            // array of total zip sizes
-                            let zip_total_sizes = [];
-                            let indiv_dl_sizes = [];
-                            // array of arrays listing which urls are in each zip 
-                            let zip_url_listing = [];
-                            // array of arrays listing the filepaths in each zip 
-                            let zip_path_listing = [];
-                            let cur_zip_idx = 0;
-                            let this_zip_size = 0;
-                            
-                            // limit zip size to 4.0 GiB (4294967296 bytes)
-                            // zips larger than 4.0 GiB are corrupted by the zip-stream.js
-                            // library and cannot be read, so we have to stay under that size
-                            const size_limit = 4294967296;
-                            
-                            // specify loopLength so we can change it if we need to ignore files
-                            var loopLength = combinedArray.length;
-                            var individual_files = [];
-                            // Allocate each url to a particular zip based on size:
-                            for (var index = 0; index < loopLength; index += 1) {
-                            
-                                let item = combinedArray[index];
-                                var this_data_url = item[0];
-                                var this_json_url = item[1];
-                                var this_path = item[2];
+                      if (!(isChrome || isOpera || isFirefox || isEdgeChromium)) {
+                        alert('Due to browser limitations, downloading of files ' +
+                          'into a zip archive is only supported in up-to-date versions of ' +
+                          'the Chrome, Firefox, Opera, and Edge browsers. Please either download ' +
+                          'the files individually using the buttons in the table, or ' +
+                          'download them manually from the central file ' +
+                          'server instead.');
+                        $('button.dl-btns').removeClass('disabled');
+                        filelist_dt.select.style('os');
+                      } else {
+                        resetMessage();
+                        updatePercent(0);
 
-                                // remove leading slash:
-                                if (this_path.charAt(0) === '/') {
-                                    this_path = this_path.substr(1);
-                                }
-                                // convert url to filename
-                                var data_filename = this_data_url.replace(/.*\//g, "");
-                                var json_filename = this_json_url.replace(/.*\//g, "");
-                                // add appropriate path structure for the file
-                                if (this_path.length > 0) {
-                                    var full_data_path = this_path + '/' + data_filename
-                                    var full_json_path = this_path + '/' + json_filename
+                        // go through data_urls to check for .ser files and 
+                        // add the auxillary .emi files if needed
+                        let aux_urls = data_urls.map(getEmiName);
+
+                        // show cancel button
+                        $('#btn-cancel-row').slideDown();
+
+                        // combinedObject will have items [data_url, json_url, path, aux_url]
+                        let combinedObject = data_urls.map(function (e, i) {
+                          return [e, json_urls[i], paths[i], aux_urls[i]];
+                        });
+                        // combinedArray will be of type array, so it can looped through with forEach
+                        let combinedArray = $.map(combinedObject, function (value, index) {
+                          return [value];
+                        });
+
+                        // array of zips (not actually used besides as a counter)
+                        let zips = [];
+                        // array of total zip sizes
+                        let zip_total_sizes = [];
+                        let indiv_dl_sizes = [];
+                        // array of arrays listing which urls are in each zip 
+                        let zip_url_listing = [];
+                        // array of arrays listing the filepaths in each zip 
+                        let zip_path_listing = [];
+                        let cur_zip_idx = 0;
+                        let this_zip_size = 0;
+
+                        // limit zip size to 4.0 GiB (4294967296 bytes)
+                        // zips larger than 4.0 GiB are corrupted by the zip-stream.js
+                        // library and cannot be read, so we have to stay under that size
+                        const size_limit = 4294967296;
+
+                        // specify loopLength so we can change it if we need to ignore files
+                        var loopLength = combinedArray.length;
+                        var individual_files = [];
+                        // Allocate each url to a particular zip based on size:
+                        // this_aux_url will be null if there's no auxiliary file
+                        // present, but sometimes .emi files are missing, and 
+                        // we already checked for that when checking file sizes,
+                        // so if aux_url is not null, check window.file_sizes. 
+                        // The value for that url will be NaN if it wasn't 
+                        // found on the server
+                        for (var index = 0; index < loopLength; index += 1) {
+                          let this_path = null;
+                          let this_file_size = 0;
+
+                          let this_data_url = null;
+                          let this_json_url = null;
+                          let this_aux_url = null;
+
+                          let data_filename = null;
+                          let json_filename = null;
+                          let aux_filename = null;
+
+                          let full_data_path = null;
+                          let full_json_path = null;
+                          let full_aux_path = null;
+
+                          let item = combinedArray[index];
+                          this_data_url = item[0];
+                          this_json_url = item[1];
+                          this_path = item[2];
+                          this_aux_url = item[3];
+
+                          // remove leading slash:
+                          if (this_path.charAt(0) === '/') {
+                            this_path = this_path.substr(1);
+                          }
+                          // convert url to filename
+                          data_filename = this_data_url.replace(/.*\//g, "");
+                          json_filename = this_json_url.replace(/.*\//g, "");
+                          if (this_aux_url) {
+                            aux_filename = this_aux_url.replace(/.*\//g, "");
+                          } else {
+                            aux_filename = null;
+                          }
+                          // add appropriate path structure for the file
+                          if (this_path.length > 0) {
+                            full_data_path = this_path + '/' + data_filename
+                            full_json_path = this_path + '/' + json_filename
+                            if (aux_filename) {
+                              full_aux_path = this_path + '/' + aux_filename
+                            } else {
+                              full_aux_path = null;
+                            }
+                          } else {
+                            full_data_path = data_filename;
+                            full_json_path = json_filename;
+                            if (aux_filename) {
+                              full_aux_path = aux_filename
+                            } else {
+                              full_aux_path = null;
+                            }
+                          }
+
+                          // make paths like files and not like URLs
+                          full_data_path = decodeURIComponent(full_data_path);
+                          full_json_path = decodeURIComponent(full_json_path);
+                          if (full_aux_path) {
+                            full_aux_path = decodeURIComponent(full_aux_path);
+                          }
+
+                          // if this file is larger than the zip limit, process it separately
+                          // and adjust the for loop to compensate
+                          this_file_size = window.file_sizes[this_data_url] +
+                            window.file_sizes[this_json_url];
+                          if (! isNaN(window.file_sizes[this_aux_url])) {
+                            this_file_size += window.file_sizes[this_aux_url];
+                          }
+                          if (this_file_size > size_limit) {
+                            console.log('Adding ' + full_data_path + ' to individual file downloads');
+                            individual_files.push(combinedArray[index][0]);
+                            console.log('Adding ' + full_json_path + ' to individual file downloads');
+                            individual_files.push(combinedArray[index][1]);
+                            if (full_aux_path && (! isNaN(window.file_sizes[this_aux_url]))) {
+                              console.log('Adding ' + full_aux_path + ' to individual file downloads');
+                              individual_files.push(combinedArray[index][3]);
+                            }
+                            indiv_dl_sizes.push(window.file_sizes[this_data_url]);
+                            indiv_dl_sizes.push(window.file_sizes[this_json_url]);
+                            if (! isNaN(window.file_sizes[this_aux_url])) {
+                              indiv_dl_sizes.push(window.file_sizes[this_aux_url]);
+                            }
+                            loopLength -= 1;
+                            combinedArray.splice(index, 1);
+                            index -= 1;
+                            continue;
+                          }
+
+                          // If this is the first file (i.e. zip size == 0), 
+                          // create new zip object and add it to array
+                          if (this_zip_size === 0) {
+                            zips.push({});
+                            zip_url_listing.push([]);
+                            zip_path_listing.push([]);
+                          }
+                          // this is not the first file:
+                          else {
+                            // check to make sure adding this file would not
+                            // put us over the zip size limit
+                            let new_size = window.file_sizes[this_data_url] +
+                              window.file_sizes[this_json_url] +
+                              this_zip_size;
+                            if (! isNaN(window.file_sizes[this_aux_url])) {
+                              new_size += window.file_sizes[this_aux_url];
+                            }
+                            // if we're over the limit, end this zip, start
+                            // new one and repeat iteration by decrementing index
+                            if (new_size > size_limit) {
+                              zip_total_sizes.push(this_zip_size);
+                              this_zip_size = 0;
+                              cur_zip_idx += 1;
+                              index--;
+                              continue;
+                            }
+                          }
+
+                          // replace any double slashes
+                          full_data_path = full_data_path.replace('//', '/');
+                          full_json_path = full_json_path.replace('//', '/');
+                          if (full_aux_path) {
+                            full_aux_path = full_aux_path.replace('//', '/');
+                          }
+
+                          // assign file to zip
+                          zip_url_listing[cur_zip_idx].push(this_data_url);
+                          zip_url_listing[cur_zip_idx].push(this_json_url);
+                          zip_path_listing[cur_zip_idx].push(full_data_path);
+                          zip_path_listing[cur_zip_idx].push(full_json_path);
+                          // only add zip file if we have a size for it
+                          if (! isNaN(window.file_sizes[this_aux_url])) {
+                            // multiple ser files could have the same emi, so 
+                            // check to make sure we do not add it twice
+                            if (! zip_url_listing[cur_zip_idx].includes(this_aux_url)){
+                              zip_url_listing[cur_zip_idx].push(this_aux_url);
+                              zip_path_listing[cur_zip_idx].push(full_aux_path);
+                            }
+                          }
+
+                          console.debug('Adding', humanFileSize(window.file_sizes[this_data_url]), 'file:', full_data_path, 'to zip #:', cur_zip_idx);
+                          console.debug('Adding', humanFileSize(window.file_sizes[this_json_url]), 'file:', full_data_path, 'to zip #:', cur_zip_idx);
+                          if (! isNaN(window.file_sizes[this_aux_url])) {
+                            console.debug('Adding', humanFileSize(window.file_sizes[this_aux_url]), 'file:', full_aux_path, 'to zip #:', cur_zip_idx);
+                          }
+
+                          this_zip_size += window.file_sizes[this_data_url];
+                          this_zip_size += window.file_sizes[this_json_url];
+                          // only add to the zip size if we actually have a file
+                          if (! isNaN(window.file_sizes[this_aux_url])) {
+                            this_zip_size += window.file_sizes[this_aux_url];
+                          }
+                        }
+                        zip_total_sizes.push(this_zip_size);
+
+                        var msg = '';
+                        if (zips.length > 1) {
+                          msg = 'Due to limitations of the .zip format, your ' + window.human_dl_size +
+                            ' download will be split into ' + zips.length +
+                            ' .zip files (each a maximum of ' +
+                            humanFileSize(size_limit) + ' in size). ' +
+                            'You can extract them all to the same ' +
+                            'folder to view all your data at once. \n'
+                          showExtraMessage(msg, 'warning');
+                        }
+
+                        // an array to hold async zip promises so we can do 
+                        // something after they all complete with Promise.all
+                        promList = [];
+                        // an array to hold each zip's percentage complete
+                        indiv_percs = [];
+                        // an array to hold each zip's downloaded bytes count
+                        indiv_dl_size = [];
+
+                        filesArr = [];
+                        for (var i = 0; i < zip_url_listing.length; i += 1) {
+                          filesArr.push([]);
+                          for (var j = 0; j < zip_url_listing[i].length; j += 1) {
+                            filesArr[i].push([zip_path_listing[i][j], zip_url_listing[i][j]]);
+                          }
+                        }
+                        // get iterators so we can do async loops
+                        // have to iterate over values but can't use a for-loop, due to async nature
+                        filesIters = filesArr.map(f => f.values());
+
+                        var bytesDownloaded = 0
+
+                        // use ponyfill if needed for TransformStream
+                        const TransformStream = window.TransformStream ?
+                          window.TransformStream : ponyfill.TransformStream;
+
+                        // create array of TransformStreams to process progress
+                        // while downloading
+                        progressArr = [];
+                        for (var i = 0; i < zips.length; i++) {
+                          p = new TransformStream({
+                            transform(chunk, ctrl) {
+                              bytesDownloaded += chunk.byteLength
+                              updateProgressBar(bytesDownloaded,
+                                arrSum(zip_total_sizes) +
+                                arrSum(indiv_dl_sizes));
+                              ctrl.enqueue(chunk);
+                            }
+                          });
+                          progressArr.push(p);
+                        }
+
+                        // add transformstreams for the individual file downloads
+                        for (var i = 0; i < individual_files.length; i++) {
+                          p = new TransformStream({
+                            transform(chunk, ctrl) {
+                              bytesDownloaded += chunk.byteLength
+                              updateProgressBar(bytesDownloaded,
+                                arrSum(zip_total_sizes) +
+                                arrSum(indiv_dl_sizes));
+                              ctrl.enqueue(chunk)
+                            }
+                          });
+                          progressArr.push(p);
+                        }
+
+                        var fileStreamArr = [];
+                        var readableStreamArr = [];
+
+                        var abortController = new AbortController();
+                        var abortSignal = abortController.signal;
+                        var dlError = false;
+
+                        // get name of zip files
+                        for (var i = 0; i < zips.length; i++) {
+                          if (zips.length === 1) {
+                            this_zip_title = zip_title;
+                          } else {
+                            this_zip_title = zip_title.replace(
+                              '.zip', '-' + (i + 1) + 'of' +
+                              zips.length + '.zip');
+                          }
+
+                          let ws = streamSaver.createWriteStream(
+                            this_zip_title, {
+                              size: zip_total_sizes[i]
+                            });
+
+                          fileStreamArr.push(ws);
+
+                          let files = filesIters[i];
+                          // ZIP is a ReadableStream
+                          z = new ZIP({
+                              pull(ctrl) {
+                                const it = files.next()
+                                if (it.done) {
+                                  ctrl.close()
                                 } else {
-                                    var full_data_path = data_filename;
-                                    var full_json_path = json_filename;
-                                }
-                                
-                                // make paths like files and not like URLs
-                                full_data_path = decodeURIComponent(full_data_path);
-                                full_json_path = decodeURIComponent(full_json_path);
+                                  const [name, url] = it.value
 
-                                // if this file is larger than the zip limit, process it separately
-                                // and adjust the for loop to compensate
-                                let this_file_size = window.file_sizes[this_data_url] +
-                                                     window.file_sizes[this_json_url]; 
-                                if (this_file_size > size_limit) {
-                                    console.log('Adding ' + full_data_path + ' to individual file downloads');
-                                    individual_files.push(combinedArray[index][0]);
-                                    console.log('Adding ' + full_json_path + ' to individual file downloads');
-                                    individual_files.push(combinedArray[index][1]);
-                                    indiv_dl_sizes.push(window.file_sizes[this_data_url]);
-                                    indiv_dl_sizes.push(window.file_sizes[this_json_url]);
-                                    loopLength -= 1;
-                                    combinedArray.splice(index, 1);
-                                    index -= 1;
-                                    continue;
+                                  return fetch(url, {
+                                      signal: abortSignal
+                                    })
+                                    .then(res => {
+                                      ctrl.enqueue({
+                                        name,
+                                        stream: () => {
+                                          r = res.body;
+                                          readableStreamArr.push(r);
+                                          return r
+                                        }
+                                      });
+                                    });
                                 }
-
-                                // If this is the first file (i.e. zip size == 0), 
-                                // create new zip object and add it to array
-                                if (this_zip_size === 0) {
-                                    zips.push({});
-                                    zip_url_listing.push([]);
-                                    zip_path_listing.push([]);
-                                }                                
-                                // this is not the first file:
-                                else {
-                                    // check to make sure adding this file would not
-                                    // put us over the zip size limit
-                                    let new_size = window.file_sizes[this_data_url] +
-                                                   window.file_sizes[this_json_url] + 
-                                                   this_zip_size;
-                                    // if we're over the limit, end this zip, start
-                                    // new one and repeat iteration by decrementing index
-                                    if (new_size > size_limit) {
-                                        zip_total_sizes.push(this_zip_size);
-                                        this_zip_size = 0;
-                                        cur_zip_idx += 1;
-                                        index--;
-                                        continue;
-                                    }
-                                }
-                                                                             
-                                // replace any double slashes
-                                full_data_path = full_data_path.replace('//', '/');
-                                full_json_path = full_json_path.replace('//', '/');
-                                
-                                // assign file to zip
-                                zip_url_listing[cur_zip_idx].push(this_data_url);
-                                zip_url_listing[cur_zip_idx].push(this_json_url);
-                                zip_path_listing[cur_zip_idx].push(full_data_path);
-                                zip_path_listing[cur_zip_idx].push(full_json_path);
-                                
-                                console.log('Adding', humanFileSize(window.file_sizes[this_data_url]), 'file:', full_data_path, 'to zip #:', cur_zip_idx);
-                                this_zip_size += window.file_sizes[this_data_url];
-                                this_zip_size += window.file_sizes[this_json_url];
-                            }
-                            zip_total_sizes.push(this_zip_size);
-                        
-                            var msg = '';
-                            if (zips.length > 1) {
-                                msg = 'Due to limitations of the .zip format, your ' + window.human_dl_size +
-                                    ' download will be split into ' + zips.length +
-                                    ' .zip files (each a maximum of ' + 
-                                    humanFileSize(size_limit) + ' in size). ' +
-                                    'You can extract them all to the same ' +
-                                    'folder to view all your data at once. \n'
-                                showExtraMessage(msg, 'warning');
-                            }
-                        
-                            // an array to hold async zip promises so we can do 
-                            // something after they all complete with Promise.all
-                            promList = [];
-                            // an array to hold each zip's percentage complete
-                            indiv_percs = [];
-                            // an array to hold each zip's downloaded bytes count
-                            indiv_dl_size = [];
-
-                            filesArr = [];
-                            for (var i = 0; i < zip_url_listing.length; i += 1) {
-                                filesArr.push([]);
-                                for (var j = 0; j <  zip_url_listing[i].length; j += 1){
-                                    filesArr[i].push([zip_path_listing[i][j], zip_url_listing[i][j]]);
-                                }
-                            }
-                            // get iterators so we can do async loops
-                            // have to iterate over values but can't use a for-loop, due to async nature
-                            filesIters = filesArr.map(f => f.values());
-                            
-                            var bytesDownloaded = 0
-                            
-                            // use ponyfill if needed for TransformStream
-                            const TransformStream = window.TransformStream ?
-                                                    window.TransformStream : ponyfill.TransformStream;
-                                                    
-                            // create array of TransformStreams to process progress
-                            // while downloading
-                            progressArr = [];
-                            for (var i = 0; i < zips.length; i++) {
-                                p = new TransformStream({
-                                    transform (chunk, ctrl) {
-                                        bytesDownloaded += chunk.byteLength 
-                                        updateProgressBar(bytesDownloaded, 
-                                                          arrSum(zip_total_sizes) + 
-                                                          arrSum(indiv_dl_sizes));
-                                        ctrl.enqueue(chunk);
-                                    }
-                                });
-                                progressArr.push(p);
-                            }
-
-                            // add transformstreams for the individual file downloads
-                            for (var i = 0; i < individual_files.length; i++) {
-                                p = new TransformStream({
-                                    transform (chunk, ctrl) {
-                                        bytesDownloaded += chunk.byteLength 
-                                        updateProgressBar(bytesDownloaded, 
-                                                          arrSum(zip_total_sizes) + 
-                                                          arrSum(indiv_dl_sizes));
-                                        ctrl.enqueue(chunk)
-                                    }
-                                });
-                                progressArr.push(p);
-                            }
-
-                            var fileStreamArr = [];
-                            var readableStreamArr = [];
-                            
-                            var abortController = new AbortController();
-                            var abortSignal = abortController.signal;
-                            var dlError = false;
-                            
-                            // get name of zip files
-                            for (var i = 0; i < zips.length; i++) {
-                                if (zips.length === 1) {
-                                    this_zip_title = zip_title;
-                                } else {
-                                    this_zip_title = zip_title.replace(
-                                        '.zip', '-' + (i + 1) + 'of' +
-                                        zips.length + '.zip');
-                                }
-                                
-                                let ws = streamSaver.createWriteStream(
-                                    this_zip_title,
-                                    { size: zip_total_sizes[i]});
-                                    
-                                fileStreamArr.push(ws);
-                                
-                                let files = filesIters[i];
-                                // ZIP is a ReadableStream
-                                z = new ZIP({
-                                    pull (ctrl) {
-                                        const it = files.next()
-                                        if (it.done) {
-                                            ctrl.close()
-                                        } else {
-                                            const [name, url] = it.value
-                                
-                                            return fetch(url, 
-                                                         {signal: abortSignal})
-                                                   .then(res => {
-                                                       ctrl.enqueue({
-                                                           name,
-                                                           stream: () => {
-                                                               r = res.body;
-                                                               readableStreamArr.push(r);
-                                                               return r
-                                                           }
-                                                       });
-                                                   });
-                                       }
-                                    }
-                                }).pipeThrough(progressArr[i])
-                                  .pipeTo(fileStreamArr[i],
-                                          {signal: abortSignal})
-                                                 .catch( err => {
-                                                    if (abortSignal.aborted) {
-                                                       console.log('[XSLT] [zip-pipeTo] User clicked cancel');
-                                                    } else { 
-                                                       console.log('[XSLT] [zip-pipeTo] Other error');
-                                                       console.error(err);
-                                                       dlError = true;
-                                                       showError('There was an error during the download:', err.message);
-                                                    }
-                                                 });
-                                promList.push(z);
-                            }
-                            
-                            // add warning text if downloading any individual files
-                            if (individual_files.length > 0) {
-                                if ( msg.length > 0 ) { msg += '\n'; }
-                                
-                                msg += 'Because their individual size is larger than can be ' +
-                                       'included in a .zip file, the following files (and their metadata) ' +
-                                       'will not be included in the .zip and instead downloaded individually: \n';
-                                
-                                for (let f of individual_files) {
-                                    // f is a url, so convert to filename
-                                    if (! f.endsWith('.json') ){
-                                        msg += '    - ' + decodeURIComponent(f.replace(/.*\//g, "")) + '\n';
-                                    }
-                                }
-                                
-                                showExtraMessage(msg , 'warning');
-                            }
-                            
-                            // used to convert the response of a fetch api to a modern ReadableStream with pipeThrough
-                            toPonyRS = WebStreamsAdapter.createReadableStreamWrapper(ponyfill.ReadableStream)
-                            
-                            for (var i = 0; i < individual_files.length; i++) {
-                                let url = individual_files[i];
-                                let filename = decodeURIComponent(url.replace(/.*\//g, ""));
-                                let fileStream = streamSaver.createWriteStream(
-                                    filename,
-                                    {size: window.file_sizes[url]}
-                                );
-                                let writer = fileStream.getWriter();
-                                writer.releaseLock();
-                                let this_prog = progressArr[i + zips.length]
-                                let p = fetch(url, {signal: abortSignal})
-                                        .then(res =>  {
-                                            rs = res.body;
-                                            // use webstream adapter if we don't have pipeTo on the response (i.e. FF)
-                                            rs = window.ReadableStream.prototype.pipeTo ?
-                                                 rs : toPonyRS(rs)
-                                            readableStreamArr.push(rs);
-                                            return rs.pipeThrough(this_prog)
-                                                     .pipeTo(fileStream,
-                                                         // make sure this pipe is abortable
-                                                        {signal: abortSignal})
-                                                     .catch( err => {
-                                                        if (abortSignal.aborted) {
-                                                           console.log('[XSLT] [indivFile-pipeTo] User clicked cancel');
-                                                        } else { 
-                                                           console.log('[XSLT] [indivFile-pipeTo] Other error');
-                                                           dlError = true;
-                                                           showError('There was an error during the download:', err.message);
-                                                        }
-                                                     });
-                                        });
-                                promList.push(p);
-                                fileStreamArr.push(fileStream);
-                            }
-                            
-                            // Add warning if user tries to leave page before download is finished:
-                            // In newer browsers, this message will not show (just the "unsaved changes" warning)
-                            $(window).bind('beforeunload', function () {
-                                return 'The download has not finished, are you sure you want to leave the page?';
+                              }
+                            }).pipeThrough(progressArr[i])
+                            .pipeTo(fileStreamArr[i], {
+                              signal: abortSignal
+                            })
+                            .catch(err => {
+                              if (abortSignal.aborted) {
+                                console.log('[XSLT] [zip-pipeTo] User clicked cancel');
+                              } else {
+                                console.log('[XSLT] [zip-pipeTo] Other error');
+                                console.error(err);
+                                dlError = true;
+                                showError('There was an error during the download:', err.message);
+                              }
                             });
-                            
-                            const cancel_downloads = function() {
-                                abortController.abort();
+                          promList.push(z);
+                        }
+
+                        // add warning text if downloading any individual files
+                        if (individual_files.length > 0) {
+                          if (msg.length > 0) {
+                            msg += '\n';
+                          }
+
+                          msg += 'Because their individual size is larger than can be ' +
+                            'included in a .zip file, the following files (and their metadata) ' +
+                            'will not be included in the .zip and instead downloaded individually: \n';
+
+                          for (let f of individual_files) {
+                            // f is a url, so convert to filename
+                            if (!f.endsWith('.json')) {
+                              msg += '    - ' + decodeURIComponent(f.replace(/.*\//g, "")) + '\n';
                             }
-                            
-                            // make downloads cancel when leaving page or clicking cancel button
-                            window.onunload = cancel_downloads;
-                            $('#btn-cancel-dl').click(cancel_downloads);
-                            
-                            // clean up after all Promises have delivered
-                            Promise.all(promList).then(function () {
-                                // if the download was aborted:
-                                if (abortSignal.aborted ) {
-                                    console.log('[XSLT] [final Promise] Cancel button was clicked');
-                                    showMessage("Download canceled by user (any already completed downloads were saved)", 'warning');
-                                } else if (dlError) {
-                                    console.log('[XSLT] [final Promise] Error during downloading!');
-                                    errorProgress();
-                                } else {  // otherwise we finished normally
-                                    console.log('[XSLT] [final Promise] All downloads finished');
-                                    finishProgress();
-                                    showMessage("Finished downloading all files!", 'success');
-                                }
-                                hideExtraMessage();
-                                $(window).unbind('beforeunload');
-                                $('#btn-cancel-row').slideUp();
-                                $('#progressbar-row').slideUp();
-                                $('button.dl-btns').removeClass('disabled');
-                                filelist_dt.select.style('os');
-                                    
+                          }
+
+                          showExtraMessage(msg, 'warning');
+                        }
+
+                        // used to convert the response of a fetch api to a modern ReadableStream with pipeThrough
+                        toPonyRS = WebStreamsAdapter.createReadableStreamWrapper(ponyfill.ReadableStream)
+
+                        for (var i = 0; i < individual_files.length; i++) {
+                          let url = individual_files[i];
+                          let filename = decodeURIComponent(url.replace(/.*\//g, ""));
+                          let fileStream = streamSaver.createWriteStream(
+                            filename, {
+                              size: window.file_sizes[url]
+                            }
+                          );
+                          let writer = fileStream.getWriter();
+                          writer.releaseLock();
+                          let this_prog = progressArr[i + zips.length]
+                          let p = fetch(url, {
+                              signal: abortSignal
+                            })
+                            .then(res => {
+                              rs = res.body;
+                              // use webstream adapter if we don't have pipeTo on the response (i.e. FF)
+                              rs = window.ReadableStream.prototype.pipeTo ?
+                                rs : toPonyRS(rs)
+                              readableStreamArr.push(rs);
+                              return rs.pipeThrough(this_prog)
+                                .pipeTo(fileStream,
+                                  // make sure this pipe is abortable
+                                  {
+                                    signal: abortSignal
+                                  })
+                                .catch(err => {
+                                  if (abortSignal.aborted) {
+                                    console.log('[XSLT] [indivFile-pipeTo] User clicked cancel');
+                                  } else {
+                                    console.log('[XSLT] [indivFile-pipeTo] Other error');
+                                    dlError = true;
+                                    showError('There was an error during the download:', err.message);
+                                  }
+                                });
                             });
-                    }};
+                          promList.push(p);
+                          fileStreamArr.push(fileStream);
+                        }
+
+                        // Add warning if user tries to leave page before download is finished:
+                        // In newer browsers, this message will not show (just the "unsaved changes" warning)
+                        $(window).bind('beforeunload', function () {
+                          return 'The download has not finished, are you sure you want to leave the page?';
+                        });
+
+                        const cancel_downloads = function () {
+                          abortController.abort();
+                        }
+
+                        // make downloads cancel when leaving page or clicking cancel button
+                        window.onunload = cancel_downloads;
+                        $('#btn-cancel-dl').click(cancel_downloads);
+
+                        // clean up after all Promises have delivered
+                        Promise.all(promList).then(function () {
+                          // if the download was aborted:
+                          if (abortSignal.aborted) {
+                            console.log('[XSLT] [final Promise] Cancel button was clicked');
+                            showMessage("Download canceled by user (any already completed downloads were saved)", 'warning');
+                          } else if (dlError) {
+                            console.log('[XSLT] [final Promise] Error during downloading!');
+                            errorProgress();
+                          } else { // otherwise we finished normally
+                            console.log('[XSLT] [final Promise] All downloads finished');
+                            finishProgress();
+                            showMessage("Finished downloading all files!", 'success');
+                          }
+                          hideExtraMessage();
+                          $(window).unbind('beforeunload');
+                          $('#btn-cancel-row').slideUp();
+                          $('#progressbar-row').slideUp();
+                          $('button.dl-btns').removeClass('disabled');
+                          filelist_dt.select.style('os');
+
+                        });
+                      }
+                    };
                     
                     // https://stackoverflow.com/a/14919494/1435788
                     function humanFileSize(bytes, si) {
@@ -3258,8 +3397,13 @@ The textual data from the selected rows (not the actual files) can also be expor
                     //
                     async function get_url_size(url) {
                         let res = await fetch(url, {method:'HEAD'})
-                        contentlength = Number(res.headers.get('content-length'));
-                        return {'url': url, 'size': contentlength};
+                        if (res.status == 200){
+                          contentlength = Number(res.headers.get('content-length'));
+                          return {'url': url, 'size': contentlength};
+                        } else {
+                          console.warn(`Could not fetch file size for ${url} (file might not exist)`)
+                          return {'url': url, 'size': NaN}
+                        }
                     }
                     
                     window.file_sizes = {};
@@ -3271,54 +3415,99 @@ The textual data from the selected rows (not the actual files) can also be expor
                     //
                     function showDownloadSize(data_urls, json_urls, type) {
                         resetMessage();
-                        showMessage('Calculating download size...', 'info');
+                        showMessage('Calculating download size...', 'info');   
                         
-                        // combinedObject will have items [data_url, json_url]
+                        // go through data_urls to check for .ser files and 
+                        // add the auxillary .emi files if needed
+                        let aux_urls = data_urls.map(getEmiName);
+                        
+                        // combinedObject will have items [data_url, json_url, null]
+                        // the third item is for any auxillary files (such as .emi metadata files that should be included in download)
                         var combinedObject = data_urls.map(function(e, i) {
-                            return [e, json_urls[i]];
+                            return [e, json_urls[i], aux_urls[i]];
                         });
                         // combinedArray will be of type array, so it can looped through with forEach
                         var combinedArray = $.map(combinedObject, function(value, index) {
                             return [value];
                         });
+                                                
                         var total_size = 0;
                         promList = [];
                         sizeList = [];
                         combinedArray.forEach(function (item, index) {
-                            this_data_url = item[0];
-                            this_json_url = item[1];
-                            // if we've already cached this file's size, just use that instead of fetching again
-                            if (this_data_url in window.file_sizes) {
-                                promList.push(Promise.resolve());
-                                let this_data_size = window.file_sizes[this_data_url]
-                                total_size += this_data_size;
-                                sizeList.push({name: this_data_url,
-                                               size: this_data_size});
-                            } else {
-                                data_prom = get_url_size(this_data_url);
-                                promList.push(data_prom);
-                                data_prom.then(res => {
-                                    total_size += res.size
-                                    sizeList.push({name: res.url,
-                                                   size: res.size}); 
+                          this_data_url = item[0];
+                          this_json_url = item[1];
+                          this_aux_url = item[2];
+                          // if we've already cached this file's size, just use that instead of fetching again
+                          if (this_data_url in window.file_sizes) {
+                            promList.push(Promise.resolve());
+                            let this_data_size = window.file_sizes[this_data_url]
+                            total_size += this_data_size;
+                            sizeList.push({
+                              name: this_data_url,
+                              size: this_data_size
+                            });
+                          } else {
+                            data_prom = get_url_size(this_data_url);
+                            promList.push(data_prom);
+                            data_prom.then(res => {
+                              total_size += res.size
+                              sizeList.push({
+                                name: res.url,
+                                size: res.size
+                              });
+                            });
+                          }
+                          // if we've already cached this file's size, just use that instead of fetching again
+                          if (this_json_url in window.file_sizes) {
+                            promList.push(Promise.resolve());
+                            let this_json_size = window.file_sizes[this_json_url];
+                            total_size += this_json_size
+                            sizeList.push({
+                              name: this_json_url,
+                              size: this_json_size
+                            });
+                          } else {
+                            json_prom = get_url_size(this_json_url);
+                            promList.push(json_prom);
+                            json_prom.then(res => {
+                              total_size += res.size
+                              sizeList.push({
+                                name: res.url,
+                                size: res.size
+                              });
+                            });
+                          }
+                          // only do anything for aux urls if they're not null
+                          if (this_aux_url) {
+                            if (this_aux_url in window.file_sizes) {
+                              promList.push(Promise.resolve());
+                              let this_aux_size = window.file_sizes[this_aux_url];
+                              if (! isNaN(window.file_sizes[this_aux_url]) ){
+                                total_size += this_aux_size;
+                                sizeList.push({
+                                  name: this_aux_url,
+                                  size: this_aux_size
                                 });
+                              }
                             }
-                            // if we've already cached this file's size, just use that instead of fetching again
-                            if (this_json_url in window.file_sizes) {
-                                promList.push(Promise.resolve());
-                                let this_json_size = window.file_sizes[this_json_url];
-                                total_size += this_json_size
-                                sizeList.push({name: this_json_url,
-                                               size: this_json_size});
-                            } else {
-                                json_prom = get_url_size(this_json_url);
-                                promList.push(json_prom);
-                                json_prom.then(res => {
-                                    total_size += res.size
-                                    sizeList.push({name: res.url,
-                                                   size: res.size});
-                                });
+                            else {
+                                aux_prom = get_url_size(this_aux_url);
+                                promList.push(aux_prom);
+                                aux_prom.then(res => {
+                                  if (res !== null) {
+                                    console.debug(`Adding ${res.size} for ${res.url}`);
+                                    if (!isNaN(res.size)){
+                                        total_size += res.size
+                                    }
+                                    sizeList.push({
+                                      name: res.url,
+                                      size: res.size
+                                    });
+                                  } 
+                                })
                             }
+                          } 
                         });
                         
                         Promise.all(promList).then(function() {
@@ -3340,7 +3529,12 @@ The textual data from the selected rows (not the actual files) can also be expor
                             let msg = (type === 'initial' ? 
                                        'Total size of all datasets: ' :
                                        'Total download size: ')
-                            showMessage(msg + human_dl_size + '.', 'info');
+                           
+                            showMessage(msg + human_dl_size + (
+                                aux_urls.toArray().some((obj) => obj !== null) ?
+                                ' (includes some auxillary data files not explicitly listed below).'
+                                :
+                                '.'), 'info');
                         });
                     }
 
@@ -3356,6 +3550,17 @@ The textual data from the selected rows (not the actual files) can also be expor
                                         'Instrument: ' + $('span#instr-badge').text() + '\n' + 
                                         'Experimenter: ' + $('span.list-record-experimenter').text() + '\n' + 
                                         'Date: ' + $('span.list-record-date').text();
+                    
+                    var getEmiName = (serName) => {
+                        let re = /(.*)_[0-9]+\.ser/;
+                        let match = re.exec(serName);
+                        if (match == null) {
+                            return null;
+                        }
+                        else {
+                            return match[1] + '.emi'
+                        }
+                    }
                     
                     // DataTables for filelist-modal table
                     var filelist_dt = $('table#filelist-table').DataTable({
@@ -3446,7 +3651,10 @@ The textual data from the selected rows (not the actual files) can also be expor
                         filelist_dt.rows().data().map(x => $(x.json_dl).attr('href')),
                         'initial'
                     );
-
+                    
+                    // check to see if we have any .ser files; if so, display warning
+                    let haveSers = filelist_dt.rows().data().map(x => 
+                                     $(x.data_dl).attr('href')).toArray().some(x => x.endsWith('.ser'))
                     
                     // Event listener to calculate download size on selection
                     filelist_dt.on( 'select', function ( e, dt, items ) {
@@ -3533,8 +3741,12 @@ The textual data from the selected rows (not the actual files) can also be expor
                     $('#progressbar-row').hide();
                     $('#dl-result-row').hide();
                     $('#dl-extra-row').hide();
-                    $('#btn-cancel-row').hide();
+                    $('#btn-cancel-row').hide();       
                     
+                    if (haveSers){
+                        let msg = 'At least one .ser file was detected in this record. While not listed in this table, any associated .emi metadata file will be added to the downloaded .zip archive and download size estimate.';
+                        showExtraMessage(msg , 'warning');
+                    }     
                     
                     // function to "prettify" XML export response using regex (from https://stackoverflow.com/a/49458964/1435788)                    
                     function formatXml(xml, tab) { 

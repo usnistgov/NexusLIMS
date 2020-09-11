@@ -280,10 +280,16 @@ class AcquisitionActivity:
                          'AcquisitionActivity')
             self.store_unique_params()
 
+        if len(self.files) == 1:
+            _logger.info('Only one file found in this activity, so leaving '
+                         'metadata associated with the file, rather than '
+                         'activity')
+            self.setup_params = {}
+            return
+
         if values_to_search is None:
             values_to_search = self.unique_params
 
-        # TODO: tests for setup parameter determination
         # m will be individual dictionaries, since meta is list of dicts
         i = 0
         setup_params = {}
@@ -411,7 +417,8 @@ class AcquisitionActivity:
                         f'</startTime>{line_ending}'
         aqAc_xml += f'{INDENT*2}<sampleID>{sample_id}</sampleID>{line_ending}'
         aqAc_xml += f'{INDENT*2}<setup>{line_ending}'
-        for pk, pv in sorted(self.setup_params.items()):
+        for pk, pv in sorted(self.setup_params.items(),
+                             key=lambda i: i[0].lower()):
             # metadata values to skip in XML output
             if pk in ['warnings', 'DatasetType']:
                 pass
@@ -450,7 +457,8 @@ class AcquisitionActivity:
                         f'</location>{line_ending}'
             aqAc_xml += f'{INDENT*3}<preview>{rel_thumb_name}' \
                         f'</preview>{line_ending}'
-            for meta_k, meta_v in sorted(um.items()):
+            for meta_k, meta_v in sorted(um.items(),
+                                         key=lambda i: i[0].lower()):
                 if meta_k in ['warnings', 'DatasetType']:
                     pass
                 else:

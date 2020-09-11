@@ -18,12 +18,11 @@ requests-ntlm = "*"
 ntlm-auth = "*"
 pytz = "*"
 ldap3 = "*"
-hyperspy = {editable = true,git = "https://github.com/hyperspy/hyperspy.git",ref = "RELEASE_next_patch"}
+hyperspy = {editable = true, git = "https://github.com/hyperspy/hyperspy.git", ref = "RELEASE_next_patch"}
 nexuslims = {editable = true,path = "./mdcs/nexusLIMS"}
 #hyperspy = "1.5.2"
 tifffile = "==20***REMOVED***"
 scikit-learn = "*"
-
 # remove strict 3.7 requirement so we can test 3.7 and 3.8
 #[requires]
 #python_version = "3.7"

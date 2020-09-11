@@ -269,6 +269,24 @@ class TestExtractorModule:
         os.remove(thumb_fname)
         os.remove(thumb_fname.replace('thumb.png', 'json'))
 
+    def test_parse_metadata_bad_ser(self):
+        # if we find a bad ser that can't be read, we should get minimal
+        # metadata and a placeholder thumbnail image
+        from nexusLIMS.extractors import PLACEHOLDER_PREVIEW
+        import filecmp
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***13_unreadable_ser_1.ser")
+        meta, thumb_fname = parse_metadata(fname=TEST_FILE)
+        # assert that preview is same as our placeholder image (should be)
+        assert filecmp.cmp(PLACEHOLDER_PREVIEW, thumb_fname, shallow=False)
+        assert meta['nx_meta']['Data Type'] == 'Unknown'
+        assert meta['nx_meta']['DatasetType'] == 'Misc'
+        assert '***REMOVED***13_unreadable_ser.emi' in meta['nx_meta']['emi ' \
+                                                                   'Filename']
+        assert 'The .ser file could not be opened' in meta['nx_meta'][
+            'Extractor Warning']
+
     def test_flatten_dict(self):
         dict_to_flatten = {
             'level1.1': 'level1.1v',
@@ -554,7 +572,11 @@ class TestQuantaExtractor:
         assert metadata['HiResIllumination']['BrightFieldValue'] == ""
 
     def test_bad_metadata(self):
-        assert get_quanta_metadata(self.QUANTA_BAD_MDATA) is None
+        metadata = get_quanta_metadata(self.QUANTA_BAD_MDATA)
+        assert metadata['nx_meta']['Extractor Warnings'] == \
+               'Did not find expected FEI tags. Could not read metadata'
+        assert metadata['nx_meta']['Data Type'] == 'Unknown'
+        assert metadata['nx_meta']['Data Type'] == 'Unknown'
 
     def test_modded_metadata(self):
         metadata = get_quanta_metadata(self.QUANTA_MODDED_MDATA)
@@ -891,7 +913,8 @@ class TestSerEmiExtractor:
                  '76e6b908-f988-48cb-adab-2c64fd6de24e',
                  '9eabdd9d-6cb7-41c3-b234-bb44670a14f6']):
             assert m['nx_meta']['DatasetType'] == 'Spectrum'
-            assert m['nx_meta']['Data Type'] == 'STEM_EDS_Spectrum'
+            # this might be incorrect, but we have no way of determining
+            assert m['nx_meta']['Data Type'] == 'TEM_EDS_Spectrum'
             assert m['nx_meta']['Data Dimensions'] == '(3993,)'
             assert m['ObjectInfo']['Uuid'] == u
             assert 'Manufacturer' not in m['nx_meta']
@@ -1092,30 +1115,77 @@ class TestSerEmiExtractor:
         assert meta['nx_meta']['Magnification (x)'] == 80000
         assert meta['nx_meta']['STEM Rotation (°)'] == -90.0
 
-    def test_bad_emi(self, caplog):
-        TEST_FILE = os.path.join(
-            os.path.dirname(__file__), "files",
-            "***REMOVED***11_bad_emi_dataZeroed_1.ser")
-        meta = fei_emi.get_ser_metadata(TEST_FILE)
-        assert 'ValueError' in caplog.text
-
-    def test_emi_io_error(self, monkeypatch, caplog):
-        def monkey_hs_load(a, lazy, only_valid_data):
-            # returning an int should trigger the IOError branch in
-            # fei_emi.get_ser_metadata
-            return 5
-
-        monkeypatch.setattr(fei_emi,
-                            "_hs_load", monkey_hs_load)
-        TEST_FILE = os.path.join(
-            os.path.dirname(__file__), "files",
-            "***REMOVED***11_bad_emi_dataZeroed_1.ser")
-        meta = fei_emi.get_ser_metadata(TEST_FILE)
-        assert 'Did not understand format of .emi file' in caplog.text
-
     def test_no_emi_error(self, caplog):
         TEST_FILE = os.path.join(
             os.path.dirname(__file__), "files",
             "***REMOVED***12_no_accompanying_emi_dataZeroed_1.ser")
         meta = fei_emi.get_ser_metadata(TEST_FILE)
-        assert 'Could not find .emi file with expected name' in caplog.text
+
+        assert 'Extractor Warning' in meta['nx_meta']
+        assert 'NexusLIMS could not find a corresponding .emi metadata ' + \
+               'file for this .ser file' in meta['nx_meta']['Extractor Warning']
+        assert 'NexusLIMS could not find a corresponding .emi metadata ' + \
+               'file for this .ser file' in caplog.text
+        assert meta['nx_meta']['emi Filename'] is None
+
+    def test_unreadable_ser(self, caplog):
+        # if the ser is unreadable, neither the emi or the ser can be read,
+        # so we will get the bare minimum of metadata back from the parser
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***13_unreadable_ser_1.ser")
+        meta = fei_emi.get_ser_metadata(TEST_FILE)
+        assert 'nx_meta' in meta
+        assert meta['nx_meta']['Data Type'] == 'Unknown'
+        assert meta['nx_meta']['DatasetType'] == 'Misc'
+        assert 'Creation Time' in meta['nx_meta']
+        assert '***REMOVED***13_unreadable_ser.emi' in \
+               meta['nx_meta']['emi Filename']
+        assert 'The .emi metadata file associated with this .ser file could ' \
+               'not be opened by NexusLIMS.' in caplog.text
+        assert 'The .ser file could not be opened (perhaps file is ' \
+               'corrupted?)' in caplog.text
+
+    @staticmethod
+    def _helper_test(caplog):
+        TEST_FILE = os.path.join(
+            os.path.dirname(__file__), "files",
+            "***REMOVED***14_unreadable_emi_1.ser")
+        meta = fei_emi.get_ser_metadata(TEST_FILE)
+        assert 'nx_meta' in meta
+        assert 'ser_header_parameters' in meta
+        assert 'The .emi metadata file associated with this .ser file could ' \
+               'not be opened by NexusLIMS' in caplog.text
+        assert 'The .emi metadata file associated with this .ser file could ' \
+               'not be opened by NexusLIMS' in meta['nx_meta']['Extractor '
+                                                               'Warning']
+        assert meta['nx_meta']['Data Dimensions'] == '(1024, 1024)'
+        assert meta['nx_meta']['DatasetType'] == 'Image'
+        return meta
+
+    def test_unreadable_emi(self, caplog):
+        # if emi is unreadable, we should still get basic metadata from the ser
+        meta = TestSerEmiExtractor._helper_test(caplog)
+        assert meta['nx_meta']['Data Type'] == 'TEM_Imaging'
+
+    def test_instr_mode_parsing_with_unreadable_emi_tem(self, monkeypatch,
+                                                        caplog):
+        # if emi is unreadable, we should get imaging mode based off
+        # instrument, but testing directory doesn't allow proper handling of
+        # this, so monkeypatch get_instr_from_filepath
+        def mock_get_instr(filename):
+            return instruments.instrument_db['FEI-Titan-TEM-635816']
+        monkeypatch.setattr(fei_emi, '_get_instr', mock_get_instr)
+        meta = TestSerEmiExtractor._helper_test(caplog)
+        assert meta['nx_meta']['Data Type'] == 'TEM_Imaging'
+
+    def test_instr_mode_parsing_with_unreadable_emi_stem(self, monkeypatch,
+                                                         caplog):
+        # if emi is unreadable, we should get imaging mode based off
+        # instrument, but testing directory doesn't allow proper handling of
+        # this, so monkeypatch get_instr_from_filepath
+        def mock_get_instr(filename):
+            return instruments.instrument_db['FEI-Titan-STEM-630901']
+        monkeypatch.setattr(fei_emi, '_get_instr', mock_get_instr)
+        meta = TestSerEmiExtractor._helper_test(caplog)
+        assert meta['nx_meta']['Data Type'] == 'STEM_Imaging'

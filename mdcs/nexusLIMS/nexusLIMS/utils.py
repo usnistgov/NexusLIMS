@@ -54,7 +54,8 @@ def setup_loggers(log_level):
     log_level : int
         The level of logging, such as ``logging.DEBUG``
     """
-    _logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s',
+    _logging.basicConfig(format='%(asctime)s %(name)s %(levelname)s: '
+                                '%(message)s',
                          level=log_level)
     loggers = [_logging.getLogger(name) for name in
                _logging.root.manager.loggerDict if 'nexusLIMS' in name]
@@ -517,7 +518,7 @@ def gnu_find_files_by_mtime(path, dt_from, dt_to, extensions):
 
 def _sort_dict(item):
     return {k: _sort_dict(v) if isinstance(v, dict) else v
-            for k, v in sorted(item.items())}
+            for k, v in sorted(item.items(), key=lambda i: i[0].lower())}
 
 
 def _remove_dtb_element(tree, path):

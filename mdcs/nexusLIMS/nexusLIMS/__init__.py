@@ -109,4 +109,4 @@ def _filter_hyperspy_messages(record):
 _logging.getLogger('hyperspy.api').addFilter(_filter_hyperspy_messages)
 
 # set log message format
-_logging.basicConfig(format='%(asctime)s %(levelname)s: %(message)s')
+_logging.basicConfig(format='%(asctime)s %(name)s %(levelname)s: %(message)s')
