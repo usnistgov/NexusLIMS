@@ -1,0 +1,246 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <link rel="stylesheet" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css">
+<script src="https://pages.nist.gov/nist-header-footer/js/jquery-1.9.0.min.js" type="text/javascript" defer="defer"></script>
+<script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js" type="text/javascript" defer="defer"></script>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusLIMS taxonomy &#8212; NexusLIMS 0.0.9 documentation</title>
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/custom-styles.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="_static/custom.js"></script>
+    <link rel="shortcut icon" href="_static/nexusLIMS_bare_logo.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Schema documentation" href="schema_documentation.html" />
+    <link rel="prev" title="Developer documentation" href="development.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><span><img src="_static/logo_horizontal.png"></span>
+           </a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="api.html">API Docs</a></li>
+                <li><a href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS">Repository</a></li>
+                <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site Map <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_security.html">Data security in NexusLIMS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session_logger_app.html">Session logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Developer documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/nexusLIMS.html">nexusLIMS package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.harvester.html">nexusLIMS.harvester package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="development.html" title="Previous Chapter: Developer documentation"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Previous</span>
+    </a>
+  </li>
+  <li>
+    <a href="schema_documentation.html" title="Next Chapter: Schema documentation"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Next &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><img src="_static/nexusLIMS_bare_logo.png">
+<h4><a href="index.html" title="Return to documentation home">
+    NexusLIMS Documentation</a></h4>
+<ul class="globaltoc">
+    <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_security.html">Data security in NexusLIMS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session_logger_app.html">Session logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Developer documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
+</ul>
+
+</ul><h4>
+    <a class="no-hover">Page content</a>
+</h4>
+
+<ul>
+<li><a class="reference internal" href="#">NexusLIMS taxonomy</a></li>
+</ul>
+
+<form action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+<div id="sourcelink">
+  <a href="_sources/taxonomy.rst.txt"
+     rel="nofollow">View page source</a>
+</div>
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <div class="section" id="nexuslims-taxonomy">
+<h1>NexusLIMS taxonomy<a class="headerlink" href="#nexuslims-taxonomy" title="Permalink to this headline">¶</a></h1>
+<p>Oftentimes, it can be a bit confusing when speaking about the different portions
+of the back-end codebase, so this short page defines the terms frequently
+used by the NexusLIMS development team and what is meant by them:</p>
+<ul class="simple">
+<li><p><strong>Harvester:</strong></p>
+<ul>
+<li><p>The harvesters (implemented in the <a class="reference internal" href="api/nexusLIMS.harvester.html#module-nexusLIMS.harvester" title="nexusLIMS.harvester"><code class="xref py py-mod docutils literal notranslate"><span class="pre">nexusLIMS.harvester</span></code></a> package)
+are the portions of the code that connect to external data sources, such
+as the SharePoint calendar. Currently, the calendar harvester is the only
+one implemented, but eventually there will likely be at least an electronic
+laboratory notebook (ELN) harvester as well.</p></li>
+</ul>
+</li>
+</ul>
+<ul class="simple">
+<li><p><strong>Extractor:</strong></p>
+<ul>
+<li><p>The extractors (implemented in the <a class="reference internal" href="api/nexusLIMS.extractors.html#module-nexusLIMS.extractors" title="nexusLIMS.extractors"><code class="xref py py-mod docutils literal notranslate"><span class="pre">nexusLIMS.extractors</span></code></a> package)
+are the modules that inspect the data files collected during an Experiment
+and pull out the relevant metadata contained within for inclusion in the
+record. The preview image generation is also considered an extractor.</p></li>
+</ul>
+</li>
+</ul>
+<ul class="simple">
+<li><p><strong>Record Builder:</strong></p>
+<ul>
+<li><p>The record builder (implemented in the
+<a class="reference internal" href="api/nexusLIMS.builder.html#module-nexusLIMS.builder.record_builder" title="nexusLIMS.builder.record_builder"><code class="xref py py-mod docutils literal notranslate"><span class="pre">nexusLIMS.builder.record_builder</span></code></a> module) is the heart of the
+NexusLIMS back-end, and is the portion of the library that orchestrates
+the creation of a new record and its insertion into the NexusLIMS CDCS
+instance. Further details are provided on the
+<a class="reference internal" href="record_building.html"><span class="doc">record building</span></a> documentation page.</p></li>
+</ul>
+</li>
+</ul>
+<ul class="simple">
+<li><p><strong>Session Logger:</strong></p>
+<ul>
+<li><p>The session logger is the portable Windows application that runs on the
+individual microscope PCs, which logs simple information to the NexusLIMS
+database about when an Experiment has occurred. See the associated
+<a class="reference internal" href="session_logger_app.html"><span class="doc">documentation</span></a> page for more details.</p></li>
+</ul>
+</li>
+</ul>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+  
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="_sources/taxonomy.rst.txt"
+     rel="nofollow">View page source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2020, NIST Office of Data and Informatics.<br/>
+      Last updated on Oct, 19, 2020.<br/>
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

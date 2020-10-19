@@ -1,0 +1,647 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head><link rel="stylesheet" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css">
+    <script src="https://pages.nist.gov/nist-header-footer/js/jquery-1.9.0.min.js" type="text/javascript" defer="defer"></script>
+    <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js" type="text/javascript" defer="defer"></script>
+    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tips for customizing CDCS &#8212; NexusLIMS 0.0.9 documentation</title>
+    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="_static/custom-styles.css" />
+    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script src="_static/jquery.js"></script>
+    <script src="_static/underscore.js"></script>
+    <script src="_static/doctools.js"></script>
+    <script src="_static/language_data.js"></script>
+    <script src="_static/custom.js"></script>
+    <link rel="shortcut icon" href="_static/nexusLIMS_bare_logo.ico"/>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="API documentation" href="api.html" />
+    <link rel="prev" title="Schema documentation" href="schema_documentation.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html"><span><img src="_static/logo_horizontal.png"></span>
+           </a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="api.html">API Docs</a></li>
+                <li><a href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS">Repository</a></li>
+                <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="index.html">Site Map <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_security.html">Data security in NexusLIMS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session_logger_app.html">Session logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/nexusLIMS.html">nexusLIMS package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.harvester.html">nexusLIMS.harvester package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="schema_documentation.html" title="Previous Chapter: Schema documentation"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Previous</span>
+    </a>
+  </li>
+  <li>
+    <a href="api.html" title="Next Chapter: API documentation"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Next &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><img src="_static/nexusLIMS_bare_logo.png">
+<h4><a href="index.html" title="Return to documentation home">
+    NexusLIMS Documentation</a></h4>
+<ul class="globaltoc">
+    <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="data_security.html">Data security in NexusLIMS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session_logger_app.html">Session logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
+</ul>
+
+</ul><h4>
+    <a class="no-hover">Page content</a>
+</h4>
+
+<ul>
+<li><a class="reference internal" href="#">Tips for customizing CDCS</a><ul>
+<li><a class="reference internal" href="#overview">Overview</a></li>
+<li><a class="reference internal" href="#installation">Installation</a></li>
+<li><a class="reference internal" href="#general-tips">General tips</a></li>
+<li><a class="reference internal" href="#the-static-folder">The <code class="docutils literal notranslate"><span class="pre">static</span></code> folder</a></li>
+<li><a class="reference internal" href="#the-templates-folder">The <code class="docutils literal notranslate"><span class="pre">templates</span></code> folder</a><ul>
+<li><a class="reference internal" href="#intro-to-django-templates">Intro to Django templates</a></li>
+<li><a class="reference internal" href="#working-with-the-cdcs-templates">Working with the CDCS templates</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-mdcs-home-folder">The <code class="docutils literal notranslate"><span class="pre">mdcs_home</span></code> folder</a></li>
+<li><a class="reference internal" href="#debugging">Debugging</a></li>
+</ul>
+</li>
+</ul>
+
+<form action="search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+<div id="sourcelink">
+  <a href="_sources/customizing_cdcs.rst.txt"
+     rel="nofollow">View page source</a>
+</div>
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <div class="section" id="tips-for-customizing-cdcs">
+<h1>Tips for customizing CDCS<a class="headerlink" href="#tips-for-customizing-cdcs" title="Permalink to this headline">¶</a></h1>
+<blockquote>
+<div><p><cite>Originally written by: Joshua Taillon – ODI</cite></p>
+<p><cite>Last updated: November 15, 2019</cite></p>
+</div></blockquote>
+<p>The front-end for <cite>NexusLIMS</cite> is powered by the Configurable Data Curation
+System – <a class="reference external" href="https://www.nist.gov/itl/ssd/information-systems-group/configurable-data-curation-system-cdcs">CDCS</a>. CDCS is a project originating from the Materials Genome
+Initiative (MGI) that provides a fully customizable platform with which to
+collect, organize, query, and disseminate scientific data. The data is fed into
+the system as individual <cite>records</cite> that must conform with a <cite>template</cite>
+(expressed using XML Schema). The records can then be searched and displayed
+using a customized <cite>XSLT</cite> stylesheet (eXtensible Stylesheet Language
+Transformations). These stylesheets can incorporate any arbitrary HTML and
+javascript, giving great control over what content is ultimately displayed to
+the end user when he or she opens a record.</p>
+<div class="section" id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h2>
+<p>On the technical side, CDCS is implemented in Python using the Django framework
+and MongoDB for record storage in a NoSQL database. In addition to the actual
+record display that can be customized via XSLT, the Django framework allows
+any part of the entire CDCS application to be customized by overriding or
+changing the default <cite>templates</cite> (see <a class="reference external" href="https://docs.djangoproject.com/en/2.2/topics/templates/">here</a> for more
+documentation on Django templates). Through this mechanism, any part of the
+application can be modified as needed.</p>
+<p>The specific implementation of CDCS used for <cite>NexusLIMS</cite> is stored in a
+<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/nexuslims-cdcs">forked version</a> of the <cite>upstream</cite> CDCS
+<a class="reference external" href="https://github.com/usnistgov/MDCS">repository</a> available on the internal NIST Gitlab. CDCS is
+comprised of many individual Django <cite>apps</cite> (or <cite>modules</cite> – see
+<a class="reference external" href="https://www.nist.gov/itl/ssd/information-systems-group/cdcs-system-modules">here</a> for a complete list), that each control a different part
+or function of the overall application. For example, the
+<code class="docutils literal notranslate"><span class="pre">core_explore_keyword_app</span></code> controls the display of the data “search by
+keyword” page.</p>
+</div>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>General documentation for the installation of CDCS is available from the
+<a class="reference external" href="https://www.nist.gov/itl/ssd/information-systems-group/configurable-data-curation-system-cdcs/cdcs-help-and-resources">documentation site</a> of CDCS itself. The easiest way to install
+however, is using the Docker method, supplied by the developers of CDCS. The
+files for this can be obtained by <a class="reference external" href="https://www.nist.gov/itl/ssd/information-systems-group/configurable-data-curation-system-cdcs/contact-cdcs">contacting</a> the developers
+directly, or by going to the <a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/nexuslims-cdcs-docker-setup/tree/master">NexusLIMS repository</a> that
+holds instructions for installing the <cite>NexusLIMS</cite>-customized version (follow the
+instructions in the <code class="docutils literal notranslate"><span class="pre">README.md</span></code> file contained in that repository). If you
+proceed with the files from the <cite>NexusLIMS</cite> repository, the resulting product
+will contain all the <cite>NexusLIMS</cite> changes, rather than the default look-and-feel
+written by the CDCS developers (and as a result, will look just like
+<cite>NexusLIMS</cite>).</p>
+<p>After setting up an installation of CDCS (assuming an <cite>MDCS</cite> install rather than
+a <cite>registry</cite> install), there will be a few directories within the top-level
+folder displayed by the web server that can contain customizations. If the
+installation was performed using the <a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/nexuslims-cdcs-docker-setup/tree/master">docker method</a>,
+then this top-level folder is the <code class="docutils literal notranslate"><span class="pre">/srv/curator</span></code> directory in the
+<code class="docutils literal notranslate"><span class="pre">mdcs_cdcs_1</span></code> container. This can be accessed by telling docker to execute
+an interactive <code class="docutils literal notranslate"><span class="pre">bash</span></code> shell within the container from your host system:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker <span class="nb">exec</span> -it mdcs_cdcs_1 bash
+</pre></div>
+</div>
+<div class="admonition-a-development-tip admonition">
+<p class="admonition-title">A development tip…</p>
+<p>Microsoft’s <a class="footnote-reference brackets" href="#id2" id="id1">1</a> freely-available <a class="reference external" href="https://code.visualstudio.com/">Visual Studio Code</a>
+supports connecting to existing Docker containers and editing the files
+inside that container on-the-fly. This makes rapid prototyping significantly
+easier, as you can edit files within the container using modern IDE tools
+and see the impact of certain changes in realtime. See the
+<a class="reference external" href="https://code.visualstudio.com/docs/remote/containers">documentation</a> of the container features in VS Code
+for more detail. <a class="reference external" href="https://code.visualstudio.com/docs/remote/containers-advanced#_developing-inside-a-container-on-a-remote-docker-host">This</a> page also describes
+how to connect to a container that may be on an SSH-accessible remote host.</p>
+</div>
+<p>Since CDCS is a Django application, the structure will be familiar to anyone
+that has done Django development previously. The <code class="docutils literal notranslate"><span class="pre">templates</span></code> folder contains
+the HTML-format Django templates that are used to construct the pages, the
+<code class="docutils literal notranslate"><span class="pre">static</span></code> folder contains various <cite>static</cite> resources (such as images, CSS
+files, javascript files, etc.) that can be accessed from anywhere on the site,
+and <code class="docutils literal notranslate"><span class="pre">mdcs_home</span></code> is the “homepage” app that is designed to allow easy
+customization of a few high-level CDCS elements. The following sections go into
+each of these in more detail. To view the specific changes that were made,
+the <cite>NexusLIMS</cite> CDCS <a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/nexuslims-cdcs/commits/NexusLIMS_master">git commit history</a> will show
+every change in detail from what is provided in the default CDCS installation.</p>
+</div>
+<div class="section" id="general-tips">
+<h2>General tips<a class="headerlink" href="#general-tips" title="Permalink to this headline">¶</a></h2>
+<p>A couple general strategies help when trying to customize various pieces of the
+CDCS installation. It is common not to know where to look when trying to change
+a piece of text or the structure of a section, since the application is split
+into many different Django <cite>apps</cite> (Python modules) that are all included as part
+of the default installation. The only <cite>app</cite> immediately visible from the
+root directory of <code class="docutils literal notranslate"><span class="pre">/srv/curator</span></code> is the <code class="docutils literal notranslate"><span class="pre">mdcs_home</span></code> app. The others (at
+least in the docker-installed version – listed <a class="reference external" href="https://www.nist.gov/itl/ssd/information-systems-group/cdcs-system-modules">here</a>) are
+located in the <code class="docutils literal notranslate"><span class="pre">/usr/local/lib/python3.6/site-packages</span></code> folder holding the
+libraries for the system-level Python installation.</p>
+<p>The easiest way to determine what needs to be changed is to use the
+<cite>find in files</cite> feature supplied by most modern code editors/IDEs. After making
+sure both the <code class="docutils literal notranslate"><span class="pre">/srv/curator</span></code> and <code class="docutils literal notranslate"><span class="pre">site-packages</span></code> directories are included
+in the search, enter the text (from the website) that you wish to change, and
+you should be able to narrow down what specific file is controlling that
+display. For non-text or other elements, you can use your web browser’s
+<cite>inspect</cite> feature (usually found by right-clicking on a certain item) to find
+an element’s HTML <cite>id</cite>, <cite>name</cite>, or <cite>class</cite>, which can be used as above to find
+the file providing that element. If the file you find is within the
+<code class="docutils literal notranslate"><span class="pre">site-packages</span></code> folder, you will need to
+<a class="reference external" href="https://docs.djangoproject.com/en/2.2/howto/overriding-templates/#overriding-templates">override</a> that template, rather than making
+changes directly to the file (see the <a class="reference internal" href="#templates">templates</a> section for more detail).</p>
+<p>Once you make any changes to the files inside <code class="docutils literal notranslate"><span class="pre">/srv/curator</span></code>, you will need
+to reload Django in order to show any of those changes. This can be done by
+restarting the Docker container, or you can get Django to restart itself
+automatically by “touching” a special file in the <code class="docutils literal notranslate"><span class="pre">mdcs</span></code> directory:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># run from within the mdcs_cdcs_1 docker container:</span>
+touch /srv/curator/mdcs/wsgi.py
+</pre></div>
+</div>
+</div>
+<div class="section" id="the-static-folder">
+<h2>The <code class="docutils literal notranslate"><span class="pre">static</span></code> folder<a class="headerlink" href="#the-static-folder" title="Permalink to this headline">¶</a></h2>
+<p id="static">The <code class="docutils literal notranslate"><span class="pre">static</span></code> folder contains resources that can be used on any page within
+the Django application, such as images, javascript, CSS style definitions,
+individual files to serve, etc.
+(see documentation about the concept of static files in Django
+<a class="reference external" href="https://docs.djangoproject.com/en/2.2/howto/static-files/">here</a>). For quick customizations, a few files in
+particular are good to know about. <code class="docutils literal notranslate"><span class="pre">./static/css/extra.css</span></code> is sourced on
+every page within the application, and this is a good place to put any custom
+style definitions. Some example changes that we made to this file were
+modifying the spacing between items, changing item colors, etc. Changes can
+also be made to <code class="docutils literal notranslate"><span class="pre">./static/css/main.css</span></code>, but keeping all modifications in one
+file will help make maintenance on these settings easier.</p>
+<p>Simply changing or placing files into the <code class="docutils literal notranslate"><span class="pre">static</span></code> directory will not
+immediately make them visible, since we have to instruct Django to “collect”
+these files. This is because Django serves the static files out of a different
+directory (at least in the Docker-installed version) named <code class="docutils literal notranslate"><span class="pre">static.prod</span></code>.
+You can either manually copy any changed files into the <code class="docutils literal notranslate"><span class="pre">static.prod</span></code>
+directory (after logging into the docker container with
+<code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">exec</span> <span class="pre">-it</span> <span class="pre">mdcs_cdcs_1</span> <span class="pre">bash</span></code>) with a command like:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp -R /srv/curator/static/* /srv/curator/static.prod/
+</pre></div>
+</div>
+<p>Or you can instruct Django to do this for you (the recommended method) using
+the <a class="reference external" href="https://docs.djangoproject.com/en/2.2/ref/contrib/staticfiles/"><code class="docutils literal notranslate"><span class="pre">collectstatic</span></code> command</a>. From the <code class="docutils literal notranslate"><span class="pre">/srv/curator</span></code> directory inside
+the <code class="docutils literal notranslate"><span class="pre">mdcs_cdcs_1</span></code> container, run the following:</p>
+<div class="highlight-bash notranslate" id="collectstatic"><div class="highlight"><pre><span></span>python manage.py collectstatic -c --noinput
+</pre></div>
+</div>
+<p>This may take a little bit of time depending on how many files you have, but the
+command will completely clear the <code class="docutils literal notranslate"><span class="pre">static.prod</span></code> folder, and copy all the files
+you placed in the <code class="docutils literal notranslate"><span class="pre">static</span></code> folder into the right place.</p>
+<p>To actually use the files that are in the <code class="docutils literal notranslate"><span class="pre">static</span></code> folder, you will need
+to use the <code class="docutils literal notranslate"><span class="pre">static</span></code> <cite>template tag</cite> (documented
+<a class="reference external" href="https://docs.djangoproject.com/en/2.2/ref/templates/builtins/#std:templatetag-static">here</a>) within your templates. <cite>Template tags</cite> are
+specially-formatted bits of code that Django parses within the HTML templates
+that allow for dynamic content (see the next section). Template tags in Django
+are signified using curly braces and percent symbols <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">...</span> <span class="pre">%}</span></code> followed by
+whichever tag you want to use. As an example, you would use the following
+syntax to include an image stored at <code class="docutils literal notranslate"><span class="pre">/srv/curator/static/img/example.jpg</span></code>
+from within a Django template:</p>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="x">&lt;img src=&quot;</span><span class="cp">{%</span> <span class="k">static</span> <span class="s2">&quot;img/example.jpg&quot;</span> <span class="cp">%}</span><span class="x">&quot; alt=&quot;My image&quot;&gt;</span>
+</pre></div>
+</div>
+<p>If you peruse around the included templates in the <code class="docutils literal notranslate"><span class="pre">templates</span></code> folder, you
+will see this syntax all over, for example in  <code class="docutils literal notranslate"><span class="pre">&lt;script&gt;</span></code> elements
+(for including javascript), <code class="docutils literal notranslate"><span class="pre">&lt;style&gt;</span></code> elements (to include <code class="docutils literal notranslate"><span class="pre">.css</span></code> files),
+images, etc.</p>
+</div>
+<div class="section" id="the-templates-folder">
+<h2>The <code class="docutils literal notranslate"><span class="pre">templates</span></code> folder<a class="headerlink" href="#the-templates-folder" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="intro-to-django-templates">
+<span id="templates"></span><h3>Intro to Django templates<a class="headerlink" href="#intro-to-django-templates" title="Permalink to this headline">¶</a></h3>
+<p>While this section will not be a definitive introduction to Django’s templating
+system (see the <a class="reference external" href="https://docs.djangoproject.com/en/2.2/ref/templates/language/">official docs</a> for more detail), it
+should provide enough instruction that you understand how the pieces of the
+different pieces come together to make your own customizations. Django templates
+(a different concept than the CDCS/XML Schema templates mentioned at the
+beginning of this document) are text files that Django uses to dynamically
+generate another file (such as html) using content controlled by <cite>variables</cite>,
+<cite>tags</cite>, and <cite>filters</cite> (the <code class="docutils literal notranslate"><span class="pre">static</span></code> template tag was introduced above).
+You can also define <cite>blocks</cite> in a template, which can then be re-used throughout
+the application.</p>
+<p>A simple example of this in practice is the <code class="docutils literal notranslate"><span class="pre">if</span></code> tag. Together with tags such
+as <code class="docutils literal notranslate"><span class="pre">for</span></code>, you can control the logic within a template as you would in any
+other programming language, to dynamically generate the content that is
+ultimately displayed to the user. Consider the following example (copied from
+the Django documentation):</p>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">athlete_list</span> <span class="cp">%}</span><span class="x"></span>
+<span class="x">    Number of athletes: </span><span class="cp">{{</span> <span class="nv">athlete_list</span><span class="o">|</span><span class="nf">length</span> <span class="cp">}}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">elif</span> <span class="nv">athlete_in_locker_room_list</span> <span class="cp">%}</span><span class="x"></span>
+<span class="x">    Athletes should be out of the locker room soon!</span>
+<span class="cp">{%</span> <span class="k">else</span> <span class="cp">%}</span><span class="x"></span>
+<span class="x">    No athletes.</span>
+<span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span><span class="x"></span>
+</pre></div>
+</div>
+<p>In this example, the <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">if</span> <span class="pre">...</span> <span class="pre">%}</span></code> tag checks a variable (<code class="docutils literal notranslate"><span class="pre">athlete_list</span></code>),
+and if it evaluates to true, displays a certain content, and displays
+something else if not. This branching and flow-control capability allows
+templates to be much more flexible than a regular HTML page.</p>
+<p>The other tag that you will see used frequently is the <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">extends</span> <span class="pre">...</span> <span class="pre">%}</span></code>
+tag (docs <a class="reference external" href="https://docs.djangoproject.com/en/2.2/ref/templates/language/#template-inheritance">here</a>). This tag allows templates
+to inherit from each other by including “child” templates (defined in a separate
+file) within a “parent” template. Whenever you see an <code class="docutils literal notranslate"><span class="pre">extend</span></code> tag, you know
+that you are viewing a template that is a child of another template, and using
+that knowledge, you can work “up the chain” to see how all the templates
+are used together to generate the entire document that is finally displayed to
+the user.</p>
+<p>These basic tools are good to understand when working with the CDCS templates,
+as they provide the building blocks required to start making your own
+customizations.</p>
+</div>
+<div class="section" id="working-with-the-cdcs-templates">
+<h3>Working with the CDCS templates<a class="headerlink" href="#working-with-the-cdcs-templates" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="changing-the-default-files">
+<h4>Changing the default files<a class="headerlink" href="#changing-the-default-files" title="Permalink to this headline">¶</a></h4>
+<p><strong>theme.html:</strong></p>
+<p>Within the <code class="docutils literal notranslate"><span class="pre">/srv/curator</span></code> directory, the <code class="docutils literal notranslate"><span class="pre">templates</span></code> folder by default
+contains a few files that can be modified to make some basic customizations.
+For example, the <code class="docutils literal notranslate"><span class="pre">templates/theme.html</span></code> file contains block definitions that
+are placed into the header of the HTML pages, and thus is where you can update
+values such as the page metadata (with <code class="docutils literal notranslate"><span class="pre">&lt;meta&gt;</span></code> elements), the page title,
+and including any additional CSS style or javascript files. If you have a new
+file that you want to include, simply place the file into the <code class="docutils literal notranslate"><span class="pre">static</span></code>
+directory and follow the pattern used in this file to make sure it is linked on
+all the pages of your CDCS instance (remembering that you will need to run the
+<a class="reference internal" href="#collectstatic"><code class="docutils literal notranslate"><span class="pre">collectstatic</span></code></a> command from above.</p>
+<p><strong>menu.html and footer/default.html:</strong></p>
+<p>Within the <code class="docutils literal notranslate"><span class="pre">templates/theme.html</span></code> file, you will also see a few other files
+referenced that you can edit to make changes as well. These include the top
+menu template (<code class="docutils literal notranslate"><span class="pre">templates/theme/menu.html</span></code>) and the footer template
+(<code class="docutils literal notranslate"><span class="pre">templates/theme/footer/default.html</span></code>). As you might expect, these files can
+similarly be modified as needed. For example, on the <cite>NexusLIMS</cite> page, the block</p>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="x">&lt;div id=&quot;cdcs-menu-title&quot;&gt;</span>
+<span class="x">    &lt;a href=&quot;https://cdcs.nist.gov/&quot; title=&quot;Configurable Data Curation System (CDCS)&quot;&gt;</span>
+<span class="x">        Materials Data Curation System</span>
+<span class="x">    &lt;/a&gt;</span>
+<span class="x">&lt;/div&gt;</span>
+</pre></div>
+</div>
+<p>in <code class="docutils literal notranslate"><span class="pre">templates/theme/menu.html</span></code> was replaced by</p>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="x">&lt;div id=&quot;cdcs-menu-title&quot;&gt;</span>
+<span class="x">    &lt;a href=&quot;/&quot; title=&quot;NexusLIMS&quot;&gt;</span>
+<span class="x">        &lt;img src=&quot;</span><span class="cp">{%</span> <span class="k">static</span> <span class="s1">&#39;img/logo_horizontal.png&#39;</span> <span class="cp">%}</span><span class="x">&quot;/&gt;</span>
+<span class="x">    &lt;/a&gt;</span>
+<span class="x">&lt;/div&gt;</span>
+</pre></div>
+</div>
+<p>This small modification changed the left link in the top menu bar from text
+saying “Materials Data Curation System” (linking to the CDCS homepage) to an
+image of the project’s logo (placed in the <code class="docutils literal notranslate"><span class="pre">static</span></code> folder) that will always
+bring the user back to the homepage of the <cite>NexusLIMS</cite> CDCS instance. Likewise,
+the <cite>NexusLIMS</cite> project did not require the drop-down menus for data exploration
+and data composition that are included by default, so they were simply commented
+out of the <code class="docutils literal notranslate"><span class="pre">templates/theme/menu.html</span></code> template. Similarly, some small changes
+were made to <code class="docutils literal notranslate"><span class="pre">templates/theme/footer/default.html</span></code> to meet the project’s
+design needs.</p>
+<p><strong>core_main_app/user/homepage.html:</strong></p>
+<p>The “homepage” template located at
+<code class="docutils literal notranslate"><span class="pre">templates/core_main_app/user/homepage.html</span></code> is an example of a template
+override (explained in the next section), but is provided by default by CDCS
+since it is a commonly changed feature. This template controls the content
+(but not the header or footer, since those are defined elsewhere) of the very
+first page that is displayed to users when they visit the site’s root. By
+default, this shows some text about CDCS and a figure describing the MGI.
+It also defines two columns for <cite>tiles</cite> and <cite>templates</cite>, which are then filled
+out later on in the page loading by javascript defined in the
+<code class="docutils literal notranslate"><span class="pre">static/core_main_app/js/homepage.js</span></code> file. In the <cite>NexusLIMS</cite>
+CDCS instance, the template list was commented out, and the text/logo were
+modified to be more appropriate. <cite>Note:</cite> you do not have to keep this structure,
+and the homepage can be defined in any way you choose.</p>
+<div class="admonition-a-note-on-page-layouts admonition">
+<p class="admonition-title">A note on page layouts…</p>
+<p>The page content throughout CDCS is laid out using (currently) version
+3.3.7 of the <a class="reference external" href="https://getbootstrap.com/docs/3.3/">Bootstrap</a> web framework. This is a very
+commonly used framework that provides tools to generate mobile-responsive
+pages using a set of standard rows and columns (along with other
+components). Thus, throughout the templates, you will see content wrapped
+in <code class="docutils literal notranslate"><span class="pre">&lt;div&gt;</span></code> elements that have either the <code class="docutils literal notranslate"><span class="pre">row</span></code> or <code class="docutils literal notranslate"><span class="pre">col-**-#</span></code> classes.
+These are classes that are part of Bootstrap that control how the content
+is laid out on different-sized devices (see the <a class="reference external" href="https://getbootstrap.com/docs/3.3/css/">docs</a>
+for more detail).</p>
+</div>
+<p><strong>mdcs_home/tiles.html:</strong></p>
+<p id="tiles-template">This file (together with the <code class="docutils literal notranslate"><span class="pre">templates.html</span></code> file below) control what is
+shown on the bottom portion of the CDCS homepage. The <cite>tiles</cite> are the links
+that are shown on the left side with content such as
+“<cite>Curate your Materials Data</cite>”, “<cite>Build your own queries</cite>”, etc. <code class="docutils literal notranslate"><span class="pre">tiles.html</span></code>
+controls the overall display of these links, but the actual content of the tiles
+is controlled by the <code class="docutils literal notranslate"><span class="pre">/srv/curator/mdcs_home/views.py</span></code> file (see the
+<a class="reference internal" href="#mdcs-home"><code class="docutils literal notranslate"><span class="pre">mdcs_home</span></code></a> section for more details).</p>
+<div class="admonition-a-note-on-those-icons admonition">
+<p class="admonition-title">A note on those icons…</p>
+<p>Throughout CDCS you will notice icons on most buttons (<cite>e.g.</cite> the tiles,
+the <cite>Log In/Sign Up</cite> button, etc.) that are not included in the <code class="docutils literal notranslate"><span class="pre">static</span></code>
+folder as you might expect. These icons are provided by the
+<a class="reference external" href="https://fontawesome.com/v4.7.0/icons/">Font Awesome</a> framework (v. 4.7), which (like Bootstrap) is
+very commonly used throughout the web. The previous link will show all the
+icons that are available to use, which can be included at any point in your
+HTML templates by using an <code class="docutils literal notranslate"><span class="pre">&lt;i&gt;</span></code> element with the appropriate classes
+attached. For example, to display a camera icon, you would use the syntax
+<code class="docutils literal notranslate"><span class="pre">&lt;i</span> <span class="pre">class=&quot;fa</span> <span class="pre">fa-camera-retro&quot;&gt;&lt;/i&gt;</span></code>. The <code class="docutils literal notranslate"><span class="pre">fa</span></code> “activates” the Font
+Awesome framework, and then the <code class="docutils literal notranslate"><span class="pre">fa-camera-retro</span></code> indicates which specific
+icon to use. There are many more options that can be provided, but know that
+when you see <code class="docutils literal notranslate"><span class="pre">fa-*</span></code> in the CDCS sources, this indicates some sort of icon
+from the Font Awesome library (see the <a class="reference external" href="https://fontawesome.com/v4.7.0/examples/">documentation</a>
+for more detail).</p>
+</div>
+<p><strong>mdcs_home/templates.html:</strong></p>
+<p>Like the <code class="docutils literal notranslate"><span class="pre">tiles.html</span></code> file, this template controls what is shown underneath
+the welcome message on the CDCS homepage. By default, it loops through the
+installed <cite>XML Schema</cite> templates that have been loaded into CDCS and displays
+them to the user. This was not needed for the <cite>NexusLIMS</cite> project, and so was
+commented out entirely.</p>
+</div>
+<div class="section" id="overriding-other-cdcs-templates">
+<h4>Overriding other CDCS templates<a class="headerlink" href="#overriding-other-cdcs-templates" title="Permalink to this headline">¶</a></h4>
+<p>Inspecting the directory structure of the <code class="docutils literal notranslate"><span class="pre">templates</span></code> folder in the
+<cite>NexusLIMS</cite> CDCS <a class="reference external" href="NexusLIMSCDCSRepo">repository</a>, you will notice a few more
+folders in the customized version than the default. All the added templates in
+<cite>NexusLIMS</cite> are overrides of the ones included in the default CDCS modules
+(such as <code class="docutils literal notranslate"><span class="pre">core_explore_common_app</span></code> and <code class="docutils literal notranslate"><span class="pre">core_explore_keyword_app</span></code>). As
+mentioned previously, these are included because there were files contained
+within the <code class="docutils literal notranslate"><span class="pre">site-packages</span></code> folder that needed to be changed. By copying those
+files into the root structure (making sure to maintain relative paths), it is
+possible to override the default versions. An example is probably most
+helpful:</p>
+<p>The “root” template that is used to load most of the high-level page structure
+is present by default at:</p>
+<div class="highlight-bash notranslate">
+    <div class="highlight">
+        <pre>/usr/local/lib/python3.6/site-packages/core_main_app/<span style='color:#158cba;'>templates/core_main_app/_render/user/theme_base.html</span></pre>
+    </div>
+</div><p>For <cite>NexusLIMS</cite>, a few changes were required to this file, so it was copied
+into:</p>
+<div class="highlight-bash notranslate">
+    <div class="highlight">
+        <pre>/srv/curator/<span style='color:#158cba;'>templates/core_main_app/_render/user/theme_base.html</span></pre>
+    </div>
+</div><p>(note that the <code class="docutils literal notranslate"><span class="pre">templates/core_main_app/_render/user/</span></code> relative path is
+maintained; this is how Django knows that this file is supposed to override
+the default one from the <code class="docutils literal notranslate"><span class="pre">site-packages</span></code> folder). Once this file was copied
+to the local directory, some slight changes were made to enable additional
+functionality on the record display pages. For example, an additional javascript
+library was needed for interactive table displays
+(<a class="reference external" href="https://datatables.net/">DataTables.js</a>), so to make sure this was loaded properly, it
+was necessary to make changes to the page headers to include both the library’s
+CSS and JS files (which had been copied into the <code class="docutils literal notranslate"><span class="pre">static</span></code> folder). Note, these
+inclusions likely could have also been included in the <code class="docutils literal notranslate"><span class="pre">templates/theme.html</span></code>
+file under the blocks <code class="docutils literal notranslate"><span class="pre">theme_css</span></code> and <code class="docutils literal notranslate"><span class="pre">theme_js</span></code>, in retrospect. The other
+change made to this file was moving the jQuery and Bootstrap library loading
+to before the <code class="docutils literal notranslate"><span class="pre">body</span></code> block (<a class="reference external" href="https://github.com/usnistgov/core_main_app/blob/master/core_main_app/templates/core_main_app/_render/user/theme_base.html#L40-L42">lines 40-42</a> of the default
+installation was moved to immediately after the <code class="docutils literal notranslate"><span class="pre">&lt;body&gt;</span></code> html tag). The
+<code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">block</span> <span class="pre">body</span> <span class="pre">%}{%</span> <span class="pre">endblock</span> <span class="pre">%}</span></code> line is the one that includes the
+XSLT-processed record display, so in order to allow jQuery to be used in the
+XSLT translators, this modification was necessary.</p>
+<p>A few other templates from the <code class="docutils literal notranslate"><span class="pre">core_explore_keyword_app</span></code> and
+<code class="docutils literal notranslate"><span class="pre">core_explore_common_app</span></code> were overridden for <cite>NexusLIMS</cite>, primarily to modify
+how the search page lists the records. Check the NexusLIMS repository for more
+specific information about the changes.</p>
+</div>
+<div class="section" id="more-advanced-django-tweaks">
+<h4>More advanced Django tweaks<a class="headerlink" href="#more-advanced-django-tweaks" title="Permalink to this headline">¶</a></h4>
+<p id="more-advanced">Instead of (or in addition to) overriding templates from CDCS, there are other
+pieces of the Django application that can be modified to change how the user
+interface is presented. In the case of <cite>NexusLIMS</cite>, this has involved changing
+some of the XML utilities (written in Python) to allow parameters to be passed
+to the the XSLT translator stylesheets. For example, in the file
+<code class="docutils literal notranslate"><span class="pre">mdcs_home/utils/xml.py</span></code>, the <code class="docutils literal notranslate"><span class="pre">xsl_transform()</span></code> method from
+<code class="docutils literal notranslate"><span class="pre">site-packages/core_main_app/utils/xml.py</span></code> is overridden to allow for keyword
+arguments (see <a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/nexuslims-cdcs/blob/8511bd12a354ef4809489369ab0960af27c512aa/mdcs_home/utils/xml.py#L45">line 45</a> of <code class="docutils literal notranslate"><span class="pre">xml.py</span></code>), which are passed as
+parameters to the XSLT stylesheet. This also required modifying the
+<code class="docutils literal notranslate"><span class="pre">mdcs_home/templatetags/xsl_transform_tag.py</span></code> file, which is where the
+<code class="docutils literal notranslate"><span class="pre">xsl_transform_detail</span></code> and <code class="docutils literal notranslate"><span class="pre">xsl_transform_list</span></code> tags (to be used in the
+Django template files) are defined. Small modifications were made to the methods
+as well to allow the passing of parameters to directly to the XSLT stylesheets
+on the list and detail view pages.</p>
+</div>
+</div>
+</div>
+<div class="section" id="the-mdcs-home-folder">
+<h2>The <code class="docutils literal notranslate"><span class="pre">mdcs_home</span></code> folder<a class="headerlink" href="#the-mdcs-home-folder" title="Permalink to this headline">¶</a></h2>
+<p id="mdcs-home">While it has been mentioned a few times previously in this document, the
+<code class="docutils literal notranslate"><span class="pre">mdcs_home</span></code> folder contains a place to store customizations, overrides, and
+other additions on the Python side of the Django application. The <code class="docutils literal notranslate"><span class="pre">mdcs_home</span></code>
+folder represents a distinct Django <cite>app</cite> (like <code class="docutils literal notranslate"><span class="pre">core_main_app</span></code> and the
+others) that the user has full control over. Thus, this folder does not contain
+any HTML Django templates, but rather Python code that can be used to feed
+the desired information into those templates. This is also a place where new
+tags to be used in the templates (in the <code class="docutils literal notranslate"><span class="pre">mdcs_home/templatetags</span></code> folder)
+can be defined. Other utilities can be defined (such as
+<code class="docutils literal notranslate"><span class="pre">mdcs_home/utils/xml.py</span></code>) and imported as needed in the other Python files.</p>
+<p>A few of the files provided by default in this folder were edited for the
+<cite>NexusLIMS</cite> CDCS instance. In <code class="docutils literal notranslate"><span class="pre">views.py</span></code> (the file that handles web requests
+and returns web responses – see the <a class="reference external" href="https://docs.djangoproject.com/en/2.2/topics/http/views/">Django docs</a> for more
+detail), you can see the <code class="docutils literal notranslate"><span class="pre">tiles()</span></code> and <code class="docutils literal notranslate"><span class="pre">template_list()</span></code> methods defined,
+which control what is ultimately displayed by the
+<a class="reference internal" href="#tiles-template">default templates</a> discussed above. Since the template
+list display was removed entirely from the <cite>NexusLIMS</cite> CDCS, the only
+modifications made to this file were to the <code class="docutils literal notranslate"><span class="pre">tiles()</span></code> method. In particular,
+since the project did not require the “<cite>Search using flexible queries</cite>” or
+“<cite>Compose your own template</cite>” tools, the lines that added these tiles to
+the Django context (see <a class="reference external" href="https://stackoverflow.com/questions/20957388/what-is-a-context-in-django">more info</a> about Django context) were
+commented out, leaving only the “<cite>Explore</cite>” and “<cite>Create new record</cite>” options.
+This file (in particular the “<cite>title</cite>” and “<cite>text</cite>” values in each dictionary)
+also controls what text is displayed on the tiles and showed to the user. Note,
+it would also be possible to remove the apps mentioned in these files from the
+<code class="docutils literal notranslate"><span class="pre">INSTALLED_APPS</span></code> value in <code class="docutils literal notranslate"><span class="pre">/srv/curator/mdcs/settings.py</span></code> to remove the
+functionality entirely and hide them from the tile list on the homepage.</p>
+<p>Likewise, the <code class="docutils literal notranslate"><span class="pre">mdcs_home/menus.py</span></code> file was modified by commenting out menu
+items in the top bar that were not needed for <cite>NexusLIMS</cite>. This is also the
+place to modify the text that is shown for each value along the top bar.</p>
+</div>
+<div class="section" id="debugging">
+<h2>Debugging<a class="headerlink" href="#debugging" title="Permalink to this headline">¶</a></h2>
+<p>When making changes to the application within a Docker container, it can be
+difficult to use standard IDE tools for debugging. A useful tool for this is a
+Python module called <a class="reference external" href="https://github.com/romanvm/python-web-pdb"><code class="docutils literal notranslate"><span class="pre">web-pdb</span></code></a>, which allows you to define breakpoints in the
+Python sources, and open up a web-accessible Python debugger session. To use
+it, you will need to install it in the <code class="docutils literal notranslate"><span class="pre">mdcs_cdcs_1</span></code> container with:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install web-pdb
+</pre></div>
+</div>
+<p>And then to use it, insert the following line at the place you want to stop
+execution and debug:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">web_pdb</span><span class="p">;</span> <span class="n">web_pdb</span><span class="o">.</span><span class="n">set_trace</span><span class="p">(</span><span class="n">port</span><span class="o">=</span><span class="mi">3000</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>When the Python interpreter reaches this line, it will pause execution, and then
+you should be able to access the debugger in your web browser at whatever host
+IP is running your instance over port 3000 (something like
+<a class="reference external" href="http://localhost:3000">http://localhost:3000</a>). Note, this port is already forwarded from the CDCS
+container to <code class="docutils literal notranslate"><span class="pre">localhost</span></code> by default if you use the <code class="docutils literal notranslate"><span class="pre">NexusLIMS</span></code>-customized
+Docker installation. See <a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/nexuslims-cdcs-docker-setup/blob/90bdc073163633b5e6c2de94efad823edfcc3982/docker-compose.yml#L84">line 84</a> of the
+<code class="docutils literal notranslate"><span class="pre">docker-compose.yml</span></code> file used during installation.</p>
+<hr class="docutils" />
+<dl class="footnote brackets">
+<dt class="label" id="id2"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Certain commercial software is identified only to foster understanding.
+Such identification does not imply recommendation or endorsement by the
+National Institute of Standards and Technology, nor does it imply that
+the product identified is necessarily the best available for the purpose.</p>
+</dd>
+</dl>
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+  
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="_sources/customizing_cdcs.rst.txt"
+     rel="nofollow">View page source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2020, NIST Office of Data and Informatics.<br/>
+      Last updated on Oct, 19, 2020.<br/>
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

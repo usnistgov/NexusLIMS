@@ -1,0 +1,401 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nexusLIMS.instruments &#8212; NexusLIMS 0.0.9 documentation</title>
+    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom-styles.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../_static/custom.js"></script>
+    <link rel="shortcut icon" href="../../_static/nexusLIMS_bare_logo.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html"><span><img src="../../_static/logo_horizontal.png"></span>
+           </a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../api.html">API Docs</a></li>
+                <li><a href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS">Repository</a></li>
+                <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site Map <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data_security.html">Data security in NexusLIMS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../session_logger_app.html">Session logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/nexusLIMS.html">nexusLIMS package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.harvester.html">nexusLIMS.harvester package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li class="dummy-sidebarrel">
+    <a><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Previous</span>
+    </a>
+  </li>
+  <li class="dummy-sidebarrel">
+    <a><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Next &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><img src="../../_static/nexusLIMS_bare_logo.png">
+<h4><a href="../../index.html" title="Return to documentation home">
+    NexusLIMS Documentation</a></h4>
+<ul class="globaltoc">
+    <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data_security.html">Data security in NexusLIMS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../session_logger_app.html">Session logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API documentation</a></li>
+</ul>
+
+</ul><h4>
+    <a class="no-hover">Page content</a>
+</h4>
+
+
+<form action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <h1>Source code for nexusLIMS.instruments</h1><div class="highlight"><pre>
+<span></span><span class="c1">#  NIST Public License - 2019</span>
+<span class="c1">#</span>
+<span class="c1">#  This software was developed by employees of the National Institute of</span>
+<span class="c1">#  Standards and Technology (NIST), an agency of the Federal Government</span>
+<span class="c1">#  and is being made available as a public service. Pursuant to title 17</span>
+<span class="c1">#  United States Code Section 105, works of NIST employees are not subject</span>
+<span class="c1">#  to copyright protection in the United States.  This software may be</span>
+<span class="c1">#  subject to foreign copyright.  Permission in the United States and in</span>
+<span class="c1">#  foreign countries, to the extent that NIST may hold copyright, to use,</span>
+<span class="c1">#  copy, modify, create derivative works, and distribute this software and</span>
+<span class="c1">#  its documentation without fee is hereby granted on a non-exclusive basis,</span>
+<span class="c1">#  provided that this notice and disclaimer of warranty appears in all copies.</span>
+<span class="c1">#</span>
+<span class="c1">#  THE SOFTWARE IS PROVIDED &#39;AS IS&#39; WITHOUT ANY WARRANTY OF ANY KIND,</span>
+<span class="c1">#  EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT LIMITED</span>
+<span class="c1">#  TO, ANY WARRANTY THAT THE SOFTWARE WILL CONFORM TO SPECIFICATIONS, ANY</span>
+<span class="c1">#  IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,</span>
+<span class="c1">#  AND FREEDOM FROM INFRINGEMENT, AND ANY WARRANTY THAT THE DOCUMENTATION</span>
+<span class="c1">#  WILL CONFORM TO THE SOFTWARE, OR ANY WARRANTY THAT THE SOFTWARE WILL BE</span>
+<span class="c1">#  ERROR FREE.  IN NO EVENT SHALL NIST BE LIABLE FOR ANY DAMAGES, INCLUDING,</span>
+<span class="c1">#  BUT NOT LIMITED TO, DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES,</span>
+<span class="c1">#  ARISING OUT OF, RESULTING FROM, OR IN ANY WAY CONNECTED WITH THIS SOFTWARE,</span>
+<span class="c1">#  WHETHER OR NOT BASED UPON WARRANTY, CONTRACT, TORT, OR OTHERWISE, WHETHER</span>
+<span class="c1">#  OR NOT INJURY WAS SUSTAINED BY PERSONS OR PROPERTY OR OTHERWISE, AND</span>
+<span class="c1">#  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,</span>
+<span class="c1">#  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.</span>
+<span class="c1">#</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">**Attributes**</span>
+
+<span class="sd">Attributes</span>
+<span class="sd">----------</span>
+<span class="sd">instrument_db : dict</span>
+<span class="sd">    A dictionary of :py:class:`~nexusLIMS.instruments.Instrument` objects.</span>
+
+<span class="sd">    Each object in this dictionary represents an instrument detected in the</span>
+<span class="sd">    NexusLIMS remote database.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="n">is_subpath</span> <span class="k">as</span> <span class="n">_is_subpath</span>
+<span class="kn">import</span> <span class="nn">sqlite3</span> <span class="k">as</span> <span class="nn">_sql3</span>
+<span class="kn">import</span> <span class="nn">contextlib</span> <span class="k">as</span> <span class="nn">_contextlib</span>
+<span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
+
+
+<span class="k">def</span> <span class="nf">_get_instrument_db</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Connect to the NexusLIMS database and get a list of all the instruments</span>
+<span class="sd">    contained within</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    instrument_db : dict</span>
+<span class="sd">        A dictionary of `Instrument` instances that describe all the</span>
+<span class="sd">        instruments that were found in the ``instruments`` table of the</span>
+<span class="sd">        NexusLIMS database</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT * from instruments&quot;</span>
+    <span class="c1"># use contextlib to auto-close the connection and database cursors</span>
+    <span class="k">with</span> <span class="n">_contextlib</span><span class="o">.</span><span class="n">closing</span><span class="p">(</span><span class="n">_sql3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;nexusLIMS_db_path&#39;</span><span class="p">]))</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">conn</span><span class="p">:</span>  <span class="c1"># auto-commits</span>
+            <span class="k">with</span> <span class="n">_contextlib</span><span class="o">.</span><span class="n">closing</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">())</span> <span class="k">as</span> <span class="n">cursor</span><span class="p">:</span>  <span class="c1"># auto-closes</span>
+                <span class="n">results</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">)</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+                <span class="n">col_names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">cursor</span><span class="o">.</span><span class="n">description</span><span class="p">))</span>
+
+    <span class="n">instr_db</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+        <span class="n">this_dict</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">col_names</span><span class="p">,</span> <span class="n">l</span><span class="p">):</span>
+            <span class="n">this_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
+
+        <span class="n">key</span> <span class="o">=</span> <span class="n">this_dict</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;instrument_pid&#39;</span><span class="p">)</span>
+        <span class="n">this_dict</span><span class="p">[</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">key</span>
+        <span class="n">instr_db</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">Instrument</span><span class="p">(</span><span class="o">**</span><span class="n">this_dict</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">instr_db</span>
+
+
+<div class="viewcode-block" id="Instrument"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.instruments.Instrument">[docs]</a><span class="k">class</span> <span class="nc">Instrument</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A simple object to hold information about an instrument in the Microscopy</span>
+<span class="sd">    Nexus facility, fetched from the external NexusLIMS database</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    api_url : str or None</span>
+<span class="sd">        The calendar API url for this instrument</span>
+<span class="sd">    calendar_name : str or None</span>
+<span class="sd">        The &quot;user-friendly&quot; name of the calendar for this instrument as</span>
+<span class="sd">        displayed on the sharepoint resource (e.g. &quot;FEI Titan TEM&quot;)</span>
+<span class="sd">    calendar_url : str or None</span>
+<span class="sd">        The URL to this instrument&#39;s web-accessible calendar on the</span>
+<span class="sd">        sharepoint resource</span>
+<span class="sd">    location : str or None</span>
+<span class="sd">        The physical location of this instrument (building and room number)</span>
+<span class="sd">    name : str or None</span>
+<span class="sd">        The unique identifier for an instrument in the Nexus Microscopy facility</span>
+<span class="sd">    schema_name : str or None</span>
+<span class="sd">        The name of instrument as defined in the Nexus Microscopy schema and</span>
+<span class="sd">        displayed in the records</span>
+<span class="sd">    property_tag : str or None</span>
+<span class="sd">        The NIST property tag for this instrument</span>
+<span class="sd">    filestore_path : str or None</span>
+<span class="sd">        The path (relative to the Nexus facility root) on the central file</span>
+<span class="sd">        storage where this instrument stores its data</span>
+<span class="sd">    computer_name : str or None</span>
+<span class="sd">        The name of the &#39;support PC&#39; connected to this instrument</span>
+<span class="sd">    computer_ip : str or None</span>
+<span class="sd">        The REN IP address of the &#39;support PC&#39; connected to this instrument</span>
+<span class="sd">    computer_mount : str or None</span>
+<span class="sd">        The full path where the files are saved on the &#39;support PC&#39; for the</span>
+<span class="sd">        instrument (e.g. &#39;M:/&#39;)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">api_url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">calendar_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">calendar_url</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">location</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">schema_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">property_tag</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">filestore_path</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">computer_ip</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">computer_name</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                 <span class="n">computer_mount</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Create a new Instrument</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">api_url</span> <span class="o">=</span> <span class="n">api_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calendar_name</span> <span class="o">=</span> <span class="n">calendar_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">calendar_url</span> <span class="o">=</span> <span class="n">calendar_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="o">=</span> <span class="n">location</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">schema_name</span> <span class="o">=</span> <span class="n">schema_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">property_tag</span> <span class="o">=</span> <span class="n">property_tag</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">filestore_path</span> <span class="o">=</span> <span class="n">filestore_path</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">computer_ip</span> <span class="o">=</span> <span class="n">computer_ip</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">computer_name</span> <span class="o">=</span> <span class="n">computer_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">computer_mount</span> <span class="o">=</span> <span class="n">computer_mount</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;Nexus Instrument: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span> \
+               <span class="sa">f</span><span class="s1">&#39;API url:          </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">api_url</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span> \
+               <span class="sa">f</span><span class="s1">&#39;Calendar name:    </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">calendar_name</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span> \
+               <span class="sa">f</span><span class="s1">&#39;Calendar url:     </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">calendar_url</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span> \
+               <span class="sa">f</span><span class="s1">&#39;Schema name:      </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">schema_name</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span> \
+               <span class="sa">f</span><span class="s1">&#39;Location:         </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span> \
+               <span class="sa">f</span><span class="s1">&#39;Property tag:     </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">property_tag</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span> \
+               <span class="sa">f</span><span class="s1">&#39;Filestore path:   </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">filestore_path</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span> \
+               <span class="sa">f</span><span class="s1">&#39;Computer IP:      </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">computer_ip</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span> \
+               <span class="sa">f</span><span class="s1">&#39;Computer name:    </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">computer_name</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span> \
+               <span class="sa">f</span><span class="s1">&#39;Computer mount:   </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">computer_mount</span><span class="si">}</span><span class="se">\n</span><span class="s1">&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="sa">f</span><span class="s1">&#39; in </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">location</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">location</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span></div>
+
+
+<span class="n">instrument_db</span> <span class="o">=</span> <span class="n">_get_instrument_db</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="get_instr_from_filepath"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.instruments.get_instr_from_filepath">[docs]</a><span class="k">def</span> <span class="nf">get_instr_from_filepath</span><span class="p">(</span><span class="n">path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Using the NexusLIMS database, get an instrument object by a given path.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path : str</span>
+<span class="sd">        A path (relative or absolute) to a file saved in the central</span>
+<span class="sd">        filestore that will be used to search for a matching instrument</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    instrument : Instrument or None</span>
+<span class="sd">        An `_Instrument` instance matching the path, or None if no match was</span>
+<span class="sd">        found</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; inst = get_instr_from_filepath(&#39;/mnt/cfs2e_mmfnexus/Titan/mbk1/&#39; +</span>
+<span class="sd">    ...                                &#39;190628 - Aaron Training/&#39; +</span>
+<span class="sd">    ...                                &#39;6_28_2019 Box6 4S/4_330mm.dm3&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; str(inst)</span>
+<span class="sd">    &#39;FEI-Titan-TEM-635816 in 223/B115&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">instrument_db</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">_is_subpath</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;mmfnexus_path&quot;</span><span class="p">],</span>
+                                           <span class="n">v</span><span class="o">.</span><span class="n">filestore_path</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">v</span>
+
+    <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="get_instr_from_calendar_name"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.instruments.get_instr_from_calendar_name">[docs]</a><span class="k">def</span> <span class="nf">get_instr_from_calendar_name</span><span class="p">(</span><span class="n">cal_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Using the NexusLIMS database, get an instrument object by a given path.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    cal_name : str</span>
+<span class="sd">        A calendar name (e.g. &quot;FEITitanTEMEvents&quot;) that will be used to search</span>
+<span class="sd">        for a matching instrument in the ``api_url`` values</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    instrument : Instrument or None</span>
+<span class="sd">        An `_Instrument` instance matching the path, or None if no match was</span>
+<span class="sd">        found</span>
+
+<span class="sd">    Examples</span>
+<span class="sd">    --------</span>
+<span class="sd">    &gt;&gt;&gt; inst = get_instr_from_calendar_name(&#39;FEITitanTEMEvents&#39;)</span>
+<span class="sd">    &gt;&gt;&gt; str(inst)</span>
+<span class="sd">    &#39;FEI-Titan-TEM-635816 in 223/B115&#39;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">instrument_db</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">cal_name</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">api_url</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">v</span>
+
+    <span class="k">return</span> <span class="kc">None</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+  
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2020, NIST Office of Data and Informatics.<br/>
+      Last updated on Oct, 19, 2020.<br/>
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

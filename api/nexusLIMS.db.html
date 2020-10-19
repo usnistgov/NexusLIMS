@@ -1,0 +1,362 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head><link rel="stylesheet" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css">
+    <script src="https://pages.nist.gov/nist-header-footer/js/jquery-1.9.0.min.js" type="text/javascript" defer="defer"></script>
+    <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js" type="text/javascript" defer="defer"></script>
+    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nexusLIMS.db package &#8212; NexusLIMS 0.0.9 documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom-styles.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/custom.js"></script>
+    <link rel="shortcut icon" href="../_static/nexusLIMS_bare_logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="nexusLIMS.extractors package" href="nexusLIMS.extractors.html" />
+    <link rel="prev" title="nexusLIMS.builder package" href="nexusLIMS.builder.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html"><span><img src="../_static/logo_horizontal.png"></span>
+           </a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../api.html">API Docs</a></li>
+                <li><a href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS">Repository</a></li>
+                <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site Map <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_security.html">Data security in NexusLIMS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../session_logger_app.html">Session logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="nexusLIMS.html">nexusLIMS package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">nexusLIMS.db package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.harvester.html">nexusLIMS.harvester package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="nexusLIMS.builder.html" title="Previous Chapter: nexusLIMS.builder package"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Previous</span>
+    </a>
+  </li>
+  <li>
+    <a href="nexusLIMS.extractors.html" title="Next Chapter: nexusLIMS.extractors package"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Next &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><img src="../_static/nexusLIMS_bare_logo.png">
+<h4><a href="../index.html" title="Return to documentation home">
+    NexusLIMS Documentation</a></h4>
+<ul class="globaltoc">
+    <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_security.html">Data security in NexusLIMS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../session_logger_app.html">Session logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="nexusLIMS.html">nexusLIMS package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">nexusLIMS.db package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.harvester.html">nexusLIMS.harvester package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</ul><h4>
+    <a class="no-hover">Page content</a>
+</h4>
+
+<ul>
+<li><a class="reference internal" href="#">nexusLIMS.db package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-nexusLIMS.db.migrate_db">nexusLIMS.db.migrate_db module</a></li>
+<li><a class="reference internal" href="#module-nexusLIMS.db.session_handler">nexusLIMS.db.session_handler module</a></li>
+</ul>
+</li>
+</ul>
+
+<form action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+<div id="sourcelink">
+  <a href="../_sources/api/nexusLIMS.db.rst.txt"
+     rel="nofollow">View page source</a>
+</div>
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <div class="section" id="module-nexusLIMS.db">
+<span id="nexuslims-db-package"></span><h1>nexusLIMS.db package<a class="headerlink" href="#module-nexusLIMS.db" title="Permalink to this headline">¶</a></h1>
+<dl class="py function">
+<dt id="nexusLIMS.db.make_db_query">
+<code class="sig-prename descclassname">nexusLIMS.db.</code><code class="sig-name descname">make_db_query</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">query</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/db.html#make_db_query"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nexusLIMS.db.make_db_query" title="Permalink to this definition">¶</a></dt>
+<dd><p>Execute an arbitrary query on the NexusLIMS database and return the results
+as a list</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>query</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The SQL query to execute</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>res_list</strong> – The results of the SQL query</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-nexusLIMS.db.migrate_db">
+<span id="nexuslims-db-migrate-db-module"></span><h2>nexusLIMS.db.migrate_db module<a class="headerlink" href="#module-nexusLIMS.db.migrate_db" title="Permalink to this headline">¶</a></h2>
+<p>A standalone script to migrate a NexusLIMS sqlite database to a new schema,
+as defined in the <cite>NexusLIMS_db_creation_script.sql</cite> file. All entries in the
+<code class="docutils literal notranslate"><span class="pre">session_log</span></code> table of the database specified by <code class="docutils literal notranslate"><span class="pre">old_db</span></code> will be
+recreated in the same table in <code class="docutils literal notranslate"><span class="pre">new_db</span></code>.</p>
+<p>Because the <cite>NexusLIMS_db_creation_script.sql</cite> file requires access to a file named
+<cite>nexuslims_db.sqlite</cite>, if that file exists in the current directory, no action will be
+performed to prevent clobbering an existing database.</p>
+<dl class="py function">
+<dt id="nexusLIMS.db.migrate_db.main">
+<code class="sig-prename descclassname">nexusLIMS.db.migrate_db.</code><code class="sig-name descname">main</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">arguments</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/db/migrate_db.html#main"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nexusLIMS.db.migrate_db.main" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the migration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>old_db</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Input (old) database from which <code class="docutils literal notranslate"><span class="pre">session_log</span></code> records will be copied</p></li>
+<li><p><strong>new_db</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Output database (path to file will be created if it does not exist) to
+which <code class="docutils literal notranslate"><span class="pre">session_log</span></code> records will be copied</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="module-nexusLIMS.db.session_handler">
+<span id="nexuslims-db-session-handler-module"></span><h2>nexusLIMS.db.session_handler module<a class="headerlink" href="#module-nexusLIMS.db.session_handler" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="nexusLIMS.db.session_handler.Session">
+<em class="property">class </em><code class="sig-prename descclassname">nexusLIMS.db.session_handler.</code><code class="sig-name descname">Session</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">session_identifier</span></em>, <em class="sig-param"><span class="n">instrument</span></em>, <em class="sig-param"><span class="n">dt_from</span></em>, <em class="sig-param"><span class="n">dt_to</span></em>, <em class="sig-param"><span class="n">user</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/db/session_handler.html#Session"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nexusLIMS.db.session_handler.Session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.7/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A record of an individual session as read from the Nexus Microscopy
+facility session database. Created by combining two
+<a class="reference internal" href="#nexusLIMS.db.session_handler.SessionLog" title="nexusLIMS.db.session_handler.SessionLog"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionLog</span></code></a> objects with status
+<code class="docutils literal notranslate"><span class="pre">&quot;TO_BE_BUILT&quot;</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session_identifier</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The UUIDv4 identifier for an individual session on an instrument</p></li>
+<li><p><strong>instrument</strong> (<a class="reference internal" href="nexusLIMS.html#nexusLIMS.instruments.Instrument" title="nexusLIMS.instruments.Instrument"><em>Instrument</em></a>) – An object representing the instrument associated with this session</p></li>
+<li><p><strong>dt_from</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a>) – A <a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> object representing the start of this
+session</p></li>
+<li><p><strong>dt_to</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a>) – A <a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> object representing the end of this
+session</p></li>
+<li><p><strong>user</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The username associated with this session (may not be trustworthy)</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt id="nexusLIMS.db.session_handler.Session.insert_record_generation_event">
+<code class="sig-name descname">insert_record_generation_event</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/db/session_handler.html#Session.insert_record_generation_event"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nexusLIMS.db.session_handler.Session.insert_record_generation_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert a log for this sesssion into the session database with
+<code class="docutils literal notranslate"><span class="pre">event_type</span></code> <cite>“RECORD_GENERATION”</cite></p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>success</strong> – Whether or not the update operation was successful</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="nexusLIMS.db.session_handler.Session.update_session_status">
+<code class="sig-name descname">update_session_status</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">status</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/db/session_handler.html#Session.update_session_status"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nexusLIMS.db.session_handler.Session.update_session_status" title="Permalink to this definition">¶</a></dt>
+<dd><p>Update the <code class="docutils literal notranslate"><span class="pre">record_status</span></code> in the session logs for this
+<a class="reference internal" href="#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>status</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – One of <cite>“COMPLETED”</cite>, <cite>“WAITING_FOR_END”</cite>, <cite>“TO_BE_BUILT”</cite>,
+<cite>“ERROR”</cite>, <cite>“NO_FILES_FOUND”</cite> (the allowed values in the
+NexusLIMS database). Status value will be validated by the database</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>success</strong> – Whether or not the update operation was successful</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="nexusLIMS.db.session_handler.SessionLog">
+<em class="property">class </em><code class="sig-prename descclassname">nexusLIMS.db.session_handler.</code><code class="sig-name descname">SessionLog</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">session_identifier</span></em>, <em class="sig-param"><span class="n">instrument</span></em>, <em class="sig-param"><span class="n">timestamp</span></em>, <em class="sig-param"><span class="n">event_type</span></em>, <em class="sig-param"><span class="n">user</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/db/session_handler.html#SessionLog"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nexusLIMS.db.session_handler.SessionLog" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.7/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A simple mapping of one row in the <code class="docutils literal notranslate"><span class="pre">session_log</span></code> table of the NexusLIMS
+database (all values are strings)</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>session_identifier</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A UUID4 (36-character string) that is consistent among a single
+record’s <cite>“START”</cite>, <cite>“END”</cite>, and <cite>“RECORD_GENERATION”</cite> events</p></li>
+<li><p><strong>instrument</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The instrument associated with this session (foreign key reference to
+the <code class="docutils literal notranslate"><span class="pre">instruments</span></code> table)</p></li>
+<li><p><strong>timestamp</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The ISO format timestamp representing the date and time of the logged
+event</p></li>
+<li><p><strong>event_type</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The type of log for this session (either <cite>“START”</cite>, <cite>“END”</cite>,
+or <cite>“RECORD_GENERATION”</cite>)</p></li>
+<li><p><strong>user</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The NIST “short style” username associated with this session (if known)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="nexusLIMS.db.session_handler.get_sessions_to_build">
+<code class="sig-prename descclassname">nexusLIMS.db.session_handler.</code><code class="sig-name descname">get_sessions_to_build</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/db/session_handler.html#get_sessions_to_build"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nexusLIMS.db.session_handler.get_sessions_to_build" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query the NexusLIMS database for pairs of logs with status
+<code class="docutils literal notranslate"><span class="pre">'TO_BE_BUILT'</span></code> and return the information needed to build a record for
+that session</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>sessions</strong> – A list of <a class="reference internal" href="#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> objects
+containing the sessions that the need their record built. Will be an
+empty list if there’s nothing to do.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list of <a class="reference internal" href="#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+  
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="../_sources/api/nexusLIMS.db.rst.txt"
+     rel="nofollow">View page source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2020, NIST Office of Data and Informatics.<br/>
+      Last updated on Oct, 19, 2020.<br/>
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

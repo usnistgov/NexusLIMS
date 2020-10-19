@@ -1,0 +1,411 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nexusLIMS.extractors &#8212; NexusLIMS 0.0.9 documentation</title>
+    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom-styles.css" />
+    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/language_data.js"></script>
+    <script src="../../_static/custom.js"></script>
+    <link rel="shortcut icon" href="../../_static/nexusLIMS_bare_logo.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html"><span><img src="../../_static/logo_horizontal.png"></span>
+           </a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../api.html">API Docs</a></li>
+                <li><a href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS">Repository</a></li>
+                <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site Map <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data_security.html">Data security in NexusLIMS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../session_logger_app.html">Session logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/nexusLIMS.html">nexusLIMS package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.harvester.html">nexusLIMS.harvester package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li class="dummy-sidebarrel">
+    <a><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Previous</span>
+    </a>
+  </li>
+  <li class="dummy-sidebarrel">
+    <a><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Next &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><img src="../../_static/nexusLIMS_bare_logo.png">
+<h4><a href="../../index.html" title="Return to documentation home">
+    NexusLIMS Documentation</a></h4>
+<ul class="globaltoc">
+    <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../data_security.html">Data security in NexusLIMS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../session_logger_app.html">Session logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API documentation</a></li>
+</ul>
+
+</ul><h4>
+    <a class="no-hover">Page content</a>
+</h4>
+
+
+<form action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <h1>Source code for nexusLIMS.extractors</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the code used to harvest metadata from various file types</span>
+<span class="sd">generated from instruments in the Electron Microscopy Nexus facility.</span>
+
+<span class="sd">Extractors should return a dictionary containing the values to be displayed</span>
+<span class="sd">in NexusLIMS as a sub-dictionary under the key ``nx_meta``. The remaining keys</span>
+<span class="sd">will be for the metadata as extracted. Under ``nx_meta``, a few keys are</span>
+<span class="sd">expected (although not enforced):</span>
+
+<span class="sd">* ``&#39;Creation Time&#39;`` - ISO format date and time as a string</span>
+<span class="sd">* ``&#39;Data Type&#39;`` - a human-readable description of the data type separated by</span>
+<span class="sd">  underscores - e.g &quot;STEM_Imaging&quot;, &quot;TEM_EDS&quot;, etc.</span>
+<span class="sd">* ``&#39;DatasetType&#39;`` - determines the value of the Type attribute for the dataset</span>
+<span class="sd">  (defined in the schema)</span>
+<span class="sd">* ``&#39;Data Dimensions&#39;`` - dimensions of the dataset, surrounded by parentheses,</span>
+<span class="sd">  separated by commas as a string- e.g. &#39;(12, 1024, 1024)&#39;</span>
+<span class="sd">* ``&#39;Instrument ID&#39;`` - instrument PID pulled from the instrument database</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
+<span class="kn">import</span> <span class="nn">shutil</span> <span class="k">as</span> <span class="nn">_sh</span>
+<span class="kn">import</span> <span class="nn">json</span> <span class="k">as</span> <span class="nn">_json</span>
+<span class="kn">import</span> <span class="nn">pathlib</span> <span class="k">as</span> <span class="nn">_pathlib</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">_np</span>
+<span class="kn">from</span> <span class="nn">.quanta_tif</span> <span class="kn">import</span> <span class="n">get_quanta_metadata</span>
+<span class="kn">from</span> <span class="nn">.digital_micrograph</span> <span class="kn">import</span> <span class="n">get_dm3_metadata</span>
+<span class="kn">from</span> <span class="nn">.fei_emi</span> <span class="kn">import</span> <span class="n">get_ser_metadata</span>
+<span class="kn">from</span> <span class="nn">.thumbnail_generator</span> <span class="kn">import</span> <span class="n">sig_to_thumbnail</span> <span class="k">as</span> <span class="n">_s2thumb</span>
+<span class="kn">from</span> <span class="nn">.thumbnail_generator</span> <span class="kn">import</span> <span class="n">down_sample_image</span> <span class="k">as</span> <span class="n">_down_sample</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.instruments</span> <span class="kn">import</span> <span class="n">get_instr_from_filepath</span> <span class="k">as</span> <span class="n">_get_instr</span>
+<span class="kn">import</span> <span class="nn">hyperspy.api_nogui</span> <span class="k">as</span> <span class="nn">_hs</span>
+<span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
+<span class="kn">import</span> <span class="nn">collections</span> <span class="k">as</span> <span class="nn">_collections</span>
+
+<span class="n">_logger</span> <span class="o">=</span> <span class="n">_logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">PLACEHOLDER_PREVIEW</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span>
+                                    <span class="s1">&#39;extractor_error.png&#39;</span><span class="p">)</span>
+
+<span class="n">extension_reader_map</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">&#39;dm3&#39;</span><span class="p">:</span> <span class="n">get_dm3_metadata</span><span class="p">,</span>
+    <span class="s1">&#39;dm4&#39;</span><span class="p">:</span> <span class="n">get_dm3_metadata</span><span class="p">,</span>
+    <span class="s1">&#39;tif&#39;</span><span class="p">:</span> <span class="n">get_quanta_metadata</span><span class="p">,</span>
+    <span class="s1">&#39;ser&#39;</span><span class="p">:</span> <span class="n">get_ser_metadata</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="parse_metadata"><a class="viewcode-back" href="../../api/nexusLIMS.extractors.html#nexusLIMS.extractors.parse_metadata">[docs]</a><span class="k">def</span> <span class="nf">parse_metadata</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">write_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">generate_preview</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                   <span class="n">overwrite</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given an input filename, read the file, determine what &quot;type&quot; of file (i.e.</span>
+<span class="sd">    what instrument it came from) it is, filter the metadata (if necessary) to</span>
+<span class="sd">    what we are interested in, and return it as a dictionary (writing to the</span>
+<span class="sd">    NexusLIMS directory as JSON by default). Also calls the preview</span>
+<span class="sd">    generation method, if desired.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fname : str</span>
+<span class="sd">        The filename from which to read data</span>
+<span class="sd">    write_output : bool</span>
+<span class="sd">        Whether to write the metadata dictionary as a json file in the NexusLIMS</span>
+<span class="sd">        folder structure</span>
+<span class="sd">    generate_preview : bool</span>
+<span class="sd">        Whether to generate the thumbnail preview of this dataset (that</span>
+<span class="sd">        operation is not done in this method, it is just called from here so</span>
+<span class="sd">        it can be done at the same time)</span>
+<span class="sd">    overwrite : bool</span>
+<span class="sd">        Whether or not to overwrite the .json metadata file and thumbnail</span>
+<span class="sd">        image if either exists</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    nx_meta : dict or None</span>
+<span class="sd">        The &quot;relevant&quot; metadata that is of use for NexusLIMS. If None,</span>
+<span class="sd">        the file could not be opened</span>
+<span class="sd">    preview_fname : str or None</span>
+<span class="sd">        The file path of the generated preview image, or `None` if it was not</span>
+<span class="sd">        requested</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">extension</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname</span><span class="p">)[</span><span class="mi">1</span><span class="p">][</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="n">nx_meta</span> <span class="o">=</span> <span class="n">extension_reader_map</span><span class="p">[</span><span class="n">extension</span><span class="p">](</span><span class="n">fname</span><span class="p">)</span>
+    <span class="n">preview_fname</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># nx_meta should never be None, because the extractors are defensive and</span>
+    <span class="c1"># will always return _something_</span>
+    <span class="k">if</span> <span class="n">nx_meta</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Set the dataset type to Misc if it was not set by the file reader</span>
+        <span class="k">if</span> <span class="s1">&#39;DatasetType&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">nx_meta</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]:</span>
+            <span class="n">nx_meta</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;DatasetType&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Misc&#39;</span>
+            <span class="n">nx_meta</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Data Type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Miscellaneous&#39;</span>
+
+        <span class="k">if</span> <span class="n">write_output</span><span class="p">:</span>
+            <span class="n">out_fname</span> <span class="o">=</span> <span class="n">fname</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;mmfnexus_path&quot;</span><span class="p">],</span>
+                                      <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;nexusLIMS_path&quot;</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;.json&#39;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">out_fname</span><span class="p">)</span> <span class="ow">or</span> <span class="n">overwrite</span><span class="p">:</span>
+                <span class="c1"># Create the directory for the metadata file, if needed</span>
+                <span class="n">_pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">out_fname</span><span class="p">))</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                                                 <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="c1"># Make sure that the nx_meta dict comes first in the json output</span>
+                <span class="n">out_dict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">:</span> <span class="n">nx_meta</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]}</span>
+                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">nx_meta</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                    <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="s1">&#39;nx_meta&#39;</span><span class="p">:</span>
+                        <span class="k">pass</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">out_dict</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">out_fname</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Dumping metadata to </span><span class="si">{</span><span class="n">out_fname</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                    <span class="n">_json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">out_dict</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">sort_keys</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                               <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="bp">cls</span><span class="o">=</span><span class="n">_CustomEncoder</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">generate_preview</span><span class="p">:</span>
+        <span class="n">preview_fname</span> <span class="o">=</span> <span class="n">fname</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;mmfnexus_path&quot;</span><span class="p">],</span>
+                                      <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;nexusLIMS_path&quot;</span><span class="p">])</span> <span class="o">+</span> \
+                        <span class="s1">&#39;.thumb.png&#39;</span>
+        <span class="k">if</span> <span class="n">extension</span> <span class="o">==</span> <span class="s1">&#39;tif&#39;</span><span class="p">:</span>
+            <span class="n">instr</span> <span class="o">=</span> <span class="n">_get_instr</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+            <span class="n">instr_name</span> <span class="o">=</span> <span class="n">instr</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="n">instr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+            <span class="k">if</span> <span class="n">instr_name</span> <span class="o">==</span> <span class="s1">&#39;FEI-Quanta200-ESEM-633137&#39;</span><span class="p">:</span>
+                <span class="c1"># we know the output size we want for the Quanta</span>
+                <span class="n">output_size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">471</span><span class="p">)</span>
+                <span class="n">_down_sample</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span>
+                             <span class="n">out_path</span><span class="o">=</span><span class="n">preview_fname</span><span class="p">,</span>
+                             <span class="n">output_size</span><span class="o">=</span><span class="n">output_size</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">factor</span> <span class="o">=</span> <span class="mi">2</span>
+                <span class="n">_down_sample</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span>
+                             <span class="n">out_path</span><span class="o">=</span><span class="n">preview_fname</span><span class="p">,</span>
+                             <span class="n">factor</span><span class="o">=</span><span class="n">factor</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">load_options</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;lazy&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">}</span>
+            <span class="k">if</span> <span class="n">extension</span> <span class="o">==</span> <span class="s1">&#39;ser&#39;</span><span class="p">:</span>
+                <span class="n">load_options</span><span class="p">[</span><span class="s1">&#39;only_valid_data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">_hs</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="o">**</span><span class="n">load_options</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">_</span><span class="p">:</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Signal could not be loaded by HyperSpy. &#39;</span>
+                                <span class="s1">&#39;Using placeholder image for preview.&#39;</span><span class="p">)</span>
+                <span class="n">preview_fname</span> <span class="o">=</span> <span class="n">fname</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                    <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;mmfnexus_path&quot;</span><span class="p">],</span>
+                    <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;nexusLIMS_path&quot;</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;.thumb.png&#39;</span>
+                <span class="n">_sh</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">PLACEHOLDER_PREVIEW</span><span class="p">,</span> <span class="n">preview_fname</span><span class="p">)</span>
+                <span class="k">return</span> <span class="n">nx_meta</span><span class="p">,</span> <span class="n">preview_fname</span>
+
+            <span class="c1"># If s is a list of signals, use just the first one for</span>
+            <span class="c1"># our purposes</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">num_sigs</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+                <span class="n">fname</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">General</span><span class="o">.</span><span class="n">original_filename</span>
+                <span class="n">s</span> <span class="o">=</span> <span class="n">s</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">General</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> \
+                    <span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">General</span><span class="o">.</span><span class="n">title</span> <span class="o">+</span> \
+                    <span class="sa">f</span><span class="s1">&#39; (1 of </span><span class="si">{</span><span class="n">num_sigs</span><span class="si">}</span><span class="s1"> total signals in file &quot;</span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s1">&quot;)&#39;</span>
+            <span class="k">elif</span> <span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">General</span><span class="o">.</span><span class="n">title</span> <span class="o">==</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">General</span><span class="o">.</span><span class="n">title</span> <span class="o">=</span> \
+                    <span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">General</span><span class="o">.</span><span class="n">original_filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                        <span class="n">extension</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span>
+
+            <span class="c1"># only generate the preview if it doesn&#39;t exist, or overwrite</span>
+            <span class="c1"># parameter is explicitly provided</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">preview_fname</span><span class="p">)</span> <span class="ow">or</span> <span class="n">overwrite</span><span class="p">:</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Generating preview: </span><span class="si">{</span><span class="n">preview_fname</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="c1"># Create the directory for the thumbnail, if needed</span>
+                <span class="n">_pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">preview_fname</span><span class="p">))</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span>
+                    <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="c1"># Generate the thumbnail</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">progressbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">_s2thumb</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="n">preview_fname</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Preview already exists: </span><span class="si">{</span><span class="n">preview_fname</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">nx_meta</span><span class="p">,</span> <span class="n">preview_fname</span></div>
+
+
+<div class="viewcode-block" id="flatten_dict"><a class="viewcode-back" href="../../api/nexusLIMS.extractors.html#nexusLIMS.extractors.flatten_dict">[docs]</a><span class="k">def</span> <span class="nf">flatten_dict</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">parent_key</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="s1">&#39; &#39;</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Utility method to take a nested dictionary structure and flatten it into a</span>
+<span class="sd">    single level, separating the levels by a string as specified by</span>
+<span class="sd">    ``separator``</span>
+
+<span class="sd">    Cribbed from: https://stackoverflow.com/a/6027615/1435788</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    d : dict</span>
+<span class="sd">        The dictionary to flatten</span>
+<span class="sd">    parent_key : str</span>
+<span class="sd">        The &quot;root&quot; key to add to add to the existing keys</span>
+<span class="sd">    separator : str</span>
+<span class="sd">        The string to use to separate values in the flattened keys (i.e.</span>
+<span class="sd">        {&#39;a&#39;: {&#39;b&#39;: &#39;c&#39;}} would become {&#39;a&#39; + sep + &#39;b&#39;: &#39;c&#39;})</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    flattened_dict : str</span>
+<span class="sd">        The dictionary with depth one, with nested dictionaries flattened</span>
+<span class="sd">        into root-level keys</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">new_key</span> <span class="o">=</span> <span class="n">parent_key</span> <span class="o">+</span> <span class="n">separator</span> <span class="o">+</span> <span class="n">k</span> <span class="k">if</span> <span class="n">parent_key</span> <span class="k">else</span> <span class="n">k</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">_collections</span><span class="o">.</span><span class="n">MutableMapping</span><span class="p">):</span>
+            <span class="n">items</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">flatten_dict</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">new_key</span><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="n">separator</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">new_key</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
+
+    <span class="n">flattened_dict</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">items</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">flattened_dict</span></div>
+
+
+<span class="k">class</span> <span class="nc">_CustomEncoder</span><span class="p">(</span><span class="n">_json</span><span class="o">.</span><span class="n">JSONEncoder</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A custom JSON Encoder class that will allow certain types to be</span>
+<span class="sd">    serialized that are not able to be by default (taken from</span>
+<span class="sd">    https://stackoverflow.com/a/27050186)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">default</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">obj</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">_np</span><span class="o">.</span><span class="n">integer</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">_np</span><span class="o">.</span><span class="n">floating</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">_np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obj</span><span class="p">,</span> <span class="n">_np</span><span class="o">.</span><span class="n">bytes_</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">obj</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">(</span><span class="n">_CustomEncoder</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">default</span><span class="p">(</span><span class="n">obj</span><span class="p">)</span>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+  
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2020, NIST Office of Data and Informatics.<br/>
+      Last updated on Oct, 19, 2020.<br/>
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

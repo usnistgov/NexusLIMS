@@ -1,0 +1,420 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head><link rel="stylesheet" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css">
+    <script src="https://pages.nist.gov/nist-header-footer/js/jquery-1.9.0.min.js" type="text/javascript" defer="defer"></script>
+    <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js" type="text/javascript" defer="defer"></script>
+    
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nexusLIMS.harvester package &#8212; NexusLIMS 0.0.9 documentation</title>
+    <link rel="stylesheet" href="../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom-styles.css" />
+    <script id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/language_data.js"></script>
+    <script src="../_static/custom.js"></script>
+    <link rel="shortcut icon" href="../_static/nexusLIMS_bare_logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="nexusLIMS.schemas package" href="nexusLIMS.schemas.html" />
+    <link rel="prev" title="nexusLIMS.extractors package" href="nexusLIMS.extractors.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html"><span><img src="../_static/logo_horizontal.png"></span>
+           </a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../api.html">API Docs</a></li>
+                <li><a href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS">Repository</a></li>
+                <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site Map <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_security.html">Data security in NexusLIMS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../session_logger_app.html">Session logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="nexusLIMS.html">nexusLIMS package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.db.html">nexusLIMS.db package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">nexusLIMS.harvester package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="nexusLIMS.extractors.html" title="Previous Chapter: nexusLIMS.extractors package"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Previous</span>
+    </a>
+  </li>
+  <li>
+    <a href="nexusLIMS.schemas.html" title="Next Chapter: nexusLIMS.schemas package"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Next &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><img src="../_static/nexusLIMS_bare_logo.png">
+<h4><a href="../index.html" title="Return to documentation home">
+    NexusLIMS Documentation</a></h4>
+<ul class="globaltoc">
+    <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../data_security.html">Data security in NexusLIMS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../session_logger_app.html">Session logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="nexusLIMS.html">nexusLIMS package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.db.html">nexusLIMS.db package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">nexusLIMS.harvester package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</ul><h4>
+    <a class="no-hover">Page content</a>
+</h4>
+
+<ul>
+<li><a class="reference internal" href="#">nexusLIMS.harvester package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-nexusLIMS.harvester.sharepoint_calendar">nexusLIMS.harvester.sharepoint_calendar module</a></li>
+</ul>
+</li>
+</ul>
+
+<form action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+<div id="sourcelink">
+  <a href="../_sources/api/nexusLIMS.harvester.rst.txt"
+     rel="nofollow">View page source</a>
+</div>
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <div class="section" id="module-nexusLIMS.harvester">
+<span id="nexuslims-harvester-package"></span><h1>nexusLIMS.harvester package<a class="headerlink" href="#module-nexusLIMS.harvester" title="Permalink to this headline">¶</a></h1>
+<p>This module contains the code used to harvest metadata from various calendar
+sources. Currently, only the <a class="reference internal" href="#module-nexusLIMS.harvester.sharepoint_calendar" title="nexusLIMS.harvester.sharepoint_calendar"><code class="xref py py-mod docutils literal notranslate"><span class="pre">sharepoint_calendar</span></code></a> submodule is
+implemented, which provides abilities to download calendar information from a
+Microsoft SharePoint calendar resource.</p>
+<div class="section" id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</div>
+<div class="section" id="module-nexusLIMS.harvester.sharepoint_calendar">
+<span id="nexuslims-harvester-sharepoint-calendar-module"></span><h2>nexusLIMS.harvester.sharepoint_calendar module<a class="headerlink" href="#module-nexusLIMS.harvester.sharepoint_calendar" title="Permalink to this headline">¶</a></h2>
+<dl class="py exception">
+<dt id="nexusLIMS.harvester.sharepoint_calendar.AuthenticationError">
+<em class="property">exception </em><code class="sig-prename descclassname">nexusLIMS.harvester.sharepoint_calendar.</code><code class="sig-name descname">AuthenticationError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">message</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/harvester/sharepoint_calendar.html#AuthenticationError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nexusLIMS.harvester.sharepoint_calendar.AuthenticationError" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.7/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Class for showing an exception having to do with authentication</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="nexusLIMS.harvester.sharepoint_calendar.dump_calendars">
+<code class="sig-prename descclassname">nexusLIMS.harvester.sharepoint_calendar.</code><code class="sig-name descname">dump_calendars</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instrument</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">user</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dt_from</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dt_to</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">group</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">division</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">filename</span><span class="o">=</span><span class="default_value">'cal_events.xml'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/harvester/sharepoint_calendar.html#dump_calendars"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nexusLIMS.harvester.sharepoint_calendar.dump_calendars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the results of <a class="reference internal" href="#nexusLIMS.harvester.sharepoint_calendar.get_events" title="nexusLIMS.harvester.sharepoint_calendar.get_events"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_events()</span></code></a> to a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>instrument</strong> (<a class="reference internal" href="nexusLIMS.html#nexusLIMS.instruments.Instrument" title="nexusLIMS.instruments.Instrument"><code class="xref py py-class docutils literal notranslate"><span class="pre">Instrument</span></code></a> or str) – One of the NexusLIMS instruments contained in the
+<a class="reference internal" href="nexusLIMS.html#nexusLIMS.instruments.instrument_db" title="nexusLIMS.instruments.instrument_db"><code class="xref py py-attr docutils literal notranslate"><span class="pre">instrument_db</span></code></a> database.
+Controls what instrument calendar is used to get events. If value is
+a string, it should be one of the instrument PIDs from the Nexus
+facility</p></li>
+<li><p><strong>dt_from</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> or None) – A <a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> object representing the start of a
+calendar event to search for, as in <a class="reference internal" href="#nexusLIMS.harvester.sharepoint_calendar.fetch_xml" title="nexusLIMS.harvester.sharepoint_calendar.fetch_xml"><code class="xref py py-func docutils literal notranslate"><span class="pre">fetch_xml()</span></code></a>.
+If <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> and <code class="docutils literal notranslate"><span class="pre">dt_to</span></code> are <cite>None</cite>, no date filtering will be done.
+If just <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> is <cite>None</cite>, all events from the beginning of the
+calendar record will be returned up until <code class="docutils literal notranslate"><span class="pre">dt_to</span></code>.</p></li>
+<li><p><strong>dt_to</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> or None) – A <a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> object representing the end of
+calendar event to search for, as in <a class="reference internal" href="#nexusLIMS.harvester.sharepoint_calendar.fetch_xml" title="nexusLIMS.harvester.sharepoint_calendar.fetch_xml"><code class="xref py py-func docutils literal notranslate"><span class="pre">fetch_xml()</span></code></a>.
+If <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> and <code class="docutils literal notranslate"><span class="pre">dt_to</span></code> are <cite>None</cite>, no date filtering will be done.
+If just <code class="docutils literal notranslate"><span class="pre">dt_to</span></code> is <cite>None</cite>, all events from the <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> to the
+present will be returned.</p></li>
+<li><p><strong>user</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Either None or a valid NIST username (the short format: e.g. <code class="docutils literal notranslate"><span class="pre">&quot;ear1&quot;</span></code>
+instead of <a class="reference external" href="mailto:ernst&#46;august&#46;ruska&#37;&#52;&#48;nist&#46;gov">ernst<span>&#46;</span>august<span>&#46;</span>ruska<span>&#64;</span>nist<span>&#46;</span>gov</a>). If None, no user filtering
+will be performed. No verification of username is performed,
+so it is up to the user to make sure this is correct.</p></li>
+<li><p><strong>division</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The division number of the project. If provided, this string will be
+replicated under the “project” information in the outputted XML. If
+<code class="docutils literal notranslate"><span class="pre">None</span></code> (and <code class="docutils literal notranslate"><span class="pre">user</span></code> is provided), the division will be queried
+from the active directory server.</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The group number of the project. If provided, this string will be
+replicated under the “project” information in the outputted XML. If
+<code class="docutils literal notranslate"><span class="pre">None</span></code> (and <code class="docutils literal notranslate"><span class="pre">user</span></code> is provided), the group will be queried
+from the active directory server.</p></li>
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The filename to which the events should be written</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="nexusLIMS.harvester.sharepoint_calendar.fetch_xml">
+<code class="sig-prename descclassname">nexusLIMS.harvester.sharepoint_calendar.</code><code class="sig-name descname">fetch_xml</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instrument</span></em>, <em class="sig-param"><span class="n">dt_from</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dt_to</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/harvester/sharepoint_calendar.html#fetch_xml"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nexusLIMS.harvester.sharepoint_calendar.fetch_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the XML responses from the Nexus Sharepoint calendar for one,
+multiple, or all instruments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>instrument</strong> (<a class="reference internal" href="nexusLIMS.html#nexusLIMS.instruments.Instrument" title="nexusLIMS.instruments.Instrument"><code class="xref py py-class docutils literal notranslate"><span class="pre">Instrument</span></code></a>) – As defined in <a class="reference internal" href="#nexusLIMS.harvester.sharepoint_calendar.get_events" title="nexusLIMS.harvester.sharepoint_calendar.get_events"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_events()</span></code></a>,
+one of the NexusLIMS instruments contained in the
+<a class="reference internal" href="nexusLIMS.html#nexusLIMS.instruments.instrument_db" title="nexusLIMS.instruments.instrument_db"><code class="xref py py-attr docutils literal notranslate"><span class="pre">instrument_db</span></code></a> database.
+Controls what instrument calendar is used to get events</p></li>
+<li><p><strong>dt_from</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> or None) – A <a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> object representing the start of a
+calendar event to search for.
+If <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> and <code class="docutils literal notranslate"><span class="pre">dt_to</span></code> are <cite>None</cite>, no date filtering will be done.
+If just <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> is <cite>None</cite>, all events from the beginning of the
+calendar record will be returned up until <code class="docutils literal notranslate"><span class="pre">dt_to</span></code>.</p></li>
+<li><p><strong>dt_to</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> or None) – A <a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> object representing the end of
+calendar event to search for.
+If <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> and <code class="docutils literal notranslate"><span class="pre">dt_to</span></code> are <cite>None</cite>, no date filtering will be done.
+If just <code class="docutils literal notranslate"><span class="pre">dt_to</span></code> is <cite>None</cite>, all events from the <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> to the
+present will be returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>api_response</strong> – A string containing the XML calendar information for each
+instrument requested, stripped of the empty default namespace. If
+<code class="docutils literal notranslate"><span class="pre">dt_from</span></code> and <code class="docutils literal notranslate"><span class="pre">dt_to</span></code> are provided, it will contain just one
+<cite>“entry”</cite> representing a single event on the calendar</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>To find the right event, an API request to the Sharepoint Calendar will
+be made for all events starting on the same day as <code class="docutils literal notranslate"><span class="pre">dt_from</span></code>. This
+could result in multiple events being returned if there is more than one
+session scheduled on that microscope for that day. To find the right one,
+the timespan between each event’s <code class="docutils literal notranslate"><span class="pre">StartTime</span></code> and <code class="docutils literal notranslate"><span class="pre">EndTime</span></code> returned
+from the calendar will be compared with the timespan between <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> and
+<code class="docutils literal notranslate"><span class="pre">dt_to</span></code>. The event with the greatest overlap will be taken as the
+correct one. This approach should allow for some flexibility in terms of
+non-exact matching between the reserved timespans and those recorded by
+the session logger.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="nexusLIMS.harvester.sharepoint_calendar.get_auth">
+<code class="sig-prename descclassname">nexusLIMS.harvester.sharepoint_calendar.</code><code class="sig-name descname">get_auth</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="o">=</span><span class="default_value">'credentials.ini'</span></em>, <em class="sig-param"><span class="n">basic</span><span class="o">=</span><span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/harvester/sharepoint_calendar.html#get_auth"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nexusLIMS.harvester.sharepoint_calendar.get_auth" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set up NTLM authentication for the Microscopy Nexus using an account
+as specified from a file that lives in the package root named
+.credentials (or some other value provided as a parameter).
+Alternatively, the stored credentials can be overridden by supplying two
+environment variables: <code class="docutils literal notranslate"><span class="pre">nexusLIMS_user</span></code> and <code class="docutils literal notranslate"><span class="pre">nexusLIMS_pass</span></code>. These
+variables will be queried first, and if not found, the method will
+attempt to use the credential file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Name relative to this file (or absolute path) of file from which to
+read the parameters</p></li>
+<li><p><strong>basic</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – If True, return only username and password rather than NTLM
+authentication (like what is used for CDCS access rather than for
+NIST network resources)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>auth</strong> – NTLM authentication handler for <code class="docutils literal notranslate"><span class="pre">requests</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">requests_ntlm.HttpNtlmAuth</span></code> or tuple</p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The credentials file is expected to have a section named
+<code class="docutils literal notranslate"><span class="pre">[nexus_credentials]</span></code> and two values: <code class="docutils literal notranslate"><span class="pre">username</span></code> and
+<code class="docutils literal notranslate"><span class="pre">password</span></code>. See the <code class="docutils literal notranslate"><span class="pre">credentials.ini.example</span></code> file included in
+the repository as an example.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="nexusLIMS.harvester.sharepoint_calendar.get_div_and_group">
+<code class="sig-prename descclassname">nexusLIMS.harvester.sharepoint_calendar.</code><code class="sig-name descname">get_div_and_group</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">username</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/harvester/sharepoint_calendar.html#get_div_and_group"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nexusLIMS.harvester.sharepoint_calendar.get_div_and_group" title="Permalink to this definition">¶</a></dt>
+<dd><p>Query the NIST active directory to get division and group information for a
+user.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>username</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – a valid NIST username (the short format: e.g. “ear1”
+instead of <a class="reference external" href="mailto:ernst&#46;august&#46;ruska&#37;&#52;&#48;nist&#46;gov">ernst<span>&#46;</span>august<span>&#46;</span>ruska<span>&#64;</span>nist<span>&#46;</span>gov</a>).</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>div, group</strong> – The division and group numbers for the user (as strings)</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="nexusLIMS.harvester.sharepoint_calendar.get_events">
+<code class="sig-prename descclassname">nexusLIMS.harvester.sharepoint_calendar.</code><code class="sig-name descname">get_events</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">instrument</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dt_from</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">dt_to</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">user</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">division</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">group</span><span class="o">=</span><span class="default_value">None</span></em>, <em class="sig-param"><span class="n">wrap</span><span class="o">=</span><span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/harvester/sharepoint_calendar.html#get_events"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#nexusLIMS.harvester.sharepoint_calendar.get_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get calendar events for a particular instrument on the Microscopy Nexus,
+on some date, or by some user</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>instrument</strong> (<a class="reference internal" href="nexusLIMS.html#nexusLIMS.instruments.Instrument" title="nexusLIMS.instruments.Instrument"><code class="xref py py-class docutils literal notranslate"><span class="pre">Instrument</span></code></a> or str) – One of the NexusLIMS instruments contained in the
+<a class="reference internal" href="nexusLIMS.html#nexusLIMS.instruments.instrument_db" title="nexusLIMS.instruments.instrument_db"><code class="xref py py-attr docutils literal notranslate"><span class="pre">instrument_db</span></code></a> database.
+Controls what instrument calendar is used to get events. If string,
+value should be one of the instrument PIDs from the Nexus facility.</p></li>
+<li><p><strong>dt_from</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> or None) – A <a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> object representing the start of a
+calendar event to search for, as in <a class="reference internal" href="#nexusLIMS.harvester.sharepoint_calendar.fetch_xml" title="nexusLIMS.harvester.sharepoint_calendar.fetch_xml"><code class="xref py py-func docutils literal notranslate"><span class="pre">fetch_xml()</span></code></a>.
+If <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> and <code class="docutils literal notranslate"><span class="pre">dt_to</span></code> are <cite>None</cite>, no date filtering will be done.
+If just <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> is <cite>None</cite>, all events from the beginning of the
+calendar record will be returned up until <code class="docutils literal notranslate"><span class="pre">dt_to</span></code>.</p></li>
+<li><p><strong>dt_to</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> or None) – A <a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> object representing the end of
+calendar event to search for, as in <a class="reference internal" href="#nexusLIMS.harvester.sharepoint_calendar.fetch_xml" title="nexusLIMS.harvester.sharepoint_calendar.fetch_xml"><code class="xref py py-func docutils literal notranslate"><span class="pre">fetch_xml()</span></code></a>.
+If <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> and <code class="docutils literal notranslate"><span class="pre">dt_to</span></code> are <cite>None</cite>, no date filtering will be done.
+If just <code class="docutils literal notranslate"><span class="pre">dt_to</span></code> is <cite>None</cite>, all events from the <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> to the
+present will be returned.</p></li>
+<li><p><strong>user</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Either None or a valid NIST username (the short format: e.g. <code class="docutils literal notranslate"><span class="pre">&quot;ear1&quot;</span></code>
+instead of <a class="reference external" href="mailto:ernst&#46;august&#46;ruska&#37;&#52;&#48;nist&#46;gov">ernst<span>&#46;</span>august<span>&#46;</span>ruska<span>&#64;</span>nist<span>&#46;</span>gov</a>). If None, no user filtering
+will be performed. No verification of username is performed,
+so it is up to the user to make sure this is correct.</p></li>
+<li><p><strong>division</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The division number of the project. If provided, this string will be
+replicated under the “project” information in the outputted XML. If
+<code class="docutils literal notranslate"><span class="pre">None</span></code> (and <code class="docutils literal notranslate"><span class="pre">user</span></code> is provided), the division will be queried
+from the active directory server.</p></li>
+<li><p><strong>group</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/constants.html#None" title="(in Python v3.7)"><em>None</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The group number of the project. If provided, this string will be
+replicated under the “project” information in the outputted XML. If
+<code class="docutils literal notranslate"><span class="pre">None</span></code> (and <code class="docutils literal notranslate"><span class="pre">user</span></code> is provided), the group will be queried
+from the active directory server.</p></li>
+<li><p><strong>wrap</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Boolean used to choose whether to apply the _wrap_events() function to
+the output XML string.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>output</strong> – A well-formed XML document in a string, containing one or more &lt;event&gt;
+tags that contain information about each reservation, including title,
+instrument, user information, reservation purpose, sample details,
+description, and date/time information.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</div>
+
+
+    </div>
+      
+  </div>
+</div>
+  
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="../_sources/api/nexusLIMS.harvester.rst.txt"
+     rel="nofollow">View page source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2020, NIST Office of Data and Informatics.<br/>
+      Last updated on Oct, 19, 2020.<br/>
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

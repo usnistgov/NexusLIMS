@@ -1,0 +1,675 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nexusLIMS.extractors.quanta_tif &#8212; NexusLIMS 0.0.9 documentation</title>
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom-styles.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/custom.js"></script>
+    <link rel="shortcut icon" href="../../../_static/nexusLIMS_bare_logo.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logo_horizontal.png"></span>
+           </a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../api.html">API Docs</a></li>
+                <li><a href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS">Repository</a></li>
+                <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site Map <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_security.html">Data security in NexusLIMS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../session_logger_app.html">Session logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/nexusLIMS.html">nexusLIMS package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.harvester.html">nexusLIMS.harvester package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li class="dummy-sidebarrel">
+    <a><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Previous</span>
+    </a>
+  </li>
+  <li class="dummy-sidebarrel">
+    <a><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Next &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><img src="../../../_static/nexusLIMS_bare_logo.png">
+<h4><a href="../../../index.html" title="Return to documentation home">
+    NexusLIMS Documentation</a></h4>
+<ul class="globaltoc">
+    <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_security.html">Data security in NexusLIMS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../session_logger_app.html">Session logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API documentation</a></li>
+</ul>
+
+</ul><h4>
+    <a class="no-hover">Page content</a>
+</h4>
+
+
+<form action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <h1>Source code for nexusLIMS.extractors.quanta_tif</h1><div class="highlight"><pre>
+<span></span><span class="c1">#  NIST Public License - 2019</span>
+<span class="c1">#</span>
+<span class="c1">#  This software was developed by employees of the National Institute of</span>
+<span class="c1">#  Standards and Technology (NIST), an agency of the Federal Government</span>
+<span class="c1">#  and is being made available as a public service. Pursuant to title 17</span>
+<span class="c1">#  United States Code Section 105, works of NIST employees are not subject</span>
+<span class="c1">#  to copyright protection in the United States.  This software may be</span>
+<span class="c1">#  subject to foreign copyright.  Permission in the United States and in</span>
+<span class="c1">#  foreign countries, to the extent that NIST may hold copyright, to use,</span>
+<span class="c1">#  copy, modify, create derivative works, and distribute this software and</span>
+<span class="c1">#  its documentation without fee is hereby granted on a non-exclusive basis,</span>
+<span class="c1">#  provided that this notice and disclaimer of warranty appears in all copies.</span>
+<span class="c1">#</span>
+<span class="c1">#  THE SOFTWARE IS PROVIDED &#39;AS IS&#39; WITHOUT ANY WARRANTY OF ANY KIND,</span>
+<span class="c1">#  EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT LIMITED</span>
+<span class="c1">#  TO, ANY WARRANTY THAT THE SOFTWARE WILL CONFORM TO SPECIFICATIONS, ANY</span>
+<span class="c1">#  IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,</span>
+<span class="c1">#  AND FREEDOM FROM INFRINGEMENT, AND ANY WARRANTY THAT THE DOCUMENTATION</span>
+<span class="c1">#  WILL CONFORM TO THE SOFTWARE, OR ANY WARRANTY THAT THE SOFTWARE WILL BE</span>
+<span class="c1">#  ERROR FREE.  IN NO EVENT SHALL NIST BE LIABLE FOR ANY DAMAGES, INCLUDING,</span>
+<span class="c1">#  BUT NOT LIMITED TO, DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES,</span>
+<span class="c1">#  ARISING OUT OF, RESULTING FROM, OR IN ANY WAY CONNECTED WITH THIS SOFTWARE,</span>
+<span class="c1">#  WHETHER OR NOT BASED UPON WARRANTY, CONTRACT, TORT, OR OTHERWISE, WHETHER</span>
+<span class="c1">#  OR NOT INJURY WAS SUSTAINED BY PERSONS OR PROPERTY OR OTHERWISE, AND</span>
+<span class="c1">#  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,</span>
+<span class="c1">#  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.</span>
+<span class="c1">#</span>
+<span class="kn">import</span> <span class="nn">configparser</span> <span class="k">as</span> <span class="nn">_cp</span>
+<span class="kn">import</span> <span class="nn">io</span> <span class="k">as</span> <span class="nn">_io</span>
+<span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span> <span class="k">as</span> <span class="n">_dt</span>
+<span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
+<span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">degrees</span>
+<span class="kn">from</span> <span class="nn">decimal</span> <span class="kn">import</span> <span class="n">Decimal</span> <span class="k">as</span> <span class="n">_Decimal</span>
+<span class="kn">from</span> <span class="nn">decimal</span> <span class="kn">import</span> <span class="n">InvalidOperation</span> <span class="k">as</span> <span class="n">_invalidOp</span>
+
+<span class="kn">from</span> <span class="nn">nexusLIMS.instruments</span> <span class="kn">import</span> <span class="n">get_instr_from_filepath</span> <span class="k">as</span> <span class="n">_get_instr</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="n">_sort_dict</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="n">set_nested_dict_value</span> <span class="k">as</span> <span class="n">_set_nest_dict_val</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="n">try_getting_dict_value</span> <span class="k">as</span> <span class="n">_try_get_dict_val</span>
+
+<span class="n">_logger</span> <span class="o">=</span> <span class="n">_logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">_logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_quanta_metadata"><a class="viewcode-back" href="../../../api/nexusLIMS.extractors.html#nexusLIMS.extractors.quanta_tif.get_quanta_metadata">[docs]</a><span class="k">def</span> <span class="nf">get_quanta_metadata</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns the metadata (as a dictionary) from a .tif file saved by the FEI</span>
+<span class="sd">    Quanta SEM in the Nexus Microscopy Facility. Specific tags of interest are</span>
+<span class="sd">    duplicated under the root-level ``nx_meta`` node in the dictionary.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename : str</span>
+<span class="sd">        path to a .tif file saved by the Quanta</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    mdict : dict</span>
+<span class="sd">        The metadata text extracted from the file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">content</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+    <span class="n">user_idx</span> <span class="o">=</span> <span class="n">content</span><span class="o">.</span><span class="n">find</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;[User]&#39;</span><span class="p">)</span>
+
+    <span class="n">mdict</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">:</span> <span class="p">{}}</span>
+    <span class="c1"># assume all datasets coming from Quanta are Images, currently</span>
+    <span class="n">mdict</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;DatasetType&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Image&#39;</span>
+    <span class="n">mdict</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Data Type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;SEM_Imaging&#39;</span>
+
+    <span class="c1"># get the modification time (as ISO format):</span>
+    <span class="n">mtime</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">mtime_iso</span> <span class="o">=</span> <span class="n">_dt</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">mtime</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+
+    <span class="n">instr</span> <span class="o">=</span> <span class="n">_get_instr</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="c1"># if we found the instrument, then store the name as string, else None</span>
+    <span class="n">instr_name</span> <span class="o">=</span> <span class="n">instr</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="n">instr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="n">mdict</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument ID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">instr_name</span>
+    <span class="n">mdict</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Creation Time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mtime_iso</span>
+    <span class="n">mdict</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;warnings&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># if the user_idx is -1, it means the [User] tag was not found in the</span>
+    <span class="c1"># file, and so the metadata is missing (so we should just return 0)</span>
+    <span class="k">if</span> <span class="n">user_idx</span> <span class="o">==</span> <span class="o">-</span><span class="mi">1</span><span class="p">:</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Did not find expected FEI tags in .tif file: &#39;</span>
+                        <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">mdict</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Data Type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Unknown&#39;</span>
+        <span class="n">mdict</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Extractor Warnings&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Did not find expected FEI &#39;</span> \
+                                                 <span class="s1">&#39;tags. Could not read metadata&#39;</span>
+        <span class="n">mdict</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_sort_dict</span><span class="p">(</span><span class="n">mdict</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">mdict</span>
+
+    <span class="n">metadata_bytes</span> <span class="o">=</span> <span class="n">content</span><span class="p">[</span><span class="n">user_idx</span><span class="p">:]</span>
+    <span class="n">metadata_str</span> <span class="o">=</span> <span class="n">metadata_bytes</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\r\n</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">_io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">metadata_str</span><span class="p">)</span>
+    <span class="n">config</span> <span class="o">=</span> <span class="n">_cp</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
+    <span class="c1"># make ConfigParser respect upper/lowercase values</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">optionxform</span> <span class="o">=</span> <span class="k">lambda</span> <span class="n">option</span><span class="p">:</span> <span class="n">option</span>
+    <span class="n">config</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">itm</span> <span class="ow">in</span> <span class="n">config</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">itm</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;DEFAULT&#39;</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">mdict</span><span class="p">[</span><span class="n">itm</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">itm</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="n">mdict</span><span class="p">[</span><span class="n">itm</span><span class="p">[</span><span class="mi">0</span><span class="p">]][</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+
+    <span class="n">mdict</span> <span class="o">=</span> <span class="n">parse_nx_meta</span><span class="p">(</span><span class="n">mdict</span><span class="p">)</span>
+
+    <span class="c1"># sort the nx_meta dictionary (recursively) for nicer display</span>
+    <span class="n">mdict</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_sort_dict</span><span class="p">(</span><span class="n">mdict</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">mdict</span></div>
+
+
+<div class="viewcode-block" id="parse_nx_meta"><a class="viewcode-back" href="../../../api/nexusLIMS.extractors.html#nexusLIMS.extractors.quanta_tif.parse_nx_meta">[docs]</a><span class="k">def</span> <span class="nf">parse_nx_meta</span><span class="p">(</span><span class="n">mdict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse the &quot;important&quot; metadata that is saved at specific places within</span>
+<span class="sd">    the Quanta tag structure into a consistent place in the metadata dictionary</span>
+<span class="sd">    returned by :py:meth:`get_quanta_metadata`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mdict : dict</span>
+<span class="sd">        A metadata dictionary as returned by :py:meth:`get_quanta_metadata`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    mdict : dict</span>
+<span class="sd">        The same metadata dictionary with some values added under the</span>
+<span class="sd">        root-level ``nx_meta`` key</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># The name of the beam, scan, and detector will determine which sections are</span>
+    <span class="c1"># present (have not seen more than one beam/detector -- although likely</span>
+    <span class="c1"># will be the case for dual beam FIB/SEM)</span>
+    <span class="n">beam_name</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Beam&#39;</span><span class="p">,</span> <span class="s1">&#39;Beam&#39;</span><span class="p">])</span>
+    <span class="n">det_name</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Detectors&#39;</span><span class="p">,</span> <span class="s1">&#39;Name&#39;</span><span class="p">])</span>
+    <span class="n">scan_name</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Beam&#39;</span><span class="p">,</span> <span class="s1">&#39;Scan&#39;</span><span class="p">])</span>
+
+    <span class="c1"># some parsers are broken off into helper methods:</span>
+    <span class="k">if</span> <span class="n">beam_name</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+        <span class="n">mdict</span> <span class="o">=</span> <span class="n">parse_beam_info</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="n">beam_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">scan_name</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+        <span class="n">mdict</span> <span class="o">=</span> <span class="n">parse_scan_info</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="n">scan_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">det_name</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+        <span class="n">mdict</span> <span class="o">=</span> <span class="n">parse_det_info</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="n">det_name</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;System&#39;</span><span class="p">])</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+        <span class="n">mdict</span> <span class="o">=</span> <span class="n">parse_system_info</span><span class="p">(</span><span class="n">mdict</span><span class="p">)</span>
+
+    <span class="c1"># process the rest of the metadata tags:</span>
+
+    <span class="c1"># process beam spot size</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Beam&#39;</span><span class="p">,</span> <span class="s1">&#39;Spot&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">_Decimal</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">_invalidOp</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;Spot Size&#39;</span><span class="p">],</span>
+                           <span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">_Decimal</span><span class="p">)</span> <span class="k">else</span> <span class="n">val</span><span class="p">)</span>
+
+    <span class="c1"># process drift correction</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Image&#39;</span><span class="p">,</span> <span class="s1">&#39;DriftCorrected&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+        <span class="c1"># set to true if the value is &#39;On&#39;</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">val</span> <span class="o">==</span> <span class="s1">&#39;On&#39;</span>
+        <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;Drift Correction Applied&#39;</span><span class="p">],</span>
+                           <span class="n">val</span><span class="p">)</span>
+
+    <span class="c1"># process frame integration</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Image&#39;</span><span class="p">,</span> <span class="s1">&#39;Integrate&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">val</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;Frames Integrated&#39;</span><span class="p">],</span>
+                                   <span class="n">val</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">pass</span>
+
+    <span class="c1"># process mag mode</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Image&#39;</span><span class="p">,</span> <span class="s1">&#39;MagnificationMode&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;Magnification Mode&#39;</span><span class="p">],</span> <span class="n">val</span><span class="p">)</span>
+
+    <span class="c1"># Process &quot;ResolutionX/Y&quot; (data size)</span>
+    <span class="n">x_val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Image&#39;</span><span class="p">,</span> <span class="s1">&#39;ResolutionX&#39;</span><span class="p">])</span>
+    <span class="n">y_val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Image&#39;</span><span class="p">,</span> <span class="s1">&#39;ResolutionY&#39;</span><span class="p">])</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">x_val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">x_val</span><span class="p">)</span>
+        <span class="n">y_val</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">y_val</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+        <span class="k">pass</span>
+    <span class="k">if</span> <span class="n">x_val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span> <span class="ow">and</span> <span class="n">y_val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+        <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">,</span> <span class="s1">&#39;Data Dimensions&#39;</span><span class="p">],</span>
+                           <span class="nb">str</span><span class="p">((</span><span class="n">x_val</span><span class="p">,</span> <span class="n">y_val</span><span class="p">)))</span>
+
+    <span class="c1"># test for specimen temperature value if present and non-empty</span>
+    <span class="n">temp_val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Specimen&#39;</span><span class="p">,</span> <span class="s1">&#39;Temperature&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">temp_val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span> <span class="ow">and</span> <span class="n">temp_val</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">temp_val</span> <span class="o">=</span> <span class="n">_Decimal</span><span class="p">(</span><span class="n">temp_val</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">_invalidOp</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">,</span> <span class="s1">&#39;Specimen Temperature (K)&#39;</span><span class="p">],</span>
+                           <span class="nb">float</span><span class="p">(</span><span class="n">temp_val</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">temp_val</span><span class="p">,</span> <span class="n">_Decimal</span><span class="p">)</span>
+                           <span class="k">else</span> <span class="n">temp_val</span><span class="p">)</span>
+
+    <span class="c1"># # parse SpecTilt (think this is specimen pre-tilt, but not definite)</span>
+    <span class="c1"># # tests showed that this is always the same value as StageT, so we do not</span>
+    <span class="c1"># # need to parse this one</span>
+    <span class="c1"># val = _try_get_dict_val(mdict, [&#39;Stage&#39;, &#39;SpecTilt&#39;])</span>
+    <span class="c1"># if val != &#39;not found&#39; and val != &#39;0&#39;:</span>
+    <span class="c1">#     _set_nest_dict_val(mdict, [&#39;nx_meta&#39;, &#39;Stage Position&#39;,</span>
+    <span class="c1">#                                &#39;Specimen Tilt&#39;], val)</span>
+
+    <span class="c1"># Get user ID (sometimes it&#39;s not correct because the person left the</span>
+    <span class="c1"># instrument logged in as the previous user, so make sure to add it to</span>
+    <span class="c1"># the warnings list</span>
+    <span class="n">user_val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;User&#39;</span><span class="p">,</span> <span class="s1">&#39;User&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">user_val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+        <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">,</span> <span class="s1">&#39;Operator&#39;</span><span class="p">],</span> <span class="n">user_val</span><span class="p">)</span>
+        <span class="n">mdict</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;warnings&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="s1">&#39;Operator&#39;</span><span class="p">])</span>
+
+    <span class="c1"># parse acquisition date and time</span>
+    <span class="n">acq_date_val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;User&#39;</span><span class="p">,</span> <span class="s1">&#39;Date&#39;</span><span class="p">])</span>
+    <span class="n">acq_time_val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;User&#39;</span><span class="p">,</span> <span class="s1">&#39;Time&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">acq_date_val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+        <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">,</span> <span class="s1">&#39;Acquisition Date&#39;</span><span class="p">],</span> <span class="n">acq_date_val</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">acq_time_val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+        <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">,</span> <span class="s1">&#39;Acquisition Time&#39;</span><span class="p">],</span> <span class="n">acq_time_val</span><span class="p">)</span>
+
+    <span class="c1"># parse vacuum mode</span>
+    <span class="n">vac_val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Vacuum&#39;</span><span class="p">,</span> <span class="s1">&#39;UserMode&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">user_val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+        <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">,</span> <span class="s1">&#39;Vacuum Mode&#39;</span><span class="p">],</span> <span class="n">vac_val</span><span class="p">)</span>
+
+    <span class="c1"># parse chamber pressure</span>
+    <span class="n">ch_pres_val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;Vacuum&#39;</span><span class="p">,</span> <span class="s1">&#39;ChPressure&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">ch_pres_val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span> <span class="ow">and</span> <span class="n">ch_pres_val</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+        <span class="c1"># keep track of original digits so we don&#39;t propagate float errors</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">ch_pres_val</span> <span class="o">=</span> <span class="n">_Decimal</span><span class="p">(</span><span class="n">ch_pres_val</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">_invalidOp</span><span class="p">:</span>
+            <span class="n">ch_pres_val</span> <span class="o">=</span> <span class="n">ch_pres_val</span>
+        <span class="k">if</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span>
+                             <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">,</span> <span class="s1">&#39;Vacuum Mode&#39;</span><span class="p">])</span> <span class="o">==</span> <span class="s1">&#39;High vacuum&#39;</span><span class="p">:</span>
+            <span class="n">ch_pres_str</span> <span class="o">=</span> <span class="s1">&#39;Chamber Pressure (mPa)&#39;</span>
+            <span class="n">ch_pres_val</span> <span class="o">=</span> <span class="n">ch_pres_val</span> <span class="o">*</span> <span class="mi">10</span><span class="o">**</span><span class="mi">3</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">ch_pres_str</span> <span class="o">=</span> <span class="s1">&#39;Chamber Pressure (Pa)&#39;</span>
+            <span class="n">ch_pres_val</span> <span class="o">=</span> <span class="n">ch_pres_val</span>
+        <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">,</span> <span class="n">ch_pres_str</span><span class="p">],</span>
+                           <span class="nb">float</span><span class="p">(</span><span class="n">ch_pres_val</span><span class="p">)</span> <span class="k">if</span>
+                           <span class="nb">isinstance</span><span class="p">(</span><span class="n">ch_pres_val</span><span class="p">,</span> <span class="n">_Decimal</span><span class="p">)</span> <span class="k">else</span> <span class="n">ch_pres_val</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mdict</span></div>
+
+
+<div class="viewcode-block" id="parse_beam_info"><a class="viewcode-back" href="../../../api/nexusLIMS.extractors.html#nexusLIMS.extractors.quanta_tif.parse_beam_info">[docs]</a><span class="k">def</span> <span class="nf">parse_beam_info</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="n">beam_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mdict : dict</span>
+<span class="sd">        A metadata dictionary as returned by :py:meth:`get_quanta_metadata`</span>
+<span class="sd">    beam_name : str</span>
+<span class="sd">        The &quot;beam name&quot; read from the root-level ``Beam`` node of the</span>
+<span class="sd">        metadata dictionary</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    mdict : dict</span>
+<span class="sd">        The same metadata dictionary with some values added under the</span>
+<span class="sd">        root-level ``nx_meta`` key</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Values are in SI units, but we want easy to display, so include the</span>
+    <span class="c1"># exponential factor that will get us from input unit (such as seconds)</span>
+    <span class="c1"># to output unit (such as μs -- meaning factor = 6)</span>
+    <span class="n">to_parse</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">([</span><span class="n">beam_name</span><span class="p">,</span> <span class="s1">&#39;EmissionCurrent&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Emission Current (μA)&#39;</span><span class="p">],</span> <span class="mi">6</span><span class="p">),</span>
+        <span class="p">([</span><span class="n">beam_name</span><span class="p">,</span> <span class="s1">&#39;HFW&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Horizontal Field Width (μm)&#39;</span><span class="p">],</span> <span class="mi">6</span><span class="p">),</span>
+        <span class="p">([</span><span class="n">beam_name</span><span class="p">,</span> <span class="s1">&#39;HV&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Voltage (kV)&#39;</span><span class="p">],</span> <span class="o">-</span><span class="mi">3</span><span class="p">),</span>
+        <span class="p">([</span><span class="n">beam_name</span><span class="p">,</span> <span class="s1">&#39;SourceTiltX&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Beam Tilt X&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">([</span><span class="n">beam_name</span><span class="p">,</span> <span class="s1">&#39;SourceTiltY&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Beam Tilt Y&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">([</span><span class="n">beam_name</span><span class="p">,</span> <span class="s1">&#39;StageR&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Stage Position&#39;</span><span class="p">,</span> <span class="s1">&#39;R&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">([</span><span class="n">beam_name</span><span class="p">,</span> <span class="s1">&#39;StageTa&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Stage Position&#39;</span><span class="p">,</span> <span class="s1">&#39;α&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="c1"># all existing quanta images have a value of zero for beta</span>
+        <span class="c1"># ([beam_name, &#39;StageTb&#39;], [&#39;Stage Position&#39;, &#39;β&#39;], 0),</span>
+        <span class="p">([</span><span class="n">beam_name</span><span class="p">,</span> <span class="s1">&#39;StageX&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Stage Position&#39;</span><span class="p">,</span> <span class="s1">&#39;X&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">([</span><span class="n">beam_name</span><span class="p">,</span> <span class="s1">&#39;StageY&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Stage Position&#39;</span><span class="p">,</span> <span class="s1">&#39;Y&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">([</span><span class="n">beam_name</span><span class="p">,</span> <span class="s1">&#39;StageZ&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Stage Position&#39;</span><span class="p">,</span> <span class="s1">&#39;Z&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">([</span><span class="n">beam_name</span><span class="p">,</span> <span class="s1">&#39;StigmatorX&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Stigmator X Value&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">([</span><span class="n">beam_name</span><span class="p">,</span> <span class="s1">&#39;StigmatorY&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Stigmator Y Value&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">([</span><span class="n">beam_name</span><span class="p">,</span> <span class="s1">&#39;VFW&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Vertical Field Width (μm)&#39;</span><span class="p">],</span> <span class="mi">6</span><span class="p">),</span>
+        <span class="p">([</span><span class="n">beam_name</span><span class="p">,</span> <span class="s1">&#39;WD&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Working Distance (mm)&#39;</span><span class="p">],</span> <span class="mi">3</span><span class="p">),</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">m_in</span><span class="p">,</span> <span class="n">m_out</span><span class="p">,</span> <span class="n">factor</span> <span class="ow">in</span> <span class="n">to_parse</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="n">m_in</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span> <span class="ow">and</span> <span class="n">val</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">_Decimal</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">*</span> <span class="n">_Decimal</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="n">factor</span><span class="p">))</span>
+            <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">m_out</span><span class="p">,</span>
+                               <span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">_Decimal</span><span class="p">)</span> <span class="k">else</span> <span class="n">val</span><span class="p">)</span>
+
+    <span class="c1"># Add beam name to metadata:</span>
+    <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;Beam Name&#39;</span><span class="p">],</span> <span class="n">beam_name</span><span class="p">)</span>
+
+    <span class="c1"># BeamShiftX and BeamShiftY require an additional test:</span>
+    <span class="n">bs_x_val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="n">beam_name</span><span class="p">,</span> <span class="s1">&#39;BeamShiftX&#39;</span><span class="p">])</span>
+    <span class="n">bs_y_val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="n">beam_name</span><span class="p">,</span> <span class="s1">&#39;BeamShiftY&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">bs_x_val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span> <span class="ow">and</span> <span class="n">_Decimal</span><span class="p">(</span><span class="n">bs_x_val</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;Beam Shift X&#39;</span><span class="p">],</span>
+                           <span class="nb">float</span><span class="p">(</span><span class="n">_Decimal</span><span class="p">(</span><span class="n">bs_x_val</span><span class="p">)))</span>
+    <span class="k">if</span> <span class="n">bs_y_val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span> <span class="ow">and</span> <span class="n">_Decimal</span><span class="p">(</span><span class="n">bs_y_val</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;Beam Shift Y&#39;</span><span class="p">],</span>
+                           <span class="nb">float</span><span class="p">(</span><span class="n">_Decimal</span><span class="p">(</span><span class="n">bs_y_val</span><span class="p">)))</span>
+
+    <span class="c1"># only parse scan rotation if value is not zero:</span>
+    <span class="c1"># Not sure what the units of this value are... looks like radians because</span>
+    <span class="c1"># unique values range from 0 to 6.24811 - convert to degrees for display</span>
+    <span class="n">scan_rot_val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="n">beam_name</span><span class="p">,</span> <span class="s1">&#39;ScanRotation&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">scan_rot_val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span> <span class="ow">and</span> <span class="n">_Decimal</span><span class="p">(</span><span class="n">scan_rot_val</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">scan_rot_dec</span> <span class="o">=</span> <span class="n">_Decimal</span><span class="p">(</span><span class="n">scan_rot_val</span><span class="p">)</span>   <span class="c1"># make scan_rot a Decimal</span>
+        <span class="c1"># get number of digits in Decimal value (so we don&#39;t artificially</span>
+        <span class="c1"># introduce extra precision)</span>
+        <span class="n">digits</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">scan_rot_dec</span><span class="o">.</span><span class="n">as_tuple</span><span class="p">()</span><span class="o">.</span><span class="n">exponent</span><span class="p">)</span>
+        <span class="c1"># round the final float value to that number of digits</span>
+        <span class="n">scan_rot_val</span> <span class="o">=</span> <span class="nb">round</span><span class="p">(</span><span class="n">degrees</span><span class="p">(</span><span class="n">scan_rot_dec</span><span class="p">),</span> <span class="n">digits</span><span class="p">)</span>
+        <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">,</span> <span class="s1">&#39;Scan Rotation (°)&#39;</span><span class="p">],</span>
+                           <span class="n">scan_rot_val</span><span class="p">)</span>
+
+    <span class="c1"># TiltCorrectionAngle only if TiltCorrectionIsOn == &#39;yes&#39;</span>
+    <span class="n">tilt_corr_on</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="n">beam_name</span><span class="p">,</span> <span class="s1">&#39;TiltCorrectionIsOn&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">tilt_corr_on</span> <span class="o">==</span> <span class="s1">&#39;yes&#39;</span><span class="p">:</span>
+        <span class="n">tilt_corr_val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span>
+                                          <span class="p">[</span><span class="n">beam_name</span><span class="p">,</span> <span class="s1">&#39;TiltCorrectionAngle&#39;</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">tilt_corr_val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+            <span class="n">tilt_corr_val</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">_Decimal</span><span class="p">(</span><span class="n">tilt_corr_val</span><span class="p">))</span>
+            <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span>
+                               <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;Tilt Correction Angle&#39;</span><span class="p">],</span>
+                               <span class="n">tilt_corr_val</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mdict</span></div>
+
+
+<div class="viewcode-block" id="parse_scan_info"><a class="viewcode-back" href="../../../api/nexusLIMS.extractors.html#nexusLIMS.extractors.quanta_tif.parse_scan_info">[docs]</a><span class="k">def</span> <span class="nf">parse_scan_info</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="n">scan_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parses the `Scan` portion of the metadata dictionary (on a Quanta this is</span>
+<span class="sd">    always `&quot;EScan&quot;`) to get values such as dwell time, field width, and pixel</span>
+<span class="sd">    size</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mdict : dict</span>
+<span class="sd">        A metadata dictionary as returned by :py:meth:`get_quanta_metadata`</span>
+<span class="sd">    scan_name : str</span>
+<span class="sd">        The &quot;scan name&quot; read from the root-level ``Beam`` node of the</span>
+<span class="sd">        metadata dictionary</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    mdict : dict</span>
+<span class="sd">        The same metadata dictionary with some values added under the</span>
+<span class="sd">        root-level ``nx_meta`` key</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Values are in SI units, but we want easy to display, so include the</span>
+    <span class="c1"># exponential factor that will get us from input unit (such as seconds)</span>
+    <span class="c1"># to output unit (such as μs -- meaning factor = 6)</span>
+    <span class="n">to_parse</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">([</span><span class="n">scan_name</span><span class="p">,</span> <span class="s1">&#39;Dwell&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Pixel Dwell Time (μs)&#39;</span><span class="p">],</span> <span class="mi">6</span><span class="p">),</span>
+        <span class="p">([</span><span class="n">scan_name</span><span class="p">,</span> <span class="s1">&#39;FrameTime&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Total Frame Time (s)&#39;</span><span class="p">],</span> <span class="mi">0</span><span class="p">),</span>
+        <span class="p">([</span><span class="n">scan_name</span><span class="p">,</span> <span class="s1">&#39;HorFieldsize&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Horizontal Field Width (μm)&#39;</span><span class="p">],</span> <span class="mi">6</span><span class="p">),</span>
+        <span class="p">([</span><span class="n">scan_name</span><span class="p">,</span> <span class="s1">&#39;VerFieldsize&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Vertical Field Width (μm)&#39;</span><span class="p">],</span> <span class="mi">6</span><span class="p">),</span>
+        <span class="p">([</span><span class="n">scan_name</span><span class="p">,</span> <span class="s1">&#39;PixelHeight&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Pixel Width (nm)&#39;</span><span class="p">],</span> <span class="mi">9</span><span class="p">),</span>
+        <span class="p">([</span><span class="n">scan_name</span><span class="p">,</span> <span class="s1">&#39;PixelWidth&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Pixel Height (nm)&#39;</span><span class="p">],</span> <span class="mi">9</span><span class="p">),</span>
+    <span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">m_in</span><span class="p">,</span> <span class="n">m_out</span><span class="p">,</span> <span class="n">factor</span> <span class="ow">in</span> <span class="n">to_parse</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="n">m_in</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span> <span class="ow">and</span> <span class="n">val</span> <span class="o">!=</span> <span class="s1">&#39;&#39;</span><span class="p">:</span>
+            <span class="n">val</span> <span class="o">=</span> <span class="n">_Decimal</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="o">*</span> <span class="n">_Decimal</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="mi">10</span><span class="o">**</span><span class="n">factor</span><span class="p">))</span>
+            <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">m_out</span><span class="p">,</span>
+                               <span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">_Decimal</span><span class="p">)</span> <span class="k">else</span> <span class="n">val</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mdict</span></div>
+
+
+<div class="viewcode-block" id="parse_det_info"><a class="viewcode-back" href="../../../api/nexusLIMS.extractors.html#nexusLIMS.extractors.quanta_tif.parse_det_info">[docs]</a><span class="k">def</span> <span class="nf">parse_det_info</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="n">det_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parses the `Detector` portion of the metadata dictionary from the Quanta to</span>
+<span class="sd">    get values such as brightness, contrast, signal, etc.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mdict : dict</span>
+<span class="sd">        A metadata dictionary as returned by :py:meth:`get_quanta_metadata`</span>
+<span class="sd">    det_name : str</span>
+<span class="sd">        The &quot;detector name&quot; read from the root-level ``Beam`` node of the</span>
+<span class="sd">        metadata dictionary</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    mdict : dict</span>
+<span class="sd">        The same metadata dictionary with some values added under the</span>
+<span class="sd">        root-level ``nx_meta`` key</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">to_parse</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">([</span><span class="n">det_name</span><span class="p">,</span> <span class="s1">&#39;Brightness&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Detector Brightness Setting&#39;</span><span class="p">]),</span>
+        <span class="p">([</span><span class="n">det_name</span><span class="p">,</span> <span class="s1">&#39;Contrast&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Detector Contrast Setting&#39;</span><span class="p">]),</span>
+        <span class="p">([</span><span class="n">det_name</span><span class="p">,</span> <span class="s1">&#39;EnhancedContrast&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Detector Enhanced Contrast &#39;</span>
+                                          <span class="s1">&#39;Setting&#39;</span><span class="p">]),</span>
+        <span class="p">([</span><span class="n">det_name</span><span class="p">,</span> <span class="s1">&#39;Signal&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Detector Signal&#39;</span><span class="p">]),</span>
+        <span class="p">([</span><span class="n">det_name</span><span class="p">,</span> <span class="s1">&#39;Grid&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Detector Grid Voltage (V)&#39;</span><span class="p">]),</span>
+        <span class="p">([</span><span class="n">det_name</span><span class="p">,</span> <span class="s1">&#39;Setting&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Detector Setting&#39;</span><span class="p">])</span>
+    <span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">m_in</span><span class="p">,</span> <span class="n">m_out</span> <span class="ow">in</span> <span class="n">to_parse</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="n">m_in</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">val</span> <span class="o">=</span> <span class="n">_Decimal</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">m_in</span> <span class="o">==</span> <span class="p">[</span><span class="n">det_name</span><span class="p">,</span> <span class="s1">&#39;Setting&#39;</span><span class="p">]:</span>
+                    <span class="c1"># if &quot;Setting&quot; value is numeric, it&#39;s just the Grid</span>
+                    <span class="c1"># voltage so skip it</span>
+                    <span class="k">continue</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="n">_invalidOp</span><span class="p">):</span>
+                <span class="k">pass</span>
+            <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">m_out</span><span class="p">,</span>
+                               <span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">_Decimal</span><span class="p">)</span> <span class="k">else</span> <span class="n">val</span><span class="p">)</span>
+
+    <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;Detector Name&#39;</span><span class="p">],</span> <span class="n">det_name</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">mdict</span></div>
+
+
+<div class="viewcode-block" id="parse_system_info"><a class="viewcode-back" href="../../../api/nexusLIMS.extractors.html#nexusLIMS.extractors.quanta_tif.parse_system_info">[docs]</a><span class="k">def</span> <span class="nf">parse_system_info</span><span class="p">(</span><span class="n">mdict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parses the `System` portion of the metadata dictionary from the Quanta to</span>
+<span class="sd">    get values such as software version, chamber config, etc.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    mdict : dict</span>
+<span class="sd">        A metadata dictionary as returned by :py:meth:`get_quanta_metadata`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    mdict : dict</span>
+<span class="sd">        The same metadata dictionary with some values added under the</span>
+<span class="sd">        root-level ``nx_meta`` key</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">to_parse</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">([</span><span class="s1">&#39;System&#39;</span><span class="p">,</span> <span class="s1">&#39;Chamber&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Chamber ID&#39;</span><span class="p">]),</span>
+        <span class="p">([</span><span class="s1">&#39;System&#39;</span><span class="p">,</span> <span class="s1">&#39;Pump&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Vacuum Pump&#39;</span><span class="p">]),</span>
+        <span class="p">([</span><span class="s1">&#39;System&#39;</span><span class="p">,</span> <span class="s1">&#39;SystemType&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;System Type&#39;</span><span class="p">]),</span>
+        <span class="p">([</span><span class="s1">&#39;System&#39;</span><span class="p">,</span> <span class="s1">&#39;Stage&#39;</span><span class="p">],</span> <span class="p">[</span><span class="s1">&#39;Stage Description&#39;</span><span class="p">])</span>
+    <span class="p">]</span>
+
+    <span class="k">for</span> <span class="n">m_in</span><span class="p">,</span> <span class="n">m_out</span> <span class="ow">in</span> <span class="n">to_parse</span><span class="p">:</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="n">m_in</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+            <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">m_out</span><span class="p">,</span> <span class="n">val</span><span class="p">)</span>
+
+    <span class="c1"># Parse software info into one output tag:</span>
+    <span class="n">output_vals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;System&#39;</span><span class="p">,</span> <span class="s1">&#39;Software&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+        <span class="n">output_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;System&#39;</span><span class="p">,</span> <span class="s1">&#39;BuildNr&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+        <span class="n">output_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;(build </span><span class="si">{</span><span class="n">val</span><span class="si">}</span><span class="s1">)&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">output_vals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;Software Version&#39;</span><span class="p">],</span>
+                           <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_vals</span><span class="p">))</span>
+
+    <span class="c1"># parse column and type into one output tag:</span>
+    <span class="n">output_vals</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;System&#39;</span><span class="p">,</span> <span class="s1">&#39;Column&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+        <span class="n">output_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+    <span class="n">val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;System&#39;</span><span class="p">,</span> <span class="s1">&#39;Type&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+        <span class="n">output_vals</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">output_vals</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span><span class="s1">&#39;Column Type&#39;</span><span class="p">],</span>
+                           <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">output_vals</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">mdict</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+  
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2020, NIST Office of Data and Informatics.<br/>
+      Last updated on Oct, 19, 2020.<br/>
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

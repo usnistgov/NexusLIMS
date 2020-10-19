@@ -1,0 +1,755 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nexusLIMS.extractors.fei_emi &#8212; NexusLIMS 0.0.9 documentation</title>
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom-styles.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/custom.js"></script>
+    <link rel="shortcut icon" href="../../../_static/nexusLIMS_bare_logo.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logo_horizontal.png"></span>
+           </a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../api.html">API Docs</a></li>
+                <li><a href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS">Repository</a></li>
+                <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site Map <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_security.html">Data security in NexusLIMS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../session_logger_app.html">Session logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/nexusLIMS.html">nexusLIMS package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.harvester.html">nexusLIMS.harvester package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li class="dummy-sidebarrel">
+    <a><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Previous</span>
+    </a>
+  </li>
+  <li class="dummy-sidebarrel">
+    <a><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Next &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><img src="../../../_static/nexusLIMS_bare_logo.png">
+<h4><a href="../../../index.html" title="Return to documentation home">
+    NexusLIMS Documentation</a></h4>
+<ul class="globaltoc">
+    <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_security.html">Data security in NexusLIMS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../session_logger_app.html">Session logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API documentation</a></li>
+</ul>
+
+</ul><h4>
+    <a class="no-hover">Page content</a>
+</h4>
+
+
+<form action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <h1>Source code for nexusLIMS.extractors.fei_emi</h1><div class="highlight"><pre>
+<span></span><span class="c1">#  NIST Public License - 2019</span>
+<span class="c1">#</span>
+<span class="c1">#  This software was developed by employees of the National Institute of</span>
+<span class="c1">#  Standards and Technology (NIST), an agency of the Federal Government</span>
+<span class="c1">#  and is being made available as a public service. Pursuant to title 17</span>
+<span class="c1">#  United States Code Section 105, works of NIST employees are not subject</span>
+<span class="c1">#  to copyright protection in the United States.  This software may be</span>
+<span class="c1">#  subject to foreign copyright.  Permission in the United States and in</span>
+<span class="c1">#  foreign countries, to the extent that NIST may hold copyright, to use,</span>
+<span class="c1">#  copy, modify, create derivative works, and distribute this software and</span>
+<span class="c1">#  its documentation without fee is hereby granted on a non-exclusive basis,</span>
+<span class="c1">#  provided that this notice and disclaimer of warranty appears in all copies.</span>
+<span class="c1">#</span>
+<span class="c1">#  THE SOFTWARE IS PROVIDED &#39;AS IS&#39; WITHOUT ANY WARRANTY OF ANY KIND,</span>
+<span class="c1">#  EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT LIMITED</span>
+<span class="c1">#  TO, ANY WARRANTY THAT THE SOFTWARE WILL CONFORM TO SPECIFICATIONS, ANY</span>
+<span class="c1">#  IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,</span>
+<span class="c1">#  AND FREEDOM FROM INFRINGEMENT, AND ANY WARRANTY THAT THE DOCUMENTATION</span>
+<span class="c1">#  WILL CONFORM TO THE SOFTWARE, OR ANY WARRANTY THAT THE SOFTWARE WILL BE</span>
+<span class="c1">#  ERROR FREE.  IN NO EVENT SHALL NIST BE LIABLE FOR ANY DAMAGES, INCLUDING,</span>
+<span class="c1">#  BUT NOT LIMITED TO, DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES,</span>
+<span class="c1">#  ARISING OUT OF, RESULTING FROM, OR IN ANY WAY CONNECTED WITH THIS SOFTWARE,</span>
+<span class="c1">#  WHETHER OR NOT BASED UPON WARRANTY, CONTRACT, TORT, OR OTHERWISE, WHETHER</span>
+<span class="c1">#  OR NOT INJURY WAS SUSTAINED BY PERSONS OR PROPERTY OR OTHERWISE, AND</span>
+<span class="c1">#  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,</span>
+<span class="c1">#  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.</span>
+
+<span class="kn">from</span> <span class="nn">hyperspy.io</span> <span class="kn">import</span> <span class="n">load</span> <span class="k">as</span> <span class="n">_hs_load</span>
+<span class="kn">from</span> <span class="nn">hyperspy.signal</span> <span class="kn">import</span> <span class="n">BaseSignal</span> <span class="k">as</span> <span class="n">_BaseSignal</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">_np</span>
+<span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
+<span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span> <span class="k">as</span> <span class="n">_dt</span>
+
+<span class="kn">from</span> <span class="nn">nexusLIMS.instruments</span> <span class="kn">import</span> <span class="n">get_instr_from_filepath</span> <span class="k">as</span> <span class="n">_get_instr</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="n">_remove_dtb_element</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="n">get_nested_dict_key</span> <span class="k">as</span> <span class="n">_get_nest_dict_key</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="n">get_nested_dict_value_by_path</span> <span class="k">as</span> \
+    <span class="n">_get_nest_dict_val_by_path</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="n">set_nested_dict_value</span> <span class="k">as</span> <span class="n">_set_nest_dict_val</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="n">try_getting_dict_value</span> <span class="k">as</span> <span class="n">_try_get_dict_val</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="n">_sort_dict</span>
+<span class="n">_logger</span> <span class="o">=</span> <span class="n">_logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_ser_metadata"><a class="viewcode-back" href="../../../api/nexusLIMS.extractors.html#nexusLIMS.extractors.fei_emi.get_ser_metadata">[docs]</a><span class="k">def</span> <span class="nf">get_ser_metadata</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Returns metadata (as a dict) from an FEI .ser file + its associated .emi</span>
+<span class="sd">    files, with some non-relevant information stripped.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename : str</span>
+<span class="sd">        Path to FEI .ser file</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    metadata : dict</span>
+<span class="sd">        Metadata of interest which is extracted from the passed files. If</span>
+<span class="sd">        files cannot be opened, at least basic metadata will be returned (</span>
+<span class="sd">        creation time, etc.)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># ObjectInfo present in emi; ser_header_parameters present in .ser</span>
+    <span class="c1"># ObjectInfo should contain all the interesting metadata,</span>
+    <span class="c1"># while ser_header_parameters is mostly technical stuff not really of</span>
+    <span class="c1"># interest to anyone</span>
+    <span class="n">warning</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">emi_filename</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">ser_error</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># approach here is for every .ser we want to examine, load the</span>
+        <span class="c1"># metadata from the corresponding .emi file. If multiple .ser files</span>
+        <span class="c1"># are related to this emi, HyperSpy returns a list, so we select out</span>
+        <span class="c1"># the right signal from that list if that&#39;s what is returned</span>
+
+        <span class="n">emi_filename</span><span class="p">,</span> <span class="n">ser_index</span> <span class="o">=</span> <span class="n">get_emi_from_ser</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+        <span class="c1"># make sure to load with &quot;only_valid_data&quot; so data shape is correct</span>
+        <span class="c1"># loading the emi with HS will try loading the .ser too, so this will</span>
+        <span class="c1"># fail if there&#39;s an issue with the .ser file</span>
+        <span class="n">emi_s</span> <span class="o">=</span> <span class="n">_hs_load</span><span class="p">(</span><span class="n">emi_filename</span><span class="p">,</span> <span class="n">lazy</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">only_valid_data</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">emi_loaded</span> <span class="o">=</span> <span class="kc">True</span>
+
+        <span class="c1"># if there is more than one dataset, emi_s will be a list, so pick</span>
+        <span class="c1"># out the matching signal from the list, which will be the &quot;index&quot;</span>
+        <span class="c1"># from the filename minus 1:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">emi_s</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">emi_s</span><span class="p">[</span><span class="n">ser_index</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># otherwise we should just have a regular signal, so make s the same</span>
+        <span class="c1"># as the data loaded from the .emi</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">emi_s</span><span class="p">,</span> <span class="n">_BaseSignal</span><span class="p">):</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">emi_s</span>
+
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="c1"># if emi wasn&#39;t found, specifically mention that</span>
+        <span class="n">warning</span> <span class="o">=</span> <span class="s1">&#39;NexusLIMS could not find a corresponding .emi metadata &#39;</span> <span class="o">+</span> \
+                  <span class="s1">&#39;file for this .ser file. Metadata extraction will be &#39;</span> <span class="o">+</span> \
+                  <span class="s1">&#39;limited.&#39;</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">warning</span><span class="p">)</span>
+        <span class="n">emi_loaded</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="n">emi_filename</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+        <span class="c1"># otherwise, HyperSpy could not load the .emi, so give generic warning</span>
+        <span class="c1"># that .emi could not be loaded for some reason:</span>
+        <span class="n">warning</span> <span class="o">=</span> <span class="s1">&#39;The .emi metadata file associated with this &#39;</span> <span class="o">+</span> \
+                  <span class="s1">&#39;.ser file could not be opened by NexusLIMS. &#39;</span> <span class="o">+</span> \
+                  <span class="s1">&#39;Metadata extraction will be limited.&#39;</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">warning</span><span class="p">)</span>
+        <span class="n">emi_loaded</span> <span class="o">=</span> <span class="kc">False</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">emi_loaded</span><span class="p">:</span>
+        <span class="c1"># if we couldn&#39;t load the emi, lets at least open the .ser to pull</span>
+        <span class="c1"># out the ser_header_info</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">_hs_load</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">only_valid_data</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">lazy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="n">warning</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;The .ser file could not be opened (perhaps file is &#39;</span> <span class="o">+</span> \
+                      <span class="sa">f</span><span class="s1">&#39;corrupted?); Metadata extraction is not possible.&#39;</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">warning</span><span class="p">)</span>
+            <span class="c1"># set s to an empty signal just so we can process some basic</span>
+            <span class="c1"># metadata using same syntax as if we had read it correctly</span>
+            <span class="n">s</span> <span class="o">=</span> <span class="n">_BaseSignal</span><span class="p">(</span><span class="n">_np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            <span class="n">ser_error</span> <span class="o">=</span> <span class="kc">True</span>
+
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">original_metadata</span><span class="o">.</span><span class="n">as_dictionary</span><span class="p">()</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># if we&#39;ve already encountered a warning, add that to the metadata,</span>
+    <span class="k">if</span> <span class="n">warning</span><span class="p">:</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Extractor Warning&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">warning</span>
+    <span class="c1"># otherwise check to ensure we actually have some metadata read from .emi</span>
+    <span class="k">elif</span> <span class="s1">&#39;ObjectInfo&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">metadata</span> <span class="ow">or</span> \
+            <span class="p">(</span><span class="s1">&#39;ExperimentalConditions&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;ObjectInfo&#39;</span><span class="p">]</span> <span class="ow">and</span>
+             <span class="s1">&#39;ExperimentalDescription&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;ObjectInfo&#39;</span><span class="p">]):</span>
+        <span class="n">warning</span> <span class="o">=</span> <span class="s1">&#39;No experimental metadata was found in the &#39;</span> <span class="o">+</span> \
+                  <span class="s1">&#39;corresponding .emi file for this .ser. &#39;</span> <span class="o">+</span> \
+                  <span class="s1">&#39;Metadata extraction will be limited.&#39;</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="n">warning</span><span class="p">)</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Extractor Warning&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">warning</span>
+
+    <span class="c1"># if we successfully found the .emi file, add it to the metadata</span>
+    <span class="k">if</span> <span class="n">emi_filename</span><span class="p">:</span>
+        <span class="n">rel_emi_fname</span> <span class="o">=</span> <span class="n">emi_filename</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+            <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;mmfnexus_path&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s1">&#39;/&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="k">if</span> <span class="n">emi_filename</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;emi Filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">rel_emi_fname</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;emi Filename&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="c1"># Get the instrument object associated with this file</span>
+    <span class="n">instr</span> <span class="o">=</span> <span class="n">_get_instr</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="c1"># get the modification time (as ISO format):</span>
+    <span class="n">mtime</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+    <span class="n">mtime_iso</span> <span class="o">=</span> <span class="n">_dt</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">mtime</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+
+    <span class="c1"># if we found the instrument, then store the name as string, else None</span>
+    <span class="n">instr_name</span> <span class="o">=</span> <span class="n">instr</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="n">instr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;fname&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">filename</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Creation Time&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">mtime_iso</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument ID&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">instr_name</span>
+
+    <span class="c1"># we could not read the signal, so add some basic metadata and return</span>
+    <span class="k">if</span> <span class="n">ser_error</span><span class="p">:</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;DatasetType&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Misc&#39;</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Data Type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Unknown&#39;</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;warnings&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="c1"># sort the nx_meta dictionary (recursively) for nicer display</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_sort_dict</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">])</span>
+        <span class="k">del</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;fname&#39;</span><span class="p">]</span>
+        <span class="k">return</span> <span class="n">metadata</span>
+
+    <span class="c1"># try to set creation time to acquisition time from metadata</span>
+    <span class="n">acq_time</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;ObjectInfo&#39;</span><span class="p">,</span> <span class="s1">&#39;AcquireDate&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">acq_time</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Creation Time&#39;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="n">_dt</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">acq_time</span><span class="p">,</span> <span class="s1">&#39;</span><span class="si">%a</span><span class="s1"> %b </span><span class="si">%d</span><span class="s1"> %H:%M:%S %Y&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+
+    <span class="c1"># manufacturer is at high level, so parse it now</span>
+    <span class="n">manufacturer</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;ObjectInfo&#39;</span><span class="p">,</span> <span class="s1">&#39;Manufacturer&#39;</span><span class="p">])</span>
+    <span class="k">if</span> <span class="n">manufacturer</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Manufacturer&#39;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="n">manufacturer</span>
+
+    <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Data Dimensions&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">data</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;warnings&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="c1"># set type to STEM Image by default (this seems to be most common)</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;DatasetType&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;Image&#39;</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Data Type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;STEM_Imaging&#39;</span>
+
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">parse_acquire_info</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">parse_experimental_conditions</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+    <span class="n">metadata</span> <span class="o">=</span> <span class="n">parse_experimental_description</span><span class="p">(</span><span class="n">metadata</span><span class="p">)</span>
+
+    <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Data Type&#39;</span><span class="p">],</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;DatasetType&#39;</span><span class="p">]</span> <span class="o">=</span> \
+        <span class="n">parse_data_type</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+
+    <span class="c1"># we don&#39;t need to save the filename, it&#39;s just for internal processing</span>
+    <span class="k">del</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;fname&#39;</span><span class="p">]</span>
+
+    <span class="c1"># sort the nx_meta dictionary (recursively) for nicer display</span>
+    <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_sort_dict</span><span class="p">(</span><span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">metadata</span></div>
+
+
+<div class="viewcode-block" id="parse_experimental_conditions"><a class="viewcode-back" href="../../../api/nexusLIMS.extractors.html#nexusLIMS.extractors.fei_emi.parse_experimental_conditions">[docs]</a><span class="k">def</span> <span class="nf">parse_experimental_conditions</span><span class="p">(</span><span class="n">metadata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse the metadata that is saved at specific places within</span>
+<span class="sd">    the .emi tag structure into a consistent place in the metadata dictionary</span>
+<span class="sd">    returned by :py:meth:`get_ser_metadata`. Specifically looks at the</span>
+<span class="sd">    &quot;ExperimentalConditions&quot; node of the metadata structure.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    metadata : dict</span>
+<span class="sd">        A metadata dictionary as returned by :py:meth:`get_ser_metadata`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    metadata : dict</span>
+<span class="sd">        The same metadata dictionary with some values added under the</span>
+<span class="sd">        root-level ``nx_meta`` key</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">term_mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="p">(</span><span class="s1">&#39;DwellTimePath&#39;</span><span class="p">,</span> <span class="p">):</span> <span class="s1">&#39;Dwell Time Path (s)&#39;</span><span class="p">,</span>
+        <span class="p">(</span><span class="s1">&#39;FrameTime&#39;</span><span class="p">,</span> <span class="p">):</span> <span class="s1">&#39;Frame Time (s)&#39;</span><span class="p">,</span>
+        <span class="p">(</span><span class="s1">&#39;CameraNamePath&#39;</span><span class="p">,</span> <span class="p">):</span> <span class="s1">&#39;Camera Name Path&#39;</span><span class="p">,</span>
+        <span class="p">(</span><span class="s1">&#39;Binning&#39;</span><span class="p">,</span> <span class="p">):</span> <span class="s1">&#39;Binning&#39;</span><span class="p">,</span>
+        <span class="p">(</span><span class="s1">&#39;BeamPosition&#39;</span><span class="p">,</span> <span class="p">):</span> <span class="s1">&#39;Beam Position (μm)&#39;</span><span class="p">,</span>
+        <span class="p">(</span><span class="s1">&#39;EnergyResolution&#39;</span><span class="p">,</span> <span class="p">):</span> <span class="s1">&#39;Energy Resolution (eV)&#39;</span><span class="p">,</span>
+        <span class="p">(</span><span class="s1">&#39;IntegrationTime&#39;</span><span class="p">,</span> <span class="p">):</span> <span class="s1">&#39;Integration Time (s)&#39;</span><span class="p">,</span>
+        <span class="p">(</span><span class="s1">&#39;NumberSpectra&#39;</span><span class="p">,</span> <span class="p">):</span> <span class="s1">&#39;Number of Spectra&#39;</span><span class="p">,</span>
+        <span class="p">(</span><span class="s1">&#39;ShapingTime&#39;</span><span class="p">,</span> <span class="p">):</span> <span class="s1">&#39;Shaping Time (s)&#39;</span><span class="p">,</span>
+        <span class="p">(</span><span class="s1">&#39;ScanArea&#39;</span><span class="p">,</span> <span class="p">):</span> <span class="s1">&#39;Scan Area&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ObjectInfo&#39;</span><span class="p">,</span> <span class="s1">&#39;AcquireInfo&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">base</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">map_keys</span><span class="p">(</span><span class="n">term_mapping</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+
+    <span class="c1"># remove units from beam position (if present)</span>
+    <span class="k">if</span> <span class="s1">&#39;Beam Position (μm)&#39;</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]:</span>
+        <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Beam Position (μm)&#39;</span><span class="p">]</span> <span class="o">=</span> \
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Beam Position (μm)&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39; um&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">metadata</span></div>
+
+
+<div class="viewcode-block" id="parse_acquire_info"><a class="viewcode-back" href="../../../api/nexusLIMS.extractors.html#nexusLIMS.extractors.fei_emi.parse_acquire_info">[docs]</a><span class="k">def</span> <span class="nf">parse_acquire_info</span><span class="p">(</span><span class="n">metadata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse the metadata that is saved at specific places within</span>
+<span class="sd">    the .emi tag structure into a consistent place in the metadata dictionary</span>
+<span class="sd">    returned by :py:meth:`get_ser_metadata`. Specifically looks at the</span>
+<span class="sd">    &quot;AcquireInfo&quot; node of the metadata structure.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    metadata : dict</span>
+<span class="sd">        A metadata dictionary as returned by :py:meth:`get_ser_metadata`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    metadata : dict</span>
+<span class="sd">        The same metadata dictionary with some values added under the</span>
+<span class="sd">        root-level ``nx_meta`` key</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">term_mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="p">(</span><span class="s1">&#39;AcceleratingVoltage&#39;</span><span class="p">,</span> <span class="p">):</span> <span class="s1">&#39;Microscope Accelerating Voltage (V)&#39;</span><span class="p">,</span>
+        <span class="p">(</span><span class="s1">&#39;Tilt1&#39;</span><span class="p">,</span> <span class="p">):</span> <span class="s1">&#39;Microscope Tilt 1&#39;</span><span class="p">,</span>
+        <span class="p">(</span><span class="s1">&#39;Tilt2&#39;</span><span class="p">,</span> <span class="p">):</span> <span class="s1">&#39;Microscope Tilt 2&#39;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ObjectInfo&#39;</span><span class="p">,</span> <span class="s1">&#39;ExperimentalConditions&#39;</span><span class="p">,</span> <span class="s1">&#39;MicroscopeConditions&#39;</span><span class="p">]</span>
+
+    <span class="k">if</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">base</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">map_keys</span><span class="p">(</span><span class="n">term_mapping</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">metadata</span></div>
+
+
+<div class="viewcode-block" id="parse_experimental_description"><a class="viewcode-back" href="../../../api/nexusLIMS.extractors.html#nexusLIMS.extractors.fei_emi.parse_experimental_description">[docs]</a><span class="k">def</span> <span class="nf">parse_experimental_description</span><span class="p">(</span><span class="n">metadata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parse the metadata that is saved at specific places within</span>
+<span class="sd">    the .emi tag structure into a consistent place in the metadata dictionary</span>
+<span class="sd">    returned by :py:meth:`get_ser_metadata`. Specifically looks at the</span>
+<span class="sd">    &quot;ExperimentalDescription&quot; node of the metadata structure.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    metadata : dict</span>
+<span class="sd">        A metadata dictionary as returned by :py:meth:`get_ser_metadata`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    metadata : dict</span>
+<span class="sd">        The same metadata dictionary with some values added under the</span>
+<span class="sd">        root-level ``nx_meta`` key</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The terms to extract in this section were</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># These terms were captured by looping through a selection of</span>
+    <span class="c1"># representative .ser/.emi datafiles and running something like the</span>
+    <span class="c1"># following</span>
+    <span class="n">base</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;ObjectInfo&#39;</span><span class="p">,</span> <span class="s1">&#39;ExperimentalDescription&#39;</span><span class="p">]</span>
+
+    <span class="n">experimental_description</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">base</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">experimental_description</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span> <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
+            <span class="n">experimental_description</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+        <span class="n">term_mapping</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;ObjectInfo&#39;</span><span class="p">][</span><span class="s1">&#39;ExperimentalDescription&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+            <span class="n">term</span><span class="p">,</span> <span class="n">unit</span> <span class="o">=</span> <span class="n">split_fei_metadata_units</span><span class="p">(</span><span class="n">k</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">unit</span><span class="p">:</span>
+                <span class="n">unit</span> <span class="o">=</span> <span class="n">unit</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;uA&#39;</span><span class="p">,</span> <span class="s1">&#39;μA&#39;</span><span class="p">)</span><span class="o">.</span>\
+                            <span class="n">replace</span><span class="p">(</span><span class="s1">&#39;um&#39;</span><span class="p">,</span> <span class="s1">&#39;μm&#39;</span><span class="p">)</span><span class="o">.</span>\
+                            <span class="n">replace</span><span class="p">(</span><span class="s1">&#39;deg&#39;</span><span class="p">,</span> <span class="s1">&#39;°&#39;</span><span class="p">)</span>
+            <span class="n">term_mapping</span><span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="p">)]</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">term</span><span class="si">}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39; (</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s1">)&#39;</span> <span class="k">if</span> <span class="n">unit</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="c1"># Make stage position a nested list</span>
+            <span class="k">if</span> <span class="s1">&#39;Stage&#39;</span> <span class="ow">in</span> <span class="n">term</span><span class="p">:</span>
+                <span class="n">term</span> <span class="o">=</span> <span class="n">term</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Stage &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="n">term_mapping</span><span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="p">)]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Stage Position&#39;</span><span class="p">,</span>
+                                       <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">term</span><span class="si">}</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s1">&#39; (</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s1">)&#39;</span> <span class="k">if</span> <span class="n">unit</span>
+                                                    <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)]</span>
+            <span class="c1"># Make filter settings a nested list</span>
+            <span class="k">if</span> <span class="s1">&#39;Filter &#39;</span> <span class="ow">in</span> <span class="n">term</span><span class="p">:</span>
+                <span class="n">term</span> <span class="o">=</span> <span class="n">term</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Filter &#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+                <span class="n">term_mapping</span><span class="p">[(</span><span class="n">k</span><span class="p">,</span> <span class="p">)]</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Tecnai Filter&#39;</span><span class="p">,</span>
+                                       <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">term</span><span class="o">.</span><span class="n">title</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span> <span class="o">+</span>
+                                       <span class="p">(</span><span class="sa">f</span><span class="s1">&#39; (</span><span class="si">{</span><span class="n">unit</span><span class="si">}</span><span class="s1">)&#39;</span> <span class="k">if</span> <span class="n">unit</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)]</span>
+
+        <span class="n">metadata</span> <span class="o">=</span> <span class="n">map_keys</span><span class="p">(</span><span class="n">term_mapping</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">metadata</span><span class="p">)</span>
+
+        <span class="c1"># Microscope Mode often has excess spaces, so fix that if needed:</span>
+        <span class="k">if</span> <span class="s1">&#39;Mode&#39;</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]:</span>
+            <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Mode&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Mode&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">metadata</span></div>
+
+
+<div class="viewcode-block" id="get_emi_from_ser"><a class="viewcode-back" href="../../../api/nexusLIMS.extractors.html#nexusLIMS.extractors.fei_emi.get_emi_from_ser">[docs]</a><span class="k">def</span> <span class="nf">get_emi_from_ser</span><span class="p">(</span><span class="n">ser_fname</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the accompanying `.emi` filename from an ser filename. This method</span>
+<span class="sd">    assumes that the `.ser` file will be the same name as the `.emi` file,</span>
+<span class="sd">    but with an underscore and a digit appended. i.e. ``file.emi`` would</span>
+<span class="sd">    result in `.ser` files named ``file_1.ser``, ``file_2.ser``, etc.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ser_fname : str</span>
+<span class="sd">        The absolute path of an FEI TIA `.ser` data file</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    emi_fname : str</span>
+<span class="sd">        The absolute path of the accompanying `.emi` metadata file</span>
+<span class="sd">    index : int</span>
+<span class="sd">        The number of this .ser file (i.e. 1, 2, 3, etc.)</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    FileNotFoundError</span>
+<span class="sd">        If the accompanying .emi file cannot be resolved to be a file</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># separate filename from extension</span>
+    <span class="n">filename</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">ser_fname</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="c1"># remove everything after the last underscore and add the .emi extension</span>
+    <span class="n">emi_fname</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> <span class="s1">&#39;.emi&#39;</span>
+    <span class="n">index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">emi_fname</span><span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s2">&quot;Could not find .emi file with expected name:&quot;</span>
+                                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">emi_fname</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">emi_fname</span><span class="p">,</span> <span class="n">index</span></div>
+
+
+<div class="viewcode-block" id="split_fei_metadata_units"><a class="viewcode-back" href="../../../api/nexusLIMS.extractors.html#nexusLIMS.extractors.fei_emi.split_fei_metadata_units">[docs]</a><span class="k">def</span> <span class="nf">split_fei_metadata_units</span><span class="p">(</span><span class="n">metadata_term</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    If present, separate a metadata term into its value and units.</span>
+<span class="sd">    In the FEI metadata structure, units are indicated separated by an</span>
+<span class="sd">    underscore at the end of the term. i.e. ``High tension_kV`` indicates that</span>
+<span class="sd">    the `High tension` metadata value has units of `kV`.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    metadata_term : str</span>
+<span class="sd">        The metadata term read from the FEI tag structure</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    mdata_and_unit : :obj:`tuple` of :obj:`str`</span>
+<span class="sd">        A length-2 tuple with the metadata value name as the first</span>
+<span class="sd">        item and the unit (if present) as the second item</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mdata_and_unit</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">metadata_term</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mdata_and_unit</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">mdata_and_unit</span> <span class="o">=</span> <span class="n">mdata_and_unit</span> <span class="o">+</span> <span class="p">(</span><span class="kc">None</span><span class="p">,</span> <span class="p">)</span>
+
+    <span class="c1"># capitalize any words in metadata term that are all lowercase:</span>
+    <span class="n">mdata_term</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">w</span><span class="o">.</span><span class="n">title</span><span class="p">()</span> <span class="k">if</span> <span class="n">w</span><span class="o">.</span><span class="n">islower</span><span class="p">()</span> <span class="k">else</span> <span class="n">w</span>
+                           <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">mdata_and_unit</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">()])</span>
+    <span class="c1"># replace weird &quot;Stem&quot; capitalization</span>
+    <span class="n">mdata_term</span> <span class="o">=</span> <span class="n">mdata_term</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;Stem &#39;</span><span class="p">,</span> <span class="s1">&#39;STEM &#39;</span><span class="p">)</span>
+
+    <span class="n">mdata_and_unit</span> <span class="o">=</span> <span class="p">(</span><span class="n">mdata_term</span><span class="p">,</span> <span class="n">mdata_and_unit</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">mdata_and_unit</span></div>
+
+
+<div class="viewcode-block" id="map_keys"><a class="viewcode-back" href="../../../api/nexusLIMS.extractors.html#nexusLIMS.extractors.fei_emi.map_keys">[docs]</a><span class="k">def</span> <span class="nf">map_keys</span><span class="p">(</span><span class="n">term_mapping</span><span class="p">,</span> <span class="n">base</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a term mapping dictionary and a metadata dictionary, translate</span>
+<span class="sd">    the input keys within the &quot;raw&quot; metadata into a parsed value in the</span>
+<span class="sd">    &quot;nx_meta&quot; metadata structure.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    term_mapping : dict</span>
+<span class="sd">        Dictionary where keys are tuples of strings (the input terms),</span>
+<span class="sd">        and values are either a single string or a list of strings (the</span>
+<span class="sd">        output terms).</span>
+<span class="sd">    base : list</span>
+<span class="sd">        The &#39;root&#39; path within the metadata dictionary of where to start</span>
+<span class="sd">        applying the input terms</span>
+<span class="sd">    metadata : dict</span>
+<span class="sd">        A metadata dictionary as returned by :py:meth:`get_ser_metadata`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    metadata : dict</span>
+<span class="sd">        The same metadata dictionary with some values added under the</span>
+<span class="sd">        root-level ``nx_meta`` key, as specified by ``term_mapping``</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    The ``term_mapping`` parameter should be a dictionary of the form:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        {</span>
+<span class="sd">            (&#39;val1_1&#39;, &#39;val1_2&#39;) : &#39;output_val_1&#39;,</span>
+<span class="sd">            (&#39;val1_1&#39;, &#39;val2_2&#39;) : &#39;output_val_2&#39;,</span>
+<span class="sd">            etc.</span>
+<span class="sd">        }</span>
+
+<span class="sd">    Assuming ``base`` is ``[&#39;ObjectInfo&#39;, &#39;AcquireInfo&#39;]``, this would map</span>
+<span class="sd">    the term present at ``ObjectInfo.AcquireInfo.val1_1.val1_2`` into</span>
+<span class="sd">    ``nx_meta.output_val_1``, and ``ObjectInfo.AcquireInfo.val1_1.val2_2`` into</span>
+<span class="sd">    ``nx_meta.output_val_2``, and so on. If one of the output terms is a list,</span>
+<span class="sd">    the resulting metadata will be nested. `e.g.` ``[&#39;output_val_1&#39;,</span>
+<span class="sd">    &#39;output_val_2&#39;]`` would get mapped to ``nx_meta.output_val_1.output_val_2``.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">in_term</span> <span class="ow">in</span> <span class="n">term_mapping</span><span class="o">.</span><span class="n">keys</span><span class="p">():</span>
+        <span class="n">out_term</span> <span class="o">=</span> <span class="n">term_mapping</span><span class="p">[</span><span class="n">in_term</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">in_term</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">):</span>
+            <span class="n">in_term</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">in_term</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">out_term</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="n">out_term</span> <span class="o">=</span> <span class="p">[</span><span class="n">out_term</span><span class="p">]</span>
+        <span class="n">val</span> <span class="o">=</span> <span class="n">_try_get_dict_val</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="n">base</span> <span class="o">+</span> <span class="n">in_term</span><span class="p">)</span>
+        <span class="c1"># only add the value to this list if we found it</span>
+        <span class="k">if</span> <span class="n">val</span> <span class="o">!=</span> <span class="s1">&#39;not found&#39;</span><span class="p">:</span>
+            <span class="n">_set_nest_dict_val</span><span class="p">(</span><span class="n">metadata</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="n">out_term</span><span class="p">,</span>
+                               <span class="n">_convert_to_numeric</span><span class="p">(</span><span class="n">val</span><span class="p">))</span>
+
+    <span class="k">return</span> <span class="n">metadata</span></div>
+
+
+<div class="viewcode-block" id="parse_data_type"><a class="viewcode-back" href="../../../api/nexusLIMS.extractors.html#nexusLIMS.extractors.fei_emi.parse_data_type">[docs]</a><span class="k">def</span> <span class="nf">parse_data_type</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">metadata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Determine `&quot;Data Type&quot;` and `&quot;DatasetType&quot;` for the given .ser file based</span>
+<span class="sd">    off of metadata and signal characteristics. This method is used to</span>
+<span class="sd">    determine whether the image is TEM or STEM, Image or Diffraction,</span>
+<span class="sd">    Spectrum or Spectrum Image, etc.</span>
+
+<span class="sd">    Due to lack of appropriate metadata written by the FEI software,</span>
+<span class="sd">    a heuristic of axis limits and size is used to determine whether a</span>
+<span class="sd">    spectrum&#39;s data type is EELS or EDS. This may not be a perfect</span>
+<span class="sd">    determination.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    s : :py:class:`hyperspy.signal.BaseSignal` (or subclass)</span>
+<span class="sd">        The HyperSpy signal that contains the data of interest</span>
+<span class="sd">    metadata : dict</span>
+<span class="sd">        A metadata dictionary as returned by :py:meth:`get_ser_metadata`</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    data_type : str</span>
+<span class="sd">        The string that should be stored at metadata[&#39;nx_meta&#39;][&#39;Data Type&#39;]</span>
+<span class="sd">    dataset_type : str</span>
+<span class="sd">        The string that should be stored at metadata[&#39;nx_meta&#39;][&#39;DatasetType&#39;]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># default value that will be overwritten if the conditions below are met</span>
+    <span class="n">dataset_type</span> <span class="o">=</span> <span class="s1">&#39;Misc&#39;</span>
+
+    <span class="c1"># instrument configuration</span>
+    <span class="n">instr_conf</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="c1"># sometimes there is no metadata for follow-on signals in an .emi/.ser</span>
+    <span class="c1"># bundle (i.e. .ser files after the first one)</span>
+    <span class="k">if</span> <span class="s1">&#39;Mode&#39;</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="s1">&#39;STEM&#39;</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Mode&#39;</span><span class="p">]:</span>
+            <span class="n">instr_conf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;STEM&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="s1">&#39;TEM&#39;</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Mode&#39;</span><span class="p">]:</span>
+            <span class="n">instr_conf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;TEM&#39;</span><span class="p">)</span>
+    <span class="c1"># if there is no metadata read from .emi, make determination</span>
+    <span class="c1"># off of instrument (this is really a guess)</span>
+    <span class="k">elif</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument ID&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">&#39;STEM&#39;</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Instrument ID&#39;</span><span class="p">]:</span>
+            <span class="n">instr_conf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;STEM&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">instr_conf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;TEM&#39;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># default to TEM, (since STEM is technically a sub-technique of TEM)</span>
+        <span class="n">instr_conf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;TEM&#39;</span><span class="p">)</span>
+
+    <span class="c1"># images have signal dimension of two:</span>
+    <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">signal_dimension</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="c1"># default to an image dataset type for 2 dimensional signal</span>
+        <span class="n">dataset_type</span> <span class="o">=</span> <span class="s1">&#39;Image&#39;</span>
+        <span class="c1"># instrument modality:</span>
+        <span class="n">instr_mod</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Imaging&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="s1">&#39;Mode&#39;</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="s1">&#39;Image&#39;</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Mode&#39;</span><span class="p">]:</span>
+                <span class="n">instr_mod</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Imaging&#39;</span><span class="p">]</span>
+                <span class="n">dataset_type</span> <span class="o">=</span> <span class="s1">&#39;Image&#39;</span>
+            <span class="k">elif</span> <span class="s1">&#39;Diffraction&#39;</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Mode&#39;</span><span class="p">]:</span>
+                <span class="c1"># Diffraction mode is only actually diffraction in TEM mode,</span>
+                <span class="c1"># In STEM, imaging happens in diffraction mode</span>
+                <span class="k">if</span> <span class="s1">&#39;STEM&#39;</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Mode&#39;</span><span class="p">]:</span>
+                    <span class="n">instr_mod</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Imaging&#39;</span><span class="p">]</span>
+                    <span class="n">dataset_type</span> <span class="o">=</span> <span class="s1">&#39;Image&#39;</span>
+                <span class="k">elif</span> <span class="s1">&#39;TEM&#39;</span> <span class="ow">in</span> <span class="n">metadata</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;Mode&#39;</span><span class="p">]:</span>
+                    <span class="n">instr_mod</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Diffraction&#39;</span><span class="p">]</span>
+                    <span class="n">dataset_type</span> <span class="o">=</span> <span class="s1">&#39;Diffraction&#39;</span>
+    <span class="c1"># if signal dimension is 1, it&#39;s a spectrum and not an image</span>
+    <span class="k">elif</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">signal_dimension</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">instr_mod</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;Spectrum&#39;</span><span class="p">]</span>
+        <span class="n">dataset_type</span> <span class="o">=</span> <span class="s1">&#39;Spectrum&#39;</span>
+        <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">navigation_dimension</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">instr_mod</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;Imaging&#39;</span><span class="p">)</span>
+            <span class="n">dataset_type</span> <span class="o">=</span> <span class="s1">&#39;SpectrumImage&#39;</span>
+        <span class="c1"># do some basic axis value analysis to guess signal type since we</span>
+        <span class="c1"># don&#39;t have any indication of EELS vs. EDS; assume 5 keV and above</span>
+        <span class="c1"># is EDS</span>
+        <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">signal_axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">high_value</span> <span class="o">&gt;</span> <span class="mi">5000</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;EDS&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">instr_conf</span><span class="p">:</span>
+                <span class="n">instr_conf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;EDS&#39;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># EELS spectra are usually 2048 channels</span>
+            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">signal_axes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">2048</span><span class="p">:</span>
+                <span class="n">instr_conf</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">&#39;EELS&#39;</span><span class="p">)</span>
+
+    <span class="n">data_type</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">instr_conf</span> <span class="o">+</span> <span class="n">instr_mod</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data_type</span><span class="p">,</span> <span class="n">dataset_type</span></div>
+
+
+<span class="k">def</span> <span class="nf">_convert_to_numeric</span><span class="p">(</span><span class="n">val</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="k">if</span> <span class="s1">&#39;.&#39;</span> <span class="ow">in</span> <span class="n">val</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">val</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">val</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">val</span>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+  
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2020, NIST Office of Data and Informatics.<br/>
+      Last updated on Oct, 19, 2020.<br/>
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

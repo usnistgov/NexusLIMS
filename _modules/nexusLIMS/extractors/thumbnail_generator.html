@@ -1,0 +1,914 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>nexusLIMS.extractors.thumbnail_generator &#8212; NexusLIMS 0.0.9 documentation</title>
+    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
+    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom-styles.css" />
+    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/language_data.js"></script>
+    <script src="../../../_static/custom.js"></script>
+    <link rel="shortcut icon" href="../../../_static/nexusLIMS_bare_logo.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js "></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js "></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logo_horizontal.png"></span>
+           </a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../api.html">API Docs</a></li>
+                <li><a href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS">Repository</a></li>
+                <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site Map <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_security.html">Data security in NexusLIMS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../session_logger_app.html">Session logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/nexusLIMS.html">nexusLIMS package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.harvester.html">nexusLIMS.harvester package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li class="dummy-sidebarrel">
+    <a><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Previous</span>
+    </a>
+  </li>
+  <li class="dummy-sidebarrel">
+    <a><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Next &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><img src="../../../_static/nexusLIMS_bare_logo.png">
+<h4><a href="../../../index.html" title="Return to documentation home">
+    NexusLIMS Documentation</a></h4>
+<ul class="globaltoc">
+    <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../data_security.html">Data security in NexusLIMS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../session_logger_app.html">Session logging</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API documentation</a></li>
+</ul>
+
+</ul><h4>
+    <a class="no-hover">Page content</a>
+</h4>
+
+
+<form action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <h1>Source code for nexusLIMS.extractors.thumbnail_generator</h1><div class="highlight"><pre>
+<span></span><span class="c1">#  NIST Public License - 2019</span>
+<span class="c1">#</span>
+<span class="c1">#  This software was developed by employees of the National Institute of</span>
+<span class="c1">#  Standards and Technology (NIST), an agency of the Federal Government</span>
+<span class="c1">#  and is being made available as a public service. Pursuant to title 17</span>
+<span class="c1">#  United States Code Section 105, works of NIST employees are not subject</span>
+<span class="c1">#  to copyright protection in the United States.  This software may be</span>
+<span class="c1">#  subject to foreign copyright.  Permission in the United States and in</span>
+<span class="c1">#  foreign countries, to the extent that NIST may hold copyright, to use,</span>
+<span class="c1">#  copy, modify, create derivative works, and distribute this software and</span>
+<span class="c1">#  its documentation without fee is hereby granted on a non-exclusive basis,</span>
+<span class="c1">#  provided that this notice and disclaimer of warranty appears in all copies.</span>
+<span class="c1">#</span>
+<span class="c1">#  THE SOFTWARE IS PROVIDED &#39;AS IS&#39; WITHOUT ANY WARRANTY OF ANY KIND,</span>
+<span class="c1">#  EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT LIMITED</span>
+<span class="c1">#  TO, ANY WARRANTY THAT THE SOFTWARE WILL CONFORM TO SPECIFICATIONS, ANY</span>
+<span class="c1">#  IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,</span>
+<span class="c1">#  AND FREEDOM FROM INFRINGEMENT, AND ANY WARRANTY THAT THE DOCUMENTATION</span>
+<span class="c1">#  WILL CONFORM TO THE SOFTWARE, OR ANY WARRANTY THAT THE SOFTWARE WILL BE</span>
+<span class="c1">#  ERROR FREE.  IN NO EVENT SHALL NIST BE LIABLE FOR ANY DAMAGES, INCLUDING,</span>
+<span class="c1">#  BUT NOT LIMITED TO, DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES,</span>
+<span class="c1">#  ARISING OUT OF, RESULTING FROM, OR IN ANY WAY CONNECTED WITH THIS SOFTWARE,</span>
+<span class="c1">#  WHETHER OR NOT BASED UPON WARRANTY, CONTRACT, TORT, OR OTHERWISE, WHETHER</span>
+<span class="c1">#  OR NOT INJURY WAS SUSTAINED BY PERSONS OR PROPERTY OR OTHERWISE, AND</span>
+<span class="c1">#  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,</span>
+<span class="c1">#  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.</span>
+<span class="c1">#</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">_np</span>
+<span class="kn">import</span> <span class="nn">tempfile</span> <span class="k">as</span> <span class="nn">_tmp</span>
+<span class="kn">import</span> <span class="nn">hyperspy.api</span> <span class="k">as</span> <span class="nn">_hsapi</span>
+<span class="kn">from</span> <span class="nn">hyperspy.drawing.marker</span> <span class="kn">import</span> <span class="n">dict2marker</span> <span class="k">as</span> <span class="n">_dict2marker</span>
+<span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
+<span class="kn">import</span> <span class="nn">textwrap</span> <span class="k">as</span> <span class="nn">_textwrap</span>
+<span class="kn">import</span> <span class="nn">matplotlib</span> <span class="k">as</span> <span class="nn">_mpl</span>
+<span class="kn">from</span> <span class="nn">skimage.io</span> <span class="kn">import</span> <span class="n">imread</span> <span class="k">as</span> <span class="n">_imread</span>
+<span class="kn">import</span> <span class="nn">skimage.transform</span> <span class="k">as</span> <span class="nn">_tform</span>
+<span class="kn">from</span> <span class="nn">skimage.transform</span> <span class="kn">import</span> <span class="n">resize</span> <span class="k">as</span> <span class="n">_resize</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">_plt</span>
+<span class="kn">from</span> <span class="nn">matplotlib.offsetbox</span> <span class="kn">import</span> <span class="n">AnchoredOffsetbox</span> <span class="k">as</span> <span class="n">_AOb</span>
+<span class="kn">from</span> <span class="nn">matplotlib.offsetbox</span> <span class="kn">import</span> <span class="n">OffsetImage</span> <span class="k">as</span> <span class="n">_OIm</span>
+<span class="kn">from</span> <span class="nn">matplotlib.transforms</span> <span class="kn">import</span> <span class="n">Bbox</span> <span class="k">as</span> <span class="n">_Bbox</span>
+<span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span> <span class="k">as</span> <span class="n">_PILImage</span>
+<span class="kn">from</span> <span class="nn">PIL.Image</span> <span class="kn">import</span> <span class="n">LANCZOS</span> <span class="k">as</span> <span class="n">_LANCZOS</span>
+<span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
+
+<span class="n">_logger</span> <span class="o">=</span> <span class="n">_logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">_logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<span class="n">_dir_path</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+<span class="n">_mpl</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s1">&#39;Agg&#39;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_full_extent</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">items</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.0</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Get the full extent of items in an axis.</span>
+<span class="sd">    Adapted from https://stackoverflow.com/a/26432947/1435788</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># For text objects, we need to draw the figure first, otherwise the extents</span>
+    <span class="c1"># are undefined.</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+    <span class="n">bbox</span> <span class="o">=</span> <span class="n">_Bbox</span><span class="o">.</span><span class="n">union</span><span class="p">([</span><span class="n">item</span><span class="o">.</span><span class="n">get_window_extent</span><span class="p">()</span> <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">items</span><span class="p">])</span>
+
+    <span class="k">return</span> <span class="n">bbox</span><span class="o">.</span><span class="n">expanded</span><span class="p">(</span><span class="mf">1.0</span> <span class="o">+</span> <span class="n">pad</span><span class="p">,</span> <span class="mf">1.0</span> <span class="o">+</span> <span class="n">pad</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_set_title</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set an axis title, making sure it is no wider than 60 characters (so it</span>
+<span class="sd">    doesn&#39;t run over the edges of the plot)</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ax : :py:mod:`matplotlib.axis`</span>
+<span class="sd">        A matplotlib axis instance on which to operate</span>
+<span class="sd">    title : str</span>
+<span class="sd">        The desired axis title</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">new_title</span> <span class="o">=</span> <span class="n">_textwrap</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">title</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">new_title</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_visible_labels</span><span class="p">(</span><span class="n">ax</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper method to return only the tick labels that are visible given the</span>
+<span class="sd">    current extent of the axes. Useful when calculating the extent of the figure</span>
+<span class="sd">    to save so extra white space from invisible labels is not included.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    ax : :py:mod:`matplotlib.axis`</span>
+<span class="sd">        A matplotlib axis instance on which to operate</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    vis_labels_x, vis_labels_y : tuple of lists</span>
+<span class="sd">        lists of only the label objects that are visible on the current axis</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">vis_labels_x</span> <span class="o">=</span> <span class="n">_mpl</span><span class="o">.</span><span class="n">cbook</span><span class="o">.</span><span class="n">silent_list</span><span class="p">(</span><span class="s1">&#39;Text xticklabel&#39;</span><span class="p">)</span>
+    <span class="n">vis_labels_y</span> <span class="o">=</span> <span class="n">_mpl</span><span class="o">.</span><span class="n">cbook</span><span class="o">.</span><span class="n">silent_list</span><span class="p">(</span><span class="s1">&#39;Text yticklabel&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">():</span>
+        <span class="n">label_pos</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">get_position</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">x_limits</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_xlim</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">x_limits</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">label_pos</span> <span class="o">&lt;</span> <span class="n">x_limits</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">vis_labels_x</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_yticklabels</span><span class="p">():</span>
+        <span class="n">label_pos</span> <span class="o">=</span> <span class="n">l</span><span class="o">.</span><span class="n">get_position</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span>
+        <span class="n">y_limits</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">get_ylim</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">y_limits</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&lt;</span> <span class="n">label_pos</span> <span class="o">&lt;</span> <span class="n">y_limits</span><span class="p">[</span><span class="mi">1</span><span class="p">]:</span>
+            <span class="n">vis_labels_y</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">l</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">vis_labels_x</span><span class="p">,</span> <span class="n">vis_labels_y</span>
+
+
+<span class="k">def</span> <span class="nf">_project_image_stack</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">92</span><span class="p">,</span> <span class="n">v_shear</span><span class="o">=</span><span class="mf">0.3</span><span class="p">,</span> <span class="n">h_scale</span><span class="o">=</span><span class="mf">0.3</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create a preview of an image stack by selecting a number of example frames</span>
+<span class="sd">    and projecting them into a pseudo-3D display.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    s : :py:class:`hyperspy.signal.BaseSignal` (or subclass)</span>
+<span class="sd">        The HyperSpy signal for which an image stack preview should be</span>
+<span class="sd">        generated. Should have a signal dimension of 2 and a navigation</span>
+<span class="sd">        dimension of 1.</span>
+<span class="sd">    num : int</span>
+<span class="sd">        The number of frames in the image stack to use to make the preview</span>
+<span class="sd">    dpi : int</span>
+<span class="sd">        The &quot;dots per inch&quot; of the individual frames within the preview</span>
+<span class="sd">    v_shear : float</span>
+<span class="sd">        The factor by which to vertically shear (0.5 means shear the top border</span>
+<span class="sd">        down by half of the original image&#39;s height)</span>
+<span class="sd">    h_scale : float</span>
+<span class="sd">        The factor by which to scale in the horizontal direction (0.3 means</span>
+<span class="sd">        each projected frame will be 30% the width of the original image)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    output : :py:class:`numpy.ndarray`</span>
+<span class="sd">        The `num` frames loaded into a single NumPy array for plotting</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">shear</span> <span class="o">=</span> <span class="n">_np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span> <span class="mi">1</span><span class="p">,</span>           <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                       <span class="p">[</span><span class="o">-</span><span class="mi">1</span> <span class="o">*</span> <span class="n">v_shear</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                       <span class="p">[</span> <span class="mi">0</span><span class="p">,</span>           <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+    <span class="n">scale</span> <span class="o">=</span> <span class="n">_np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">h_scale</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                       <span class="p">[</span>      <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                       <span class="p">[</span>      <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">]])</span>
+    <span class="n">trans_mat</span> <span class="o">=</span> <span class="n">_np</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="n">shear</span><span class="p">,</span> <span class="n">_np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">inv</span><span class="p">(</span><span class="n">scale</span><span class="p">))</span>
+
+    <span class="n">tmps</span> <span class="o">=</span> <span class="p">[</span><span class="s1">&#39;&#39;</span><span class="p">]</span> <span class="o">*</span> <span class="n">num</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span>
+            <span class="n">_np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">navigation_size</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="n">num</span><span class="p">,</span>
+                         <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)):</span>
+        <span class="n">_hsapi</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">plot_images</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">inav</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">as_signal2D</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">))],</span>
+                                <span class="n">axes_decor</span><span class="o">=</span><span class="s1">&#39;off&#39;</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                                <span class="n">scalebar</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span> <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+        <span class="n">tmp</span> <span class="o">=</span> <span class="n">_tmp</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">()</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">_plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_position</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_on</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">axis</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="s1">&#39;bottom&#39;</span><span class="p">,</span> <span class="s1">&#39;left&#39;</span><span class="p">,</span> <span class="s1">&#39;right&#39;</span><span class="p">]:</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">spines</span><span class="p">[</span><span class="n">axis</span><span class="p">]</span><span class="o">.</span><span class="n">set_linewidth</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">canvas</span><span class="o">.</span><span class="n">draw</span><span class="p">()</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+        <span class="n">tmps</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">tmp</span>
+        <span class="n">_plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="p">)</span>
+
+    <span class="n">im_data</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">num</span>
+    <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">tmp</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">tmps</span><span class="p">):</span>
+        <span class="n">img</span> <span class="o">=</span> <span class="n">_plt</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="n">tmp</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">)</span>
+        <span class="n">img_trans</span> <span class="o">=</span> <span class="n">_tform</span><span class="o">.</span><span class="n">warp</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">trans_mat</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">preserve_range</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;constant&#39;</span><span class="p">,</span> <span class="n">cval</span><span class="o">=</span><span class="n">_np</span><span class="o">.</span><span class="n">nan</span><span class="p">,</span>
+                                <span class="n">output_shape</span><span class="o">=</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="p">(</span><span class="mi">1</span> <span class="o">+</span> <span class="n">v_shear</span><span class="p">)),</span>
+                                              <span class="nb">int</span><span class="p">(</span><span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">h_scale</span><span class="p">)))</span>
+        <span class="n">im_data</span><span class="p">[</span><span class="n">idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">img_trans</span>
+
+    <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tmps</span><span class="p">:</span>
+        <span class="n">t</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="n">_os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">t</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s1">&#39;.png&#39;</span><span class="p">)</span>
+
+    <span class="n">output</span> <span class="o">=</span> <span class="n">_np</span><span class="o">.</span><span class="n">hstack</span><span class="p">(</span><span class="n">im_data</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">output</span>
+
+
+<span class="k">def</span> <span class="nf">_pad_to_square</span><span class="p">(</span><span class="n">im_path</span><span class="p">,</span> <span class="n">new_width</span><span class="o">=</span><span class="mi">500</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Helper method to pad an image saved on disk to a square with size</span>
+<span class="sd">    ``width x width``. This ensures consistent display on the front-end web</span>
+<span class="sd">    page. Increasing the size of a dimension is done by padding with empty</span>
+<span class="sd">    space. The original image is overwritten.</span>
+
+<span class="sd">    Method adapted from:</span>
+<span class="sd">    https://jdhao.github.io/2017/11/06/resize-image-to-square-with-padding/</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    im_path : str</span>
+<span class="sd">        The path to the image that should be resized/padded</span>
+<span class="sd">    new_width : int</span>
+<span class="sd">        Desired output width/height of the image (in pixels)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="n">_PILImage</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">im_path</span><span class="p">)</span>
+    <span class="n">old_size</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">size</span>    <span class="c1"># old_size[0] is in (width, height) format</span>
+    <span class="n">ratio</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">new_width</span><span class="p">)</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">old_size</span><span class="p">)</span>
+    <span class="n">new_size</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">ratio</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">old_size</span><span class="p">])</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">new_size</span><span class="p">,</span> <span class="n">_PILImage</span><span class="o">.</span><span class="n">ANTIALIAS</span><span class="p">)</span>
+
+    <span class="n">new_im</span> <span class="o">=</span> <span class="n">_PILImage</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;RGBA&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">new_width</span><span class="p">,</span> <span class="n">new_width</span><span class="p">))</span>
+    <span class="n">new_im</span><span class="o">.</span><span class="n">paste</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="p">((</span><span class="n">new_width</span> <span class="o">-</span> <span class="n">new_size</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
+                      <span class="p">(</span><span class="n">new_width</span> <span class="o">-</span> <span class="n">new_size</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">//</span> <span class="mi">2</span><span class="p">))</span>
+    <span class="n">new_im</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">im_path</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_get_marker_color</span><span class="p">(</span><span class="n">annotation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the color of a DigitalMicrograph annotation</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    annotation : dict</span>
+<span class="sd">        The tag dictionary for a given annotation from a DigitalMicrograph</span>
+<span class="sd">        tag structure</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    color : str or tuple</span>
+<span class="sd">        Either an RGB tuple, or string containing a color name</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="p">(</span><span class="s1">&#39;ForegroundColor&#39;</span> <span class="ow">in</span> <span class="n">annotation</span><span class="p">)</span> <span class="ow">or</span> <span class="p">(</span><span class="s1">&#39;Color&#39;</span> <span class="ow">in</span> <span class="n">annotation</span><span class="p">):</span>
+        <span class="c1"># There seems to be 3 different colors in annotations in</span>
+        <span class="c1"># dm3-files: Color, ForegroundColor and BackgroundColor.</span>
+        <span class="c1"># ForegroundColor and BackgroundColor seems to be present</span>
+        <span class="c1"># for all annotations. Color is present in some of them.</span>
+        <span class="c1"># If Color is present, it seems to override the others.</span>
+        <span class="c1"># Currently, BackgroundColor is not utilized, due to</span>
+        <span class="c1"># HyperSpy markers only supporting a single color.</span>
+        <span class="k">if</span> <span class="s1">&#39;Color&#39;</span> <span class="ow">in</span> <span class="n">annotation</span><span class="p">:</span>
+            <span class="n">color_raw</span> <span class="o">=</span> <span class="n">annotation</span><span class="p">[</span><span class="s1">&#39;Color&#39;</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">color_raw</span> <span class="o">=</span> <span class="n">annotation</span><span class="p">[</span><span class="s1">&#39;ForegroundColor&#39;</span><span class="p">]</span>
+        <span class="c1"># Colors in DM are saved as negative values</span>
+        <span class="c1"># Some values are also in 16-bit</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">raw_value</span> <span class="ow">in</span> <span class="n">color_raw</span><span class="p">:</span>
+            <span class="n">raw_value</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="n">raw_value</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">raw_value</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">raw_value</span> <span class="o">/=</span> <span class="mi">2</span><span class="o">**</span><span class="mi">16</span>
+            <span class="n">color</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">raw_value</span><span class="p">)</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">color</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">color</span> <span class="o">=</span> <span class="s1">&#39;red&#39;</span>
+
+    <span class="k">return</span> <span class="n">color</span>
+
+
+<span class="k">def</span> <span class="nf">_get_marker_props</span><span class="p">(</span><span class="n">annotation</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the properties of a DigitalMicrograph annotation</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    annotation : dict</span>
+<span class="sd">        The tag dictionary for a given annotation from a DigitalMicrograph</span>
+<span class="sd">        tag structure</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    marker_properties : dict</span>
+<span class="sd">        A dictionary containing various properties for this</span>
+<span class="sd">        annotation/marker, such as line width, style, etc.</span>
+<span class="sd">    temp_dict : dict</span>
+<span class="sd">        A dictionary that contains the marker type</span>
+<span class="sd">    marker_text : None or str</span>
+<span class="sd">        If present, the text of a textual annotation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">marker_properties</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">temp_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">marker_text</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">if</span> <span class="s1">&#39;AnnotationType&#39;</span> <span class="ow">in</span> <span class="n">annotation</span><span class="p">:</span>
+        <span class="n">annotation_type</span> <span class="o">=</span> <span class="n">annotation</span><span class="p">[</span><span class="s1">&#39;AnnotationType&#39;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">annotation_type</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">temp_dict</span><span class="p">[</span><span class="s1">&#39;marker_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;LineSegment&quot;</span>
+            <span class="n">marker_properties</span><span class="p">[</span><span class="s1">&#39;linewidth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">elif</span> <span class="n">annotation_type</span> <span class="o">==</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Arrow marker not loaded: not implemented&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">annotation_type</span> <span class="o">==</span> <span class="mi">4</span><span class="p">:</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Double arrow marker not loaded: not implemented&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">annotation_type</span> <span class="o">==</span> <span class="mi">5</span><span class="p">:</span>
+            <span class="n">temp_dict</span><span class="p">[</span><span class="s1">&#39;marker_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Rectangle&quot;</span>
+            <span class="n">marker_properties</span><span class="p">[</span><span class="s1">&#39;linewidth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">elif</span> <span class="n">annotation_type</span> <span class="o">==</span> <span class="mi">6</span><span class="p">:</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Ellipse marker not loaded: not implemented&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">annotation_type</span> <span class="o">==</span> <span class="mi">8</span><span class="p">:</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Mask spot marker not loaded: not implemented&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">annotation_type</span> <span class="o">==</span> <span class="mi">9</span><span class="p">:</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Mask array marker not loaded: not implemented&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">annotation_type</span> <span class="o">==</span> <span class="mi">13</span><span class="p">:</span>
+            <span class="n">temp_dict</span><span class="p">[</span><span class="s1">&#39;marker_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Text&quot;</span>
+            <span class="n">marker_text</span> <span class="o">=</span> <span class="n">annotation</span><span class="p">[</span><span class="s1">&#39;Text&#39;</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="n">annotation_type</span> <span class="o">==</span> <span class="mi">15</span><span class="p">:</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s1">&#39;Mask band pass marker not loaded: not implemented&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">annotation_type</span> <span class="o">==</span> <span class="mi">19</span><span class="p">:</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s1">&#39;Mask wedge marker not loaded: not implemented&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">annotation_type</span> <span class="o">==</span> <span class="mi">23</span><span class="p">:</span>  <span class="c1"># roirectangle</span>
+            <span class="n">temp_dict</span><span class="p">[</span><span class="s1">&#39;marker_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Rectangle&quot;</span>
+            <span class="n">marker_properties</span><span class="p">[</span><span class="s1">&#39;linestyle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;--&#39;</span>
+            <span class="n">marker_properties</span><span class="p">[</span><span class="s1">&#39;linewidth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">elif</span> <span class="n">annotation_type</span> <span class="o">==</span> <span class="mi">25</span><span class="p">:</span>  <span class="c1"># roiline</span>
+            <span class="n">temp_dict</span><span class="p">[</span><span class="s1">&#39;marker_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;LineSegment&quot;</span>
+            <span class="n">marker_properties</span><span class="p">[</span><span class="s1">&#39;linestyle&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;--&#39;</span>
+            <span class="n">marker_properties</span><span class="p">[</span><span class="s1">&#39;linewidth&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="k">elif</span> <span class="n">annotation_type</span> <span class="o">==</span> <span class="mi">27</span><span class="p">:</span>
+            <span class="n">temp_dict</span><span class="p">[</span><span class="s1">&#39;marker_type&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Point&quot;</span>
+        <span class="k">elif</span> <span class="n">annotation_type</span> <span class="o">==</span> <span class="mi">29</span><span class="p">:</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                    <span class="s1">&#39;ROI curve marker not loaded: not implemented&#39;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">annotation_type</span> <span class="o">==</span> <span class="mi">31</span><span class="p">:</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;Scalebar marker not loaded: not implemented&#39;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">marker_properties</span><span class="p">,</span> <span class="n">temp_dict</span><span class="p">,</span> <span class="n">marker_text</span>
+
+
+<span class="k">def</span> <span class="nf">_get_markers_dict</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">tags_dict</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    s : :py:class:`hyperspy.signal.BaseSignal`</span>
+<span class="sd">        The HyperSpy signal from which annotations should be read</span>
+<span class="sd">    tags_dict : dict</span>
+<span class="sd">        The dictionary of DigitalMicrograph tags (saved as</span>
+<span class="sd">        ``s.original_metadata``)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    markers_dict : dict</span>
+<span class="sd">        The Markers that correspond to the annotations found in `s`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">scale_y</span><span class="p">,</span> <span class="n">scale_x</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">scale</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">scale</span>
+    <span class="n">offset_y</span><span class="p">,</span> <span class="n">offset_x</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="p">[</span><span class="s1">&#39;y&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">offset</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="p">[</span><span class="s1">&#39;x&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">offset</span>
+
+    <span class="n">markers_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="n">annotations_dict</span> <span class="o">=</span> <span class="n">tags_dict</span><span class="p">[</span>
+            <span class="s1">&#39;DocumentObjectList&#39;</span><span class="p">][</span><span class="s1">&#39;TagGroup0&#39;</span><span class="p">][</span><span class="s1">&#39;AnnotationGroupList&#39;</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">annotation</span> <span class="ow">in</span> <span class="n">annotations_dict</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>
+        <span class="k">if</span> <span class="s1">&#39;Rectangle&#39;</span> <span class="ow">in</span> <span class="n">annotation</span><span class="p">:</span>
+            <span class="n">position</span> <span class="o">=</span> <span class="n">annotation</span><span class="p">[</span><span class="s1">&#39;Rectangle&#39;</span><span class="p">]</span>
+        <span class="n">marker_properties</span><span class="p">,</span> <span class="n">temp_dict</span><span class="p">,</span> <span class="n">marker_text</span> <span class="o">=</span> \
+            <span class="n">_get_marker_props</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;marker_type&#39;</span> <span class="ow">in</span> <span class="n">temp_dict</span><span class="p">:</span>
+            <span class="n">color</span> <span class="o">=</span> <span class="n">_get_marker_color</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;Label&#39;</span> <span class="ow">in</span> <span class="n">annotation</span><span class="p">:</span>
+                <span class="c1"># Some annotations contains an empty label, which are</span>
+                <span class="c1"># represented in the input dict as an empty list: []</span>
+                <span class="k">if</span> <span class="n">annotation</span><span class="p">[</span><span class="s1">&#39;Label&#39;</span><span class="p">]</span> <span class="o">!=</span> <span class="p">[]:</span>
+                    <span class="n">marker_label</span> <span class="o">=</span> <span class="n">annotation</span><span class="p">[</span><span class="s1">&#39;Label&#39;</span><span class="p">]</span>
+                    <span class="n">label_marker_dict</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s1">&#39;marker_type&#39;</span><span class="p">:</span> <span class="s2">&quot;Text&quot;</span><span class="p">,</span>
+                        <span class="s1">&#39;plot_marker&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                        <span class="s1">&#39;plot_on_signal&#39;</span><span class="p">:</span> <span class="kc">True</span><span class="p">,</span>
+                        <span class="s1">&#39;axes_manager&#39;</span><span class="p">:</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="p">,</span>
+                        <span class="s1">&#39;data&#39;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s1">&#39;y1&#39;</span><span class="p">:</span> <span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale_y</span><span class="o">+</span><span class="n">offset_y</span><span class="p">,</span>
+                            <span class="s1">&#39;x1&#39;</span><span class="p">:</span> <span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale_x</span><span class="o">+</span><span class="n">offset_x</span><span class="p">,</span>
+                            <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+                            <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">marker_label</span><span class="p">,</span>
+                            <span class="p">},</span>
+                        <span class="s1">&#39;marker_properties&#39;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s1">&#39;color&#39;</span><span class="p">:</span> <span class="n">color</span><span class="p">,</span>
+                            <span class="s1">&#39;va&#39;</span><span class="p">:</span> <span class="s1">&#39;bottom&#39;</span><span class="p">,</span>
+                            <span class="p">}</span>
+                        <span class="p">}</span>
+                    <span class="n">marker_name</span> <span class="o">=</span> <span class="s2">&quot;Text&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">annotation</span><span class="p">[</span><span class="s1">&#39;UniqueID&#39;</span><span class="p">])</span>
+                    <span class="n">markers_dict</span><span class="p">[</span><span class="n">marker_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">label_marker_dict</span>
+
+            <span class="n">marker_properties</span><span class="p">[</span><span class="s1">&#39;color&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">color</span>
+            <span class="n">temp_dict</span><span class="p">[</span><span class="s1">&#39;plot_on_signal&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="n">temp_dict</span><span class="p">[</span><span class="s1">&#39;plot_marker&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+            <span class="n">temp_dict</span><span class="p">[</span><span class="s1">&#39;axes_manager&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="p">,</span>
+            <span class="n">temp_dict</span><span class="p">[</span><span class="s1">&#39;data&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;y1&#39;</span><span class="p">:</span> <span class="n">position</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">*</span><span class="n">scale_y</span><span class="o">+</span><span class="n">offset_y</span><span class="p">,</span>
+                <span class="s1">&#39;x1&#39;</span><span class="p">:</span> <span class="n">position</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">*</span><span class="n">scale_x</span><span class="o">+</span><span class="n">offset_x</span><span class="p">,</span>
+                <span class="s1">&#39;y2&#39;</span><span class="p">:</span> <span class="n">position</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">*</span><span class="n">scale_y</span><span class="o">+</span><span class="n">offset_y</span><span class="p">,</span>
+                <span class="s1">&#39;x2&#39;</span><span class="p">:</span> <span class="n">position</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span><span class="o">*</span><span class="n">scale_x</span><span class="o">+</span><span class="n">offset_x</span><span class="p">,</span>
+                <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+                <span class="s1">&#39;text&#39;</span><span class="p">:</span> <span class="n">marker_text</span><span class="p">,</span>
+            <span class="p">}</span>
+            <span class="n">temp_dict</span><span class="p">[</span><span class="s1">&#39;marker_properties&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">marker_properties</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">temp_dict</span><span class="p">[</span><span class="s1">&#39;marker_type&#39;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">annotation</span><span class="p">[</span><span class="s1">&#39;UniqueID&#39;</span><span class="p">])</span>
+            <span class="n">markers_dict</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">temp_dict</span>
+
+    <span class="k">return</span> <span class="n">markers_dict</span>
+
+
+<div class="viewcode-block" id="add_annotation_markers"><a class="viewcode-back" href="../../../api/nexusLIMS.extractors.html#nexusLIMS.extractors.thumbnail_generator.add_annotation_markers">[docs]</a><span class="k">def</span> <span class="nf">add_annotation_markers</span><span class="p">(</span><span class="n">s</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Read annotations from a signal originating from DigitalMicrograph and</span>
+<span class="sd">    convert the ones (that we can) into Hyperspy markers for plotting.</span>
+<span class="sd">    Adapted from a currently (at the time of writing) open `pull request`_ in</span>
+<span class="sd">    HyperSpy.</span>
+
+<span class="sd">    .. _pull request: https://github.com/hyperspy/hyperspy/pull/1491</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    s : :py:class:`hyperspy.signal.BaseSignal` (or subclass)</span>
+<span class="sd">        The HyperSpy signal for which a thumbnail should be generated</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Parsing markers can potentially lead to errors, so to avoid</span>
+    <span class="c1"># this any Exceptions are caught and logged instead of the files</span>
+    <span class="c1"># not being loaded at all.</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">markers_dict</span> <span class="o">=</span> <span class="n">_get_markers_dict</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">original_metadata</span><span class="o">.</span><span class="n">as_dictionary</span><span class="p">())</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">err</span><span class="p">:</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;Markers could not be loaded from the file &quot;</span>
+            <span class="s2">&quot;due to: </span><span class="si">{0}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">err</span><span class="p">))</span>
+        <span class="n">markers_dict</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">markers_dict</span><span class="p">:</span>
+        <span class="n">markers_list</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">markers_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># convert each marker dictionary item into a Marker object</span>
+            <span class="n">markers_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_dict2marker</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">k</span><span class="p">))</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">markers_list</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># add the Marker objects (in a list) to the signal</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">add_marker</span><span class="p">(</span><span class="n">markers_list</span><span class="p">,</span> <span class="n">permanent</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="sig_to_thumbnail"><a class="viewcode-back" href="../../../api/nexusLIMS.extractors.html#nexusLIMS.extractors.thumbnail_generator.sig_to_thumbnail">[docs]</a><span class="k">def</span> <span class="nf">sig_to_thumbnail</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">out_path</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">92</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Generate a preview thumbnail from an arbitrary HyperSpy signal. For a 2D</span>
+<span class="sd">    signal, the signal from the first navigation position is used (most</span>
+<span class="sd">    likely the top- and left-most position. For a 1D signal (*i.e.* a</span>
+<span class="sd">    spectrum or spectrum image), the output depends on the</span>
+<span class="sd">    number of navigation dimensions:</span>
+
+<span class="sd">    - 0: Image of spectrum</span>
+<span class="sd">    - 1: Image of linescan (*a la* DigitalMicrograph)</span>
+<span class="sd">    - 2: Image of spectra sampled from navigation space</span>
+<span class="sd">    - 2+: As for 2 dimensions</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    s : :py:class:`hyperspy.signal.BaseSignal` (or subclass)</span>
+<span class="sd">        The HyperSpy signal for which a thumbnail should be generated</span>
+<span class="sd">    out_path : str</span>
+<span class="sd">        A path to the desired thumbnail filename. All formats supported by</span>
+<span class="sd">        :py:meth:`~matplotlib.figure.Figure.savefig` can be used.</span>
+<span class="sd">    dpi : int</span>
+<span class="sd">        The &quot;dots per inch&quot; resolution for the outputted figure</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    f : :py:class:`matplotlib.figure.Figure`</span>
+<span class="sd">        Handle to a matplotlib Figure</span>
+
+<span class="sd">    Notes</span>
+<span class="sd">    -----</span>
+<span class="sd">    This method heavily utilizes HyperSpy&#39;s existing plotting functions to</span>
+<span class="sd">    figure out how to best display the image</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span> <span class="nf">_set_extent_and_save</span><span class="p">():</span>
+        <span class="n">_set_title</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">General</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">items</span> <span class="o">=</span> <span class="p">[</span><span class="n">ax</span><span class="p">,</span> <span class="n">ax</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="n">ax</span><span class="o">.</span><span class="n">xaxis</span><span class="o">.</span><span class="n">label</span><span class="p">,</span> <span class="n">ax</span><span class="o">.</span><span class="n">yaxis</span><span class="o">.</span><span class="n">label</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">labels</span> <span class="ow">in</span> <span class="n">_get_visible_labels</span><span class="p">(</span><span class="n">ax</span><span class="p">):</span>
+            <span class="n">items</span> <span class="o">+=</span> <span class="n">labels</span>
+        <span class="n">extent</span> <span class="o">=</span> <span class="n">_full_extent</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">items</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.05</span><span class="p">)</span><span class="o">.</span><span class="n">transformed</span><span class="p">(</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">dpi_scale_trans</span><span class="o">.</span><span class="n">inverted</span><span class="p">())</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="n">extent</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+        <span class="n">_pad_to_square</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+        <span class="c1"># _plt.close(f)</span>
+
+    <span class="c1"># close all currently open plots to ensure we don&#39;t leave a mess behind</span>
+    <span class="c1"># in memory</span>
+    <span class="n">_plt</span><span class="o">.</span><span class="n">close</span><span class="p">(</span><span class="s1">&#39;all&#39;</span><span class="p">)</span>
+    <span class="n">_plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;image.cmap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;gray&#39;</span>
+
+    <span class="c1"># Processing 1D signals (spectra, spectrum images, etc)</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_hsapi</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">Signal1D</span><span class="p">):</span>
+        <span class="c1"># signal is single spectrum</span>
+        <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">navigation_dimension</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+            <span class="c1"># get signal plot figure</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">_plot</span><span class="o">.</span><span class="n">signal_plot</span><span class="o">.</span><span class="n">figure</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">get_axes</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># Change line color to matplotlib default</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">get_lines</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">set_color</span><span class="p">(</span><span class="n">_plt</span><span class="o">.</span><span class="n">get_cmap</span><span class="p">(</span><span class="s1">&#39;tab10&#39;</span><span class="p">)(</span><span class="mi">0</span><span class="p">))</span>
+            <span class="n">_set_extent_and_save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">f</span>
+        <span class="c1"># signal is 1D linescan</span>
+        <span class="k">elif</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">navigation_dimension</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">_plot</span><span class="o">.</span><span class="n">pointer</span><span class="o">.</span><span class="n">set_on</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>       <span class="c1"># remove pointer</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">_plot</span><span class="o">.</span><span class="n">navigator_plot</span><span class="o">.</span><span class="n">figure</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">get_axes</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>            <span class="c1"># remove colorbar scale</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">get_axes</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">_set_extent_and_save</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">f</span>
+        <span class="k">elif</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">navigation_dimension</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">nav_size</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">navigation_size</span>
+            <span class="k">if</span> <span class="n">nav_size</span> <span class="o">&gt;=</span> <span class="mi">9</span><span class="p">:</span>
+                <span class="n">n_to_plot</span> <span class="o">=</span> <span class="mi">9</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">n_to_plot</span> <span class="o">=</span> <span class="n">nav_size</span>
+
+            <span class="c1"># temporarily unfold the signal so we can get spectra from all</span>
+            <span class="c1"># over the navigation space easily:</span>
+            <span class="k">with</span> <span class="n">s</span><span class="o">.</span><span class="n">unfolded</span><span class="p">():</span>
+                <span class="n">idx_to_plot</span> <span class="o">=</span> <span class="n">_np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">nav_size</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="n">n_to_plot</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+                <span class="n">s_to_plot</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="o">.</span><span class="n">inav</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">idx_to_plot</span><span class="p">]</span>
+
+            <span class="n">f</span> <span class="o">=</span> <span class="n">_plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+            <span class="n">_hsapi</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">plot_spectra</span><span class="p">(</span><span class="n">s_to_plot</span><span class="p">,</span> <span class="n">style</span><span class="o">=</span><span class="s1">&#39;cascade&#39;</span><span class="p">,</span>
+                                     <span class="n">padding</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">_plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+
+            <span class="n">desc</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\ x\ &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
+                                  <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">navigation_shape</span><span class="p">])</span>
+
+            <span class="n">_set_title</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">General</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_title</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="sa">r</span><span class="s2">&quot;$\bf{&quot;</span> <span class="o">+</span>
+                         <span class="n">desc</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;\ Spectrum\ Image}$&#39;</span><span class="p">)</span>
+
+            <span class="c1"># Load &quot;watermark&quot; stamp and rescale to be appropriately sized</span>
+            <span class="n">stamp</span> <span class="o">=</span> <span class="n">_imread</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_dir_path</span><span class="p">,</span>
+                                          <span class="s1">&#39;spectrum_image_logo.svg.png&#39;</span><span class="p">))</span>
+            <span class="n">width</span><span class="p">,</span> <span class="n">height</span> <span class="o">=</span> <span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">get_size_inches</span><span class="p">()</span> <span class="o">*</span> <span class="n">f</span><span class="o">.</span><span class="n">dpi</span>
+            <span class="n">stamp_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">width</span> <span class="o">/</span> <span class="mf">2.5</span><span class="p">)</span>
+            <span class="n">scaling</span> <span class="o">=</span> <span class="p">(</span><span class="n">stamp_width</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">stamp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="n">stamp_height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">stamp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">scaling</span><span class="p">))</span>
+            <span class="n">stamp</span> <span class="o">=</span> <span class="n">_resize</span><span class="p">(</span><span class="n">stamp</span><span class="p">,</span> <span class="p">(</span><span class="n">stamp_width</span><span class="p">,</span> <span class="n">stamp_height</span><span class="p">),</span>
+                            <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wrap&#39;</span><span class="p">,</span> <span class="n">anti_aliasing</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="c1"># Create matplotlib annotation with image in center</span>
+            <span class="n">imagebox</span> <span class="o">=</span> <span class="n">_OIm</span><span class="p">(</span><span class="n">stamp</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">15</span><span class="p">)</span>
+            <span class="n">imagebox</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">axes</span> <span class="o">=</span> <span class="n">ax</span>
+            <span class="n">ao</span> <span class="o">=</span> <span class="n">_AOb</span><span class="p">(</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">borderpad</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">child</span><span class="o">=</span><span class="n">imagebox</span><span class="p">)</span>
+            <span class="n">ao</span><span class="o">.</span><span class="n">patch</span><span class="o">.</span><span class="n">set_alpha</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">add_artist</span><span class="p">(</span><span class="n">ao</span><span class="p">)</span>
+
+            <span class="c1"># Pack figure and save</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+            <span class="n">_pad_to_square</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">f</span>
+
+    <span class="c1"># Signal is an image of some sort, so we&#39;ll use hs.plot.plot_images</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_hsapi</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">Signal2D</span><span class="p">):</span>
+        <span class="c1"># signal is single image</span>
+        <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">navigation_dimension</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="c1"># check to see if this is a dm3/dm4; if so try to plot with</span>
+            <span class="c1"># annotations</span>
+            <span class="n">orig_fname</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">General</span><span class="o">.</span><span class="n">original_filename</span>
+            <span class="k">if</span> <span class="s1">&#39;.dm3&#39;</span> <span class="ow">in</span> <span class="n">orig_fname</span> <span class="ow">or</span> <span class="s1">&#39;.dm4&#39;</span> <span class="ow">in</span> <span class="n">orig_fname</span><span class="p">:</span>
+                <span class="n">add_annotation_markers</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">colorbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">_plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">_hsapi</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">plot_images</span><span class="p">([</span><span class="n">s</span><span class="p">],</span> <span class="n">axes_decor</span><span class="o">=</span><span class="s1">&#39;off&#39;</span><span class="p">,</span>
+                                        <span class="n">colorbar</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">scalebar</span><span class="o">=</span><span class="s1">&#39;all&#39;</span><span class="p">,</span>
+                                        <span class="n">label</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+            <span class="n">f</span> <span class="o">=</span> <span class="n">_plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">_plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+            <span class="n">_set_title</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">General</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+            <span class="n">_pad_to_square</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">f</span>
+
+        <span class="c1"># we&#39;re looking at an image stack</span>
+        <span class="k">elif</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">navigation_dimension</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">_plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+            <span class="n">_plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">_project_image_stack</span><span class="p">(</span>
+                <span class="n">s</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">navigation_size</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">))</span>
+            <span class="n">ax</span> <span class="o">=</span> <span class="n">_plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_position</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+            <span class="n">_set_title</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">General</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_title</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                         <span class="sa">r</span><span class="s2">&quot;$\bf{&quot;</span> <span class="o">+</span> <span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">navigation_size</span><span class="p">)</span> <span class="o">+</span>
+                         <span class="sa">r</span><span class="s1">&#39;-member&#39;</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;\ Image\ Series}$&#39;</span><span class="p">)</span>
+            <span class="c1"># use _full_extent to determine the bounding box needed to pick</span>
+            <span class="c1"># out just the items we&#39;re interested in</span>
+            <span class="n">extent</span> <span class="o">=</span> <span class="n">_full_extent</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="p">[</span><span class="n">ax</span><span class="p">,</span> <span class="n">ax</span><span class="o">.</span><span class="n">title</span><span class="p">],</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span><span class="o">.</span><span class="n">transformed</span><span class="p">(</span>
+                <span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">dpi_scale_trans</span><span class="o">.</span><span class="n">inverted</span><span class="p">())</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="n">extent</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+            <span class="n">_pad_to_square</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">ax</span><span class="o">.</span><span class="n">figure</span>
+
+        <span class="c1"># This is a 4D-STEM type image, so display as tableau</span>
+        <span class="k">elif</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">navigation_dimension</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">asp_ratio</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">signal_shape</span><span class="p">[</span>
+                            <span class="mi">1</span><span class="p">]</span><span class="o">/</span><span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">signal_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">width</span> <span class="o">=</span> <span class="mi">6</span>
+            <span class="n">f</span> <span class="o">=</span> <span class="n">_plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="n">width</span><span class="p">,</span> <span class="n">width</span> <span class="o">*</span> <span class="n">asp_ratio</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">navigation_size</span> <span class="o">&gt;=</span> <span class="mi">9</span><span class="p">:</span>
+                <span class="n">square_n</span> <span class="o">=</span> <span class="mi">3</span>
+            <span class="k">elif</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">navigation_size</span> <span class="o">&gt;=</span> <span class="mi">4</span><span class="p">:</span>
+                <span class="n">square_n</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">square_n</span> <span class="o">=</span> <span class="mi">1</span>
+            <span class="n">num_to_plot</span> <span class="o">=</span> <span class="n">square_n</span><span class="o">**</span><span class="mi">2</span>
+            <span class="n">im_list</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="n">num_to_plot</span>
+            <span class="n">desc</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;\ x\ &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span>
+                                  <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">navigation_shape</span><span class="p">])</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">unfold_navigation_space</span><span class="p">()</span>
+            <span class="n">chunk_size</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">navigation_size</span> <span class="o">//</span> <span class="n">num_to_plot</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_to_plot</span><span class="p">):</span>
+                <span class="k">if</span> <span class="n">square_n</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                    <span class="n">im_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">]</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">im_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">inav</span><span class="p">[</span><span class="n">i</span> <span class="o">*</span> <span class="n">chunk_size</span><span class="p">:</span>
+                                        <span class="p">(</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="p">)</span> <span class="o">*</span> <span class="n">chunk_size</span><span class="p">]</span><span class="o">.</span><span class="n">inav</span><span class="p">[</span><span class="n">chunk_size</span><span class="o">//</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">axlist</span> <span class="o">=</span> <span class="n">_hsapi</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">plot_images</span><span class="p">(</span><span class="n">im_list</span><span class="p">,</span> <span class="n">colorbar</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                                             <span class="n">axes_decor</span><span class="o">=</span><span class="s1">&#39;off&#39;</span><span class="p">,</span>
+                                             <span class="n">tight_layout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">scalebar</span><span class="o">=</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                                             <span class="n">per_row</span><span class="o">=</span><span class="n">square_n</span><span class="p">,</span> <span class="n">fig</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+
+            <span class="c1"># Make sure scalebar is fully on plot:</span>
+            <span class="n">txt</span> <span class="o">=</span> <span class="n">axlist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">texts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">left_extent</span> <span class="o">=</span> <span class="n">txt</span><span class="o">.</span><span class="n">get_window_extent</span><span class="p">()</span><span class="o">.</span><span class="n">transformed</span><span class="p">(</span>
+                          <span class="n">axlist</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">transData</span><span class="o">.</span><span class="n">inverted</span><span class="p">())</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">left_extent</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># Move scalebar text over if it overlaps outside of axis</span>
+                <span class="n">txt</span><span class="o">.</span><span class="n">set_x</span><span class="p">(</span><span class="n">txt</span><span class="o">.</span><span class="n">get_position</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="o">+</span> <span class="n">left_extent</span> <span class="o">*</span> <span class="o">-</span><span class="mi">1</span><span class="p">)</span>
+            <span class="c1"># txt.set_y(txt.get_position()[1]*1.1)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">suptitle</span><span class="p">(</span><span class="n">_textwrap</span><span class="o">.</span><span class="n">fill</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">General</span><span class="o">.</span><span class="n">title</span><span class="p">,</span> <span class="mi">60</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
+                       <span class="sa">r</span><span class="s2">&quot;$\bf{&quot;</span> <span class="o">+</span> <span class="n">desc</span> <span class="o">+</span> <span class="sa">r</span><span class="s1">&#39;\ Hyperimage}$&#39;</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">(</span><span class="n">rect</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span>
+                                 <span class="n">f</span><span class="o">.</span><span class="n">texts</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">get_window_extent</span><span class="p">()</span><span class="o">.</span><span class="n">transformed</span><span class="p">(</span>
+                                     <span class="n">f</span><span class="o">.</span><span class="n">transFigure</span><span class="o">.</span><span class="n">inverted</span><span class="p">())</span><span class="o">.</span><span class="n">bounds</span><span class="p">[</span><span class="mi">1</span><span class="p">]))</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">)</span>
+            <span class="n">_pad_to_square</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">f</span>
+
+    <span class="c1"># Complex image, so plot power spectrum (like an FFT)</span>
+    <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">_hsapi</span><span class="o">.</span><span class="n">signals</span><span class="o">.</span><span class="n">ComplexSignal2D</span><span class="p">):</span>
+        <span class="c1"># in tests, setting minimum to a percentile around 66% looks good</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">amplitude</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">interpolation</span><span class="o">=</span><span class="s1">&#39;bilinear&#39;</span><span class="p">,</span> <span class="n">norm</span><span class="o">=</span><span class="s1">&#39;log&#39;</span><span class="p">,</span>
+                         <span class="n">vmin</span><span class="o">=</span><span class="n">_np</span><span class="o">.</span><span class="n">nanpercentile</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">amplitude</span><span class="o">.</span><span class="n">data</span><span class="p">,</span> <span class="mi">66</span><span class="p">),</span>
+                         <span class="n">colorbar</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">axes_off</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">_plt</span><span class="o">.</span><span class="n">gcf</span><span class="p">()</span>
+        <span class="n">ax</span> <span class="o">=</span> <span class="n">_plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
+        <span class="n">_set_title</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">General</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
+        <span class="n">extent</span> <span class="o">=</span> <span class="n">_full_extent</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="p">[</span><span class="n">ax</span><span class="p">,</span> <span class="n">ax</span><span class="o">.</span><span class="n">title</span><span class="p">],</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span><span class="o">.</span><span class="n">transformed</span><span class="p">(</span>
+                              <span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">dpi_scale_trans</span><span class="o">.</span><span class="n">inverted</span><span class="p">())</span>
+        <span class="n">f</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="n">extent</span><span class="p">)</span>
+        <span class="n">_pad_to_square</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">f</span>
+
+    <span class="c1"># if we have a different type of signal, just output a graphical</span>
+    <span class="c1"># representation of the axis manager</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">f</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">_plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">()</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_position</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
+
+        <span class="c1"># Remove axes_manager text</span>
+        <span class="n">ax_m</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="fm">__repr__</span><span class="p">()</span>
+        <span class="n">ax_m</span> <span class="o">=</span> <span class="n">ax_m</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">ax_m</span> <span class="o">=</span> <span class="n">ax_m</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="n">ax_m</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ax_m</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.03</span><span class="p">,</span> <span class="o">.</span><span class="mi">9</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">General</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+                <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.85</span><span class="p">,</span> <span class="s1">&#39;Could not generate preview image&#39;</span><span class="p">,</span>
+                <span class="n">va</span><span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="s1">&#39;Axes information:&#39;</span><span class="p">,</span>
+                <span class="n">va</span><span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="n">fontstyle</span><span class="o">=</span><span class="s1">&#39;italic&#39;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.03</span><span class="p">,</span> <span class="o">.</span><span class="mi">75</span><span class="p">,</span> <span class="n">ax_m</span><span class="p">,</span>
+                <span class="n">fontfamily</span><span class="o">=</span><span class="s1">&#39;monospace&#39;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">)</span>
+
+        <span class="n">extent</span> <span class="o">=</span> <span class="n">_full_extent</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">ax</span><span class="o">.</span><span class="n">texts</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span><span class="o">.</span><span class="n">transformed</span><span class="p">(</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">dpi_scale_trans</span><span class="o">.</span><span class="n">inverted</span><span class="p">())</span>
+
+        <span class="n">f</span><span class="o">.</span><span class="n">savefig</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">bbox_inches</span><span class="o">=</span><span class="n">extent</span><span class="p">,</span> <span class="n">dpi</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+        <span class="n">_pad_to_square</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="mi">500</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">f</span></div>
+
+
+<div class="viewcode-block" id="down_sample_image"><a class="viewcode-back" href="../../../api/nexusLIMS.extractors.html#nexusLIMS.extractors.thumbnail_generator.down_sample_image">[docs]</a><span class="k">def</span> <span class="nf">down_sample_image</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">out_path</span><span class="p">,</span> <span class="n">output_size</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">factor</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Load an image file from disk, down-sample it to the requested dpi, and save.</span>
+<span class="sd">    Sometimes the data doesn&#39;t need to be loaded as a HyperSpy signal,</span>
+<span class="sd">    and it&#39;s better just to down-sample existing image data (such as for .tif</span>
+<span class="sd">    files created by the Quanta SEM).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fname : str</span>
+<span class="sd">        The filepath that will be resized. All formats supported by</span>
+<span class="sd">        :py:func:`PIL.Image.open` can be used</span>
+<span class="sd">    out_path : str</span>
+<span class="sd">        A path to the desired thumbnail filename. All formats supported by</span>
+<span class="sd">        :py:meth:`PIL.Image.Image.save` can be used.</span>
+<span class="sd">    output_size : tuple</span>
+<span class="sd">        A tuple of ints specifying the width and height of the output image.</span>
+<span class="sd">        Either this argument or ``factor`` should be provided (not both).</span>
+<span class="sd">    factor : int</span>
+<span class="sd">        The multiple of the image size to reduce by (i.e. a value of 2</span>
+<span class="sd">        results in an image that is 50% of each original dimension). Either</span>
+<span class="sd">        this argument or ``output_size`` should be provided (not both).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">output_size</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">factor</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;One of output_size or factor must be provided&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">output_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">factor</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Only one of output_size or factor should be provided&#39;</span><span class="p">)</span>
+
+    <span class="n">im</span> <span class="o">=</span> <span class="n">_PILImage</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+    <span class="n">size</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">size</span>
+
+    <span class="k">if</span> <span class="n">output_size</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">resized</span> <span class="o">=</span> <span class="n">output_size</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">resized</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="n">s</span><span class="o">//</span><span class="n">factor</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">size</span><span class="p">])</span>
+
+    <span class="c1"># if im.mode not in [&#39;RGB&#39;, &#39;RGBA&#39;, &#39;CMYK&#39;, &#39;YCbCr&#39;, &#39;LAB&#39;, &#39;HSV&#39;]:</span>
+    <span class="c1">#     im = im.convert(&#39;I&#39;)    # convert to 8-bit</span>
+    <span class="k">if</span> <span class="s1">&#39;I&#39;</span> <span class="ow">in</span> <span class="n">im</span><span class="o">.</span><span class="n">mode</span><span class="p">:</span>
+        <span class="n">im</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">point</span><span class="p">(</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="n">i</span> <span class="o">*</span> <span class="p">(</span><span class="mf">1.</span> <span class="o">/</span> <span class="mi">256</span><span class="p">))</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s1">&#39;L&#39;</span><span class="p">)</span>
+
+    <span class="n">im</span><span class="o">.</span><span class="n">thumbnail</span><span class="p">(</span><span class="n">resized</span><span class="p">,</span> <span class="n">resample</span><span class="o">=</span><span class="n">_LANCZOS</span><span class="p">)</span>
+    <span class="n">im</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="n">out_path</span><span class="p">)</span>
+    <span class="n">_pad_to_square</span><span class="p">(</span><span class="n">out_path</span><span class="p">,</span> <span class="n">new_width</span><span class="o">=</span><span class="mi">500</span><span class="p">)</span>
+
+    <span class="n">_plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">&#39;image.cmap&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;gray&#39;</span>
+    <span class="n">f</span> <span class="o">=</span> <span class="n">_plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+    <span class="n">f</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">im</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">f</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+  
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2020, NIST Office of Data and Informatics.<br/>
+      Last updated on Oct, 19, 2020.<br/>
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>
