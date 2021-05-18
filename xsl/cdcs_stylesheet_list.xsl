@@ -90,7 +90,7 @@
            <xsl:value-of select="$detail_url"/>
          </xsl:attribute>
          <span class="list-record-title">
-           <i class="fa fa-file-text results-icon"/>
+             <i class="fas fa-file-alt results-icon"/>
            <xsl:choose>
              <xsl:when test="$title = 'No matching calendar event found'">
                <xsl:text>Untitled experiment</xsl:text>
@@ -270,7 +270,7 @@
                     title: 'Record sorting',
                     text: 'By default, the records are sorted with the most recently added records first. Use this sort button to change the sorting order.',
                     attachTo: {
-                        element: '#result-button-filter',
+                        element: '#result-button-filter0',
                         on: 'left'
                     },
                     scrollTo: false,

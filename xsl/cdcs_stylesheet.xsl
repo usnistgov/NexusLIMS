@@ -94,7 +94,7 @@
                 </xsl:with-param>
             </xsl:call-template>
         </xsl:variable>
-        <div style="width:95%;">        
+        <div style="width:100%;">        
             <!-- ============ CSS Styling ============ --> 
             <style>
                 .scrollDisabled { /* class to prevent scrolling when modal is shown */
@@ -221,6 +221,15 @@
                     text-align: center !important;
                 }
                 
+                .sidebar div.dataTables_paginate li.paginate_button a i {
+                    vertical-align: middle;
+                }
+                
+                .sidebar .table-sm td {
+                    padding: 5px;
+                    line-height: 1.5em;
+                }
+                
                 .sidebar div { /* Parameters for other text found in the sidebar (e.g. start time) */
                     font-size: 12px;
                 }
@@ -332,7 +341,11 @@
                 .aa_header_row {
                     /* width: 95%; */
                     margin-bottom: .5em;
-                    margin-top: -35px;
+                    margin-top: 10px;
+                }
+                
+                .aa_header_row .dt_paginate_container {
+                    margin-top: 0px;
                 }
                 
                 .accordion { /* Parameters for accordions used to hide parameter / metadata tables */
@@ -415,7 +428,6 @@
                 
                 .close-modal { /* Parameters for 'X' used to close the modal box */
                     color: #000;
-                    float: right;
                     font-size: 28px;
                     font-weight: bold;
                 }
@@ -428,7 +440,7 @@
                 }
                 
                 #filelist-modal .modal-body .filelist-header-row {
-                    
+                    justify-content: space-between;
                 }
                 
                 .help-filelist-modal {
@@ -438,13 +450,14 @@
                     vertical-align: top;
                 }
                 
-                i.help-filelist-modal ~ div.tooltip.in {
+                i.help-filelist-modal > div.tooltip {
                     opacity: 1;
                 }
-                i.help-filelist-modal ~ div.tooltip > div.tooltip-arrow {
+                i.help-filelist-modal > div.tooltip > div.arrow,
+                i.help-filelist-modal > div.tooltip > div.arrow::before {
                     border-bottom-color: #3a65a2;
                 }
-                i.help-filelist-modal ~ div.tooltip > div.tooltip-inner {
+                i.help-filelist-modal > div.tooltip > div.tooltip-inner {
                     background-color: #e5ecf6;
                     color: #474747;
                     max-width: unset;
@@ -536,23 +549,19 @@
                     font-size: small;
                     padding: 0px 10px;
                     white-space: pre-wrap;
-                    margin-bottom: 5px;
                 }
                 #download-extra{
                     font-size: small;
                     padding: 0.5em 10px;
-                    margin-bottom: 5px;
                     white-space: break-spaces;
                     line-height: 1.5em;
                 }
                 #progress_bar {
                     margin-top: 10px;
-                    margin-bottom: 5px;
                 }
                 #btn-cancel-row {
                     text-align: center;
                     margin-top: 10px;
-                    margin-bototm: 5px;
                 }
                 #btn-cancel-row button {
                    font-size: small;
@@ -606,8 +615,12 @@
                 
                 table#summary-table > tbody > tr > * {
                     border: 0;
-                    padding: 1px;
-                    line-height: 1.25;
+                    padding: .1rem;
+                    line-height: 1.5;
+                    font-size: 0.75em;
+                }
+                table#summary-table th {
+                    font-weight: bold;
                 }
                 
                 table.preview-and-table {
@@ -640,12 +653,27 @@
                     color: white;
                 }
                 
+                table.filelist-table.dataTable tbody td.select-checkbox:before {
+                    top: 64%;
+                }
+                table.filelist-table.dataTable tr.selected td.select-checkbox:after {
+                    top: 44%;
+                }
+                .filelist-btn {
+                    font-weight: 300;
+                    font-family: 'Source Sans Pro', sans-serif;
+                }
+                
                 th.parameter-name {
                     font-weight: bold;
                 }
                 
                 td.aa-meta-col {
                     white-space: nowrap;
+                }
+                
+                .table-col {
+                    width: 100%;
                 }
                 
                 /* Fix for margins getting messed up inside the AA panels */ 
@@ -724,6 +752,7 @@
                 .main .row {
                 }
                 
+                /*
                 .motivation-text, #session_info_column {
                     margin-top: -40px;
                 }
@@ -748,16 +777,21 @@
                 }
                 }
                 @media screen and (max-width: 480px) {
-                .motivation-text, #session_info_column {
-                margin-top: -10px;
-                margin-right: 50px;
+                    .motivation-text, #session_info_column {
+                       margin-top: -10px;
+                       margin-right: 50px;
+                    }
+                    .experimenter-and-date {
+                        margin-right: 50px;
+                    }
+                    #top-button-div {
+                        margin-right: 50px;
+                    }
                 }
-                .experimenter-and-date {
-                margin-right: 50px;
-                }
+                */
+                
                 #top-button-div {
-                margin-right: 50px;
-                }
+                    flex-direction: row-reverse;
                 }
                 .tooltip {
                     z-index: 100001;
@@ -876,12 +910,16 @@
                 }
                 .pager-col {
                     padding-top: 20px;
+                    width: 100%;
                 }
                 .aa-img-col {
                     padding-top: 10px;
                 }
                 .aa_header_row > .col-md-12 {
                     padding-top: 10px;
+                }
+                .aa_header_row .dataTables_paginate {
+                    float: right;
                 }
             </style>
 
@@ -892,7 +930,7 @@
             <!-- ============= Main Generation of the Page ============= -->
             <!-- Add sidebar to the page -->
             <div class="sidebar">
-                <table id="nav-table" class="table table-condensed table-hover">
+                <table id="nav-table" class="table table-sm table-hover">
                     <!-- Procedurally generate unique id numbers which relate each acquisition event to its position on
                         the webpage such that it will jump there when the link is clicked -->
                     <thead>
@@ -929,34 +967,34 @@
                 <a><i class="fa fa-toggle-right"></i></a>
             </div>
     
-            <div class="main col-md-push-2" style="padding: 0;" id="top-button-div">
-                <button id="btn-edit-record" type="button" class="btn btn-default pull-right btn-top-group"
+            <div class="main d-sm-flex" style="padding: 0;" id="top-button-div">
+                <button id="btn-edit-record" type="button" class="btn btn-outline-dark btn-top-group"
                         data-toggle="tooltip" data-placement="top" 
                         title="Manually edit the contents of this record (login required)">
-                    <i class="fa fa-file-text menu-fa"></i> Edit this record
+                    <i class="fas fa-file-alt menu-fa"></i> Edit this record
                 </button>
-                <button id="btn-xml-dl" type="button" class="btn btn-default pull-right btn-top-group"
+                <button id="btn-xml-dl" type="button" class="btn btn-outline-dark btn-top-group"
                     data-toggle="tooltip" data-placement="top" 
                     title="Download metadata contents of this record as XML">
-                    <i class="fa fa-code menu-fa"></i> Download XML
+                    <i class="fas fa-code menu-fa"></i> Download XML
                 </button>
-                <button id="btn-filelisting" type="button" class="btn btn-default pull-right btn-top-group"
+                <button id="btn-filelisting" type="button" class="btn btn-outline-dark btn-top-group"
                         data-toggle="tooltip" data-placement="top" 
                         title="View a file listing (and download the files) of this record"
                         onclick="openModal('filelist-modal');">
-                    <i class="fa fa-cloud-download menu-fa"></i> Download files
+                    <i class="fas fa-cloud-download-alt menu-fa"></i> Download files
                 </button>
-                <button id="btn-previous-page" type="button" class="btn btn-default pull-right btn-top-group"
+                <button id="btn-previous-page" type="button" class="btn btn-outline-dark btn-top-group"
                         data-toggle="tooltip" data-placement="top" 
                         title="Go back to the previous page">
-                    <i class="fa fa-arrow-left menu-fa"></i> Back to previous
+                    <i class="fas fa-arrow-left menu-fa"></i> Back to previous
                 </button>
             </div>
             
             <!-- Main content -->
-            <span id='xmlName' style='visibility:hidden;'><xsl:value-of select="$xmlName"/></span>
+            <span id='xmlName' style='display: none;'><xsl:value-of select="$xmlName"/></span>
             
-            <div class="main col-sm-pull-10" id="main-column">                        
+            <div class="main col-sm-12" id="main-column">                        
                 <xsl:variable name="expTitle">
                     <xsl:choose>
                         <xsl:when test="$title = 'No matching calendar event found'">
@@ -1002,81 +1040,84 @@
                         <xsl:otherwise>Unknown date</xsl:otherwise>
                     </xsl:choose>
                 </xsl:variable>
-                <div id='record-header'>
-                    <div id='summary-info'>
-                        <span class="list-record-title page-header">
-                            <i class="fa fa-file-text results-icon"/>
-                            <xsl:value-of select="$expTitle"/>
-                        </span>
-                        <br/>
-                        <xsl:variable name="instr-pid">
-                            <xsl:value-of select="string(summary/instrument/@pid)"/>
-                        </xsl:variable>
-                        <span id='instr-badge' class="badge list-record-badge">
-                            <xsl:choose>
-                                <xsl:when test="summary/instrument/text()">
-                                    <xsl:attribute name="style">background-color:<xsl:for-each select="document('')">
-                                        <xsl:value-of select="key('lookup.instr.color', $instr-pid)"/>
-                                    </xsl:for-each> !important;</xsl:attribute>
+                
+                <div class="row" style="margin-top: 0;">    
+                    <div class="col-md-6" id="session_info_column">
+                        <div id='record-header' style="margin-bottom: 1em;">
+                            <div id='summary-info'>
+                                <span class="list-record-title page-header">
+                                    <i class="fas fa-file-alt results-icon"/>
+                                    <xsl:value-of select="$expTitle"/>
+                                </span>
+                                <br/>
+                                <xsl:variable name="instr-pid">
+                                    <xsl:value-of select="string(summary/instrument/@pid)"/>
+                                </xsl:variable>
+                                <span id='instr-badge' class="badge list-record-badge">
+                                    <xsl:choose>
+                                        <xsl:when test="summary/instrument/text()">
+                                            <xsl:attribute name="style">background-color:<xsl:for-each select="document('')">
+                                                <xsl:value-of select="key('lookup.instr.color', $instr-pid)"/>
+                                            </xsl:for-each> !important;</xsl:attribute>
+                                            <xsl:element name="a">
+                                                <xsl:attribute name="target">_blank</xsl:attribute>
+                                                <xsl:attribute name="href">
+                                                    <xsl:call-template name="get-calendar-link">
+                                                        <xsl:with-param name="instrument" select="summary/instrument"></xsl:with-param>
+                                                    </xsl:call-template></xsl:attribute>
+                                                <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                                                <xsl:attribute name="data-placement">bottom</xsl:attribute> 
+                                                <xsl:attribute name="title">Click to view this instrument on the Sharepoint calendar</xsl:attribute>
+                                                <xsl:value-of select="summary/instrument"/>
+                                            </xsl:element>
+                                        </xsl:when>
+                                        <xsl:otherwise>
+                                            Unknown instrument
+                                        </xsl:otherwise>
+                                    </xsl:choose>
+                                    
+                                </span>
+                                <span class="badge list-record-badge">
                                     <xsl:element name="a">
-                                        <xsl:attribute name="target">_blank</xsl:attribute>
                                         <xsl:attribute name="href">
-                                            <xsl:call-template name="get-calendar-link">
-                                                <xsl:with-param name="instrument" select="summary/instrument"></xsl:with-param>
-                                            </xsl:call-template></xsl:attribute>
+                                            javascript:void(0);
+                                        </xsl:attribute>
+                                        <xsl:attribute name="onclick">
+                                            openModal('filelist-modal');
+                                        </xsl:attribute>
                                         <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
                                         <xsl:attribute name="data-placement">bottom</xsl:attribute> 
-                                        <xsl:attribute name="title">Click to view this instrument on the Sharepoint calendar</xsl:attribute>
-                                        <xsl:value-of select="summary/instrument"/>
+                                        <xsl:attribute name="title">Click to view a file listing of this record</xsl:attribute>
+                                        <xsl:value-of select="count(//dataset)"/> data file<xsl:if test="count(//dataset)>1">s</xsl:if> in <xsl:value-of select="count(//acquisitionActivity)"/> activit<xsl:choose>
+                                            <xsl:when test="count(//acquisitionActivity) = 1">y</xsl:when>
+                                            <xsl:otherwise>ies</xsl:otherwise>
+                                        </xsl:choose>
                                     </xsl:element>
-                                </xsl:when>
-                                <xsl:otherwise>
-                                    Unknown instrument
-                                </xsl:otherwise>
-                            </xsl:choose>
-                            
-                        </span>
-                        <span class="badge list-record-badge">
-                            <xsl:element name="a">
-                                <xsl:attribute name="href">
-                                    javascript:void(0);
-                                </xsl:attribute>
-                                <xsl:attribute name="onclick">
-                                    openModal('filelist-modal');
-                                </xsl:attribute>
-                                <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
-                                <xsl:attribute name="data-placement">bottom</xsl:attribute> 
-                                <xsl:attribute name="title">Click to view a file listing of this record</xsl:attribute>
-                                <xsl:value-of select="count(//dataset)"/> data file<xsl:if test="count(//dataset)>1">s</xsl:if> in <xsl:value-of select="count(//acquisitionActivity)"/> activit<xsl:choose>
-                                    <xsl:when test="count(//acquisitionActivity) = 1">y</xsl:when>
-                                    <xsl:otherwise>ies</xsl:otherwise>
-                                </xsl:choose>
-                            </xsl:element>
-                        </span>
-                        <i class="fa fa-cubes" style="margin-left:0.75em; font-size: small;"
-                           data-toggle="tooltip" data-placement="bottom" title="Filetypes present in record"/><span style="font-size: small;"><xsl:text>: </xsl:text></span>
-                        <xsl:call-template name="extensions-to-badges">
-                            <xsl:with-param name="input"><xsl:value-of select="$unique-extensions"/></xsl:with-param>
-                            <xsl:with-param name="global-count">true</xsl:with-param>
-                        </xsl:call-template>
-                    </div>
-                    <div class="row">
-                            <div class="experimenter-and-date">
-                                <span class="list-record-experimenter">
-                                    <xsl:choose>
-                                        <xsl:when test="summary/experimenter">
-                                            <xsl:value-of select="summary/experimenter"/>
-                                        </xsl:when>
-                                        <xsl:otherwise>Unknown experimenter</xsl:otherwise>
-                                    </xsl:choose>
                                 </span>
-                                <xsl:text> - </xsl:text>
-                                <span class="list-record-date"><i><xsl:value-of select="$date"/></i></span>
+                                <i class="fa fa-cubes" style="margin-left:0.75em; font-size: small;"
+                                    data-toggle="tooltip" data-placement="bottom" title="Filetypes present in record"/><span style="font-size: small;"><xsl:text>: </xsl:text></span>
+                                <xsl:call-template name="extensions-to-badges">
+                                    <xsl:with-param name="input"><xsl:value-of select="$unique-extensions"/></xsl:with-param>
+                                    <xsl:with-param name="global-count">true</xsl:with-param>
+                                </xsl:call-template>
                             </div>
-                    </div>
-                    <div class="row">
-                            <div class="motivation-text">
-                               
+                            <div class="row">
+                                <div class="experimenter-and-date">
+                                    <span class="list-record-experimenter">
+                                        <xsl:choose>
+                                            <xsl:when test="summary/experimenter">
+                                                <xsl:value-of select="summary/experimenter"/>
+                                            </xsl:when>
+                                            <xsl:otherwise>Unknown experimenter</xsl:otherwise>
+                                        </xsl:choose>
+                                    </span>
+                                    <xsl:text> - </xsl:text>
+                                    <span class="list-record-date"><i><xsl:value-of select="$date"/></i></span>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="motivation-text">
+                                    
                                     <xsl:choose>
                                         <xsl:when test="summary/motivation/text()">
                                             <span style="font-style:italic;">Motivation: </span><xsl:value-of select="summary/motivation"/>
@@ -1089,25 +1130,23 @@
                                             </xsl:call-template>
                                         </xsl:otherwise>
                                     </xsl:choose>
-                                
-                            </div>
-                    </div>           
-                </div>
-                <div class="row">    
-                    <div class="col-md-6 no-top-padding" id="session_info_column">
-                        <span style='line-height: 0.5em;'><br/></span>
+                                    
+                                </div>
+                            </div>           
+                        </div>
+                        
                         <h3 id="res-info-header">Session Summary 
                         <xsl:call-template name="help-tip">
                             <xsl:with-param name="tip-text">Summary information is extracted from the Sharepoint calendar reservation associated with this record</xsl:with-param>
                         </xsl:call-template></h3>
                         <!-- Display summary information (date, time, instrument, and id) -->
     
-                        <table class="table table-condensed" id="summary-table" 
-                               style="border-collapse:collapse;width:80%;">
+                        <table class="table" id="summary-table" 
+                               style="border-collapse:collapse;">
                             <xsl:if test="summary/reservationStart/text()">
                                 <tr>
-                                    <th align="left" class="col-sm-4 parameter-name">Date: </th>
-                                    <td align="left" class="col-sm-8">
+                                    <th scope="row">Date: </th>
+                                    <td>
                                         <xsl:call-template name="tokenize-select">
                                             <xsl:with-param name="text" select="summary/reservationStart"/>
                                             <xsl:with-param name="delim">T</xsl:with-param>
@@ -1116,8 +1155,8 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <th align="left" class="col-sm-4 parameter-name">Start Time: </th>
-                                    <td align="left" class="col-sm-8">
+                                    <th scope="row">Start Time: </th>
+                                    <td>
                                         <xsl:call-template name="tokenize-select">
                                             <xsl:with-param name="text" select="summary/reservationStart"/>
                                             <xsl:with-param name="delim">T</xsl:with-param>
@@ -1128,8 +1167,8 @@
                             </xsl:if>
                             <xsl:if test="summary/reservationEnd/text()">
                                 <tr>
-                                    <th align="left" class="col-sm-4 parameter-name">End Time: </th>
-                                    <td align="justify" class="col-sm-8">
+                                    <th scope="row">End Time: </th>
+                                    <td align="justify">
                                         <xsl:call-template name="tokenize-select">
                                             <xsl:with-param name="text" select="summary/reservationEnd"/>
                                             <xsl:with-param name="delim">T</xsl:with-param>
@@ -1140,8 +1179,8 @@
                             </xsl:if>
                             <xsl:if test="summary/collaborator">
                                 <tr>
-                                    <th align="left" class="col-sm-4 parameter-name">Collaborator<xsl:if test="count(summary/collaborator) > 1">s</xsl:if>: </th>
-                                    <td align="left" class="col-sm-8">
+                                    <th scope="row">Collaborator<xsl:if test="count(summary/collaborator) > 1">s</xsl:if>: </th>
+                                    <td>
                                         <xsl:for-each select="summary/collaborator">
                                             <xsl:if test="position() > 1"><br/></xsl:if>
                                             <xsl:value-of select="."/>
@@ -1151,28 +1190,28 @@
                             </xsl:if>
                             <xsl:if test="id/text()">
                                 <tr>
-                                    <th align="left" class="col-sm-4 parameter-name">Session ID:<xsl:text> </xsl:text>
+                                    <th scope="row">Session ID:<xsl:text> </xsl:text>
                                         <xsl:call-template name="help-tip">
                                             <xsl:with-param name="tip-placement">right</xsl:with-param>
                                             <xsl:with-param name="tip-text">ID from this instrument's Sharepoint calendar listing</xsl:with-param>
                                         </xsl:call-template></th>
-                                    <td align="justify" class="col-sm-8"><xsl:value-of select="id"/></td>
+                                    <td><xsl:value-of select="id"/></td>
                                 </tr>
                             </xsl:if>
                             <xsl:if test="sample/name/text()">
                                 <tr>
-                                    <th align="left" class="col-sm-4 parameter-name">Sample name: </th>
-                                    <td align="left" class="col-sm-8"> <xsl:value-of select="sample/name"/></td>
+                                    <th scope="row">Sample name: </th>
+                                    <td> <xsl:value-of select="sample/name"/></td>
                                 </tr>    
                             </xsl:if>
                             <xsl:if test="acquisitionActivity[@seqno=0]/sampleID/text()">
                                 <tr>
-                                    <th align="left" class="col-sm-4 parameter-name">Sample ID:<xsl:text> </xsl:text>
+                                    <th scope="row">Sample ID:<xsl:text> </xsl:text>
                                         <xsl:call-template name="help-tip">
                                             <xsl:with-param name="tip-placement">right</xsl:with-param>
                                             <xsl:with-param name="tip-text">Automatically generated random ID (for now)</xsl:with-param>
                                         </xsl:call-template></th>
-                                    <td align="justify" class="col-sm-8"><xsl:value-of select="acquisitionActivity[@seqno=0]/sampleID"/></td>
+                                    <td><xsl:value-of select="acquisitionActivity[@seqno=0]/sampleID"/></td>
                                 </tr>
                             </xsl:if>
                             <xsl:variable name="description-stripped">
@@ -1182,8 +1221,8 @@
                             </xsl:variable>
                             <xsl:if test="string-length($description-stripped) > 0">
                                 <tr>
-                                    <th align="left" class="col-sm-6 parameter-name">Description: </th>
-                                    <td align="justify"><xsl:value-of select="$description-stripped"/></td>
+                                    <th scope="row">Description: </th>
+                                    <td><xsl:value-of select="$description-stripped"/></td>
                                 </tr>
                             </xsl:if>
                         </table>
@@ -1253,17 +1292,18 @@
                                 <figure class="slide">
                                     <img class="nx-img"><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute></img>
                                     <figcaption class="nx-caption">
-                                        <div class="row">
-                                            <div class="col-xs-offset-1 col-xs-1" style="margin-top:0.2em;">
-                                            <a  class="gal-nav" onclick="plusSlide(-1); disable_gallery_tooltips();"
-                                                data-toggle="tooltip" data-placement="left" 
-                                                title="The left/right arrow keys can also be used to navigate the image gallery">
-                                                <span class="fa-stack fa-lg">
-                                                    <i class="fa fa-circle fa-stack-2x"></i>
-                                                    <i class="fa fa-long-arrow-left fa-stack-1x fa-inverse"></i>
-                                                </span>
-                                            </a></div>
-                                            <div class="col-xs-8">
+                                        <div class="row" style="justify-content: space-evenly; align-items: center; flex-wrap: nowrap;">
+                                            <div class="" style="">
+                                               <a  class="gal-nav" onclick="plusSlide(-1); disable_gallery_tooltips();"
+                                                   data-toggle="tooltip" data-placement="left" 
+                                                   title="The left/right arrow keys can also be used to navigate the image gallery">
+                                                   <span class="fa-stack fa-lg">
+                                                       <i class="fas fa-circle fa-stack-2x"></i>
+                                                       <i class="fas fa-arrow-left fa-stack-1x fa-inverse"></i>
+                                                   </span>
+                                               </a>
+                                            </div>
+                                            <div class="">
                                             <span>Dataset <xsl:value-of select="position()"/> of <xsl:value-of select="count(//dataset)" /></span>
                                             <br/>
                                             <span style="margin-left:0.9em;">Activity <xsl:value-of select="$aa_num"/> of <xsl:value-of select="count(//acquisitionActivity)"/></span>
@@ -1273,13 +1313,13 @@
                                                     data-toggle='tooltip' data-placement='bottom'
                                                     title='Jump to activity {$aa_num} in record'><i class='fa fa-link'/></a>
                                             </sup></div>
-                                            <div class='col-xs-1' style="margin-top:0.2em;">
+                                            <div class='' style="">
                                                 <a  class="gal-nav" onclick="plusSlide(1); disable_gallery_tooltips();"
                                                 data-toggle="tooltip" data-placement="right" 
                                                 title="The left/right arrow keys can also be used to navigate the image gallery">
                                                 <span class="fa-stack fa-lg">
-                                                    <i class="fa fa-circle fa-stack-2x"></i>
-                                                    <i class="fa fa-long-arrow-right fa-stack-1x fa-inverse"></i>
+                                                    <i class="fas fa-circle fa-stack-2x"></i>
+                                                    <i class="fas fa-arrow-right fa-stack-1x fa-inverse"></i>
                                                 </span>
                                             </a></div>
                                         </div>
@@ -1304,7 +1344,7 @@
                                     <a class="aa_anchor" name="{generate-id(current())}"/>
                                     <span class="aa_header"><b>Experiment activity <xsl:value-of select="@seqno+1"/></b><xsl:text> </xsl:text></span>
                                     
-                                    <a href='javascript:void(0)' onclick="$(this).blur(); openModal('{generate-id(current())}-modal');"
+                                    <a href='javascript:void(0)' onclick="$(this).blur(); openModal('{generate-id(current())}-modal'); activate_modal_tooltips('{generate-id(current())}-modal');"
                                        data-toggle='tooltip' data-placement='right'
                                        title="Click to view this activity's setup parameters">
                                        <i class='fa fa-tasks fa-border param-button'/>
@@ -1340,9 +1380,9 @@
                                     </xsl:call-template>
                                 </div>
                             </div>
-                            <div class="row aa-content-row">
+                            <div class="row aa-content-row" style="margin-top: -20px;">
                                 <!-- preview image column -->
-                                <div class="col-lg-5 aa-img-col">
+                                <div class="col-lg-4 aa-img-col">
                                     <!-- likely better to load and hide each image first rather than change img src dynamically -->
                                     <xsl:for-each select="dataset[1]">
                                         <img class="nx-img aa-img visible" id="{generate-id()}-aa-img"><xsl:attribute name="src"><xsl:value-of select="$previewBaseUrl"/><xsl:value-of select="preview"/></xsl:attribute></img>        
@@ -1353,7 +1393,7 @@
                                 </div>
                                 
                                 <!-- dataset listing column -->
-                                <div class="col-lg-7 aa-table-col">
+                                <div class="col-lg-8 aa-table-col">
                                     <table class="table table-condensed table-hover aa-table compact wrap" border="1" style="width:100%; border-collapse:collapse;">
                                         <thead>
                                             <tr>
@@ -1437,7 +1477,7 @@
                                                     </xsl:choose>
                                                     <td class='text-center aa-meta-col'>
                                                         <!-- Modal content inside of table, since it needs to be in the context of this dataset -->
-                                                        <a href='javascript:void(0)' onclick="$(this).blur(); openModal('{generate-id(current())}-modal');"
+                                                        <a href='javascript:void(0)' onclick="$(this).blur(); openModal('{generate-id(current())}-modal'); console.log('Calling activate_modal_tooltips on {generate-id(current())}-modal'); activate_modal_tooltips('{generate-id(current())}-modal');"
                                                         data-toggle='tooltip' data-placement='left'
                                                         title="Click to view this dataset's unique metadata">
                                                             <i class='fa fa-tasks fa-border param-button' style='margin-left:0;'/>
@@ -1459,25 +1499,22 @@
                                                         <div id="{generate-id(current())}-modal" class="modal">
                                                             <div class="modal-content">
                                                                 <div class="container-fluid">
-                                                                    <div class="row">
-                                                                        <div class="col-xs-11">
-                                                                            <b><xsl:value-of select="name"/></b><br/>
+                                                                    <div class="row"
+                                                                         style="justify-content: center;">
+                                                                        <div class="col-11" style="max-width: 500px; white-space: pre-wrap; text-align: left; line-height: 1.5em;"><span style="font-weight: bold;"><xsl:value-of select="name"/></span>
                                                                             <xsl:choose>
                                                                                 <xsl:when test="description/text()">
-                                                                                    <div style="font-size:15px">Dataset description: 
-                                                                                        <i>
-                                                                                            <xsl:value-of select="description"/>
-                                                                                        </i>
-                                                                                    </div>
+                                                                                    <br/>
+                                                                                    <div style="font-size:15px">Dataset description: <em><xsl:value-of select="description"/></em></div>
                                                                                 </xsl:when>
-                                                                            </xsl:choose>
-                                                                        </div>
+                                                                            </xsl:choose></div>
                                                                         
-                                                                        <div class="col-xs-1">
-                                                                            <i class="close-modal fa fa-close" onclick="closeModal('{generate-id(current())}-modal')"/>
+                                                                        <div class="col-1">
+                                                                            <i class="close-modal fas fa-times" onclick="closeModal('{generate-id(current())}-modal')"/>
                                                                         </div> 
                                                                     </div>
-                                                                    <div class="row">
+                                                                    <div class="row"
+                                                                         style="justify-content: center;">
                                                                         <div class='col-xs-12' style="padding-top: 10px;">
                                                                             <!-- Generate the table with setup conditions for each acquisition activity -->
                                                                             <table class="table table-condensed table-hover meta-table compact text-left" border="1" style="">
@@ -1538,10 +1575,11 @@
                                                                             </table>   
                                                                         </div>
                                                                     </div>
-                                                                    <div class='row'>
+                                                                    <div class='row'
+                                                                         style="justify-content: center;">
                                                                         <div class='col-xs-12 text-center' style="padding-top: 10px;">
                                                                             <xsl:element name='a'>
-                                                                                <xsl:attribute name='style'>font-size: 12pt; font-style: italic</xsl:attribute>
+                                                                                <xsl:attribute name='style'>font-size: 12pt; font-style: italic; color: #007aa7;</xsl:attribute>
                                                                                 <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
                                                                                 <xsl:attribute name="data-placement">top</xsl:attribute>
                                                                                 <xsl:attribute name="data-html">true</xsl:attribute>
@@ -1583,17 +1621,14 @@
                         <div id="{generate-id(current())}-modal" class="modal">
                             <div class="modal-content">
                                 <div class="container-fluid">
-                                    <div class="row">
-                                        <div class="col-med-11">
-                                            <b>Experiment activity <xsl:value-of select="@seqno+1"/></b><br/>
-                                        </div>
-                                        
-                                        <div class="col-med-1 pull-right">
-                                            <i class="close-modal fa fa-close" onclick="closeModal('{generate-id(current())}-modal')"/>
+                                    <div class="row" style="">
+                                        <div class="col-10" style="align-self: start; max-width: 500px; white-space: pre-wrap; text-align: left; line-height: 1.5em; font-weight: bold;">Experiment activity <xsl:value-of select="@seqno+1"/></div>
+                                        <div class="col-1">
+                                            <i class="close-modal fas fa-times" onclick="closeModal('{generate-id(current())}-modal')"/>
                                         </div> 
                                     </div>
                                     <div class="row">
-                                        <div class='col-xs-12' style='padding-top: 0.25em;'>
+                                        <div class='col-xs-12' style=''>
                                             <div style="font-size:15px">Activity contents: 
                                                 <i>
                                                     <xsl:call-template name="parse-activity-contents"></xsl:call-template>
@@ -1601,8 +1636,8 @@
                                             </div>
                                         </div>
                                     </div>
-                                    <div class="row">
-                                        <div class='col-xs-12' style="padding-top: 10px;">
+                                    <div class="row" style="justify-content: center;">
+                                        <div class='col-xs-12' style="">
                                             <!-- Generate the table with setup conditions for each acquisition activity -->
                                             <table class="table table-condensed table-hover meta-table compact" border="1" style="">
                                                 <thead>
@@ -1667,8 +1702,8 @@
                                             </table>   
                                         </div>
                                     </div>
-                                    <div class='row'>
-                                        <div class='col-xs-12 text-center' style="padding-top: 10px;">
+                                    <div class='row' style="justify-content: center;">
+                                        <div class='col-xs-12 text-center' style="color: #007aa7;">
                                             <xsl:element name='a'>
                                                 <xsl:attribute name='style'>font-size: 12pt; font-style: italic</xsl:attribute>
                                                 <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
@@ -1688,34 +1723,15 @@
                 <div id="filelist-modal" class="modal">
                     <div class="modal-content">
                         <div class="modal-body">
-                            <div class="row row-no-gutters">
-                                <div class="col-xs-2 pull-right" style="padding-top: 30px;">
-                                    <i class="help-filelist-modal fa fa-question-circle">
-                                        <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
-                                        <xsl:attribute name="data-placement">bottom</xsl:attribute>
-                                        <xsl:attribute name="title">
-<!-- Do not indent this text, as it affects the tooltip display -->                                            
-This window shows all the datasets identified as part of this record.
-                                            
-Rows of the table can be selected using the mouse, holding down Ctrl or Shift to select multiple rows.
-                                            
-The files (and metadata) associated with the selected datasets can be downloaded by clicking on the "Download selected" or "Download all" button (warning, this may take some time for large amounts of data). You can close this dialoge (but not the browser tab!) while the download is processing without interrupting its progress. Do not navigate away from the page, or the download will cancel!
-                                            
-The textual data from the selected rows (not the actual files) can also be exported to the clipboard, a CSV file, an Excel file, or printed to PDF by using the respective buttons as well.
-                                        </xsl:attribute>
-                                    </i>
-                                    <i class="close-modal fa fa-close" onclick="closeModal('filelist-modal')"/>
-                                </div>
-                            </div>
                             <div class="row filelist-header-row">
-                                <div class="col-med-12" style="padding-top: 0px; max-width: 600px">
+                                <div class="col-xs-10" style="flex-grow: 1;">
                                     <b>Complete filelisting for:</b><br/>
                                     <span class='modal-expTitle'>
-                                        <i class="fa fa-file-text-o results-icon"/>
+                                        <i class="far fa-file-alt results-icon"/>
                                         <xsl:value-of select="$expTitle"/>
                                     </span> - <span class='modal-expDate'><xsl:value-of select="$date"/></span><br/>
                                     <span class='modal-expTitle' style="white-space: pre-line;">Root path:  </span><code id='filelist-rootpath'
-                                        style="line-height: 1.25em; display: inline-block;"><a>
+                                        style="line-height: 1.25em; display: inline;"><a>
                                         <xsl:attribute name="href">
                                             <xsl:value-of select="$datasetBaseUrl"/>
                                         </xsl:attribute>
@@ -1727,12 +1743,31 @@ The textual data from the selected rows (not the actual files) can also be expor
                                         <xsl:attribute name="title">Click to view directory struture directly in the browser</xsl:attribute>
                                     </a></code>
                                 </div>
+                                <div class="col-xs-2">
+                                    <i class="help-filelist-modal fas fa-question-circle"
+                                       style="margin-right: 1em;">
+                                        <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                                        <xsl:attribute name="data-placement">bottom</xsl:attribute>
+                                        <xsl:attribute name="data-container">.help-filelist-modal</xsl:attribute>
+                                        <xsl:attribute name="title">
+<!-- Do not indent this text, as it affects the tooltip display -->                                            
+This window shows all the datasets identified as part of this record.
+
+Rows of the table can be selected using the mouse, holding down Ctrl or Shift to select multiple rows.
+
+The files (and metadata) associated with the selected datasets can be downloaded by clicking on the "Download selected" or "Download all" button (warning, this may take some time for large amounts of data). You can close this dialogue (but not the browser tab!) while the download is processing without interrupting its progress. Do not navigate away from the page, or the download will cancel!
+
+The textual data from the selected rows (not the actual files) can also be exported to the clipboard, a CSV file, an Excel file, or printed to PDF by using the respective buttons as well.
+                                        </xsl:attribute>
+                                    </i>
+                                    <i class="close-modal fas fa-times" onclick="closeModal('filelist-modal')"/>
+                                </div>
                             </div>
                             <!-- Download progressbar row ((hidden by default by jQuery) -->
                             <div id='progressbar-row' class='row'>
-                                <div class='col-xs-12' style="padding-top: 5px;">
-                                    <div class="progress progress-striped active" id="progress_bar">
-                                        <div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
+                                <div class='col-xs-12 w-100' style="">
+                                    <div class="progress" id="progress_bar">
+                                        <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
                                             0%
                                         </div>
                                     </div>
@@ -1740,7 +1775,7 @@ The textual data from the selected rows (not the actual files) can also be expor
                             </div>
                             <!-- Download cancel button row (hidden by default by jQuery) -->
                             <div id='btn-cancel-row' class='row'>
-                                <div class='col-xs-12'>
+                                <div class='col-xs-12 w-100'>
                                     <button id="btn-cancel-dl" class="btn btn-danger" type="button"
                                             data-toggle="tooltip" data-placement="right" 
                                             title="Canceling the download through the browser will not work, so be sure to use this button to actually stop the file transfer"><i class='fa fa-ban menu-fa' aria-hidden="true"/><span>Cancel download</span></button> 
@@ -1748,18 +1783,18 @@ The textual data from the selected rows (not the actual files) can also be expor
                             </div>
                             <!-- Download result text row (hidden by default by jQuery) -->
                             <div id='dl-result-row' class='row'>
-                                <div class='col-xs-12' style="padding-top: 5px;">
+                                <div class='col-xs-12 w-100 mt-1 mb-1' style="">
                                     <p id="download-result"></p>
                                 </div>
                             </div>
                             <!-- Download extra message row (hidden by default by jQuery) -->
                             <div id='dl-extra-row' class='row'>
-                                <div class='col-xs-12' style="padding-top: 5px;">
+                                <div class='col-xs-12 w-100 mt-1 mb-1' style="">
                                     <p id="download-extra"></p>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class='col-xs-12' style="padding-top: 5px;">
+                            <div class="row mt-1">
+                                <div class='col-xs-12 pt-0'>
                                     <!-- Generate the table with setup conditions for each acquisition activity -->
                                     <table id="filelist-table" 
                                            class="table table-condensed table-hover filelist-table compact" 
@@ -1902,7 +1937,7 @@ The textual data from the selected rows (not the actual files) can also be expor
                 // Edge 20+
                 var isEdge = !isIE && !!window.StyleMedia;
                 // Chrome 1 - 79
-                var isChrome = !!window.chrome && (!!window.chrome.webstore || !!window.chrome.runtime);
+                var isChrome = !!window.chrome;
                 // Edge (based on chromium) detection
                 var isEdgeChromium = isChrome && (navigator.userAgent.indexOf("Edg") != -1);
                 // Blink engine detection
@@ -2190,6 +2225,15 @@ The textual data from the selected rows (not the actual files) can also be expor
                 function activate_metadata_tooltips(){
                     // activate tooltips (on demand)
                     $('table.meta-table [data-toggle="tooltip"]').tooltip({trigger: 'hover'}); 
+                }
+                
+                function activate_modal_tooltips(id) {
+                    // tooltips on modals like to be placed at the top of the screen, even if you've
+                    // scrolled down, so dispose of existing tooltip, and create new one attached to modal
+                    // container; this appears to work to allow tooltips to show up properly 
+                    // in the modal windows (make sure to call this function when showing the modal)
+                    $(`#${id} [data-toggle="tooltip"]`).tooltip('dispose');
+                    $(`#${id} [data-toggle="tooltip"]`).tooltip({trigger: 'hover', container: `#${id}`}); 
                 }
             
                 // Key handlers
@@ -2740,9 +2784,14 @@ The textual data from the selected rows (not the actual files) can also be expor
                                     next: "<i class='fa fa-angle-double-right'></i>"
                                 }
                             },
+                            // make dataset column as wide as possible without causing remaining
+                            // columns to wrap
+                            columnDefs: [
+                                { "width": "53%", "targets": 0 }
+                            ],
                             responsive: true,
                             ordering: false,
-                            dom: "<'row table-row't><'row pager-row'<'col-xs-12 pager-col text-right'p>>",
+                            dom: '<"row table-row"<"col-xs-12 table-col"t>><"row pager-row"<"col-xs-12 pager-col"p>>'
                         });
                         
                         // controls to reveal appropriate image on row hover
@@ -2939,7 +2988,7 @@ The textual data from the selected rows (not the actual files) can also be expor
                           'download them manually from the central file ' +
                           'server instead.');
                         $('button.dl-btns').removeClass('disabled');
-                        filelist_dt.select.style('os');
+                        filelist_dt.select.style('multi');
                       } else {
                         resetMessage();
                         updatePercent(0);
@@ -3367,7 +3416,7 @@ The textual data from the selected rows (not the actual files) can also be expor
                           $('#btn-cancel-row').slideUp();
                           $('#progressbar-row').slideUp();
                           $('button.dl-btns').removeClass('disabled');
-                          filelist_dt.select.style('os');
+                          filelist_dt.select.style('multi');
 
                         });
                       }
@@ -3545,7 +3594,11 @@ The textual data from the selected rows (not the actual files) can also be expor
                     var mo = new Intl.DateTimeFormat('en', { month: '2-digit' }).format(d);
                     var da = new Intl.DateTimeFormat('en', { day: '2-digit' }).format(d);
                     var record_title = $('span#xmlName').text();
-                    var zip_title = record_title.replace('.xml', '.zip');
+                    if (record_title.endsWith('.xml')) {
+                        var zip_title = record_title.replace('.xml', '.zip')
+                    } else {
+                        var zip_title = record_title + '.zip';
+                    }
                     var record_header = 'NexusLIMS Experiment: ' + $('span.list-record-title').text() + '\n' +
                                         'Instrument: ' + $('span#instr-badge').text() + '\n' + 
                                         'Experimenter: ' + $('span.list-record-experimenter').text() + '\n' + 
@@ -3570,15 +3623,15 @@ The textual data from the selected rows (not the actual files) can also be expor
                             { 
                                 extend: 'selectAll',
                                 className: 'btn-select-all dl-btns',
-                                text: "<i class='fa fa-check-square menu-fa'/> Select all"
+                                text: "<i class='fas fa-check-square menu-fa'/> <span class='filelist-btn'>Select all</span>"
                             },
                             { 
                                 extend: 'selectNone',
                                 className: 'btn-select-none dl-btns',
-                                text: "<i class='fa fa-square-o menu-fa'/> Select none"
+                                text: "<i class='far fa-square menu-fa'/> <span class='filelist-btn''>Select none</span>"
                             },
                             {
-                                text: "<i class='fa fa-archive menu-fa'/> Download all as .zip",
+                                text: "<i class='fa fa-archive menu-fa'/> <span class='filelist-btn''>Download all as .zip</span>",
                                 className: 'btn-dl-all dl-btns',
                                 action: function ( e, dt, node, config ) {
                                     var data_urls = dt.rows().data().map(x => $(x.data_dl).attr('href'));
@@ -3597,7 +3650,7 @@ The textual data from the selected rows (not the actual files) can also be expor
                             },
                             {
                                 extend: 'selected',
-                                text: "<i class='fa fa-file-archive-o menu-fa'/> Download selected as .zip",
+                                text: "<i class='far fa-file-archive menu-fa'/> <span class='filelist-btn'>Download selected as .zip</span>",
                                 attr:  {
                                     'data-toggle': 'tooltip',
                                     'data-placement': 'top',
@@ -3616,16 +3669,16 @@ The textual data from the selected rows (not the actual files) can also be expor
                                 }
                             }],
                         select: {
-                            style:    'os',
+                            style:    'multi',
                             //selector: 'td:first-child'
                         },
                         columnDefs: [ 
                             { data: 'checkbox', orderable: false, width: '1em',
-                              className: 'select-checkbox', targets: 0 },
+                              className: 'select-checkbox', targets: 0, "defaultContent": ""},
                             // give each column a "data" attribute so we can reference them by name
                             { data: 'name', name: 'name', targets: 1 },
                             { data: 'path', name: 'path', targets: 2 },
-                            { data: 'size', name: 'size', width: '3em', targets: 3 },
+                            { data: 'size', name: 'size', width: '4em', targets: 3 },
                             { data: 'type', name: 'type', targets: 4 },
                             { data: 'json_dl', name: 'json_dl', width: '3em', targets: 5 },
                             { data: 'data_dl', name: 'data_dl', width: '3em', targets: 6 },
@@ -3693,19 +3746,19 @@ The textual data from the selected rows (not the actual files) can also be expor
                                 extend: 'copy',
                                 title: record_title,
                                 messageTop: record_header,
-                                text: "<i class='fa fa-copy menu-fa'/> Copy"
+                                text: "<i class='far fa-copy menu-fa'/> <span class='filelist-btn'>Copy</span>"
                             }),
                             $.extend( true, {}, buttonCommon, {
                                 extend: 'csv',
                                 title: record_title,
                                 messageTop: record_header,
-                                text: "<i class='fa fa-file-code-o menu-fa'/> CSV"
+                                text: "<i class='far fa-file-code menu-fa'/> <span class='filelist-btn'>CSV</span>"
                             }),
                             $.extend( true, {}, buttonCommon, {
                                 extend: 'excel',
                                 title: record_title,
                                 messageTop: record_header,
-                                text: "<i class='fa fa-file-excel-o menu-fa'/> Excel"
+                                text: "<i class='far fa-file-excel menu-fa'/> <span class='filelist-btn'>Excel</span>"
                             }),
                             $.extend( true, {}, buttonCommon, {
                                 extend: 'print',
@@ -3717,7 +3770,7 @@ The textual data from the selected rows (not the actual files) can also be expor
                                     // replace newlines with html break:
                                     return record_header.split("\n").join("<br/>");
                                 },
-                                text: "<i class='fa fa-print menu-fa'/> Print"
+                                text: "<i class='fa fa-print menu-fa'/> <span class='filelist-btn'>Print</span>"
                             })
                         ]
                     });
