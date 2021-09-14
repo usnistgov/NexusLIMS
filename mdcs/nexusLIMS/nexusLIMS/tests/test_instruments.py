@@ -40,7 +40,6 @@ class TestInstruments:
                                'FEI-Quanta200-ESEM-633137',
                                'FEI-Titan-STEM-630901',
                                'FEI-Titan-TEM-635816',
-                               'Hitachi-S4700-SEM-606559',
                                'Hitachi-S5500-SEM-635262',
                                'JEOL-JEM3010-TEM-565989',
                                'JEOL-JSM7100-SEM-N102656',

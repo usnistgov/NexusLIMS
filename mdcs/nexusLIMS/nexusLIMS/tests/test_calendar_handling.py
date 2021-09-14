@@ -186,20 +186,20 @@ class TestCalendarHandling:
                 sc.fetch_xml(instrument=5)
 
     def test_fetch_xml_only_dt_from(self):
-        # at the time of writing this code (2020-06-26), there were 8 records
-        # on the Hitachi S4700 after Jan 1. 2020, which should only increase
+        # at the time of writing this code (2021-09-13), there were 278 records
+        # on the Titan STEM after Jan 1. 2020, which should only increase
         # over time
-        xml = sc.fetch_xml(instrument_db['Hitachi-S4700-SEM-606559'],
+        xml = sc.fetch_xml(instrument_db['FEI-Titan-STEM-630901'],
                            dt_from=dt.fromisoformat('2020-01-01T00:00:00'))
         doc = etree.fromstring(xml)
-        assert len(doc.findall('entry')) >= 8
+        assert len(doc.findall('entry')) >= 278
 
     def test_fetch_xml_only_dt_to(self):
-        # There are five events prior to May 1, 2016 on the Hitachi S4700
-        xml = sc.fetch_xml(instrument_db['Hitachi-S4700-SEM-606559'],
-                           dt_to=dt.fromisoformat('2016-05-01T00:00:00'))
+        # There are nine events prior to April 1, 2019 on the Titan STEM
+        xml = sc.fetch_xml(instrument_db['FEI-Titan-STEM-630901'],
+                           dt_to=dt.fromisoformat('2019-04-01T00:00:00'))
         doc = etree.fromstring(xml)
-        assert len(doc.findall('entry')) == 5
+        assert len(doc.findall('entry')) == 9
 
     def test_fetch_xml_calendar_event(self):
         xml = \

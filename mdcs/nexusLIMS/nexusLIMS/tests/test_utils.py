@@ -84,7 +84,7 @@ class TestUtils:
         for d in ['JEOL3010/***REMOVED***/***REMOVED***/20190724/M1_DC_Beam',
                   'JEOL3010/***REMOVED***/***REMOVED***/20190724/M2_DC_Beam_Dose_1',
                   'JEOL3010/***REMOVED***/***REMOVED***/20190724/M3_DC_Beam_Dose_2']:
-            assert os.path.join(os.environ['mmfnexus_path'], d) in dirs
+            assert os.path.join(path, d) in dirs
 
     def test_gnu_find(self, fix_mountain_time):
         files = gnu_find_files_by_mtime(
