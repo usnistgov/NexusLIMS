@@ -46,9 +46,9 @@ from configparser import ConfigParser as _ConfigParser
 from nexusLIMS.instruments import Instrument as _Instrument
 from nexusLIMS.instruments import instrument_db as _instr_db
 from nexusLIMS.instruments import get_instr_from_calendar_name as _from_cal
-from nexusLIMS.utils import parse_xml as _parse_xml
 from nexusLIMS.utils import nexus_req as _nexus_req
 from nexusLIMS.utils import _get_timespan_overlap
+from nexusLIMS.harvesters import ReservationEvent
 
 _logger = _logging.getLogger(__name__)
 XSLT_PATH = _os.path.join(_os.path.dirname(__file__), "cal_parser.xsl")
@@ -56,8 +56,9 @@ CA_BUNDLE_PATH = _os.path.join(_os.path.dirname(__file__),
                                "sharepoint_cert_bundle.pem")
 INDENT = '  '
 
-__all__ = ['AuthenticationError', 'get_auth', 'fetch_xml', 'get_div_and_group',
-           'get_events', '_wrap_events', 'dump_calendars', 'CA_BUNDLE_PATH']
+__all__ = ['res_event_from_xml', 'AuthenticationError', 'get_auth', 'fetch_xml',
+           'get_div_and_group', 'get_events', '_wrap_events',
+           'dump_calendars', 'CA_BUNDLE_PATH']
 
 
 class AuthenticationError(Exception):
@@ -66,147 +67,107 @@ class AuthenticationError(Exception):
         self.message = message
 
 
-class CalendarEvent:
+def res_event_from_xml(xml, date=None):
     """
-    A representation of a single calendar "entry" returned from the SharePoint
-    API. Each attribute is mapped to a node in the XML API response, and will be
-    None if the node cannot be found in the XML. Timestamps are given in
-    either Zulu time (UTC) or with a local timestamp offset, so datetime
-    attributes should be timezone-aware.
+    Creates a ReservationEvent from an xml response from
+    :py:func:`~.fetch_xml` rather than providing values directly. If there are
+    multiple events in the XML, it will only process the first one
 
-    Attributes
+    Parameters
     ----------
-    title : str
-        The title of the event (present at
-        ``/feed/entry/content/m:properties/d:TitleOfExperiment``)
-    instrument : ~nexusLIMS.instruments.Instrument
-        The instrument associated with this calendar entry (fetched using
-        the name of the calendar, present at ``/feed/title``)
-    updated : datetime.datetime
-        The time this event was last updated (present at
-        ``/feed/entry/updated``)
-    username : str
-        The NIST "short" username of the user indicated in this event (present
-        at ``/feed/entry/link[@title="UserName"]/m:inline/feed/entry/content
-        /m:properties/d:UserName``)
-    created_by : str
-        The NIST "short" username of the user that created this event (present
-        at ```/feed/entry/link[@title="CreatedBy"]/m:inline/feed/entry/content
-        /m:properties/d:UserName``)
-    start_time : datetime.datetime
-        The time this event was scheduled to start (present at
-        ``/feed/entry/content/m:properties/d:StartTime``)
-        The API response returns this value without a timezone, in the timezone
-        of the sharepoint server
-    end_time : datetime.datetime
-        The time this event was scheduled to end (present at
-        ``/feed/entry/content/m:properties/d:EndTime``)
-    category_value : str
-        The "type" or category of this event (such as User session, service,
-        etc.) (present at ``/feed/entry/content/m:properties/d:CategoryValue``)
-    experiment_purpose : str
-        The user-entered purpose of this experiment (present at
-        ``/feed/entry/content/m:properties/d:ExperimentPurpose``)
-    sample_details : str
-        The user-entered sample details for this experiment (present at
-        ``/feed/entry/content/m:properties/d:SampleDetails``)
-    project_id : str
-        The user-entered project identifier for this experiment (present at
-        ``/feed/entry/content/m:properties/d:ProjectID``)
-    sharepoint_id : int
-        The numeric identifier assigned to this event by SharePoint (present at
-        ``/feed/entry/content/m:properties/d:Id``)
+    xml : str
+        Output of an API query to the Sharepoint calendar that contains a
+        single event (which should be the case if start and end times were
+        provided to :py:func:`~.fetch_xml`)
+    date : None or datetime.datetime
+        (Optional) a date to use in serializing the output in case there is
+        no date information in the XML response (i.e. there were no
+        reservations found for the date range searched)
+
+    Notes
+    -----
+    Each attribute of the resulting ``ReservationEvent`` is mapped to a node
+    in the XML API response, and will be ``None`` if the node cannot be found in
+    the XML. Timestamps are given in either Zulu time (UTC) or with a
+    local timestamp offset, so datetime attributes should be timezone-aware.
+
+    Mapping of attributes:
+
+    - ``experiment_title`` - present at
+      ``/feed/entry/content/m:properties/d:TitleOfExperiment``
+    - ``instrument`` - fetched using the name of the calendar, present at
+      ``/feed/title``
+    - ``last_updated`` - present at ``/feed/entry/updated``
+    - ``username`` - present at
+      ``/feed/entry/link[@title="UserName"]/m:inline/feed/entry/content/m:properties/d:UserName``
+    - ``created_by`` - present at
+      ``/feed/entry/link[@title="CreatedBy"]/m:inline/feed/entry/content/m:properties/d:UserName``
+    - ``start_time`` - ``/feed/entry/content/m:properties/d:StartTime`` (The API
+      response returns this value without a timezone, in the timezone of the
+      sharepoint server
+    - ``end_time`` - present at ``/feed/entry/content/m:properties/d:EndTime``
+    - ``reservation_type`` - /feed/entry/content/m:properties/d:CategoryValue
+    - ``experiment_purpose`` - present at
+      ``/feed/entry/content/m:properties/d:ExperimentPurpose``
+    - ``sample_details`` - present at
+      ``/feed/entry/content/m:properties/d:SampleDetails``
+    - ``sample_pid`` - not collected by the SharePoint form at this time
+    - ``project_id`` - a non-persistent identifier string
+      present at ``/feed/entry/content/m:properties/d:ProjectID``
+    - ``internal_id`` - present at ``/feed/entry/content/m:properties/d:Id``
+
+    Returns
+    -------
+    res_event : ReservationEvent
+        An object representing an entry on the SharePoint calendar. Could
+        be empty if no ``entry`` nodes are present in XML response
     """
-
-    def __init__(self, title=None, instrument=None, updated=None,
-                 username=None, created_by=None, start_time=None,
-                 end_time=None, category_value=None, experiment_purpose=None,
-                 sample_details=None, project_id=None, sharepoint_id=None):
-        self.title = title
-        self.instrument = instrument
-        self.updated = updated
-        self.username = username
-        self.created_by = created_by
-        self.start_time = start_time
-        self.end_time = end_time
-        self.category_value = category_value
-        self.experiment_purpose = experiment_purpose
-        self.sample_details = sample_details
-        self.project_id = project_id
-        self.sharepoint_id = sharepoint_id
-
-    @classmethod
-    def from_xml(cls, xml):
-        """
-        Alternative constructor that allows parsing of an xml response from
-        :py:func:`~.fetch_xml` rather than providing values directly
-
-        Parameters
-        ----------
-        xml : str
-            Output of an API query to the Sharepoint calendar that contains a
-            single event (which should be the case if start and end times were
-            provided to :py:func:`~.fetch_xml`)
-
-        Returns
-        -------
-        cal_event : CalendarEvent or None
-            An object representing an entry on the SharePoint calendar. Could
-            be None if no entry is found within the provided XML
-        """
-        def _get_el_text(xpath):
-            el = et.find(xpath, namespaces=et.nsmap)
-            if el is None:
-                return el
-            else:
-                return el.text
-
-        et = _etree.fromstring(xml)
-        if _get_el_text('entry') is None:
-            # no "entry" nodes were found, so return None
-            return None
-        title = _get_el_text('entry//d:TitleOfExperiment')
-        # get instrument from calendar title
-        instrument = _get_el_text('title')
-        if instrument is not None:
-            instrument = _from_cal(instrument)
-        sp_tz = _get_sharepoint_tz()
-        updated = _get_el_text('entry/updated')
-        if updated is not None:
-            updated = _datetime.fromisoformat(updated)
-        username = _get_el_text('entry/link[@title="UserName"]//d:UserName')
-        created_by = _get_el_text('entry/link[@title="CreatedBy"]//d:UserName')
-        start_time = _get_el_text('entry//d:StartTime')
-        if start_time is not None:
-            start_time = _timezone(sp_tz).localize(
-                _datetime.fromisoformat(start_time))
-        end_time = _get_el_text('entry//d:EndTime')
-        if end_time is not None:
-            end_time = _timezone(sp_tz).localize(
-                _datetime.fromisoformat(end_time))
-        category_value = _get_el_text('entry//d:CategoryValue')
-        sample_details = _get_el_text('entry//d:SampleDetails')
-        project_id = _get_el_text('entry//d:ProjectID')
-        sharepoint_id = _get_el_text('entry/content//d:Id')
-        if sharepoint_id is not None:
-            sharepoint_id = int(sharepoint_id)
-
-        return CalendarEvent(
-            title=title, instrument=instrument, updated=updated,
-            username=username, created_by=created_by, start_time=start_time,
-            end_time=end_time, category_value=category_value,
-            sample_details=sample_details, project_id=project_id,
-            sharepoint_id=sharepoint_id
-        )
-
-    def __repr__(self):
-        if self.username and self.start_time and self.end_time:
-            return f'Event for {self.username} on {self.instrument.name} ' \
-                   f'from {self.start_time.isoformat()} to ' \
-                   f'{self.end_time.isoformat()}'
+    def _get_el_text(xpath):
+        el = et.find(xpath, namespaces=et.nsmap)
+        if el is None:
+            return el
         else:
-            return f'No matching calendar event' + \
-                   (f' for {self.instrument.name}' if self.instrument else '')
+            return el.text
+
+    et = _etree.fromstring(xml)
+
+    # get instrument from calendar title
+    instrument = _get_el_text('title')
+    if instrument is not None:
+        instrument = _from_cal(instrument)
+
+    if _get_el_text('entry') is None:
+        # no "entry" nodes were found, so return very basic ReservationEvent
+        return ReservationEvent(instrument=instrument, start_time=date)
+
+    title = _get_el_text('entry//d:TitleOfExperiment')
+    sp_tz = _get_sharepoint_tz()
+    updated = _get_el_text('entry/updated')
+    if updated is not None:
+        updated = _datetime.fromisoformat(updated)
+    username = _get_el_text('entry/link[@title="UserName"]//d:UserName')
+    created_by = _get_el_text('entry/link[@title="CreatedBy"]//d:UserName')
+    start_time = _get_el_text('entry//d:StartTime')
+    if start_time is not None:
+        start_time = _timezone(sp_tz).localize(
+            _datetime.fromisoformat(start_time))
+    end_time = _get_el_text('entry//d:EndTime')
+    if end_time is not None:
+        end_time = _timezone(sp_tz).localize(
+            _datetime.fromisoformat(end_time))
+    category_value = _get_el_text('entry//d:CategoryValue')
+    sample_details = _get_el_text('entry//d:SampleDetails')
+    purpose = _get_el_text('entry//d:ExperimentPurpose')
+    project_name = _get_el_text('entry//d:ProjectID')
+    sharepoint_id = _get_el_text('entry/content//d:Id')
+
+    return ReservationEvent(
+        experiment_title=title, instrument=instrument, last_updated=updated,
+        username=username, created_by=created_by, start_time=start_time,
+        end_time=end_time, reservation_type=category_value,
+        experiment_purpose=purpose, sample_details=sample_details,
+        project_name=project_name, internal_id=sharepoint_id
+    )
 
 
 def get_div_and_group(username):
@@ -472,8 +433,7 @@ def get_events(instrument=None,
                dt_to=None,
                user=None,
                division=None,
-               group=None,
-               wrap=True):
+               group=None):
     """
     Get calendar events for a particular instrument on the Microscopy Nexus,
     on some date, or by some user
@@ -512,47 +472,39 @@ def get_events(instrument=None,
         replicated under the "project" information in the outputted XML. If
         ``None`` (and ``user`` is provided), the group will be queried
         from the active directory server.
-    wrap : bool
-        Boolean used to choose whether to apply the _wrap_events() function to
-        the output XML string.
 
     Returns
     -------
-    output : str
-        A well-formed XML document in a string, containing one or more <event>
-        tags that contain information about each reservation, including title,
-        instrument, user information, reservation purpose, sample details,
-        description, and date/time information.
+    res_event : ReservationEvent
+        A ``ReservationEvent`` in a string, containing information about a
+        single reservation, including title, instrument, user information,
+        reservation purpose, sample details, description, and date/time
+        information.
     """
 
-    output = ''
     xml = fetch_xml(instrument, dt_from=dt_from, dt_to=dt_to)
-    cal_event = CalendarEvent.from_xml(xml)
-    _logger.info(cal_event)
 
-    if not division and not group and user:
-        _logging.info('Querying LDAP for division and group info')
-        division, group = get_div_and_group(user)
+    res_event = res_event_from_xml(xml, date=dt_from)
+    _logger.info(res_event)
 
-    # parse the xml into a string, and then indent
-    # date parsing is no longer necessary because fetch_xml should return
-    # only one event if both dt_from and dt_to are provided
-    output += INDENT + str(_parse_xml(xml, XSLT_PATH,
-                                      user=user,
-                                      division=division,
-                                      group=group)).replace('\n', '\n' +
-                                                            INDENT)
+    # currently not using division and group code
 
-    if wrap:
-        output = _wrap_events(output)
+    # if not division and not group and user:
+    #     _logging.info('Querying LDAP for division and group info')
+    #     division, group = get_div_and_group(user)
 
-    return output
+    return res_event
 
 
 def _wrap_events(events_string):
     """
     Helper function to turn events string from :py:func:`~.get_events` into a
     well-formed XML file with proper indentation
+
+    .. deprecated:: 1.0.1
+          `_wrap_events` is no longer used since API responses and
+          reservation information is managed as ``lxml`` elements now instead of
+          as strings
 
     Parameters
     ----------
@@ -623,10 +575,11 @@ def dump_calendars(instrument=None, user=None, dt_from=None, dt_to=None,
         The filename to which the events should be written
     """
     with open(filename, 'w') as f:
-        text = get_events(instrument=instrument, dt_from=dt_from,
-                          dt_to=dt_to, user=user, division=division,
-                          group=group, wrap=True)
-        f.write(text)
+        res_event = get_events(instrument=instrument, dt_from=dt_from,
+                               dt_to=dt_to, user=user, division=division,
+                               group=group)
+        f.write(_etree.tostring(res_event.as_xml(), xml_declaration=True,
+                                encoding='UTF-8', pretty_print=True).decode())
 
 
 def _get_sharepoint_date_string(dt):

@@ -3,10 +3,11 @@ import pytest
 import requests
 from lxml import etree
 from datetime import datetime as dt
-from nexusLIMS.harvester import sharepoint_calendar as sc
+from nexusLIMS.harvesters import sharepoint_calendar as sc
 from nexusLIMS.utils import parse_xml as _parse_xml
 from nexusLIMS.utils import nexus_req as _nexus_req
-from nexusLIMS.harvester.sharepoint_calendar import AuthenticationError
+from nexusLIMS.harvesters import ReservationEvent
+from nexusLIMS.harvesters.sharepoint_calendar import AuthenticationError
 from nexusLIMS import instruments
 from nexusLIMS.instruments import instrument_db
 from collections import OrderedDict
@@ -23,7 +24,7 @@ warnings.filterwarnings(
     DeprecationWarning)
 
 
-class TestCalendarHandling:
+class TestSharepoint:
     SC_XSL_FILE = os.path.abspath(
         os.path.join(os.path.dirname(sc.__file__), 'cal_parser.xsl'))
     CREDENTIAL_FILE_ABS = os.path.abspath(
@@ -50,7 +51,7 @@ class TestCalendarHandling:
         events directly.
         """
         # return the xml parsed from the file
-        file_content = bytes(TestCalendarHandling.xml_content, encoding='utf-8')
+        file_content = bytes(TestSharepoint.xml_content, encoding='utf-8')
 
         # parsed_xml items will be an _XSLTResultTree object with many
         # <event>...</event> tags on the same level
@@ -130,14 +131,14 @@ class TestCalendarHandling:
                 sc.fetch_xml(instrument_db['FEI-Titan-TEM-635816'])
 
     def test_absolute_path_to_credentials(self, monkeypatch):
-        from nexusLIMS.harvester.sharepoint_calendar import get_auth
+        from nexusLIMS.harvesters.sharepoint_calendar import get_auth
         with monkeypatch.context() as m:
             # remove environment variable so we get into file processing
             m.delenv('nexusLIMS_user')
             _ = get_auth(self.CREDENTIAL_FILE_ABS)
 
     def test_relative_path_to_credentials(self, monkeypatch):
-        from nexusLIMS.harvester.sharepoint_calendar import get_auth
+        from nexusLIMS.harvesters.sharepoint_calendar import get_auth
         os.chdir(os.path.dirname(__file__))
         with monkeypatch.context() as m:
             # remove environment variable so we get into file processing
@@ -145,7 +146,7 @@ class TestCalendarHandling:
             _ = get_auth(self.CREDENTIAL_FILE_REL)
 
     def test_bad_path_to_credentials(self, monkeypatch):
-        from nexusLIMS.harvester.sharepoint_calendar import get_auth
+        from nexusLIMS.harvesters.sharepoint_calendar import get_auth
         with monkeypatch.context() as m:
             # remove environment variable so we get into file processing
             m.delenv('nexusLIMS_user')
@@ -201,67 +202,71 @@ class TestCalendarHandling:
         doc = etree.fromstring(xml)
         assert len(doc.findall('entry')) == 9
 
-    def test_fetch_xml_calendar_event(self):
+    def test_sharepoint_fetch_xml_reservation_event(self):
         xml = \
             sc.fetch_xml(instrument=instrument_db['FEI-Titan-TEM-635816'],
                          dt_from=dt.fromisoformat('2018-11-13T00:00:00'),
                          dt_to=dt.fromisoformat('2018-11-13T23:59:59'))
-        cal_event = sc.CalendarEvent.from_xml(xml)
-        assert cal_event.title == '***REMOVED***'
-        assert cal_event.sharepoint_id == 470
+        cal_event = sc.res_event_from_xml(xml)
+        assert cal_event.experiment_title == '***REMOVED***'
+        assert cal_event.internal_id == '470'
         assert cal_event.username == '***REMOVED***'
         assert cal_event.start_time == dt.fromisoformat(
             '2018-11-13T09:00:00-05:00')
 
-    def test_fetch_xml_calendar_event_no_entry(self):
+    def test_sharepoint_fetch_xml_reservation_event_no_entry(self):
         # tests when there is no matching event found
         xml = \
             sc.fetch_xml(instrument=instrument_db['FEI-Titan-TEM-635816'],
                          dt_from=dt.fromisoformat('2010-01-01T00:00:00'),
                          dt_to=dt.fromisoformat('2010-01-01T00:00:01'))
-        cal_event = sc.CalendarEvent.from_xml(xml)
-        assert cal_event is None
+        cal_event = sc.res_event_from_xml(xml)
+        assert cal_event.experiment_title is None
+        assert cal_event.instrument.name == 'FEI-Titan-TEM-635816'
+        assert cal_event.username is None
 
-    def test_calendar_event_repr(self):
+    def test_reservation_event_repr(self):
         s = dt(2020, 8, 20, 12, 0, 0)
         e = dt(2020, 8, 20, 16, 0, 40)
-        c = sc.CalendarEvent('Test event',
-                             instrument_db['FEI-Titan-TEM-635816'],
-                             dt.now(), '***REMOVED***', '***REMOVED***', s, e, 'category',
-                             'purpose', 'sample details', 'projectID', 999)
+        c = ReservationEvent(experiment_title='Test event',
+                             instrument=instrument_db['FEI-Titan-TEM-635816'],
+                             last_updated=dt.now(), username='***REMOVED***',
+                             created_by='***REMOVED***', start_time=s, end_time=e,
+                             reservation_type='category',
+                             experiment_purpose='purpose',
+                             sample_details='sample details',
+                             project_id='projectID',
+                             internal_id='999')
         assert c.__repr__() == 'Event for ***REMOVED*** on FEI-Titan-TEM-635816 from ' \
                                '2020-08-20T12:00:00 to 2020-08-20T16:00:40'
 
-        c = sc.CalendarEvent()
+        c = ReservationEvent()
         assert c.__repr__() == 'No matching calendar event'
 
-        c = sc.CalendarEvent(instrument=instrument_db['FEI-Titan-TEM-635816'])
+        c = ReservationEvent(instrument=instrument_db['FEI-Titan-TEM-635816'])
         assert c.__repr__() == 'No matching calendar event for ' \
                                'FEI-Titan-TEM-635816'
 
     def test_dump_calendars(self, tmp_path):
-        from nexusLIMS.harvester.sharepoint_calendar import dump_calendars
+        from nexusLIMS.harvesters.sharepoint_calendar import dump_calendars
         f = os.path.join(tmp_path, 'cal_output.xml')
         dump_calendars(instrument='FEI-Titan-TEM-635816', filename=f)
+        pass
 
     def test_division_group_lookup(self):
-        from nexusLIMS.harvester.sharepoint_calendar import get_events
-        events = get_events(instrument='FEI-Titan-TEM-635816',
-                            dt_from=dt.fromisoformat('2019-03-06T09:00:00'),
-                            dt_to=dt.fromisoformat('2019-03-06T11:00:00'),
-                            user='***REMOVED***')
-        doc = etree.fromstring(events)
-        assert doc.find('event/project/division').text == '642'
-        assert doc.find('event/project/group').text == '00'
+        from nexusLIMS.harvesters.sharepoint_calendar import get_div_and_group
+        div, group = get_div_and_group('***REMOVED***')
+        assert div == '641'
+        assert group == '02'
 
     def test_get_events_good_date(self):
-        from nexusLIMS.harvester.sharepoint_calendar import get_events
+        from nexusLIMS.harvesters.sharepoint_calendar import get_events
         events_1 = get_events(instrument='FEI-Titan-TEM-635816',
                               dt_from=dt.fromisoformat('2019-03-13T08:00:00'),
                               dt_to=dt.fromisoformat('2019-03-13T16:00:00'))
-        doc = etree.fromstring(events_1)
-        assert doc.find('event/user/userName').text == '***REMOVED***'
-        assert doc.find('event/title').text == '***REMOVED***'
+        assert events_1.username is None
+        assert events_1.created_by == '***REMOVED***'
+        assert events_1.experiment_title == '***REMOVED***'
 
     def test_calendar_parsing_event_number(self, parse_xml):
         """
@@ -351,7 +356,7 @@ class TestCalendarHandling:
         assert len(parse_xml_date_list) == 1
 
     def test_basic_auth(self):
-        from nexusLIMS.harvester.sharepoint_calendar import get_auth
+        from nexusLIMS.harvesters.sharepoint_calendar import get_auth
         res = get_auth(basic=True)
         assert isinstance(res, tuple)
 
@@ -525,3 +530,44 @@ class TestCalendarHandling:
         assert sc._get_sharepoint_tz() == 'America/Los_Angeles'
         monkeypatch.setattr(sc, '_nexus_req', mock_get_ht)
         assert sc._get_sharepoint_tz() == 'Pacific/Honolulu'
+
+
+class TestReservationEvent:
+    def test_full_reservation_constructor(self):
+        res_event = ReservationEvent(
+            experiment_title="A test title",
+            instrument=instrument_db['FEI-Titan-TEM-635816'],
+            last_updated=dt.fromisoformat("2021-09-15T16:04:00"),
+            username='***REMOVED***', created_by='***REMOVED***',
+            start_time=dt.fromisoformat("2021-09-15T03:00:00"),
+            end_time=dt.fromisoformat("2021-09-15T16:00:00"),
+            reservation_type="A test event",
+            experiment_purpose="To test the constructor",
+            sample_details="A sample that was loaded into a microscope for "
+                           "testing",
+            sample_pid="***REMOVED***.5", sample_name="The test sample",
+            project_name="NexusLIMS", project_id="***REMOVED***.1.5",
+            project_ref="https://www.example.org", internal_id="42308",
+            division="641", group="00"
+        )
+
+        xml = res_event.as_xml()
+        assert xml.find('title').text == "A test title"
+        assert xml.find('id').text == "42308"
+        assert xml.find('summary/experimenter').text == "***REMOVED***"
+        assert xml.find('summary/instrument').text == "FEI Titan TEM"
+        assert xml.find('summary/instrument').get("pid") == \
+               "FEI-Titan-TEM-635816"
+        assert xml.find('summary/reservationStart').text == \
+               "2021-09-15T03:00:00"
+        assert xml.find('summary/reservationEnd').text == "2021-09-15T16:00:00"
+        assert xml.find('summary/motivation').text == "To test the constructor"
+        assert xml.find('sample').get("id") == "***REMOVED***.5"
+        assert xml.find('sample/name').text == "The test sample"
+        assert xml.find('sample/description').text == \
+               "A sample that was loaded into a microscope for testing"
+        assert xml.find('project/name').text == "NexusLIMS"
+        assert xml.find('project/division').text == "641"
+        assert xml.find('project/group').text == "00"
+        assert xml.find('project/project_id').text == "***REMOVED***.1.5"
+        assert xml.find('project/ref').text == "https://www.example.org"

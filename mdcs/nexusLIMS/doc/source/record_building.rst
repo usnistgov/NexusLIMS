@@ -124,7 +124,7 @@ Overview
 2.  `(link) <querying-sharepoint_>`_
     Fetch any associated calendar information for this
     :py:class:`~nexusLIMS.db.session_handler.Session` using
-    :py:func:`~nexusLIMS.harvester.sharepoint_calendar.get_events`
+    :py:func:`~nexusLIMS.harvesters.sharepoint_calendar.get_events`
 3.  `(link) <identifying-files_>`_
     Identify files that NexusLIMS knows how to parse within the time range using
     :py:func:`~nexusLIMS.utils.find_files_by_mtime`; if no files are found,
@@ -193,8 +193,8 @@ element, including information such as who made the reservation, what the
 experiment's motivation was, what sample was examined, etc.
 
 To obtain this information, the
-:py:func:`~nexusLIMS.harvester.sharepoint_calendar.get_events` function from the
-:py:mod:`~nexusLIMS.harvester.sharepoint_calendar` harvester module is used.
+:py:func:`~nexusLIMS.harvesters.sharepoint_calendar.get_events` function from the
+:py:mod:`~nexusLIMS.harvesters.sharepoint_calendar` harvester module is used.
 This function authenticates to and queries the SharePoint API, and receives
 an XML response representing any reservations found that match the timespan of
 the :py:class:`~nexusLIMS.db.session_handler.Session`. This XML is then

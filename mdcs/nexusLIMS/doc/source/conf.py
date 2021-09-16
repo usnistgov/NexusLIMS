@@ -89,7 +89,7 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3.7/', None),
                        'requests': (
                            'https://2.python-requests.org/en/master', None),
                        'PIL': (
-                           'https://pillow.readthedocs.io/en/3.1.x/',
+                           'https://pillow.readthedocs.io/en/stable/',
                            None),
                        # use the custom objects.inv file above for LXML:
                        'lxml': ('https://lxml.de/', 'objects_lxml.inv')

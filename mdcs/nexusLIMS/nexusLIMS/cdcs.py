@@ -33,7 +33,7 @@ from urllib.parse import urljoin as _urljoin
 import sys
 import argparse
 from nexusLIMS._urls import cdcs_url as _cdcs_url
-from nexusLIMS.harvester.sharepoint_calendar import AuthenticationError as \
+from nexusLIMS.harvesters.sharepoint_calendar import AuthenticationError as \
     _authError
 from nexusLIMS.utils import nexus_req as _nx_req
 from tqdm import tqdm as _tqdm
@@ -174,9 +174,9 @@ def upload_record_files(files_to_upload, progress=False):
 
     Returns
     -------
-    files_uploaded : list of str
+    files_uploaded : :obj:`list` of :obj:`str`
         A list of the files that were successfully uploaded
-    record_ids : list of str
+    record_ids : :obj:`list` of :obj:`str`
         A list of the record id values (onthe server) that were uploaded
     """
     if files_to_upload is None:

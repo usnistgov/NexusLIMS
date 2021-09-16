@@ -33,6 +33,7 @@ import math as _math
 from xml.sax.saxutils import escape
 from urllib.parse import quote as _urlquote
 from timeit import default_timer as _timer
+from lxml import etree as _etree
 
 import hyperspy.api_nogui as _hs
 import numpy as _np
@@ -109,7 +110,8 @@ def cluster_filelist_mtimes(filelist):
                               35, base=_math.e)
     _logger.info('KDE bandwidth grid search')
     grid = _GridSearchCV(_KernelDensity(kernel='gaussian'),
-                         {'bandwidth': bandwidths}, cv=_LeaveOneOut(), n_jobs=-1)
+                         {'bandwidth': bandwidths},
+                         cv=_LeaveOneOut(), n_jobs=-1)
     grid.fit(m_array)
     bw = grid.best_params_['bandwidth']
     _logger.info(f'Using bandwidth of {bw:.3f} minutes for KDE')
@@ -378,10 +380,9 @@ class AcquisitionActivity:
         # store what we calculated as unique metadata into the attribute
         self.unique_meta = unique_meta
 
-    def as_xml(self, seqno, sample_id,
-               indent_level=1, print_xml=False):
+    def as_xml(self, seqno, sample_id, print_xml=False):
         """
-        Build an XML string representation of this AcquisitionActivity (for
+        Build an XML (``lxml``) representation of this AcquisitionActivity (for
         use in instances of the NexusLIMS schema)
 
         Parameters
@@ -392,10 +393,6 @@ class AcquisitionActivity:
         sample_id : str
             A unique identifier pointing to a sample identifier. No checks
             are done on this value; it is merely reproduced in the XML output
-        indent_level : int
-            (Default is 1) the level of indentation to use in exporting. If
-            0, no lines will be indented. A value of 1 should be appropriate
-            for most cases as used in the Nexus schema
         print_xml : bool
             Whether to print the XML output to the console or not (Default:
             False)
@@ -407,16 +404,15 @@ class AcquisitionActivity:
             properly-formed complete XML document since it does not have a
             header or namespace definitions)
         """
+        aqAc_xml_el = _etree.Element("acquisitionActivity")
+        aqAc_xml_el.set('seqno', str(seqno))
+        start_time_el = _etree.SubElement(aqAc_xml_el, "startTime")
+        start_time_el.text = self.start.isoformat()
+        sample_id_el = _etree.SubElement(aqAc_xml_el, "sampleID")
+        sample_id_el.text = sample_id
 
-        aqAc_xml = ''
-        INDENT = '  ' * indent_level
-        line_ending = '\n'
+        setup_el = _etree.SubElement(aqAc_xml_el, "setup")
 
-        aqAc_xml += f'{INDENT}<acquisitionActivity seqno="{seqno}">{line_ending}'
-        aqAc_xml += f'{INDENT*2}<startTime>{self.start.isoformat()}' \
-                        f'</startTime>{line_ending}'
-        aqAc_xml += f'{INDENT*2}<sampleID>{sample_id}</sampleID>{line_ending}'
-        aqAc_xml += f'{INDENT*2}<setup>{line_ending}'
         for pk, pv in sorted(self.setup_params.items(),
                              key=lambda i: i[0].lower()):
             # metadata values to skip in XML output
@@ -428,10 +424,11 @@ class AcquisitionActivity:
                 # for setup parameters, a key in the first dataset's warning
                 # list is the same as in all of them
                 pk_warning = pk in self.warnings[0]
-                aqAc_xml += f'{INDENT*3}<param name="{pk}"' + \
-                            (' warning="true">' if pk_warning else '>') + \
-                            f'{pv}</param>{line_ending}'
-        aqAc_xml += f'{INDENT*2}</setup>{line_ending}'
+                param_el = _etree.SubElement(setup_el, "param")
+                param_el.set("name", str(pk))
+                if pk_warning:
+                    param_el.set("warning", "true")
+                param_el.text = str(pv)
 
         for f, m, um, w in zip(self.files, self.meta,
                                self.unique_meta, self.warnings):
@@ -448,15 +445,19 @@ class AcquisitionActivity:
             rel_thumb_name = _urlquote(rel_thumb_name)
 
             # f is string; um is a dictionary, w is a list
-            aqAc_xml += f'{INDENT*2}<dataset ' \
-                        f'type="{m["DatasetType"]}" ' \
-                        f'role="Experimental">{line_ending}'
-            aqAc_xml += f'{INDENT*3}<name>{_os.path.basename(f)}' \
-                        f'</name>{line_ending}'
-            aqAc_xml += f'{INDENT*3}<location>{rel_fname}' \
-                        f'</location>{line_ending}'
-            aqAc_xml += f'{INDENT*3}<preview>{rel_thumb_name}' \
-                        f'</preview>{line_ending}'
+            dset_el = _etree.SubElement(aqAc_xml_el, "dataset")
+            dset_el.set("type", str(m["DatasetType"]))
+            dset_el.set("role", "Experimental")
+
+            dset_name_el = _etree.SubElement(dset_el, "name")
+            dset_name_el.text = _os.path.basename(f)
+
+            dset_loc_el = _etree.SubElement(dset_el, "location")
+            dset_loc_el.text = rel_fname
+
+            dset_prev_el = _etree.SubElement(dset_el, "preview")
+            dset_prev_el.text = rel_thumb_name
+
             for meta_k, meta_v in sorted(um.items(),
                                          key=lambda i: i[0].lower()):
                 if meta_k in ['warnings', 'DatasetType']:
@@ -466,15 +467,14 @@ class AcquisitionActivity:
                             any(c in meta_v for c in '<&'):
                         meta_v = escape(meta_v)
                     meta_k_warning = meta_k in w
-                    aqAc_xml += f'{INDENT*3}<meta name="{meta_k}"' + \
-                                (' warning="true">' if
-                                 meta_k_warning else '>') + \
-                                f'{meta_v}</meta>{line_ending}'
-            aqAc_xml += f'{INDENT*2}</dataset>{line_ending}'
-
-        aqAc_xml += f'{INDENT}</acquisitionActivity>{line_ending}'
+                    meta_el = _etree.SubElement(dset_el, "meta")
+                    meta_el.set("name", str(meta_k))
+                    if meta_k_warning:
+                        meta_el.set("warning", "true")
+                    meta_el.text = str(meta_v)
 
         if print_xml:
-            print(aqAc_xml)
+            print(_etree.tostring(aqAc_xml_el, pretty_print=True,
+                                  encoding='UTF-8'))
 
-        return aqAc_xml
+        return aqAc_xml_el

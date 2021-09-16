@@ -38,3 +38,5 @@ htmlcov/
 # Oxygen project files
 *.xpr
 /mdcs/nexusLIMS/nexusLIMS/db/build/
+
+node_modules
