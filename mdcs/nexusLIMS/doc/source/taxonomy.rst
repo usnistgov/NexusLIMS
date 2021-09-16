@@ -7,7 +7,7 @@ used by the NexusLIMS development team and what is meant by them:
 
 - **Harvester:**
 
-  - The harvesters (implemented in the :py:mod:`nexusLIMS.harvester` package)
+  - The harvesters (implemented in the :py:mod:`nexusLIMS.harvesters` package)
     are the portions of the code that connect to external data sources, such
     as the SharePoint calendar. Currently, the calendar harvester is the only
     one implemented, but eventually there will likely be at least an electronic

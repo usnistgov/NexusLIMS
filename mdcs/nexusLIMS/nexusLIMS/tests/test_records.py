@@ -18,7 +18,7 @@ from uuid import uuid4
 from datetime import datetime as _dt
 from datetime import timedelta as _td
 from nexusLIMS.tests.utils import files
-from nexusLIMS.harvester.sharepoint_calendar import AuthenticationError
+from nexusLIMS.harvesters.sharepoint_calendar import AuthenticationError
 import pytest
 
 
@@ -27,10 +27,10 @@ class TestRecordBuilder:
     # have to do these before modifying the database with the actual run tests
     def test_dry_run_calendar(self):
         sessions = session_handler.get_sessions_to_build()
-        cal_event = _rb.dry_run_get_calendar_event(sessions[0])
-        assert cal_event.project_id == '642.03.??'
+        cal_event = _rb.dry_run_get_sharepoint_reservation_event(sessions[0])
+        assert cal_event.project_name == '642.03.??'
         assert cal_event.username == '***REMOVED***'
-        assert cal_event.title == 'Looking for Nickel Alloys'
+        assert cal_event.experiment_title == 'Looking for Nickel Alloys'
         assert cal_event.start_time == _dt.fromisoformat(
             '2019-09-06T16:30:00-04:00')
 
@@ -234,14 +234,13 @@ def gnu_find_activities(fix_mountain_time):
     instr = instrument_db['FEI-Titan-TEM-635816']
     dt_from = _dt.fromisoformat('2018-11-13T13:00:00.000')
     dt_to = _dt.fromisoformat('2018-11-13T16:00:00.000')
-    activities_str, activities_list = _rb.build_acq_activities(
+    activities_list = _rb.build_acq_activities(
         instrument=instr, dt_from=dt_from, dt_to=dt_to,
-        sample_id='test_sample_id', generate_previews=False)
+        generate_previews=False)
 
     yield {'instr': instr,
            'dt_from': dt_from,
            'dt_to': dt_to,
-           'activities_str': activities_str,
            'activities_list': activities_list}
 
 
@@ -254,18 +253,16 @@ class TestActivity:
             raise RuntimeError('Mock failure for GNU find method')
 
         monkeypatch.setattr(_rb, '_gnu_find_files', mock_gnu_find)
-        self.activities_str_python_find, self.activities_list_python_find = \
+        self.activities_list_python_find = \
             _rb.build_acq_activities(
                 instrument=gnu_find_activities['instr'],
                 dt_from=gnu_find_activities['dt_from'],
                 dt_to=gnu_find_activities['dt_to'],
-                sample_id='test_sample_id',
                 generate_previews=False)
 
-        assert len(gnu_find_activities['activities_list']) == \
-            len(self.activities_list_python_find)
-        assert gnu_find_activities['activities_str'] == \
-            self.activities_str_python_find
+        for i in range(len(self.activities_list_python_find)):
+            assert str(gnu_find_activities['activities_list'][i]) == \
+                str(self.activities_list_python_find[i])
 
     def test_activity_repr(self, gnu_find_activities):
         if 'is_mountain_time' in os.environ:    # pragma: no cover
@@ -321,8 +318,8 @@ class TestActivity:
         a.files[0] += '<&'
         a.unique_meta[0]['Imaging Mode'] = '<IMAGING>'
 
-        xml_str = a.as_xml(seqno=0, sample_id='sample_id', indent_level=1,
-                           print_xml=True)
+        xml_el = a.as_xml(seqno=0, sample_id='sample_id',
+                          print_xml=True)
 
 
 class TestSession:

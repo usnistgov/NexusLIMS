@@ -30,9 +30,6 @@
 
 Attributes
 ----------
-XSLT_PATH : str
-    The path to ``cal_events_to_nx_record.xsl``, which is used to translate
-    the calender event response XML to a format compatible with the Nexus Schema
 """
 
 import os as _os
@@ -48,8 +45,7 @@ from io import BytesIO as _bytesIO
 import nexusLIMS.schemas.activity as _activity
 from nexusLIMS.schemas.activity import AcquisitionActivity as _AcqAc
 from nexusLIMS.schemas.activity import cluster_filelist_mtimes
-from nexusLIMS.harvester import sharepoint_calendar as _sp_cal
-from nexusLIMS.utils import parse_xml as _parse_xml
+from nexusLIMS.harvesters import sharepoint_calendar as _sp_cal
 from nexusLIMS.utils import find_files_by_mtime as _find_files
 from nexusLIMS.utils import gnu_find_files_by_mtime as _gnu_find_files
 from nexusLIMS.extractors import extension_reader_map as _ext
@@ -59,8 +55,6 @@ from nexusLIMS import version as _version
 from timeit import default_timer as _timer
 
 _logger = _logging.getLogger(__name__)
-XSLT_PATH = _os.path.join(_os.path.dirname(__file__),
-                          "cal_events_to_nx_record.xsl")
 XSD_PATH = _os.path.join(_os.path.dirname(_activity.__file__),
                          "nexus-experiment.xsd")
 
@@ -111,60 +105,40 @@ def build_record(instrument, dt_from, dt_to,
         for the data contained in the provided path
     """
 
-    xml_record = ''
-
     if sample_id is None:
         sample_id = str(_uuid4())
 
-    # Insert XML prolog, XSLT reference, and namespaces.
-    xml_record += "<?xml version=\"1.0\" encoding=\"UTF-8\"?> \n"
-    # TODO: Header elements may be changed once integration into CDCS determined
-    xml_record += "<?xml-stylesheet type=\"text/xsl\" href=\"\"?>\n"
-    xml_record += "<nx:Experiment xmlns=\"\"\n"
-    xml_record += "xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
-    xml_record += "xmlns:nx=\"" \
-                  "https://data.nist.gov/od/dm/nexus/experiment/v1.0\">\n"
+    # setup namespaces
+    NX = "https://data.nist.gov/od/dm/nexus/experiment/v1.0"
+    XSI = "http://www.w3.org/2001/XMLSchema-instance"
+    NSMAP = {None: "", "xsi": XSI, "nx": NX}
+    xml = _etree.Element(f"{{{NX}}}Experiment", nsmap=NSMAP)
 
     _logger.info(f"Getting calendar events with instrument: {instrument.name}, "
                  f"from {dt_from.isoformat()} to {dt_to.isoformat()}, "
                  f"user: {user}")
-    events_str = _sp_cal.get_events(instrument=instrument, dt_from=dt_from,
-                                    dt_to=dt_to, user=user, wrap=True)
+    # this now returns a ReservationEvent, not a string
+    res_event = _sp_cal.get_events(instrument=instrument, dt_from=dt_from,
+                                   dt_to=dt_to, user=user)
 
-    # Apply XSLT to transform calendar events to single record format:
-    output = _parse_xml(events_str, XSLT_PATH,
-                        instrument_PID=instrument.name,
-                        instrument_name=instrument.schema_name,
-                        experiment_id=str(_uuid4()),
-                        collaborator=None,
-                        sample_id=sample_id)
+    output = res_event.as_xml()
 
-    # No calendar events were found
-    if str(output) == '':
-        output = f'<title>Experiment on the {instrument.schema_name}' \
-                 f' on {dt_from.strftime("%A %b. %d, %Y")}</title>\n' + \
-                 '<id/>\n' + \
-                 '<summary>\n' + \
-                 f'    <instrument pid="{instrument.name}">' \
-                 f'{instrument.schema_name}</instrument>\n' + \
-                 '</summary>\n'
-
-    xml_record += str(output)
+    for child in output:
+        xml.append(child)
 
     _logger.info(f"Building acquisition activities for timespan from "
                  f"{dt_from.isoformat()} to {dt_to.isoformat()}")
-    aa_str, activities = build_acq_activities(instrument,
-                                              dt_from, dt_to, sample_id,
-                                              generate_previews)
-    xml_record += aa_str
+    activities = build_acq_activities(instrument,
+                                      dt_from, dt_to,
+                                      generate_previews)
+    for i, a in enumerate(activities):
+        xml.append(a.as_xml(i, sample_id, print_xml=False))
 
-    xml_record += "</nx:Experiment>"  # Add closing tag for root element.
+    return _etree.tostring(xml, xml_declaration=True, encoding='UTF-8',
+                           pretty_print=True).decode()
 
-    return xml_record
 
-
-def build_acq_activities(instrument, dt_from, dt_to,
-                         sample_id, generate_previews):
+def build_acq_activities(instrument, dt_from, dt_to, generate_previews):
     """
     Build an XML string representation of each AcquisitionActivity for a
     single microscopy session. This includes setup parameters and metadata
@@ -184,18 +158,13 @@ def build_acq_activities(instrument, dt_from, dt_to,
     dt_to : datetime.datetime
         The ending timestamp used to determine the last point in time for
         which files should be associated with this record
-    sample_id : str
-        An identifier for the sample from which data was collected
     generate_previews : bool
         Whether or not to create the preview thumbnail images
 
     Returns
     -------
-    acq_activities : str
-        A string representing the XML output for each AcquisitionActivity
-        associated with a given reservation/experiment on a microscope.
-
-    activities : :obj:`list` of :obj:`~nexusLIMS.schemas.activity.AcquisitionActivity`:
+    activities : :obj:`list` of
+    :obj:`~nexusLIMS.schemas.activity.AcquisitionActivity`:
         The list of :py:class:`~nexusLIMS.schemas.activity.AcquisitionActivity`
         objects generated for the record
     """
@@ -261,7 +230,6 @@ def build_acq_activities(instrument, dt_from, dt_to,
             # not increment i)
             aa_idx += 1
 
-    acq_activities_str = ''
     _logger.info('Finished detecting activities')
     for i, a in enumerate(activities):
         # aa_logger = _logging.getLogger('nexusLIMS.schemas.activity')
@@ -271,10 +239,7 @@ def build_acq_activities(instrument, dt_from, dt_to,
         _logger.info(f'Activity {i}: storing unique metadata values')
         a.store_unique_metadata()
 
-        acq_activities_str += a.as_xml(i, sample_id,
-                                       indent_level=1, print_xml=False)
-
-    return acq_activities_str, activities
+    return activities
 
 
 def get_files(path, dt_from, dt_to):
@@ -392,7 +357,7 @@ def build_new_session_records():
 
     Returns
     -------
-    xml_files : list of str
+    xml_files : :obj:`list` of :obj:`str`
         A list of record files that were successfully built and saved to
         centralized storage
     """
@@ -467,7 +432,7 @@ def process_new_records(dry_run=False):
         for s in sessions:
             _logger.info('')
             _logger.info('')
-            dry_run_get_calendar_event(s)
+            dry_run_get_sharepoint_reservation_event(s)
             dry_run_file_find(s)
     else:
         xml_files = build_new_session_records()
@@ -491,7 +456,7 @@ def process_new_records(dry_run=False):
                               f'{files_not_uploaded}')
 
 
-def dry_run_get_calendar_event(s):
+def dry_run_get_sharepoint_reservation_event(s):
     """
     Get the calendar event that would be used to create a record based off
     the supplied session
@@ -503,14 +468,14 @@ def dry_run_get_calendar_event(s):
 
     Returns
     -------
-    cal_event : ~nexusLIMS.harvester.sharepoint_calendar.CalendarEvent
+    res_event : ~nexusLIMS.harvesters.ReservationEvent
         A list of strings containing the files that would be included for the
         record of this session (if it were not a dry run)
     """
     xml = _sp_cal.fetch_xml(s.instrument, s.dt_from, s.dt_to)
-    cal_event = _sp_cal.CalendarEvent.from_xml(xml)
-    _logger.info(cal_event)
-    return cal_event
+    res_event = _sp_cal.res_event_from_xml(xml)
+    _logger.info(res_event)
+    return res_event
 
 
 def dry_run_file_find(s):
@@ -525,7 +490,7 @@ def dry_run_file_find(s):
 
     Returns
     -------
-    files : list of str
+    files : :obj:`list` of :obj:`str`
         A list of strings containing the files that would be included for the
         record of this session (if it were not a dry run)
     """
@@ -549,11 +514,12 @@ def dry_run_file_find(s):
     return files
 
 
-if __name__ == '__main__':   # pragma: no cover
+if __name__ == '__main__':  # pragma: no cover
     """
     If running as a module, process new records (with some control flags)
     """
     from nexusLIMS.utils import setup_loggers
+
     parser = _ap.ArgumentParser()
 
     # Optional argument flag which defaults to False

@@ -131,7 +131,7 @@ def nexus_req(url, fn, basic_auth=False, **kwargs):
     r : :py:class:`requests.Response`
         A requests response object
     """
-    from .harvester.sharepoint_calendar import CA_BUNDLE_PATH, get_auth
+    from .harvesters.sharepoint_calendar import CA_BUNDLE_PATH, get_auth
     with _tempfile.NamedTemporaryFile() as tmp:
         with open(_certifi.where(), 'rb') as sys_cert:
             lines = sys_cert.readlines()
