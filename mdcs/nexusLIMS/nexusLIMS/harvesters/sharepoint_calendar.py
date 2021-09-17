@@ -52,13 +52,11 @@ from nexusLIMS.harvesters import ReservationEvent
 
 _logger = _logging.getLogger(__name__)
 XSLT_PATH = _os.path.join(_os.path.dirname(__file__), "cal_parser.xsl")
-CA_BUNDLE_PATH = _os.path.join(_os.path.dirname(__file__),
-                               "sharepoint_cert_bundle.pem")
 INDENT = '  '
 
 __all__ = ['res_event_from_xml', 'AuthenticationError', 'get_auth', 'fetch_xml',
            'get_div_and_group', 'get_events', '_wrap_events',
-           'dump_calendars', 'CA_BUNDLE_PATH']
+           'dump_calendars']
 
 
 class AuthenticationError(Exception):

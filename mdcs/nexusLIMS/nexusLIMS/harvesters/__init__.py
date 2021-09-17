@@ -5,6 +5,10 @@ various calendar
 sources.
 """
 from lxml import etree
+import os as _os
+
+CA_BUNDLE_PATH = _os.path.join(_os.path.dirname(__file__),
+                               "cert_bundle.pem")
 
 
 class ReservationEvent:

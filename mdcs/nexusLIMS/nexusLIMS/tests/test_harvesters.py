@@ -532,6 +532,140 @@ class TestSharepoint:
         assert sc._get_sharepoint_tz() == 'Pacific/Honolulu'
 
 
+class TestNemoIntegration:
+    @pytest.fixture
+    def nemo_connector(self):
+        """
+        A NemoConnector instance that can be used for valid tests
+        """
+        assert 'NEMO_address_1' in os.environ
+        assert 'NEMO_token_1' in os.environ
+        from nexusLIMS.harvesters.nemo import NemoConnector
+        return NemoConnector(os.environ['NEMO_address_1'],
+                             os.environ['NEMO_token_1'])
+
+    @pytest.fixture
+    def bogus_nemo_connector_url(self):
+        """
+        A NemoConnector with a bad URL and token that should fail
+        """
+        from nexusLIMS.harvesters.nemo import NemoConnector
+        return NemoConnector("https://a_url_that_doesnt_exist/",
+                             "notneeded")
+
+    @pytest.fixture
+    def bogus_nemo_connector_token(self):
+        """
+        A NemoConnector with a bad URL and token that should fail
+        """
+        from nexusLIMS.harvesters.nemo import NemoConnector
+        return NemoConnector(os.environ['NEMO_address_1'],
+                             "badtokenvalue")
+
+    def test_nemo_connector_repr(self, nemo_connector):
+        assert str(nemo_connector) == f"Connection to NEMO API at " \
+                                      f"{os.environ['NEMO_address_1']}"
+
+    def test_getting_nemo_data(self):
+        from nexusLIMS.utils import nexus_req
+        from urllib.parse import urljoin
+        from requests import get as _get
+        r = nexus_req(url=urljoin(os.environ['NEMO_address_1'],
+                                  'api/reservations'),
+                      fn=_get, token_auth=os.environ['NEMO_token_1'])
+
+    @pytest.mark.parametrize("test_user_id_input,"
+                             "expected_usernames",
+                             [(3, ["***REMOVED***"]),
+                              ([2, 3, 4], ["***REMOVED***", "***REMOVED***", "***REMOVED***"]),
+                              (-1, [])])
+    def test_get_users(self, nemo_connector, test_user_id_input,
+                       expected_usernames):
+        users = nemo_connector.get_users(user_id=test_user_id_input)
+        # test for the username in each entry, and compare as a set so it's an
+        # unordered and deduplicated comparison
+        assert set([u['username'] for u in users]) == set(expected_usernames)
+
+    @pytest.mark.parametrize("test_username_input,"
+                             "expected_usernames",
+                             [('***REMOVED***', ["***REMOVED***"]),
+                              (['***REMOVED***', '***REMOVED***', '***REMOVED***'],
+                               ["***REMOVED***", "***REMOVED***", "***REMOVED***"]),
+                              ('ernst_ruska', [])])
+    def test_get_users_by_username(self, nemo_connector,
+                                   test_username_input, expected_usernames):
+        users = nemo_connector.get_users_by_username(
+            username=test_username_input)
+        # test for the username in each entry, and compare as a set so it's an
+        # unordered and deduplicated comparison
+        assert set([u['username'] for u in users]) == set(expected_usernames)
+
+    def test_get_users_memoization(self):
+        # to test the memoization of user data, we have to use one instance
+        # of NemoConnector rather than a new one from the fixture for each call
+        from nexusLIMS.harvesters.nemo import NemoConnector
+        n = NemoConnector(os.environ['NEMO_address_1'],
+                          os.environ['NEMO_token_1'])
+        to_test = [(3, ["***REMOVED***"]),
+                   ([2, 3, 4], ["***REMOVED***", "***REMOVED***", "***REMOVED***"]),
+                   (-1, []),
+                   ([2, 3], ["***REMOVED***", "***REMOVED***"]),
+                   (2, ["***REMOVED***"])]
+        for u_id, expected in to_test:
+            users = n.get_users(u_id)
+            assert set([u['username'] for u in users]) == set(expected)
+
+    def test_get_users_by_username_memoization(self):
+        # to test the memoization of user data, we have to use one instance
+        # of NemoConnector rather than a new one from the fixture for each call
+        from nexusLIMS.harvesters.nemo import NemoConnector
+        n = NemoConnector(os.environ['NEMO_address_1'],
+                          os.environ['NEMO_token_1'])
+        to_test = [('***REMOVED***', ["***REMOVED***"]),
+                   (['***REMOVED***', '***REMOVED***', '***REMOVED***'], ["***REMOVED***", "***REMOVED***", "***REMOVED***"]),
+                   ('ernst_ruska', []),
+                   (['***REMOVED***', '***REMOVED***'], ['***REMOVED***', '***REMOVED***']),
+                   ('***REMOVED***', ['***REMOVED***'])]
+        for uname, expected in to_test:
+            users = n.get_users_by_username(uname)
+            assert set([u['username'] for u in users]) == set(expected)
+
+    def test_get_users_bad_url(self, bogus_nemo_connector_url):
+        with pytest.raises(requests.exceptions.ConnectionError):
+            bogus_nemo_connector_url.get_users()
+
+    @pytest.mark.parametrize("test_tool_id_input,expected_names",
+                             [(1, ["643 Titan (S)TEM (probe corrected)"]),
+                              ([1, 2], ["643 Titan (S)TEM (probe corrected)",
+                                        "642 JEOL 3010 (strobo)"]),
+                              ([1, 2, 3], ["643 Titan (S)TEM (probe corrected)",
+                                           "642 JEOL 3010 (strobo)",
+                                           "642 Titan"]),
+                              (-1, [])])
+    def test_get_tools(self, nemo_connector,
+                       test_tool_id_input, expected_names):
+        tools = nemo_connector.get_tools(test_tool_id_input)
+        # test for the tool name in each entry, and compare as a set so it's an
+        # unordered and deduplicated comparison
+        assert set([t['name'] for t in tools]) == set(expected_names)
+
+    def test_get_tools_memoization(self):
+        # to test the memoization of tool data, we have to use one instance
+        # of NemoConnector rather than a new one from the fixture for each call
+        from nexusLIMS.harvesters.nemo import NemoConnector
+        n = NemoConnector(os.environ['NEMO_address_1'],
+                          os.environ['NEMO_token_1'])
+        to_test = [([1, 2, 3], ["643 Titan (S)TEM (probe corrected)",
+                                "642 JEOL 3010 (strobo)",
+                                "642 Titan"]),
+                   (2, ["642 JEOL 3010 (strobo)"]),
+                   ([2, 3], ["642 JEOL 3010 (strobo)",
+                             "642 Titan"])]
+        for t_id, expected in to_test:
+            tools = n.get_tools(t_id)
+            assert set([t['name'] for t in tools]) == set(expected)
+
+
 class TestReservationEvent:
     def test_full_reservation_constructor(self):
         res_event = ReservationEvent(

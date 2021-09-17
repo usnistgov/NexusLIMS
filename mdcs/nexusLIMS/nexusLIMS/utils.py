@@ -105,7 +105,7 @@ def parse_xml(xml, xslt_file, **kwargs):
     return simplified_dom
 
 
-def nexus_req(url, fn, basic_auth=False, **kwargs):
+def nexus_req(url, fn, basic_auth=False, token_auth=None, **kwargs):
     """
     A helper method that wraps a function from :py:mod:`requests`, but adds a
     local certificate authority chain to validate the SharePoint server's
@@ -115,7 +115,7 @@ def nexus_req(url, fn, basic_auth=False, **kwargs):
     ----------
     url : str
         The URL to fetch
-    fn : function
+    fn : object
         The function from the ``requests`` library to use (e.g.
         :py:func:`~requests.get`, :py:func:`~requests.put`,
         :py:func:`~requests.post`, etc.)
@@ -123,6 +123,10 @@ def nexus_req(url, fn, basic_auth=False, **kwargs):
         If True, use only username and password for authentication rather than
         NTLM (like what is used for CDCS access rather than for NIST network
         resources)
+    token_auth : None or str
+        If a value is provided, it will be used as a token for authentication
+        (only one of ``token_auth`` or ``basic_auth`` should be provided. The
+        method will error if both are provided
     **kwargs : dict, optional
         Other keyword arguments are passed along to the ``fn``
 
@@ -130,8 +134,27 @@ def nexus_req(url, fn, basic_auth=False, **kwargs):
     -------
     r : :py:class:`requests.Response`
         A requests response object
+
+    Raises
+    ------
+    ValueError
+        If multiple methods of authentication are provided to the function
     """
-    from .harvesters.sharepoint_calendar import CA_BUNDLE_PATH, get_auth
+    if basic_auth and token_auth:
+        raise ValueError('Both `basic_auth` and `token_auth` were provided. '
+                         'Only one can be used at a time')
+
+    from .harvesters import CA_BUNDLE_PATH
+    from .harvesters.sharepoint_calendar import get_auth
+
+    # if token_auth is desired, add it to any existing headers passed along
+    # with the request
+    if token_auth:
+        if 'headers' in kwargs:
+            kwargs['headers']['Authorization'] = f"Token {token_auth}"
+        else:
+            kwargs['headers'] = {'Authorization': f"Token {token_auth}"}
+
     with _tempfile.NamedTemporaryFile() as tmp:
         with open(_certifi.where(), 'rb') as sys_cert:
             lines = sys_cert.readlines()
@@ -140,7 +163,11 @@ def nexus_req(url, fn, basic_auth=False, **kwargs):
             lines = our_cert.readlines()
         tmp.writelines(lines)
         tmp.seek(0)
-        r = fn(url, auth=get_auth(basic=basic_auth), verify=tmp.name, **kwargs)
+        if token_auth:
+            r = fn(url, verify=tmp.name, **kwargs)
+        else:
+            r = fn(url, auth=get_auth(basic=basic_auth), verify=tmp.name,
+                   **kwargs)
 
     return r
 
