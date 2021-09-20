@@ -638,7 +638,7 @@ class TestNemoIntegration:
         with pytest.raises(requests.exceptions.HTTPError) as e:
             bogus_nemo_connector_token.get_users()
         assert "401" in str(e.value)
-        assert "Unauthorized" in e.value
+        assert "Unauthorized" in str(e.value)
 
     @pytest.mark.parametrize("test_tool_id_input,expected_names",
                              [(1, ["643 Titan (S)TEM (probe corrected)"]),
@@ -733,6 +733,59 @@ class TestNemoIntegration:
 
         multi_tool = nemo_connector.get_reservations(tool_id=[2, 10])
         assert all([d['tool']['id'] in [2, 10] for d in multi_tool])
+
+    def test_get_usage_events(self, nemo_connector):
+        # not sure best way to test this, but defaults should return at least
+        # as many dictionaries as were present on the day these tests were
+        # written (Sept. 20, 2021)
+        defaults = nemo_connector.get_usage_events()
+        assert len(defaults) >= 3
+        assert all([key in defaults[0] for key in ['id', 'start', 'end',
+                                                   'run_data', 'user',
+                                                   'operator', 'project',
+                                                   'tool']])
+        assert all([isinstance(d, dict) for d in defaults])
+
+        dt_test = dt.fromisoformat('2021-09-20T00:00:00-06:00')
+        date_gte = nemo_connector.get_usage_events(dt_from=dt_test)
+        assert all([dt.fromisoformat(d['start']) >= dt_test for d in date_gte])
+
+        dt_test = dt.fromisoformat('2021-09-13T23:59:59-06:00')
+        date_lte = nemo_connector.get_usage_events(dt_to=dt_test)
+        assert all([dt.fromisoformat(d['end']) <= dt_test for d in date_lte])
+
+        dt_test_from = dt.fromisoformat('2021-09-13T14:00:00-06:00')
+        dt_test_to = dt.fromisoformat('2021-09-20T00:00:00-06:00')
+        date_both = nemo_connector.get_usage_events(dt_from=dt_test_from,
+                                                    dt_to=dt_test_to)
+        assert all([
+            dt.fromisoformat(d['start']) >= dt_test_from and
+            dt.fromisoformat(d['end']) <= dt_test_to
+            for d in date_both
+        ])
+        assert len(date_both) == 2
+
+        one_tool = nemo_connector.get_usage_events(tool_id=1)
+        assert all([d['tool']['id'] is 1 for d in one_tool])
+
+        multi_tool = nemo_connector.get_usage_events(tool_id=[1, 5])
+        assert all([d['tool']['id'] in [1, 5] for d in multi_tool])
+
+        username_test = nemo_connector.get_usage_events(user='***REMOVED***')
+        assert all([d['user']['id'] == 3 for d in username_test])
+
+        user_id_test = nemo_connector.get_usage_events(user=18)  # a***REMOVED***
+        assert all([d['user']['username'] == 'a***REMOVED***' for d in user_id_test])
+
+        dt_test_from = dt.fromisoformat('2021-09-13T16:01:00-06:00')
+        dt_test_to = dt.fromisoformat('2021-09-13T16:02:00-06:00')
+        multiple_test = nemo_connector.get_usage_events(user=18,
+                                                        dt_from=dt_test_from,
+                                                        dt_to=dt_test_to,
+                                                        tool_id=1)
+        # should return one usage event
+        assert len(multiple_test) == 1
+        assert multiple_test[0]['user']['username'] == 'a***REMOVED***'
 
 
 class TestReservationEvent:

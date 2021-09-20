@@ -155,7 +155,7 @@ class NemoConnector:
 
         return self._get_users_helper(p)
 
-    def get_users_by_username(self, username=None):
+    def get_users_by_username(self, username=None) -> List:
         """
         Get a list of one or more users from the NEMO API in a dictionary
         representation. The results will be cached in the NemoConnector
@@ -170,7 +170,7 @@ class NemoConnector:
 
         Returns
         -------
-        users : list
+        users
             A list (could be empty) of users that match the ids and/or
             usernames given
 
@@ -325,6 +325,51 @@ class NemoConnector:
                     r.update({'cancelled_by': u[0]})
 
         return reservations
+
+    def get_usage_events(self,
+                         user: Union[str, int] = None,
+                         dt_from: datetime = None,
+                         dt_to: datetime = None,
+                         tool_id: Union[int, List[int]] = None):
+        p = {}
+        if user:
+            if isinstance(user, str):
+                u_id = self.get_users_by_username(user)[0]['id']
+            else:
+                u_id = user
+            p['user_id'] = u_id
+        if dt_from:
+            p['start__gte'] = dt_from.isoformat()
+        if dt_to:
+            p['end__lte'] = dt_to.isoformat()
+        if tool_id:
+            if hasattr(tool_id, '__iter__'):
+                p.update({"tool_id__in": ','.join([str(i) for i in tool_id])})
+            else:
+                p.update({"tool_id": tool_id})
+
+        usage_events = self._api_caller(requests.get, 'usage_events/', p)
+
+        for event in usage_events:
+            # expand various fields within the usage event data
+            if event['user']:
+                user = self.get_users(event['user'])
+                if user:
+                    event.update({'user': user[0]})
+            if event['operator']:
+                user = self.get_users(event['operator'])
+                if user:
+                    event.update({'operator': user[0]})
+            if event['project']:
+                proj = self.get_projects(event['project'])
+                if proj:
+                    event.update({'project': proj[0]})
+            if event['tool']:
+                tool = self.get_tools(event['tool'])
+                if tool:
+                    event.update({'tool': tool[0]})
+
+        return usage_events
 
     def _get_users_helper(self, p: Dict[str, str]) -> list:
         """
