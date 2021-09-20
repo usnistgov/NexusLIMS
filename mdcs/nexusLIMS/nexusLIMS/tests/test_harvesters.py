@@ -665,6 +665,69 @@ class TestNemoIntegration:
             tools = n.get_tools(t_id)
             assert set([t['name'] for t in tools]) == set(expected)
 
+    @pytest.mark.parametrize("test_proj_id_input,expected_names",
+                             [(6, ["610"]),
+                              ([3, 4], ["641", "642"]),
+                              ([10, 9, 8], ["735", "683", "681"]),
+                              (-1, [])])
+    def test_get_projects(self, nemo_connector,
+                          test_proj_id_input, expected_names):
+        proj = nemo_connector.get_projects(test_proj_id_input)
+        # test for the project name in each entry, and compare as a set so
+        # it's an unordered and deduplicated comparison
+        assert set([p['name'] for p in proj]) == set(expected_names)
+
+    def test_get_projects_memoization(self):
+        # to test the memoization of project data, we have to use one instance
+        # of NemoConnector rather than a new one from the fixture for each call
+        from nexusLIMS.harvesters.nemo import NemoConnector
+        n = NemoConnector(os.environ['NEMO_address_1'],
+                          os.environ['NEMO_token_1'])
+        to_test = [([10, 9, 8], ["735", "683", "681"]),
+                   (10, ["735"]),
+                   ([9, 8], ["683", "681"])]
+        for p_id, expected in to_test:
+            projects = n.get_projects(p_id)
+            assert set([p['name'] for p in projects]) == set(expected)
+
+    def test_get_reservations(self, nemo_connector):
+        # not sure best way to test this, but defaults should return at least
+        # as many dictionaries as were present on the day these tests were
+        # written (Sept. 20, 2021)
+        defaults = nemo_connector.get_reservations()
+        assert len(defaults) > 10
+        assert all([key in defaults[0] for key in ['id', 'question_data',
+                                                   'creation_time', 'start',
+                                                   'end']])
+        assert all([isinstance(d, dict) for d in defaults])
+
+        dt_test = dt.fromisoformat('2021-09-15T00:00:00-06:00')
+        date_gte = nemo_connector.get_reservations(dt_from=dt_test)
+        assert all([dt.fromisoformat(d['start']) >= dt_test for d in date_gte])
+
+        dt_test = dt.fromisoformat('2021-09-17T23:59:59-06:00')
+        date_lte = nemo_connector.get_reservations(dt_to=dt_test)
+        assert all([dt.fromisoformat(d['end']) <= dt_test for d in date_lte])
+
+        dt_test_from = dt.fromisoformat('2021-09-15T00:00:00-06:00')
+        dt_test_to = dt.fromisoformat('2021-09-17T23:59:59-06:00')
+        date_both = nemo_connector.get_reservations(dt_from=dt_test_from,
+                                                    dt_to=dt_test_to)
+        assert all([
+            dt.fromisoformat(d['start']) >= dt_test_from and
+            dt.fromisoformat(d['end']) <= dt_test_to
+            for d in date_both
+        ])
+
+        cancelled = nemo_connector.get_reservations(cancelled=True)
+        assert all([d['cancelled'] is True for d in cancelled])
+
+        one_tool = nemo_connector.get_reservations(tool_id=2)
+        assert all([d['tool']['id'] is 2 for d in one_tool])
+
+        multi_tool = nemo_connector.get_reservations(tool_id=[2, 10])
+        assert all([d['tool']['id'] in [2, 10] for d in multi_tool])
+
 
 class TestReservationEvent:
     def test_full_reservation_constructor(self):
