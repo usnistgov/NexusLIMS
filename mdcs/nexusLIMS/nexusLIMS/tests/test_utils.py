@@ -32,6 +32,7 @@ from nexusLIMS.utils import find_dirs_by_mtime, _zero_bytes
 from nexusLIMS.extractors import extension_reader_map as _ext
 from nexusLIMS.extractors import quanta_tif
 from datetime import datetime
+from requests import get
 import os
 import sys
 from io import BytesIO
@@ -193,3 +194,17 @@ class TestUtils:
             'nexusLIMS').getEffectiveLevel() == logging.DEBUG
         assert logging.getLogger(
             'nexusLIMS.extractors').getEffectiveLevel() == logging.DEBUG
+
+    def test_bad_auth_options(self):
+        with pytest.raises(ValueError):
+            # giving
+            nexus_req("http://example.com", get, basic_auth=True,
+                      token_auth='test')
+
+    def test_header_addition_nexus_req(self):
+        r = nexus_req(os.environ['NEMO_address_1'], get,
+                      token_auth=os.environ['NEMO_token_1'],
+                      headers={'test_header': 'test_header_val'})
+        assert 'test_header' in r.request.headers
+        assert r.request.headers['test_header'] == 'test_header_val'
+        assert 'users' in r.json()

@@ -634,6 +634,12 @@ class TestNemoIntegration:
         with pytest.raises(requests.exceptions.ConnectionError):
             bogus_nemo_connector_url.get_users()
 
+    def test_get_users_bad_token(self, bogus_nemo_connector_token):
+        with pytest.raises(requests.exceptions.HTTPError) as e:
+            bogus_nemo_connector_token.get_users()
+        assert "401" in str(e.value)
+        assert "Unauthorized" in e.value
+
     @pytest.mark.parametrize("test_tool_id_input,expected_names",
                              [(1, ["643 Titan (S)TEM (probe corrected)"]),
                               ([1, 2], ["643 Titan (S)TEM (probe corrected)",
