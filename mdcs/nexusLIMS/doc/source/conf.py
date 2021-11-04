@@ -60,8 +60,8 @@ add_function_parentheses = True
 # master_doc = 'index'
 
 # # LXML does not use sphinx, so if you want to link to specific page,
-# # you have to create a custom objects.inv file for that module (this is
-# # used for nexusLIMS.utils.parse_xml, for example). To do this, use the
+# # you have to create a custom objects.inv file for that module
+#   To do this, use the
 # # example below to add the specific objects and links as needed (this
 # # method from https://sphobjinv.readthedocs.io/en/latest/customfile.html)
 

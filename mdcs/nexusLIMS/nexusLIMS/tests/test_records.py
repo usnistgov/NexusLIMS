@@ -9,6 +9,7 @@ from nexusLIMS.builder import record_builder as _rb
 from nexusLIMS.schemas import activity
 from nexusLIMS.db import session_handler
 from nexusLIMS.db import make_db_query
+from nexusLIMS.db.session_handler import db_query as dbq
 import nexusLIMS.utils
 import time
 from collections import namedtuple
@@ -19,13 +20,14 @@ from datetime import datetime as _dt
 from datetime import timedelta as _td
 from nexusLIMS.tests.utils import files
 from nexusLIMS.harvesters.sharepoint_calendar import AuthenticationError
+from nexusLIMS.harvesters import nemo
 import pytest
 
 
 class TestRecordBuilder:
 
     # have to do these before modifying the database with the actual run tests
-    def test_dry_run_calendar(self):
+    def test_dry_run_sharepoint_calendar(self):
         sessions = session_handler.get_sessions_to_build()
         cal_event = _rb.dry_run_get_sharepoint_reservation_event(sessions[0])
         assert cal_event.project_name == '642.03.??'
@@ -36,7 +38,11 @@ class TestRecordBuilder:
 
     def test_dry_run_file_find(self, fix_mountain_time):
         sessions = session_handler.get_sessions_to_build()
-        correct_files_per_session = [28, 37, 38, 55,  0, 18]
+        # add at least one NEMO session to the file find
+        sessions += nemo.get_usage_events_as_sessions(
+            dt_from=_dt.fromisoformat('2021-08-02T00:00:00-04:00'),
+            dt_to=_dt.fromisoformat('2021-08-03T00:00:00-04:00'))
+        correct_files_per_session = [28, 37, 38, 55,  0, 18, 4]
         file_list_list = []
         for s, ans in zip(sessions, correct_files_per_session):
             found_files = _rb.dry_run_file_find(s)
@@ -48,18 +54,30 @@ class TestRecordBuilder:
                f'/Titan/***REMOVED***/200204 - ***REMOVED*** - ***REMOVED*** ' \
                f'- Titan/15 - 620k.dm3' in file_list_list[5]
 
+        # file from NEMO session
+        assert f'{os.environ["mmfnexus_path"]}' \
+               f'/Titan/***REMOVED***/210801 - MTJ-MgO - ***REMOVED*** - Titan' \
+               f'/02 - 620k.dm3' in file_list_list[6]
+
     def test_process_new_records_dry_run(self):
         # just running to ensure coverage, tests are included above
-        _rb.process_new_records(dry_run=True)
+        _rb.process_new_records(dry_run=True,
+                                dt_to=_dt.fromisoformat(
+                                    '2021-08-03T00:00:00-04:00'))
 
     def test_process_new_records_dry_run_no_sessions(self, monkeypatch, caplog):
         monkeypatch.setattr(_rb, '_get_sessions', lambda: [])
-        _rb.process_new_records(dry_run=True)
+        # there shouldn't be any MARLIN sessions before July 1, 2021
+        _rb.process_new_records(dry_run=True,
+                                dt_to=_dt.fromisoformat(
+                                    '2021-07-01T00:00:00-04:00'))
         assert "No 'TO_BE_BUILT' sessions were found. Exiting." in caplog.text
 
     def test_process_new_records_no_files_warning(self, monkeypatch, caplog):
         monkeypatch.setattr(_rb, "build_new_session_records", lambda: [])
-        _rb.process_new_records(dry_run=False)
+        _rb.process_new_records(dry_run=False,
+                                dt_to=_dt.fromisoformat(
+                                    '2021-07-01T00:00:00-04:00'))
         assert "No XML files built, so no files uploaded" in caplog.text
 
     def test_new_session_processor(self, monkeypatch, fix_mountain_time):
@@ -79,26 +97,29 @@ class TestRecordBuilder:
         monkeypatch.setattr(_rb, 'build_record',
                             partial(build_record, generate_previews=False))
 
-        _rb.process_new_records()
+        # use just datetime range that should have just one record from NEMO
+        _rb.process_new_records(
+            dt_from=_dt.fromisoformat('2021-08-02T00:00:00-04:00'),
+            dt_to=_dt.fromisoformat('2021-08-03T00:00:00-04:00'))
 
         # tests on the database entries
         # after processing the records, there should be size added
         # "RECORD_GENERATION" logs, for a total of 18 logs
-        assert len(make_db_query('SELECT * FROM session_log')) == 18
+        assert len(make_db_query('SELECT * FROM session_log')) == 21
         assert len(make_db_query('SELECT * FROM session_log WHERE '
-                                 '"event_type" = "RECORD_GENERATION"')) == 6
+                                 '"event_type" = "RECORD_GENERATION"')) == 7
         assert len(make_db_query('SELECT * FROM session_log WHERE '
                                  '"record_status" = "TO_BE_BUILT"')) == 0
         assert len(make_db_query('SELECT * FROM session_log WHERE'
                                  '"record_status" = "NO_FILES_FOUND"')) == 3
         assert len(make_db_query('SELECT * FROM session_log WHERE'
-                                 '"record_status" = "COMPLETED"')) == 15
+                                 '"record_status" = "COMPLETED"')) == 18
 
         # tests on the XML records
-        # there should be 5 completed records in the records/uploaded/ folder
+        # there should be 6 completed records in the records/uploaded/ folder
         xmls = glob(os.path.join(os.path.dirname(__file__), 'files',
                                  'records', 'uploaded', '*.xml'))
-        assert len(xmls) == 5
+        assert len(xmls) == 6
 
         # test some various values from the records saved to disk:
         expected = {
@@ -141,6 +162,16 @@ class TestRecordBuilder:
                 '/summary/motivation': None,
                 '/summary/instrument': 'FEI-Titan-TEM-635816'
             },
+            # DONE: add expected values for NEMO built record
+            '2021-08-02_FEI-Titan-TEM-635816_n_9.xml': {
+                '/title': '***REMOVED***',
+                '//acquisitionActivity': 1,
+                '//dataset': 4,
+                '/summary/motivation': '***REMOVED*** '
+                                       '***REMOVED*** '
+                                       '***REMOVED***.',
+                '/summary/instrument': 'FEI-Titan-TEM-635816'
+            }
         }
         for f in sorted(xmls):
             base_f = os.path.basename(f)
@@ -202,7 +233,9 @@ class TestRecordBuilder:
                 dt_to=_dt.fromisoformat('2020-02-04T12:00:00.000'),
                 user='None')]
 
-        def mock_build_record(instrument, dt_from, dt_to):
+        def mock_build_record(session,
+                              sample_id=None,
+                              generate_previews=True):
             return '<xml>Record that will not validate against NexusLIMS ' \
                    'Schema</xml>'
 
@@ -213,11 +246,13 @@ class TestRecordBuilder:
         assert "Could not validate record, did not write to disk" in caplog.text
 
     def test_dump_record(self, monkeypatch, fix_mountain_time):
-        out_fname = _rb.dump_record(instrument_db['FEI-Titan-TEM-635816'],
-                                    dt_from=_dt.fromisoformat('2020-02-04T'
-                                                              '09:00:00.000'),
-                                    dt_to=_dt.fromisoformat('2020-02-04T'
-                                                            '12:00:00.000'),
+        from nexusLIMS.db.session_handler import Session
+        session = Session(session_identifier="an-identifier-string",
+                          instrument=instrument_db['FEI-Titan-TEM-635816'],
+                          dt_from=_dt.fromisoformat('2020-02-04T09:00:00.000'),
+                          dt_to=_dt.fromisoformat('2020-02-04T12:00:00.000'),
+                          user='unused')
+        out_fname = _rb.dump_record(session=session,
                                     generate_previews=False)
         os.remove(out_fname)
 
@@ -348,6 +383,48 @@ class TestSession:
         # remove the session log we added
         q = f"DELETE FROM session_log WHERE session_identifier = '{uuid}'"
         make_db_query(q)
+
+
+class TestSessionLog:
+    sl = session_handler.SessionLog(
+        session_identifier='testing-session-log',
+        instrument=instrument_db['FEI-Titan-TEM-635816'].name,
+        timestamp='2020-02-04T09:00:00.000',
+        event_type='START',
+        user='ear1',
+        record_status='TO_BE_BUILT'
+    )
+
+    @pytest.fixture
+    def cleanup_session_log(self):
+        # this fixture removes the rows for the session logs added in
+        # this test class, so it doesn't mess up future record building tests
+        yield None
+        # below runs on test teardown
+        dbq(query='DELETE FROM session_log WHERE session_identifier = ?',
+            args=('testing-session-log', ))
+
+    def test_repr(self):
+        assert self.sl.__repr__() == "SessionLog " \
+            "(id=testing-session-log, " \
+            "instrument=FEI-Titan-TEM-635816, " \
+            "timestamp=2020-02-04T09:00:00.000, " \
+            "event_type=START, " \
+            "user=ear1, " \
+            "record_status=TO_BE_BUILT)"
+
+    def test_insert_log(self):
+        _, res_before = dbq(query='SELECT * FROM session_log', args=None)
+        self.sl.insert_log()
+        _, res_after = dbq(query='SELECT * FROM session_log', args=None)
+        assert len(res_after) - len(res_before) == 1
+
+    def test_insert_duplicate_log(self, caplog, cleanup_session_log):
+        result = self.sl.insert_log()
+        assert 'WARNING' in caplog.text
+        assert 'SessionLog already existed in DB, so no row was added:' in \
+               caplog.text
+        assert result
 
 
 class TestCDCS:

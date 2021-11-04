@@ -43,23 +43,6 @@ from datetime import timedelta as _td
 
 
 class TestUtils:
-    def test_parse_xml_bad_xslt(self):
-        xml_string = '<xml><level1>test</level1></xml>'
-        xsl_string = \
-            b"""
-            <xsl:stylesheet xmlns:xsl="http://www.w3.org/1999/XSL/Transform"
-            xmlns:xsi="http://www.w3.org/2001/XMLSchema"                                                             
-            xmlns:nx="https://data.nist.gov/od/dm/nexus/experiment/v1.0"                                             
-            version="1.0">                                                                                           
-            <xsl:output method="html" indent="yes" encoding="UTF-8"/>                                                
-            <xsl:template match="/">                                                                                 
-                <xsl:comment>--</xsl:comment>                                                                        
-            </xsl:template> 
-            </xsl:stylesheet>
-            """
-        with pytest.raises(etree.XSLTApplyError):
-            parse_xml(xml_string, BytesIO(xsl_string))
-
     def test_get_nested_dict_value(self):
         nest = {'level1': {'level2.1': {'level3.1': 'value'}}}
         assert get_nested_dict_value(nest, 'value') == ('level1', 'level2.1',

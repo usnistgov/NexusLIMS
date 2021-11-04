@@ -25,12 +25,13 @@
 #  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
-
+from typing import Tuple
 from lxml import etree as _etree
 import certifi as _certifi
 import tempfile as _tempfile
 import os as _os
 import subprocess as _sp
+from datetime import datetime
 from datetime import timedelta as _timedelta
 from os.path import getmtime as _getmtime
 from warnings import warn
@@ -61,48 +62,6 @@ def setup_loggers(log_level):
                _logging.root.manager.loggerDict if 'nexusLIMS' in name]
     for logger in loggers:
         logger.setLevel(log_level)
-
-
-def parse_xml(xml, xslt_file, **kwargs):
-    """
-    Parse and translate an XML string from the API into a nicer format
-
-    Parameters
-    ----------
-    xml : str or bytes
-        A string containing XML, such as that returned by :py:func:`~.fetch_xml`
-    xslt_file : str or io.BytesIO
-        Path to the XSLT file to use for transformation
-    **kwargs : str, optional
-        Other keyword arguments are passed as parameters to the XSLT
-        transformer. ``None`` values are converted to an empty string.
-    Returns
-    -------
-    simplified_dom : :py:class:`lxml.etree._XSLTResultTree`
-    """
-
-    for key, value in kwargs.items():
-        kwargs[key] = "''" if value is None else f"'{value}'"
-
-    parser = _etree.XMLParser(remove_blank_text=True, encoding='utf-8')
-
-    # load XML structure from  string
-    root = _etree.fromstring(xml, parser)
-
-    # use LXML to load XSLT stylesheet into xsl_transform
-    # (note, etree.XSLT needs to be called on a root _Element
-    # not an _ElementTree)
-    xsl_dom = _etree.parse(xslt_file, parser).getroot()
-    xsl_transform = _etree.XSLT(xsl_dom)
-
-    # do XSLT transformation
-    try:
-        simplified_dom = xsl_transform(root, **kwargs)
-    except _etree.XSLTApplyError:
-        for error in xsl_transform.error_log:
-            print(error.message, error.line)
-        raise _etree.XSLTApplyError("Error in parse_xml")
-    return simplified_dom
 
 
 def nexus_req(url, fn, basic_auth=False, token_auth=None, **kwargs):
@@ -616,14 +575,15 @@ def _zero_bytes(fname, bytes_from, bytes_to):
     return new_fname
 
 
-def _get_timespan_overlap(range_1, range_2):
+def _get_timespan_overlap(range_1: Tuple[datetime, datetime],
+                          range_2: Tuple[datetime, datetime]) -> _timedelta:
     """
     Find the amount of overlap between two time spans. Adapted from
     https://stackoverflow.com/a/9044111
 
     Parameters
     ----------
-    range_1 : :obj:`tuple` of :py:class:`~datetime.datetime`
+    range_1
         Tuple of length 2 of datetime objects: first is the start of the time
         range and the second is the end of the time range
     range_2
@@ -632,7 +592,7 @@ def _get_timespan_overlap(range_1, range_2):
 
     Returns
     -------
-    overlap : :py:class:`~datetime.timedelta`
+    overlap
         The amount of overlap between the time ranges
     """
     latest_start = max(range_1[0], range_2[0])

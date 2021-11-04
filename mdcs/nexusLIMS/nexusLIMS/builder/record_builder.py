@@ -30,7 +30,11 @@
 
 Attributes
 ----------
+XSD_PATH
+    A string containing the path to the Nexus Experiment schema file,
+    which is used to validate XML records built by this module
 """
+from typing import List, Union
 
 import os as _os
 import logging as _logging
@@ -41,66 +45,55 @@ import argparse as _ap
 from uuid import uuid4 as _uuid4
 from lxml import etree as _etree
 from datetime import datetime as _datetime
+from datetime import timedelta as _timedelta
 from io import BytesIO as _bytesIO
 import nexusLIMS.schemas.activity as _activity
 from nexusLIMS.schemas.activity import AcquisitionActivity as _AcqAc
 from nexusLIMS.schemas.activity import cluster_filelist_mtimes
+from nexusLIMS.instruments import Instrument
+from nexusLIMS.harvesters import ReservationEvent as _ResEvent
 from nexusLIMS.harvesters import sharepoint_calendar as _sp_cal
+from nexusLIMS.harvesters import nemo as _nemo
 from nexusLIMS.utils import find_files_by_mtime as _find_files
 from nexusLIMS.utils import gnu_find_files_by_mtime as _gnu_find_files
 from nexusLIMS.extractors import extension_reader_map as _ext
 from nexusLIMS.db.session_handler import get_sessions_to_build as _get_sessions
+from nexusLIMS.db.session_handler import Session
 from nexusLIMS.cdcs import upload_record_files as _upload_record_files
 from nexusLIMS import version as _version
 from timeit import default_timer as _timer
+from importlib import import_module
 
 _logger = _logging.getLogger(__name__)
-XSD_PATH = _os.path.join(_os.path.dirname(_activity.__file__),
-                         "nexus-experiment.xsd")
+XSD_PATH: str  = _os.path.join(_os.path.dirname(_activity.__file__),
+                               "nexus-experiment.xsd")
 
-
-def build_record(instrument, dt_from, dt_to,
-                 user=None,
-                 sample_id=None,
-                 generate_previews=True):
+def build_record(session: Session,
+                 sample_id: Union[None, str] = None,
+                 generate_previews: bool = True) -> str:
     """
     Construct an XML document conforming to the NexusLIMS schema from a
-    directory containing microscopy data files. For calendar parsing,
+    directory containing microscopy data files. Accepts either a
+    :py:class:`~nexusLIMS.db.session_handler.Session` object or an Instrument
+    and date range (for backwards compatibility). For calendar parsing,
     currently no logic is implemented for a query that returns multiple records
 
     Parameters
     ----------
-    instrument : :py:class:`~nexusLIMS.instruments.Instrument`
-        One of the NexusLIMS instruments contained in the
-        :py:attr:`~nexusLIMS.instruments.instrument_db` database.
-        Controls what instrument calendar is used to get events.
-    dt_from : datetime.datetime
-
-    dt_to : datetime.datetime
-        The
-    dt_from : :py:class:`~datetime.datetime` or None
-        A :py:class:`~datetime.datetime` object representing the starting
-        timestamp that will be used to determine which files go in this
-        record, as in :py:func:`~.sharepoint_calendar.fetch_xml`.
-    dt_to : :py:class:`~datetime.datetime` or None
-        A :py:class:`~datetime.datetime` object representing the ending
-        timestamp used to determine the last point in time for which
-        files should be associated with this record, as in
-        :py:func:`~.sharepoint_calendar.fetch_xml`.
-    user : str or None
-        A valid NIST username (the short format: e.g. "ear1"
-        instead of ernst.august.ruska@nist.gov). Controls the results
-        returned from the calendar - value is as specified in
-        :py:func:`~.sharepoint_calendar.get_events`
-    sample_id : str or None
+    session
+        A :py:class:`~nexusLIMS.db.session_handler.Session` or ``None``. If
+        a value is provided, ``instrument``, ``dt_from``, ``dt_to`` and ``user``
+        will be ignored, and the values from the Session object will be used
+        instead
+    sample_id
         A unique identifier pointing to a sample identifier for data
         collected in this record. If None, a UUIDv4 will be generated
-    generate_previews : bool
+    generate_previews
         Whether or not to create the preview thumbnail images
 
     Returns
     -------
-    xml_record : str
+    xml_record
         A formatted string containing a well-formed and valid XML document
         for the data contained in the provided path
     """
@@ -108,7 +101,13 @@ def build_record(instrument, dt_from, dt_to,
     if sample_id is None:
         sample_id = str(_uuid4())
 
-    # setup namespaces
+    # use instrument, dt_from, dt_to, and user from session:
+    instrument = session.instrument
+    dt_from = session.dt_from
+    dt_to = session.dt_to
+    user = session.user
+
+    # setup XML namespaces
     NX = "https://data.nist.gov/od/dm/nexus/experiment/v1.0"
     XSI = "http://www.w3.org/2001/XMLSchema-instance"
     NSMAP = {None: "", "xsi": XSI, "nx": NX}
@@ -116,10 +115,16 @@ def build_record(instrument, dt_from, dt_to,
 
     _logger.info(f"Getting calendar events with instrument: {instrument.name}, "
                  f"from {dt_from.isoformat()} to {dt_to.isoformat()}, "
-                 f"user: {user}")
-    # this now returns a ReservationEvent, not a string
-    res_event = _sp_cal.get_events(instrument=instrument, dt_from=dt_from,
-                                   dt_to=dt_to, user=user)
+                 f"user: {user}; using harvester: {instrument.harvester}")
+    # this now returns a nexusLIMS.harvesters.ReservationEvent, not a string
+    # DONE: Make this general to handle a session regardless of harvester,
+    #  not just sharepoint (as it is now)
+    # We need to make a consistent method that every harvester has
+    # implemented that takes a session and returns a matching
+    # ReservationEvent (if any)
+    res_event = get_reservation_event(session)
+    # res_event = _sp_cal.get_events(instrument=instrument, dt_from=dt_from,
+    #                                dt_to=dt_to, user=user)
 
     output = res_event.as_xml()
 
@@ -136,6 +141,40 @@ def build_record(instrument, dt_from, dt_to,
 
     return _etree.tostring(xml, xml_declaration=True, encoding='UTF-8',
                            pretty_print=True).decode()
+
+
+def get_reservation_event(session: Session) -> _ResEvent:
+    """
+    Handles the abstraction of choosing the right "version" of the
+    ``res_event_from_session`` method from the harvester specified in the
+    instrument database. This allows for one consistent function name to call
+    a different method depending on which harvester is specified for each
+    instrument (currently just NEMO or Sharepoint).
+
+    Parameters
+    ----------
+    session
+        The py:class:`~nexusLIMS.db.session_handler.Session` for which to
+        fetch a matching py:class:`~nexusLIMS.harvesters.ReservationEvent` from
+        the relevant harvester
+
+    Returns
+    -------
+    res_event
+        A py:class:`~nexusLIMS.harvesters.ReservationEvent` representation of
+        a reservation that matches the instrument and timespan specified in
+        ``session``.
+    """
+    # use import_module to choose the correct harvester based on the instrument
+    harvester = \
+        import_module(f".{session.instrument.harvester}",
+                      "nexusLIMS.harvesters")
+    # for PyCharm typing, explicitly specify what modules may be in `harvester`
+    harvester: Union[_nemo, _sp_cal]
+    # TODO: check if that method exists for the given harvester and raise
+    #  NotImplementedError if not
+    res_event = harvester.res_event_from_session(session)
+    return res_event
 
 
 def build_acq_activities(instrument, dt_from, dt_to, generate_previews):
@@ -274,35 +313,23 @@ def get_files(path, dt_from, dt_to):
     return files
 
 
-def dump_record(instrument,
-                dt_from,
-                dt_to,
-                filename=None,
-                user=None,
-                generate_previews=True):
+def dump_record(session: Session,
+                filename: Union[None, str] = None,
+                generate_previews: bool = True):
     """
-    Writes an XML record composed of information pulled from the Sharepoint
-    calendar as well as metadata extracted from the microscope data (e.g. dm3
-    files).
+    Writes an XML record for a :py:class:`~nexusLIMS.db.session_handler.Session`
+    composed of information pulled from the appropriate reservation system
+    as well as metadata extracted from the microscope data (e.g. dm3 or
+    other files).
 
     Parameters
     ----------
-    instrument : :py:class:`~nexusLIMS.instruments.Instrument`
-        One of the NexusLIMS instruments contained in the
-        :py:attr:`~nexusLIMS.instruments.instrument_db` database.
-        Controls what instrument calendar is used to get events.
-    dt_from : datetime.datetime
-        The starting timestamp that will be used to determine which files go
-        in this record
-    dt_to : datetime.datetime
-        The ending timestamp used to determine the last point in time for
-        which files should be associated with this record
+    session
+        A py:class:`~nexusLIMS.db.session_handler.Session` object
+        representing a unit of time on one of the instruments known to NexusLIMS
     filename : None or str
         The filename of the dumped xml file to write. If None, a default name
         will be generated from the other parameters
-    user : str
-        A string which corresponds to the NIST user who performed the
-        microscopy experiment
     generate_previews : bool
         Whether or not to create the preview thumbnail images
 
@@ -313,13 +340,13 @@ def dump_record(instrument,
     """
     if filename is None:
         filename = 'compiled_record' + \
-                   (f'_{instrument.name}' if instrument else '') + \
-                   dt_from.strftime('_%Y-%m-%d') + \
-                   (f'_{user}' if user else '') + '.xml'
+                   (f'_{session.instrument.name}' if session.instrument
+                    else '') + \
+                   session.dt_from.strftime('_%Y-%m-%d') + \
+                   (f'_{session.user}' if session.user else '') + '.xml'
     _pathlib.Path(_os.path.dirname(filename)).mkdir(parents=True, exist_ok=True)
     with open(filename, 'w') as f:
-        text = build_record(instrument, dt_from, dt_to,
-                            user=user,
+        text = build_record(session=session,
                             generate_previews=generate_previews)
         f.write(text)
     return filename
@@ -347,7 +374,7 @@ def validate_record(xml_filename):
     return validates
 
 
-def build_new_session_records():
+def build_new_session_records() -> List[str]:
     """
     Fetches new records that need to be built from the database (using
     :py:func:`~nexusLIMS.db.session_handler.get_sessions_to_build`), builds
@@ -357,11 +384,14 @@ def build_new_session_records():
 
     Returns
     -------
-    xml_files : :obj:`list` of :obj:`str`
+    xml_files
         A list of record files that were successfully built and saved to
         centralized storage
     """
-    # get the list of sessions with 'WAITING_TO_BE_BUILT' status
+    # get the list of sessions with 'TO_BE_BUILT' status; does not fetch new
+    # usage events from any NEMO instances;
+    # nexusLIMS.harvesters.nemo.add_all_usage_events_to_db() must be used
+    # first to do so
     sessions = _get_sessions()
     if not sessions:
         _sys.exit("No 'TO_BE_BUILT' sessions were found. Exiting.")
@@ -370,8 +400,7 @@ def build_new_session_records():
     for s in sessions:
         try:
             s.insert_record_generation_event()
-            record_text = build_record(instrument=s.instrument,
-                                       dt_from=s.dt_from, dt_to=s.dt_to)
+            record_text = build_record(session=s)
         except (FileNotFoundError, Exception) as e:
             if isinstance(e, FileNotFoundError):
                 # if no files were found for this session log, mark it as so in
@@ -393,9 +422,17 @@ def build_new_session_records():
             if validate_record(_bytesIO(bytes(record_text, 'UTF-8'))):
                 _logger.info(f'Validated newly generated record')
                 # generate filename for saved record and make sure path exists
+                # DONE: fix this for NEMO records since session_identifier is
+                #  a URL and it doesn't work right
+                if s.instrument.harvester == 'nemo':
+                    # for NEMO session_identifier is a URL of usage_event
+                    unique_suffix = f'{_nemo.id_from_url(s.session_identifier)}'
+                else:
+                    # assume session_identifier is a UUID
+                    unique_suffix = f'{s.session_identifier.split("-")[0]}'
                 basename = f'{s.dt_from.strftime("%Y-%m-%d")}_' \
                            f'{s.instrument.name}_' \
-                           f'{s.session_identifier.split("-")[0]}.xml'
+                           f'{unique_suffix}.xml'
                 filename = _os.path.join(_os.environ['nexusLIMS_path'], '..',
                                          'records', basename)
                 filename = _os.path.abspath(filename)
@@ -418,25 +455,58 @@ def build_new_session_records():
     return xml_files
 
 
-def process_new_records(dry_run=False):
+def process_new_records(dry_run: bool = False,
+                        dt_from: Union[None, _datetime] = None,
+                        dt_to: Union[None, _datetime] = None):
     """
     Using :py:meth:`build_new_session_records()`, process new records,
     save them to disk, and upload them to the NexusLIMS CDCS instance.
+
+    Parameters
+    ----------
+    dry_run
+        Controls whether or not records will actually be built. If ``True``,
+        session harvesting and file finding will be performed, but no preview
+        images or records will be built. Can be used to see what _would_ happen
+        if ``dry_run`` is set to ``False``.
+    dt_from
+        The point in time after which sessions will be fetched. If ``None``,
+        no date filtering will be performed. This parameter currently only
+        has an effect for the NEMO harvester. All SharePoint events will always
+        be fetched.
+    dt_to
+        The point in time before which sessions will be fetched. If ``None``,
+        no date filtering will be performed. This parameter currently only
+        has an effect for the NEMO harvester. All SharePoint events will always
+        be fetched.
     """
     if dry_run:
         _logger.info("!!DRY RUN!! Only finding files, not building records")
+        # get 'TO_BE_BUILT' sessions from the database
         sessions = _get_sessions()
+        # get Session objects for NEMO usage events without adding to DB
+        # DONE: NEMO usage events fetched should take a time range;
+        sessions += _nemo.get_usage_events_as_sessions(dt_from=dt_from,
+                                                       dt_to=dt_to)
         if not sessions:
             _logger.warning("No 'TO_BE_BUILT' sessions were found. Exiting.")
             return None
         for s in sessions:
+            # at this point, sessions can be from any type of harvester
             _logger.info('')
             _logger.info('')
-            dry_run_get_sharepoint_reservation_event(s)
+            # DONE: generalize this from just sharepoint to any harvester
+            #       (prob. new function that takes session and determines
+            #       where it came from and then gets the matching reservation
+            #       event)
+            get_reservation_event(s)
             dry_run_file_find(s)
     else:
+        # DONE: NEMO usage events fetcher should take a time range; we also
+        #  need a consistent response for testing
+        _nemo.add_all_usage_events_to_db(dt_from=dt_from,
+                                         dt_to=dt_to)
         xml_files = build_new_session_records()
-        # noinspection PyTypeChecker
         if len(xml_files) == 0:
             _logger.warning("No XML files built, so no files uploaded")
         else:
@@ -456,19 +526,19 @@ def process_new_records(dry_run=False):
                               f'{files_not_uploaded}')
 
 
-def dry_run_get_sharepoint_reservation_event(s):
+def dry_run_get_sharepoint_reservation_event(s: Session) -> _ResEvent:
     """
     Get the calendar event that would be used to create a record based off
     the supplied session
 
     Parameters
     ----------
-    s : ~nexusLIMS.db.session_handler.Session
+    s
         A session read from the database
 
     Returns
     -------
-    res_event : ~nexusLIMS.harvesters.ReservationEvent
+    res_event
         A list of strings containing the files that would be included for the
         record of this session (if it were not a dry run)
     """
@@ -478,25 +548,25 @@ def dry_run_get_sharepoint_reservation_event(s):
     return res_event
 
 
-def dry_run_file_find(s):
+def dry_run_file_find(s: Session) -> List[str]:
     """
     Get the files that would be included for any records to be created based
     off the supplied session
 
     Parameters
     ----------
-    s : ~nexusLIMS.db.session_handler.Session
+    s
         A session read from the database
 
     Returns
     -------
-    files : :obj:`list` of :obj:`str`
+    files
         A list of strings containing the files that would be included for the
         record of this session (if it were not a dry run)
     """
     path = _os.path.abspath(_os.path.join(_os.environ['mmfnexus_path'],
                                           s.instrument.filestore_path))
-    _logger.info(f'Searching for files in '
+    _logger.info(f'Searching for files for {s.instrument.name} in '
                  f'{_os.path.abspath(path)} between '
                  f'{s.dt_from.isoformat()} and '
                  f'{s.dt_to.isoformat()}')
@@ -561,4 +631,8 @@ if __name__ == '__main__':  # pragma: no cover
     # when running as script, __name__ is "__main__", so we need to set level
     # explicitly since the setup_loggers function won't find it
     _logger.setLevel(logging_levels[args.verbose])
-    process_new_records(args.dry_run)
+
+    # by default only fetch the last week's worth of data from the NEMO
+    # harvesters to speed things up
+    process_new_records(args.dry_run,
+                        dt_from=_datetime.now() - _timedelta(weeks=1))

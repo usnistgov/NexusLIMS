@@ -3,12 +3,12 @@ import pytest
 import requests
 from lxml import etree
 from datetime import datetime as dt
+from nexusLIMS import harvesters
 from nexusLIMS.harvesters import sharepoint_calendar as sc
-from nexusLIMS.utils import parse_xml as _parse_xml
 from nexusLIMS.utils import nexus_req as _nexus_req
 from nexusLIMS.harvesters import ReservationEvent
 from nexusLIMS.harvesters.sharepoint_calendar import AuthenticationError
-from nexusLIMS import instruments
+from nexusLIMS.db.session_handler import db_query
 from nexusLIMS.instruments import instrument_db
 from collections import OrderedDict
 
@@ -25,66 +25,11 @@ warnings.filterwarnings(
 
 
 class TestSharepoint:
-    SC_XSL_FILE = os.path.abspath(
-        os.path.join(os.path.dirname(sc.__file__), 'cal_parser.xsl'))
     CREDENTIAL_FILE_ABS = os.path.abspath(
         os.path.join(os.path.dirname(__file__),
                      '..',
                      'credentials.ini.example'))
     CREDENTIAL_FILE_REL = os.path.join('..', 'credentials.ini.example')
-
-    # get xml content from the FEI Titan for use with parse_xml (we do it at
-    # class level so we don't have to hit the server more than once)
-    #  The only modification made is the manual removal of
-    #  'xmlns="http://www.w3.org/2005/Atom"' from the top level element,
-    #  since this is done by fetch_xml() in the actual processing
-    instr_url = instrument_db['FEI-Titan-TEM-635816'].api_url + \
-                '?$expand=CreatedBy'
-    xml_content = _nexus_req(instr_url, requests.get).text.replace(
-        'xmlns="http://www.w3.org/2005/Atom"', '')
-
-    @pytest.fixture
-    def parse_xml(self):
-        """
-        Use the parse_xml method to actually parse the xml through the XSLT
-        stylesheet, which we can then compare to parsing the raw calendar
-        events directly.
-        """
-        # return the xml parsed from the file
-        file_content = bytes(TestSharepoint.xml_content, encoding='utf-8')
-
-        # parsed_xml items will be an _XSLTResultTree object with many
-        # <event>...</event> tags on the same level
-        parsed_xml = dict()
-        # should be 403 items
-        parsed_xml['all'] = _parse_xml(xml=file_content,
-                                       xslt_file=self.SC_XSL_FILE)
-        # should be 10 items
-        parsed_xml['user'] = _parse_xml(xml=file_content,
-                                        xslt_file=self.SC_XSL_FILE,
-                                        user="***REMOVED***")
-        # should be 2 items
-        parsed_xml['date'] = _parse_xml(xml=file_content,
-                                        xslt_file=self.SC_XSL_FILE,
-                                        date='2019-03-06')
-        # should be 1 item
-        parsed_xml['date_and_user'] = _parse_xml(xml=file_content,
-                                                 xslt_file=self.SC_XSL_FILE,
-                                                 date='2019-03-06',
-                                                 user='***REMOVED***')
-
-        # convert parsing result to string and wrap so we have well-formed xml:
-        xml_strings = dict()
-        for k, v in parsed_xml.items():
-            xml_strings[k] = sc._wrap_events(str(v))
-
-        # get document tree from the raw file and the ones we parsed:
-        parsed_docs = dict()
-        raw_doc = etree.fromstring(file_content)
-        for k, v in xml_strings.items():
-            parsed_docs[k] = etree.fromstring(v)
-
-        return raw_doc, parsed_docs
 
     @pytest.mark.parametrize('instrument', list(instrument_db.values()),
                              ids=list(instrument_db.keys()))
@@ -95,7 +40,8 @@ class TestSharepoint:
                                'testVDI-VM-JAT-111222']:
             pass
         else:
-            sc.fetch_xml(instrument)
+            if instrument.harvester == "sharepoint_calendar":
+                sc.fetch_xml(instrument)
 
     def test_download_with_date(self):
         doc = etree.fromstring(
@@ -225,6 +171,21 @@ class TestSharepoint:
         assert cal_event.instrument.name == 'FEI-Titan-TEM-635816'
         assert cal_event.username is None
 
+    def test_sharepoint_res_event_from_session(self):
+        from nexusLIMS.db.session_handler import Session
+        s = Session(session_identifier="test_identifier",
+                    instrument=instrument_db['FEI-Titan-TEM-635816'],
+                    dt_from=dt.fromisoformat('2018-11-13T00:00:00'),
+                    dt_to=dt.fromisoformat('2018-11-13T23:59:59'),
+                    user='unused')
+        res_event = sc.res_event_from_session(s)
+        assert res_event.experiment_title == '***REMOVED***'
+        assert res_event.instrument.name == 'FEI-Titan-TEM-635816'
+        assert res_event.internal_id == '470'
+        assert res_event.username == '***REMOVED***'
+        assert res_event.start_time == dt.fromisoformat(
+            '2018-11-13T09:00:00-05:00')
+
     def test_reservation_event_repr(self):
         s = dt(2020, 8, 20, 12, 0, 0)
         e = dt(2020, 8, 20, 16, 0, 40)
@@ -268,145 +229,10 @@ class TestSharepoint:
         assert events_1.created_by == '***REMOVED***'
         assert events_1.experiment_title == '***REMOVED***'
 
-    def test_calendar_parsing_event_number(self, parse_xml):
-        """
-        We will assume that if the number of elements for each case is the
-        same, then we probably are parsing okay. This could be improved by
-        actually testing the content of the elements (although that is done
-        by test_parsed_event_content()). The number of events is going to
-        increase as time goes on (since we're getting the calendar response
-        dynamically), so we cannot know `a priori` how many there should be.
-        """
-        # Unpack the fixture tuple to use in our method
-        raw_doc, parsed_docs = parse_xml
-
-        # there should be 403 events to match the 403 entries in the raw xml
-        parsed_event_list = parsed_docs['all'].findall('event')
-        raw_entry_list = raw_doc.findall('entry')
-        assert len(parsed_event_list) == len(raw_entry_list)
-        # assert len(parsed_event_list) == 403
-
-    def test_calendar_parsing_username(self, parse_xml):
-        """
-        We will assume that if the number of elements for each case is the
-        same, then we probably are parsing okay. This could be improved by
-        actually testing the content of the elements (although that is done
-        by test_parsed_event_content())
-        """
-        # Unpack the fixture tuple to use in our method
-        raw_doc, parsed_docs = parse_xml
-
-        # test user parsing:
-        # user '***REMOVED***' has 10 events on the Titan calendar
-        raw_user_list = raw_doc.xpath("entry[./link/m:inline/entry/content/"
-                                      "m:properties/d:UserName/text() = '***REMOVED***']",
-                                      namespaces=raw_doc.nsmap)
-        # parsed_docs['user'] is root <events> tag
-        parse_xml_user_list = parsed_docs['user'].findall('event')
-
-        assert len(raw_user_list) == len(parse_xml_user_list)
-        assert len(parse_xml_user_list) == 10
-
-    def test_calendar_parsing_date(self, parse_xml):
-        """
-        We will assume that if the number of elements for each case is the
-        same, then we probably are parsing okay. This could be improved by
-        actually testing the content of the elements (although that is done
-        by test_parsed_event_content())
-        """
-        # Unpack the fixture tuple to use in our method
-        raw_doc, parsed_docs = parse_xml
-
-        # test date parsing:
-        # 2019-03-06 has 2 events on the Titan calendar
-        raw_date_list = raw_doc.xpath("entry[contains("
-                                      "./content/m:properties/d:StartTime/"
-                                      "text(), '2019-03-06')]",
-                                      namespaces=raw_doc.nsmap)
-        # parsed_docs['user'] is root <events> tag
-        parse_xml_date_list = parsed_docs['date'].findall('event')
-
-        assert len(raw_date_list) == len(parse_xml_date_list)
-        assert len(parse_xml_date_list) == 2
-
-    def test_calendar_parsing_username_and_date(self, parse_xml):
-        """
-        We will assume that if the number of elements for each case is the
-        same, then we probably are parsing okay. This could be improved by
-        actually testing the content of the elements (although that is done
-        by test_parsed_event_content())
-        """
-        # Unpack the fixture tuple to use in our method
-        raw_doc, parsed_docs = parse_xml
-
-        # test date and user parsing:
-        # 2019-03-06 has 2 events on the Titan calendar, one of which was
-        # made by ***REMOVED***
-        raw_date_list = raw_doc.xpath("entry[contains("
-                                      "./content/m:properties/d:StartTime/"
-                                      "text(), '2019-03-06') and "
-                                      "./link/m:inline/entry/content/"
-                                      "m:properties/d:UserName/text() = "
-                                      "'***REMOVED***']",
-                                      namespaces=raw_doc.nsmap)
-        # parsed_docs['user'] is root <events> tag
-        parse_xml_date_list = parsed_docs['date_and_user'].findall('event')
-
-        assert len(raw_date_list) == len(parse_xml_date_list)
-        assert len(parse_xml_date_list) == 1
-
     def test_basic_auth(self):
         from nexusLIMS.harvesters.sharepoint_calendar import get_auth
         res = get_auth(basic=True)
         assert isinstance(res, tuple)
-
-    def test_parsed_event_content(self, parse_xml):
-        """
-        Test the content of the event that was parsed with the XSLT
-        """
-        # Unpack the fixture tuple to use in our method
-        raw_doc, parsed_docs = parse_xml
-
-        parsed_xml = parsed_docs['date_and_user']
-        assert parsed_xml.tag == 'events'
-
-        # Should be one event matching this condition
-        event = parsed_docs['date_and_user'].find('event')
-        tag_dict = OrderedDict([
-            ('dateSearched', '2019-03-06'),
-            ('userSearched', '***REMOVED***'),
-            ('title', 'Bringing up HT'),
-            ('instrument', 'FEITitanTEMEvents'),
-            ('user', '\n  '),
-            ('purpose', 'Still need to bring up HT '
-                        'following water filter replacement'),
-            ('sampleDetails', 'No sample'),
-            ('description', None),
-            ('startTime', '2019-03-06T09:00:00'),
-            ('endTime', '2019-03-06T11:00:00'),
-            ('link', instrument_db['FEI-Titan-TEM-635816'].api_url + '(501)'),
-            ('eventId', '501')])
-
-        user = parsed_docs['date_and_user'].find('event/user')
-        link_idx = instrument_db['FEI-Titan-TEM-635816'].api_url.rfind('/')
-        lnk_base = instrument_db['FEI-Titan-TEM-635816'].api_url[:link_idx]
-        user_dict = OrderedDict([
-            ('userName', '***REMOVED***'),
-            ('name', '***REMOVED*** (Fed)'),
-            ('email', '***REMOVED***'),
-            ('phone', '***REMOVED***'),
-            ('office', '***REMOVED***'),
-            ('link', f'{lnk_base}/UserInformationList(224)'),
-            ('userId', '224')])
-
-        for k, v in tag_dict.items():
-            if k == 'user':
-                continue
-            else:
-                assert event.find(k).text == v
-
-        for k, v in user_dict.items():
-            assert user.find(k).text == v
 
     def test_get_sharepoint_date_string(self):
         date_str = sc._get_sharepoint_date_string(
@@ -566,6 +392,23 @@ class TestNemoIntegration:
         assert str(nemo_connector) == f"Connection to NEMO API at " \
                                       f"{os.environ['NEMO_address_1']}"
 
+    def test_nemo_multiple_harvesters_enabled(self, monkeypatch):
+        monkeypatch.setenv("NEMO_address_2", "https://nemo.address.com/api/")
+        monkeypatch.setenv("NEMO_token_2", "sometokenvalue")
+
+        from nexusLIMS.harvesters import nemo
+        assert len(nemo.get_harvesters_enabled()) == 2
+        assert str(nemo.get_harvesters_enabled()[1]) == \
+            f"Connection to NEMO API at " \
+            f"{os.environ['NEMO_address_2']}"
+
+    def test_nemo_harvesters_enabled(self):
+        from nexusLIMS.harvesters import nemo
+        assert len(nemo.get_harvesters_enabled()) == 1
+        assert str(nemo.get_harvesters_enabled()[0]) == \
+            f"Connection to NEMO API at " \
+            f"{os.environ['NEMO_address_1']}"
+
     def test_getting_nemo_data(self):
         from nexusLIMS.utils import nexus_req
         from urllib.parse import urljoin
@@ -603,9 +446,8 @@ class TestNemoIntegration:
     def test_get_users_memoization(self):
         # to test the memoization of user data, we have to use one instance
         # of NemoConnector rather than a new one from the fixture for each call
-        from nexusLIMS.harvesters.nemo import NemoConnector
-        n = NemoConnector(os.environ['NEMO_address_1'],
-                          os.environ['NEMO_token_1'])
+        n = harvesters.nemo.NemoConnector(os.environ['NEMO_address_1'],
+                                          os.environ['NEMO_token_1'])
         to_test = [(3, ["***REMOVED***"]),
                    ([2, 3, 4], ["***REMOVED***", "***REMOVED***", "***REMOVED***"]),
                    (-1, []),
@@ -787,6 +629,156 @@ class TestNemoIntegration:
         assert len(multiple_test) == 1
         assert multiple_test[0]['user']['username'] == 'a***REMOVED***'
 
+        # test event_id
+        one_event = nemo_connector.get_usage_events(event_id=3)
+        assert len(one_event) == 1
+        assert one_event[0]['user']['username'] == '***REMOVED***'
+
+        multi_events = nemo_connector.get_usage_events(event_id=[3, 4, 5])
+        assert len(multi_events) == 3
+
+    @pytest.fixture
+    def cleanup_session_log(self):
+        # this fixture removes the rows for the usage event added in
+        # test_usage_event_to_session_log, so it doesn't mess up future
+        # record building tests
+        yield None
+        db_query('DELETE FROM session_log WHERE session_identifier LIKE ?',
+                 ('%usage_events/?id=3%',))
+
+    def test_usage_event_to_session_log(self,
+                                        nemo_connector,
+                                        cleanup_session_log):
+        success_before, results_before = db_query('SELECT * FROM session_log;')
+        nemo_connector.write_usage_event_to_session_log(3)
+        success_after, results_after = db_query('SELECT * FROM session_log;')
+        assert len(results_after) - len(results_before) == 2
+
+        success, results = db_query('SELECT * FROM session_log ORDER BY '
+                                    'id_session_log DESC LIMIT 2;')
+        # session ids are same:
+        assert results[0][1] == results[1][1]
+        assert results[0][1].endswith("/api/usage_events/?id=3")
+        # record status
+        assert results[0][5] == 'TO_BE_BUILT'
+        assert results[1][5] == 'TO_BE_BUILT'
+        # event type
+        assert results[0][4] == 'END'
+        assert results[1][4] == 'START'
+
+    def test_usage_event_to_session_log_non_existent_event(self,
+                                                           caplog,
+                                                           nemo_connector):
+        success_before, results_before = db_query('SELECT * FROM session_log;')
+        nemo_connector.write_usage_event_to_session_log(0)
+        success_after, results_after = db_query('SELECT * FROM session_log;')
+        assert 'No usage event with id = 0 was found' in caplog.text
+        assert 'WARNING' in caplog.text
+        assert len(results_after) == len(results_before)
+
+    def test_usage_event_to_session(self, nemo_connector):
+        session = nemo_connector.get_session_from_usage_event(3)
+        assert session.dt_from == \
+               dt.fromisoformat('2021-09-20T12:02:19.930972-06:00')
+        assert session.dt_to == \
+               dt.fromisoformat('2021-09-20T13:13:49.123309-06:00')
+        assert session.user == '***REMOVED***'
+        assert session.instrument == instrument_db['testsurface-CPU_P1111111']
+
+    def test_usage_event_to_session_non_existent_event(self,
+                                                       caplog,
+                                                       nemo_connector):
+        session = nemo_connector.get_session_from_usage_event(0)
+        assert 'No usage event with id = 0 was found' in caplog.text
+        assert 'WARNING' in caplog.text
+        assert session is None
+
+    def test_res_event_from_session(self):
+        from nexusLIMS.db.session_handler import Session
+        from nexusLIMS.harvesters import nemo
+        s = Session('test_matching_reservation',
+                    instrument_db['FEI-Titan-TEM-635816_n'],
+                    dt.fromisoformat('2021-08-02T15:00:00-06:00'),
+                    dt.fromisoformat('2021-08-02T16:00:00-06:00'),
+                    user='***REMOVED***')
+        res_event = nemo.res_event_from_session(s)
+        assert res_event.instrument == instrument_db['FEI-Titan-TEM-635816_n']
+        assert res_event.experiment_title == '***REMOVED***'
+        assert res_event.experiment_purpose == \
+               '***REMOVED*** ***REMOVED*** ' \
+               '***REMOVED***.'
+        assert res_event.sample_name == "***REMOVED***'s ***REMOVED***"
+        assert res_event.project_id is None
+        assert res_event.username == '***REMOVED***'
+        assert res_event.internal_id == '87'
+
+    def test_res_event_from_session_no_matching_sessions(self):
+        from nexusLIMS.db.session_handler import Session
+        from nexusLIMS.harvesters import nemo
+        s = Session('test_no_reservations',
+                    instrument_db['FEI-Titan-TEM-635816_n'],
+                    dt.fromisoformat('2021-08-10T15:00:00-06:00'),
+                    dt.fromisoformat('2021-08-10T16:00:00-06:00'),
+                    user='***REMOVED***')
+        res_event = nemo.res_event_from_session(s)
+        assert res_event.username == '***REMOVED***'
+        assert res_event.start_time == dt.fromisoformat(
+            '2021-08-10T15:00:00-06:00')
+        assert res_event.end_time == dt.fromisoformat(
+            '2021-08-10T16:00:00-06:00')
+
+    def test_res_event_from_session_no_overlapping_sessions(self):
+        from nexusLIMS.db.session_handler import Session
+        from nexusLIMS.harvesters import nemo
+        s = Session('test_no_reservations',
+                    instrument_db['FEI-Titan-TEM-635816_n'],
+                    dt.fromisoformat('2021-08-05T15:00:00-06:00'),
+                    dt.fromisoformat('2021-08-05T16:00:00-06:00'),
+                    user='***REMOVED***')
+        res_event = nemo.res_event_from_session(s)
+        assert res_event.username == '***REMOVED***'
+        assert res_event.start_time == dt.fromisoformat(
+            '2021-08-05T15:00:00-06:00')
+        assert res_event.end_time == dt.fromisoformat(
+            '2021-08-05T16:00:00-06:00')
+
+    def test_no_connector_for_session(self):
+        from nexusLIMS.db.session_handler import Session
+        from nexusLIMS.instruments import Instrument
+        from nexusLIMS.harvesters import nemo
+        s = Session('test_no_reservations',
+                    Instrument(name='Dummy instrument'),
+                    dt.fromisoformat('2021-08-05T15:00:00-06:00'),
+                    dt.fromisoformat('2021-08-05T16:00:00-06:00'),
+                    user='***REMOVED***')
+        with pytest.raises(LookupError) as e:
+            nemo.get_connector_for_session(s)
+
+        assert "Did not find enabled NEMO harvester for " \
+               "\"Dummy instrument\"" in str(e.value)
+
+    def test_bad_res_question_value(self, nemo_connector):
+        from nexusLIMS.harvesters import nemo
+        dt_from = dt.fromisoformat('2021-08-02T00:00:00-06:00')
+        dt_to = dt.fromisoformat('2021-08-03T00:00:00-06:00')
+        res = nemo_connector.get_reservations(tool_id=3,
+                                              dt_from=dt_from, dt_to=dt_to)[0]
+        val = nemo._get_res_question_value('bad_value', res)
+        assert val is None
+
+    def test_no_res_questions(self, nemo_connector):
+        from nexusLIMS.harvesters import nemo
+        dt_from = dt.fromisoformat('2021-09-06T00:00:00-06:00')
+        dt_to = dt.fromisoformat('2021-09-07T00:00:00-06:00')
+        res = nemo_connector.get_reservations(tool_id=10,
+                                              dt_from=dt_from, dt_to=dt_to)[0]
+        val = nemo._get_res_question_value('project_id', res)
+        assert val is None
+
+    def test_bad_id_from_url(self):
+        from nexusLIMS.harvesters import nemo
+        this_id = nemo.id_from_url('https://test.com/?notid=4')
+        assert this_id is None
 
 class TestReservationEvent:
     def test_full_reservation_constructor(self):
@@ -801,7 +793,8 @@ class TestReservationEvent:
             experiment_purpose="To test the constructor",
             sample_details="A sample that was loaded into a microscope for "
                            "testing",
-            sample_pid="***REMOVED***.5", sample_name="The test sample",
+            sample_pid=["***REMOVED***.5"],
+            sample_name="The test sample",
             project_name="NexusLIMS", project_id="***REMOVED***.1.5",
             project_ref="https://www.example.org", internal_id="42308",
             division="641", group="00"
@@ -826,4 +819,46 @@ class TestReservationEvent:
         assert xml.find('project/division').text == "641"
         assert xml.find('project/group').text == "00"
         assert xml.find('project/project_id').text == "***REMOVED***.1.5"
+        assert xml.find('project/ref').text == "https://www.example.org"
+
+    def test_res_event_without_title(self):
+        res_event = ReservationEvent(
+            experiment_title=None,
+            instrument=instrument_db['FEI-Titan-TEM-635816'],
+            last_updated=dt.fromisoformat("2021-09-15T16:04:00"),
+            username='***REMOVED***', created_by='***REMOVED***',
+            start_time=dt.fromisoformat("2021-09-15T04:00:00"),
+            end_time=dt.fromisoformat("2021-09-15T17:00:00"),
+            reservation_type="A test event",
+            experiment_purpose="To test a reservation with no title",
+            sample_details="A sample that was loaded into a microscope for "
+                           "testing",
+            sample_pid=["***REMOVED***.6"],
+            sample_name="The test sample name",
+            project_name="NexusLIMS", project_id="***REMOVED***.1.6",
+            project_ref="https://www.example.org", internal_id="48328",
+            division="641", group="00"
+        )
+
+        xml = res_event.as_xml()
+        assert xml.find('title').text == "Experiment on the FEI Titan TEM on " \
+                                         "Wednesday Sep. 15, 2021"
+        assert xml.find('id').text == "48328"
+        assert xml.find('summary/experimenter').text == "***REMOVED***"
+        assert xml.find('summary/instrument').text == "FEI Titan TEM"
+        assert xml.find('summary/instrument').get("pid") == \
+               "FEI-Titan-TEM-635816"
+        assert xml.find('summary/reservationStart').text == \
+               "2021-09-15T04:00:00"
+        assert xml.find('summary/reservationEnd').text == "2021-09-15T17:00:00"
+        assert xml.find('summary/motivation').text == "To test a reservation " \
+                                                      "with no title"
+        assert xml.find('sample').get("id") == "***REMOVED***.6"
+        assert xml.find('sample/name').text == "The test sample name"
+        assert xml.find('sample/description').text == \
+               "A sample that was loaded into a microscope for testing"
+        assert xml.find('project/name').text == "NexusLIMS"
+        assert xml.find('project/division').text == "641"
+        assert xml.find('project/group').text == "00"
+        assert xml.find('project/project_id').text == "***REMOVED***.1.6"
         assert xml.find('project/ref').text == "https://www.example.org"

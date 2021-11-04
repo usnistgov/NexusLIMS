@@ -30,15 +30,20 @@ This module contains the functionality to harvest instruments, reservations,
 etc. from an instance of NEMO (https://github.com/usnistgov/NEMO/), a
 calendering and laboratory logistics application.
 """
-from typing import Dict, Any, Iterable, Callable
+from typing import Any, Callable, List, Union, Dict
 
-from nexusLIMS.utils import nexus_req
-from urllib.parse import urljoin
+import re
+import os
 import requests
-from pprint import pprint
 import logging
-from datetime import datetime
-from typing import List, Union, Dict
+from urllib.parse import urljoin, urlparse, parse_qs
+from datetime import datetime, timedelta
+from uuid import uuid4
+
+from nexusLIMS.utils import nexus_req, _get_timespan_overlap
+from nexusLIMS.harvesters import ReservationEvent
+from nexusLIMS.db.session_handler import SessionLog, Session, db_query
+from nexusLIMS.instruments import get_instr_from_api_url
 
 _logger = logging.getLogger(__name__)
 
@@ -293,11 +298,11 @@ class NemoConnector:
         if cancelled is not None:
             p['cancelled'] = cancelled
 
-        if tool_id:
-            if hasattr(tool_id, '__iter__'):
+        if tool_id is not None:
+            if isinstance(tool_id, list):
                 p.update({"tool_id__in": ','.join([str(i) for i in tool_id])})
             else:
-                p.update({"tool_id": tool_id})
+                p.update({"tool_id": str(tool_id)})
 
         reservations = self._api_caller(requests.get, 'reservations/', p)
 
@@ -327,11 +332,53 @@ class NemoConnector:
         return reservations
 
     def get_usage_events(self,
+                         event_id: Union[int, List[int]] = None,
                          user: Union[str, int] = None,
                          dt_from: datetime = None,
                          dt_to: datetime = None,
-                         tool_id: Union[int, List[int]] = None):
+                         tool_id: Union[int, List[int]] = None) -> List:
+        """
+        Return a list of usage events from the API, filtered by date
+        (inclusive). If only one argument is provided, the API will return all
+        reservations either before or after the parameter. With no arguments,
+        the method will return all reservations. The method will
+        "auto-expand" linked information such as user, project, tool, etc. so
+        results will have a full dictionary for each of those fields, rather
+        than just the index (as returned from the API).
+
+        Parameters
+        ----------
+        event_id
+            The NEMO integer identifier (or a list of them) to fetch. If
+            ``None``, the returned usage events will not be filtered by ID
+            number
+        user
+            The user for which to fetch usage events, as either an integer
+            representing their id in the NEMO instance, or as a string
+            containing their username.  If ``None`` is given, usage events
+            from all users will be returned.
+        dt_from
+            The "starting point" of the time range; only usage events
+            starting at or after this point in time will be returned
+        dt_to
+            The "ending point" of the time range; only usage events ending at
+            or prior to this point in time will be returned
+        tool_id
+            A tool identifier (or list of them) to limit the scope of the
+            usage event search (this should be the NEMO internal integer ID)
+
+        Returns
+        -------
+        usage_events
+            A list (could be empty) of usage events that match the filters
+            supplied
+        """
         p = {}
+        if event_id is not None:
+            if hasattr(event_id, '__iter__'):
+                p.update({"id__in": ','.join([str(i) for i in event_id])})
+            else:
+                p.update({"id": event_id})
         if user:
             if isinstance(user, str):
                 u_id = self.get_users_by_username(user)[0]['id']
@@ -342,7 +389,7 @@ class NemoConnector:
             p['start__gte'] = dt_from.isoformat()
         if dt_to:
             p['end__lte'] = dt_to.isoformat()
-        if tool_id:
+        if tool_id is not None:
             if hasattr(tool_id, '__iter__'):
                 p.update({"tool_id__in": ','.join([str(i) for i in tool_id])})
             else:
@@ -370,6 +417,119 @@ class NemoConnector:
                     event.update({'tool': tool[0]})
 
         return usage_events
+
+    def write_usage_event_to_session_log(self,
+                                         event_id: int) -> None:
+        """
+        Inserts two rows (if needed) into the ``session_log`` (marking the start
+        and end of a usage event), only for instruments recognized by
+        NexusLIMS (i.e. that have a row in the ``instruments`` table of the DB)
+
+        Parameters
+        ----------
+        event_id
+            The NEMO id number for the event to insert
+
+        """
+        event = self.get_usage_events(event_id=event_id)
+        if event:
+            # get_usage_events returns list, so pick out first one
+            event = event[0]
+            tool_api_url = f"{self.base_url}tools/?id={event['tool']['id']}"
+            instr = get_instr_from_api_url(tool_api_url)
+            if instr is None:
+                _logger.warning(f"Usage event {event_id} was for an instrument "
+                                f"({tool_api_url}) not known "
+                                f"to NexusLIMS, so no records will be added "
+                                f"to DB.")
+                return
+            session_id = f"{self.base_url}usage_events/?id={event['id']}"
+
+            # try to insert start log
+            res = db_query("SELECT * FROM session_log WHERE session_identifier "
+                           "= ? AND event_type = ?", (session_id, 'START'))
+            if len(res[1]) > 0:
+                # there was already a start log, so warn and don't do anything:
+                _logger.warning(f"A  'START' log with session id "
+                                f"\"{session_id}\" was found in the the DB, "
+                                f"so a new one will not be inserted for this "
+                                f"event")
+            else:
+                start_log = SessionLog(
+                    session_identifier=session_id,
+                    instrument=instr.name,
+                    timestamp=event['start'],
+                    event_type='START',
+                    user=event['user']['username'],
+                    record_status='TO_BE_BUILT'
+                )
+                start_inserted = start_log.insert_log()
+
+            # try to insert end log
+            res = db_query("SELECT * FROM session_log WHERE session_identifier "
+                           "= ? AND event_type = ?", (session_id, 'END'))
+            if len(res[1]) > 0:
+                # there was already a start log, so warn and don't do anything:
+                _logger.warning(f"An 'END'   log with session id "
+                                f"\"{session_id}\" was found in the the DB, "
+                                f"so a new one will not be inserted for this "
+                                f"event")
+            else:
+                end_log = SessionLog(
+                    session_identifier=session_id,
+                    instrument=instr.name,
+                    timestamp=event['end'],
+                    event_type='END',
+                    user=event['user']['username'],
+                    record_status='TO_BE_BUILT'
+                )
+                end_inserted = end_log.insert_log()
+        else:
+            _logger.warning(f"No usage event with id = {event_id} was found "
+                            f"for {self}")
+
+    def get_session_from_usage_event(self, event_id: int) -> Union[Session,
+                                                                   None]:
+        """
+        Get a :py:class:`~nexusLIMS.db.session_handler.Session`
+        representation of a usage event for use in dry runs of the record
+        builder
+
+        Parameters
+        ----------
+        event_id
+            The NEMO id number for the event to insert
+
+        Returns
+        -------
+        session
+            A representation of the usage_event from NEMO as a
+            :py:class:`~nexusLIMS.db.session_handler.Session` object
+        """
+        event = self.get_usage_events(event_id=event_id)
+        if event:
+            event = event[0]
+            # we cannot reliably test an unended event, so exlcude from coverage
+            if event['start'] is not None and event['end'] is None: # pragma: no cover
+                _logger.warning(
+                    f"Usage event with id = {event_id} has not yet ended "
+                    f"for '{self}'")
+                return None
+            instr = get_instr_from_api_url(f"{self.base_url}tools/?id="
+                                           f"{event['tool']['id']}")
+            session_id = f"{self.base_url}usage_events/?id={event_id}"
+            session = Session(
+                session_identifier=session_id,
+                instrument=instr,
+                dt_from=datetime.fromisoformat(event['start']),
+                dt_to=datetime.fromisoformat(event['end']),
+                user=event['user']['username']
+            )
+            return session
+        else:
+            _logger.warning(f"No usage event with id = {event_id} was found "
+                            f"for '{self}'")
+            return None
 
     def _get_users_helper(self, p: Dict[str, str]) -> list:
         """
@@ -430,3 +590,248 @@ class NemoConnector:
         r.raise_for_status()
         results = r.json()
         return results
+
+
+# return enabled NEMO harvesters based on environment
+def get_harvesters_enabled() -> List[NemoConnector]:
+    """
+    Check the environment for NEMO settings and return a list of connectors
+    based off the values found
+
+    Returns
+    -------
+    harvesters_enabled
+        A list of NemoConnector objects representing the NEMO APIs enabled
+        via environment settings
+    """
+    harvesters_enabled_str: List[str] = \
+        list(filter(lambda x: re.search('NEMO_address', x), os.environ.keys()))
+    harvesters_enabled = [NemoConnector(os.getenv(addr),
+                                        os.getenv(addr.replace('address',
+                                                               'token')))
+                          for addr in harvesters_enabled_str]
+    return harvesters_enabled
+
+
+def add_all_usage_events_to_db(user: Union[str, int] = None,
+                               dt_from: datetime = None,
+                               dt_to: datetime = None,
+                               tool_id: Union[int, List[int]] = None):
+    """
+    Loop through enabled NEMO connectors and add each one's usage events to
+    the NexusLIMS ``session_log`` database table (if required).
+
+    Parameters
+    ----------
+    user
+        The user(s) for which to add usage events. If ``None``, events will
+        not be filtered by user at all
+    dt_from
+        The point in time after which usage events will be added. If ``None``,
+        no date filtering will be performed
+    dt_to
+        The point in time before which usage events will be added. If
+        ``None``, no date filtering will be performed
+    tool_id
+        The tools(s) for which to add usage events. If ``None``, events will
+        not be filtered by tool at all
+    """
+    for n in get_harvesters_enabled():
+        events = n.get_usage_events(user=user, dt_from=dt_from,
+                                    dt_to=dt_to, tool_id=tool_id)
+        for e in events:
+            n.write_usage_event_to_session_log(e['id'])
+
+
+def get_usage_events_as_sessions(user: Union[str, int] = None,
+                                 dt_from: datetime = None,
+                                 dt_to: datetime = None,
+                                 tool_id: Union[int, List[int]] = None) -> \
+        List[Session]:
+    """
+    Loop through enabled NEMO connectors and return each one's usage events to
+    as py:class:`~nexusLIMS.db.session_handler.Session` objects without
+    writing logs to the ``session_log`` table. Mostly used for doing dry runs
+    of the record builder.
+
+    Parameters
+    ----------
+    user
+        The user(s) for which to fetch usage events. If ``None``, events will
+        not be filtered by user at all
+    dt_from
+        The point in time after which usage events will be fetched. If ``None``,
+        no date filtering will be performed
+    dt_to
+        The point in time before which usage events will be fetched. If
+        ``None``, no date filtering will be performed
+    tool_id
+        The tools(s) for which to fetch usage events. If ``None``, events will
+        not be filtered by tool at all
+    """
+    sessions = []
+    for n in get_harvesters_enabled():
+        events = n.get_usage_events(user=user, dt_from=dt_from,
+                                    dt_to=dt_to, tool_id=tool_id)
+        for e in events:
+            this_session = n.get_session_from_usage_event(e['id'])
+            # this_session could be None, and if the instrument from the
+            # usage event is not in our DB, this_session.instrument could
+            # also be None. In each case, we should ignore that one
+            if this_session is not None and this_session.instrument is not None:
+                sessions.append(this_session)
+
+    return sessions
+
+
+def get_connector_for_session(session: Session) -> Union[NemoConnector, None]:
+    """
+    Given a py:class:`~nexusLIMS.db.session_handler.Session`, find the matching
+    py:class:`~nexusLIMS.harvesters.nemo.NemoConnector` from the enabled
+    list of NEMO harvesters
+
+    Parameters
+    ----------
+    session
+        The session for which a NemoConnector is needed
+
+    Returns
+    -------
+    n
+        The connector object that allows for querying the NEMO API for the
+        instrument contained in ``session``
+    """
+    instr_base_url = urljoin(session.instrument.api_url, '.')
+
+    for n in get_harvesters_enabled():
+        if n.base_url in instr_base_url:
+            return n
+
+    raise LookupError(f'Did not find enabled NEMO harvester for '
+                      f'"{session.instrument.name}". Perhaps check environment '
+                      f'variables? The following harvesters are enabled: '
+                      f'{get_harvesters_enabled()}')
+
+
+def res_event_from_session(session: Session) -> ReservationEvent:
+    """
+    Create an internal py:class:`~nexusLIMS.harvesters.ReservationEvent`
+    representation of a session by finding a matching reservation in the NEMO
+    system and parsing the data contained within into a ``ReservationEvent``
+
+    Parameters
+    ----------
+    session
+        The session for which to get a reservation event
+
+    Returns
+    -------
+    res_event
+        The matching reservation event
+    """
+    # a session has instrument, dt_from, dt_to, and user
+
+    # we should fetch all reservations +/- two days, and then find the one
+    # with the maximal overlap with the session time range
+    # probably don't want to filter by user for now, since sometimes users
+    # will enable/reserve on behalf of others, etc.
+
+    # in order to get reservations, we need a NemoConnector
+    c = get_connector_for_session(session)
+
+    # tool id can be extracted from instrument api_url query parameter
+    tool_id = id_from_url(session.instrument.api_url)
+
+    # get reservation with maximum overlap (like sharepoint_calendar.fetch_xml)
+    reservations: List[dict] = c.get_reservations(
+        tool_id=tool_id,
+        dt_from=session.dt_from - timedelta(days=2),
+        dt_to=session.dt_to + timedelta(days=2)
+    )
+
+    starts = [datetime.fromisoformat(r['start']) for r in reservations]
+    ends = [datetime.fromisoformat(r['end']) for r in reservations]
+
+    overlaps = [_get_timespan_overlap((session.dt_from, session.dt_to),
+                                      (s, e)) for s, e in zip(starts, ends)]
+
+    # DONE:
+    #   need to handle if there are no matching sessions (i.e. reservations is
+    #   an empty list
+    #   also need to handle if there is no overlap at all with any reservation
+    if len(reservations) == 0 or max(overlaps) == timedelta(0):
+        # there were no reservations that matched this usage event time range,
+        # or none of the reservations overlapped with the usage event
+        # so we'll use what limited information we have from the usage event
+        # session
+        res_event = ReservationEvent(
+            experiment_title=None, instrument=session.instrument,
+            last_updated=session.dt_to, username=session.user,
+            created_by=None, start_time=session.dt_from,
+            end_time=session.dt_to, reservation_type=None,
+            experiment_purpose=None, sample_details=None,
+            sample_pid=None, sample_name=None, project_name=None,
+            project_id=None, project_ref=None, internal_id=None,
+            division=None, group=None
+        )
+    else:
+        max_overlap = overlaps.index(max(overlaps))
+        # select the reservation with the most overlap
+        res = reservations[max_overlap]
+
+        # Create ReservationEvent from NEMO reservation dict
+        res_event = ReservationEvent(
+            experiment_title=_get_res_question_value('experiment_title', res),
+            instrument=session.instrument,
+            last_updated=datetime.fromisoformat(res['creation_time']),
+            username=res['user']['username'],
+            created_by=res['creator']['username'],
+            start_time=datetime.fromisoformat(res['start']),
+            end_time=datetime.fromisoformat(res['start']),
+            reservation_type=None, # reservation type is not collected in NEMO
+            experiment_purpose=_get_res_question_value('experiment_purpose',
+                                                       res),
+            sample_details=_get_res_question_value('sample_details', res),
+            sample_pid=None,
+            sample_name=_get_res_question_value('sample_name', res),
+            project_name=None,
+            project_id=_get_res_question_value('project_id', res),
+            project_ref=None,
+            internal_id=str(res['id']),
+            division=None,
+            group=None
+        )
+    return res_event
+
+
+def _get_res_question_value(value: str, res_dict: Dict) -> Union[str, None]:
+    if 'question_data' in res_dict and res_dict['question_data'] is not None:
+        if value in res_dict['question_data']:
+            return res_dict['question_data'][value].get('user_input', None)
+        else:
+            return None
+    else:
+        return None
+
+def id_from_url(url: str) -> Union[None, int]:
+    """
+    Get the value of the id query parameter stored in URL string. This is
+    used to extract the value as needed from API strings
+
+    Parameters
+    ----------
+    url
+        The URL to parse, such as
+        ``https://***REMOVED***/api/usage_events/?id=9``
+
+    Returns
+    -------
+    this_id
+        The id value if one is present, otherwise ``None``
+    """
+    query = parse_qs(urlparse(url).query)
+    if 'id' in query:
+        this_id = int(query['id'][0])
+        return this_id
+    else:
+        return None

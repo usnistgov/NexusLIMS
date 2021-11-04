@@ -26,6 +26,7 @@
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
 
+from typing import Union, List
 from nexusLIMS.instruments import instrument_db as _instr_db
 import os as _os
 from datetime import datetime as _dt
@@ -36,6 +37,19 @@ import logging as _logging
 _logger = _logging.getLogger(__name__)
 
 
+def db_query(query, args=None):
+    if args is None:
+        args = tuple()
+    success = False
+    with _contextlib.closing(_sql3.connect(
+            _os.environ['nexusLIMS_db_path'])) as conn:
+        with conn:  # auto-commits
+            with _contextlib.closing(conn.cursor()) as cursor:
+                results = cursor.execute(query, args).fetchall()
+                success = True
+    return success, results
+
+
 class SessionLog:
     """
     A simple mapping of one row in the ``session_log`` table of the NexusLIMS
@@ -43,28 +57,77 @@ class SessionLog:
 
     Parameters
     ----------
-    session_identifier : str
-         A UUID4 (36-character string) that is consistent among a single
-         record's `"START"`, `"END"`, and `"RECORD_GENERATION"` events
-    instrument : str
+    session_identifier
+         A unique string that is consistent among a single
+         record's `"START"`, `"END"`, and `"RECORD_GENERATION"` events (often a
+          UUID, but is not required to be so)
+    instrument
         The instrument associated with this session (foreign key reference to
         the ``instruments`` table)
-    timestamp : str
+    timestamp
         The ISO format timestamp representing the date and time of the logged
         event
-    event_type : str
+    event_type
         The type of log for this session (either `"START"`, `"END"`,
         or `"RECORD_GENERATION"`)
-    user : str
+    user
         The NIST "short style" username associated with this session (if known)
+    record_status
+        The status to use for this record (defaults to ``'TO_BE_BUILT'``
     """
-    def __init__(self, session_identifier, instrument,
-                 timestamp, event_type, user):
+    def __init__(self, session_identifier: str, instrument: str,
+                 timestamp: str, event_type: str, user: str,
+                 record_status: Union[str, None] = None):
         self.session_identifier = session_identifier
         self.instrument = instrument
         self.timestamp = timestamp
         self.event_type = event_type
         self.user = user
+        self.record_status = record_status if record_status else 'TO_BE_BUILT'
+
+    def __repr__(self):
+        return f"SessionLog (id={self.session_identifier}, " \
+               f"instrument={self.instrument}, " \
+               f"timestamp={self.timestamp}, " \
+               f"event_type={self.event_type}, " \
+               f"user={self.user}, " \
+               f"record_status={self.record_status})"
+
+    def insert_log(self) -> bool:
+        """
+        Inserts a log into the database with the information contained within
+        this SessionLog's attributes (used primarily for NEMO ``usage_event``
+        integration). It will check for the presence of a matching record first
+        and warn without inserting anything if it finds one.
+
+        Returns
+        -------
+        success
+            Whether or not the session log row was inserted successfully
+        """
+        query = "SELECT * FROM session_log " \
+                "WHERE session_identifier=? AND " \
+                "instrument=? AND " \
+                "timestamp=? AND " \
+                "event_type=? AND " \
+                "record_status=? AND " \
+                "user=?"
+        args = (self.session_identifier, self.instrument, self.timestamp,
+                self.event_type, self.record_status, self.user)
+
+        success, results = db_query(query, args)
+        if results:
+            # There was a matching record in the DB, so warn and return success
+            _logger.warning(f"SessionLog already existed in DB, so no "
+                            f"row was added: {self}")
+            return success
+
+        query = "INSERT INTO session_log(session_identifier, instrument, " \
+                "timestamp, event_type, record_status, user) VALUES " \
+                "(?, ?, ?, ?, ?, ?)"
+        success, results = db_query(query, args)
+
+        return success
 
 
 class Session:
@@ -77,7 +140,7 @@ class Session:
     Parameters
     ----------
     session_identifier : str
-        The UUIDv4 identifier for an individual session on an instrument
+        The unique identifier for an individual session on an instrument
     instrument : ~nexusLIMS.instruments.Instrument
         An object representing the instrument associated with this session
     dt_from : :py:class:`~datetime.datetime`
@@ -183,7 +246,7 @@ class Session:
         return success
 
 
-def get_sessions_to_build():
+def get_sessions_to_build() -> List[Session]:
     """
     Query the NexusLIMS database for pairs of logs with status
     ``'TO_BE_BUILT'`` and return the information needed to build a record for
@@ -191,7 +254,7 @@ def get_sessions_to_build():
 
     Returns
     -------
-    sessions : list of :py:class:`~nexusLIMS.db.session_handler.Session`
+    sessions
         A list of :py:class:`~nexusLIMS.db.session_handler.Session` objects
         containing the sessions that the need their record built. Will be an
         empty list if there's nothing to do.
@@ -221,8 +284,6 @@ def get_sessions_to_build():
         el_list = [el for el in end_logs if el.session_identifier ==
                    sl.session_identifier]
         if len(el_list) != 1:
-            # TODO: we should do something more intelligent here than just
-            #  raising an error
             raise ValueError()
 
         el = el_list[0]

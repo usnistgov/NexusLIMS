@@ -1,9 +1,13 @@
 """
 This module contains a top-level class to represent calendar reservations and
-associated metadata harvest metadata from
-various calendar
-sources.
+associated metadata harvest metadata from various calendar sources.
+The expectation is that submodules of this module will have a method named
+``res_event_from_session`` implemented to handle fetching a ReservationEvent
+object from a :py:class:`nexusLIMS.db.session_handler.Session` object.
 """
+from typing import Union, List
+from nexusLIMS.instruments import Instrument
+from datetime import datetime
 from lxml import etree
 import os as _os
 
@@ -22,55 +26,67 @@ class ReservationEvent:
 
     Attributes
     ----------
-    experiment_title : str
+    experiment_title
         The title of the event
-    instrument : ~nexusLIMS.instruments.Instrument
+    instrument
         The instrument associated with this reservation
     last_updated : datetime.datetime
         The time this event was last updated
-    username : str
+    username
         The NIST "short" username of the user indicated in this event
-    created_by : str
+    created_by
         The NIST "short" username of the user that created this event
-    start_time : datetime.datetime
+    start_time
         The time this event was scheduled to start
-    end_time : datetime.datetime
+    end_time
         The time this event was scheduled to end
-    reservation_type : str
+    reservation_type
         The "type" or category of this event (such as User session, service,
         etc.))
-    experiment_purpose : str
+    experiment_purpose
         The user-entered purpose of this experiment
-    sample_details : str
+    sample_details
         The user-entered sample details for this experiment
-    sample_pid : :obj:`list` of :obj:`str`
+    sample_pid
         A list of sample names or PIDs provided by the user
-    sample_name : str
+    sample_name
         A user-friendly sample name (not a PID)
-    project_name : str
+    project_name
         The user-entered project identifier for this experiment
-    project_id : str or list
+    project_id
         The specific project ID within a research group/division. If a ``str``
         is provided, it will be converted to a list internally
-    project_ref : str
+    project_ref
         An (optional) link to this project in another database
-    internal_id : str
+    internal_id
         The identifier assigned to this event (if any) by the calendaring system
-    division : str
+    division
         An identifier of the division this experiment was performed for (i.e.
         the user's division)
-    group : str
+    group
         An identifier of the group this experiment was performed for (i.e.
         the user's group)
     """
 
-    def __init__(self, experiment_title=None, instrument=None,
-                 last_updated=None, username=None, created_by=None,
-                 start_time=None, end_time=None, reservation_type=None,
-                 experiment_purpose=None, sample_details=None, sample_pid=None,
-                 sample_name=None, project_name=None,
-                 project_id=None, project_ref=None, internal_id=None,
-                 division=None, group=None):
+    def __init__(self,
+                 experiment_title: Union[str, None] = None,
+                 instrument: Union[Instrument, None] = None,
+                 last_updated: Union[datetime, None] = None,
+                 username: Union[str, None] = None,
+                 created_by: Union[str, None] = None,
+                 start_time: Union[datetime, None] = None,
+                 end_time: Union[datetime, None] = None, 
+                 reservation_type: Union[str, None] = None,
+                 experiment_purpose: Union[str, None] = None,
+                 sample_details: Union[str, None] = None,
+                 sample_pid: Union[List[str], None] = None,
+                 sample_name: Union[str, None] = None,
+                 project_name: Union[str, None] = None,
+                 project_id: Union[str, List[str], None] = None,
+                 project_ref: Union[str, None] = None,
+                 internal_id: Union[str, None] = None,
+                 division: Union[str, None] = None,
+                 group: Union[str, None] = None):
         self.experiment_title = experiment_title
         self.instrument = instrument
         self.last_updated = last_updated
@@ -81,10 +97,7 @@ class ReservationEvent:
         self.reservation_type = reservation_type
         self.experiment_purpose = experiment_purpose
         self.sample_details = sample_details
-        if isinstance(sample_pid, (str,)):
-            self.sample_pid = [sample_pid]
-        else:
-            self.sample_pid = sample_pid
+        self.sample_pid = sample_pid
         self.sample_name = sample_name
         self.project_name = project_name
         self.project_id = project_id
@@ -102,13 +115,13 @@ class ReservationEvent:
             return f'No matching calendar event' + \
                    (f' for {self.instrument.name}' if self.instrument else '')
 
-    def as_xml(self):
+    def as_xml(self) -> etree.Element:
         """
         Get an XML representation of this ReservationEvent
 
         Returns
         -------
-        root : lxml.etree.Element
+        root
             The reservation event serialized as XML that matches the
             Nexus Experiment schema
         """
@@ -136,7 +149,13 @@ class ReservationEvent:
         if self.instrument:
             instr_el = etree.SubElement(summary_el, "instrument")
             instr_el.text = self.instrument.schema_name
-            instr_el.set('pid', self.instrument.name)
+            # temporary workaround for duplicate harvesters for some instruments
+            if self.instrument.harvester == 'nemo' and \
+                    self.instrument.name.endswith('_n'):
+                pid = self.instrument.name.strip('_n')
+            else:
+                pid = self.instrument.name
+            instr_el.set('pid', pid)
         if self.start_time:
             start_el = etree.SubElement(summary_el, "reservationStart")
             start_el.text = self.start_time.isoformat()
