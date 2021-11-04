@@ -348,9 +348,12 @@ def find_dirs_by_mtime(path, dt_from, dt_to):
     """
     dirs = []
 
-    # adjust the datetime objects with the tz_offset (usually should be 0)
-    dt_from += tz_offset
-    dt_to += tz_offset
+    # adjust the datetime objects with the tz_offset (usually should be 0) if
+    # they are naive
+    if dt_from.tzinfo is None:
+        dt_from += tz_offset
+    if dt_to.tzinfo is None:
+        dt_to += tz_offset
 
     # use os.walk and only inspect the directories for mtime (much fewer
     # comparisons than looking at every file):
@@ -389,9 +392,12 @@ def find_files_by_mtime(path, dt_from, dt_to):
 
     dirs = [path]
 
-    # adjust the datetime objects with the tz_offset (usually should be 0)
-    dt_from += tz_offset
-    dt_to += tz_offset
+    # adjust the datetime objects with the tz_offset (usually should be 0) if
+    # they are naive
+    if dt_from.tzinfo is None:
+        dt_from += tz_offset
+    if dt_to.tzinfo is None:
+        dt_to += tz_offset
 
     files = set()    # use a set here (faster and we won't have duplicates)
     # for each of those directories, walk the file tree and inspect the
@@ -466,9 +472,12 @@ def gnu_find_files_by_mtime(path, dt_from, dt_to, extensions):
     if not _which('find'):
         raise RuntimeError('find command was not found on the system PATH')
 
-    # adjust the datetime objects with the tz_offset (usually should be 0)
-    dt_from += tz_offset
-    dt_to += tz_offset
+    # adjust the datetime objects with the tz_offset (usually should be 0) if
+    # they are naive
+    if dt_from.tzinfo is None:
+        dt_from += tz_offset
+    if dt_to.tzinfo is None:
+        dt_to += tz_offset
 
     # Actually run find command (ignoring mib files if specified by
     # environment variable):
