@@ -145,8 +145,8 @@ def res_event_from_xml(xml, date=None):
     updated = _get_el_text('entry/updated')
     if updated is not None:
         updated = _datetime.fromisoformat(updated)
-    username = _get_el_text('entry/link[@title="UserName"]//d:UserName')
-    created_by = _get_el_text('entry/link[@title="CreatedBy"]//d:UserName')
+    username = _get_el_text('entry/link[@title="UserName"]//d:Name')
+    created_by = _get_el_text('entry/link[@title="CreatedBy"]//d:Name')
     start_time = _get_el_text('entry//d:StartTime')
     if start_time is not None:
         start_time = _timezone(sp_tz).localize(
