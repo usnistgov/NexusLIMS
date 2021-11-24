@@ -34,8 +34,12 @@ class ReservationEvent:
         The time this event was last updated
     username
         The NIST "short" username of the user indicated in this event
+    user_full_name
+        The full name of the user for this event
     created_by
         The NIST "short" username of the user that created this event
+    created_by_full_name
+        The full name of the user that created this event
     start_time
         The time this event was scheduled to start
     end_time
@@ -73,7 +77,9 @@ class ReservationEvent:
                  instrument: Union[Instrument, None] = None,
                  last_updated: Union[datetime, None] = None,
                  username: Union[str, None] = None,
+                 user_full_name: Union[str, None] = None,
                  created_by: Union[str, None] = None,
+                 created_by_full_name: Union[str, None] = None,
                  start_time: Union[datetime, None] = None,
                  end_time: Union[datetime, None] = None, 
                  reservation_type: Union[str, None] = None,
@@ -91,7 +97,9 @@ class ReservationEvent:
         self.instrument = instrument
         self.last_updated = last_updated
         self.username = username
+        self.user_full_name = user_full_name
         self.created_by = created_by
+        self.created_by_full_name = created_by_full_name
         self.start_time = start_time
         self.end_time = end_time
         self.reservation_type = reservation_type
@@ -143,7 +151,10 @@ class ReservationEvent:
 
         # summary node
         summary_el = etree.SubElement(root, "summary")
-        if self.username:
+        if self.user_full_name:
+            experimenter_el = etree.SubElement(summary_el, "experimenter")
+            experimenter_el.text = self.user_full_name
+        elif self.username:
             experimenter_el = etree.SubElement(summary_el, "experimenter")
             experimenter_el.text = self.username
         if self.instrument:

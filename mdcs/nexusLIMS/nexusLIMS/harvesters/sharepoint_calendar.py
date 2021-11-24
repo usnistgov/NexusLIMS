@@ -143,7 +143,10 @@ def res_event_from_xml(xml, date=None):
     updated = _get_el_text('entry/updated')
     if updated is not None:
         updated = _datetime.fromisoformat(updated)
+    user_full_name = _get_el_text('entry/link[@title="UserName"]//d:Name')
     username = _get_el_text('entry/link[@title="UserName"]//d:UserName')
+    created_by_full_name = _get_el_text(
+        'entry/link[@title="CreatedBy"]//d:Name')
     created_by = _get_el_text('entry/link[@title="CreatedBy"]//d:UserName')
     start_time = _get_el_text('entry//d:StartTime')
     if start_time is not None:
@@ -161,10 +164,12 @@ def res_event_from_xml(xml, date=None):
 
     return ReservationEvent(
         experiment_title=title, instrument=instrument, last_updated=updated,
-        username=username, created_by=created_by, start_time=start_time,
-        end_time=end_time, reservation_type=category_value,
-        experiment_purpose=purpose, sample_details=sample_details,
-        project_name=project_name, internal_id=sharepoint_id
+        username=username, user_full_name=user_full_name,
+        created_by=created_by, created_by_full_name=created_by_full_name,
+        start_time=start_time, end_time=end_time,
+        reservation_type=category_value, experiment_purpose=purpose,
+        sample_details=sample_details, project_name=project_name,
+        internal_id=sharepoint_id
     )
 
 
