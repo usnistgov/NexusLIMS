@@ -19,10 +19,11 @@ class ReservationEvent:
     """
     A representation of a single calendar reservation, independent of the type
     of calendar the reservation was made with. ``ReservationEvent``
-    is a common interface that is used by the record building code. Sub-modules
-    should contain methods return an instance of this class as needed by
-    parsing their data as needed. Any attribute can be None to indicate it was
-    not present or no value was provided.
+    is a common interface that is used by the record building code.
+    Any attribute can be None to indicate it was not present or no value was
+    provided. The :py:meth:`as_xml` method is used to serialize the information
+    contained within a ``ReservationEvent`` into an XML representation that is
+    compatible with the Nexus Facility ``Experiment`` schema.
 
     Attributes
     ----------

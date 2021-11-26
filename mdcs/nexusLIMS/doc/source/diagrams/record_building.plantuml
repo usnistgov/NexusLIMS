@@ -33,6 +33,16 @@ end note
 
 |#eeeeff|Session handler|
 
+:""harvesters.nemo.add_all_usage_events_to_db()"";
+note right
+    Check the ""usage_events"" API
+    endpoint for each enabled NEMO
+    harvester (if any) and add
+    corresponding rows to the
+    NexusLIMS database to be used
+    in the next step
+end note
+
 :""session_handler.get_sessions_to_build()"";
 note right
   Check NexusLIMS database for
@@ -64,14 +74,20 @@ if (Are there new sessions?) then (True)
       document for this
       ""Experiment""
     end note
-    :""harvester.sharepoint_calendar.get_events()"";
+    :""harvesters.XXXX.res_event_from_session(s)"";
     note left
-      Finds reservation for
+      Finds a reservation for
       this ""instrument"" that
       match the specified
       timespan
     end note
-    if (Calendar event found?) then (True)
+    note right
+        Uses whatever harvester is
+        specified in the NexusLIMS
+        database for the given
+        instrument
+    end note
+    if (""ReservationEvent"" found?) then (True)
       :Add detailed event
       info to record summary
       ""XML"";
@@ -201,6 +217,6 @@ endif
 
 
 center footer
- Last updated Feb. 19, 2020
+ Last updated Nov. 26, 2021
 end footer
 @enduml

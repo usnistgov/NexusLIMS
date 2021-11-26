@@ -78,7 +78,7 @@ log database for any newly created usage events (default is to look back seven
 days for usage events). The record builder then calls
 :py:func:`~nexusLIMS.builder.record_builder.build_new_session_records`, which in
 turn uses :py:func:`~nexusLIMS.db.session_handler.get_sessions_to_build` to
-query the NexusLIMS database for sessions awaiting processing (the database
+query the NexusLIMS database for any sessions awaiting processing (the database
 location can be referenced within the code using the environment variable
 :ref:`nexusLIMS_db_path <nexusLIMS-db-path>` (`e.g.`
 ``os.environ["nexusLIMS_db_path"]``. This method interrogates the database for
@@ -140,10 +140,11 @@ Overview
 
 .. TODO: clarify multiple harvesters here
 
-2.  `(link) <querying-sharepoint_>`_
+2.  `(link) <harvesting-calendar_>`_
     Fetch any associated calendar information for this
-    :py:class:`~nexusLIMS.db.session_handler.Session` using
-    :py:func:`~nexusLIMS.harvesters.sharepoint_calendar.get_events`
+    :py:class:`~nexusLIMS.db.session_handler.Session` using one of the enabled
+    harvesters (currently :py:mod:`~nexusLIMS.harvesters.sharepoint_calendar`
+    or :py:mod:`~nexusLIMS.harvesters.nemo`).
 3.  `(link) <identifying-files_>`_
     Identify files that NexusLIMS knows how to parse within the time range using
     :py:func:`~nexusLIMS.utils.find_files_by_mtime`; if no files are found,
@@ -199,33 +200,35 @@ begins the record by writing basic XML header information before querying the
 reservation system for additional information about the experiment.
 `(go to top) <overview_>`_
 
-.. _querying-sharepoint:
+.. _harvesting-calendar:
 
-2. Querying the SharePoint Calendar
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2. Querying the Reservation Calendars
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Since users must make reservations on the SharePoint calendar, this is an
-important source of metadata for the experimental records created by NexusLIMS.
-Information from these calendar "events" is included throughout the record,
+Since users must make reservations on either the SharePoint calendar or the
+NEMO facility management system, these are
+important sources of metadata for the experimental records created by NexusLIMS.
+Information from these reservation "events" is included throughout the record,
 although it primarily informs the information contained in the ``<summary>``
 element, including information such as who made the reservation, what the
 experiment's motivation was, what sample was examined, etc.
 
-To obtain this information, the
-:py:func:`~nexusLIMS.harvesters.sharepoint_calendar.get_events` function from the
-:py:mod:`~nexusLIMS.harvesters.sharepoint_calendar` harvester module is used.
-This function authenticates to and queries the SharePoint API, and receives
-an XML response representing any reservations found that match the timespan of
-the :py:class:`~nexusLIMS.db.session_handler.Session`. This XML is then
-translated using the XSLT file (path specified by
-:py:data:`~nexusLIMS.builder.record_builder.XSLT_PATH`) into a format that is
-compatible with the Nexus Microscopy Schema. This result is added to the XML
-representation of the current record.
-
-If no matching events are found, some basic details are added to the
-``<summary>`` section of the record using the information that can be accessed,
-such as the instrument the Experiment was performed on, as well as the date and
-time. `(go to top) <overview_>`_
+To obtain this information, the record builder uses whatever harvester module
+is listed in the ``harvester`` column of the NexusLIMS database for that
+instrument. (i.e. either :py:mod:`~nexusLIMS.harvesters.nemo` or
+:py:mod:`~nexusLIMS.harvesters.sharepoint_calendar` as of version
+1.1.0). Each of these modules implements a ``res_event_from_session`` method,
+used by the record builder to return a
+:py:class:`~nexusLIMS.harvesters.ReservationEvent` object representing the
+reservation that overlaps maximally with the unit of time (or a very simple
+generic one, if no matching reservation was found). These functions operate
+serve as an adaptor layer to allow NexusLIMS to generate structurally-uniform
+representations of a reservation from differing calendaring applications.
+From this point on, identical code is used regardless of the original source of
+the reservation information. Once the
+:py:class:`~nexusLIMS.harvesters.ReservationEvent` is obtained,
+it is serialized into XML format that is compatible with the Nexus Microscopy
+Schema. `(go to top) <overview_>`_
 
 .. _identifying-files:
 

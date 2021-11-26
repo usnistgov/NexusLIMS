@@ -793,7 +793,7 @@ def res_event_from_session(session: Session) -> ReservationEvent:
                                  f"{res['creator']['last_name']} "
                                  f"({res['creator']['username']})",
             start_time=datetime.fromisoformat(res['start']),
-            end_time=datetime.fromisoformat(res['start']),
+            end_time=datetime.fromisoformat(res['end']),
             reservation_type=None, # reservation type is not collected in NEMO
             experiment_purpose=_get_res_question_value('experiment_purpose',
                                                        res),
