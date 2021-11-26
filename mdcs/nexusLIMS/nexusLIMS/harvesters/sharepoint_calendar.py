@@ -116,7 +116,7 @@ def res_event_from_xml(xml, date=None):
 
     Returns
     -------
-    res_event : ReservationEvent
+    res_event : ~nexusLIMS.harvesters.ReservationEvent
         An object representing an entry on the SharePoint calendar. Could
         be empty if no ``entry`` nodes are present in XML response
     """
@@ -478,8 +478,8 @@ def get_events(instrument=None,
 
     Returns
     -------
-    res_event : ReservationEvent
-        A ``ReservationEvent`` in a string, containing information about a
+    res_event : ~nexusLIMS.harvesters.ReservationEvent
+        A ``ReservationEvent``, containing information about a
         single reservation, including title, instrument, user information,
         reservation purpose, sample details, description, and date/time
         information.

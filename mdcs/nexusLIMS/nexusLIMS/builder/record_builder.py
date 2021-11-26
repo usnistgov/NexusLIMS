@@ -93,7 +93,7 @@ def build_record(session: Session,
 
     Returns
     -------
-    xml_record
+    xml_record : str
         A formatted string containing a well-formed and valid XML document
         for the data contained in the provided path
     """
@@ -154,14 +154,14 @@ def get_reservation_event(session: Session) -> _ResEvent:
     Parameters
     ----------
     session
-        The py:class:`~nexusLIMS.db.session_handler.Session` for which to
-        fetch a matching py:class:`~nexusLIMS.harvesters.ReservationEvent` from
+        The :py:class:`~nexusLIMS.db.session_handler.Session` for which to
+        fetch a matching :py:class:`~nexusLIMS.harvesters.ReservationEvent` from
         the relevant harvester
 
     Returns
     -------
-    res_event
-        A py:class:`~nexusLIMS.harvesters.ReservationEvent` representation of
+    res_event : ~nexusLIMS.harvesters.ReservationEvent
+        A :py:class:`~nexusLIMS.harvesters.ReservationEvent` representation of
         a reservation that matches the instrument and timespan specified in
         ``session``.
     """
@@ -299,7 +299,7 @@ def get_files(path, dt_from, dt_to):
 
     Returns
     -------
-    files : :obj:`list` of :obj:`str`
+    files : list of str
         A list of the files that have modification times within the
         time range provided (sorted by modification time)
     """
@@ -325,7 +325,7 @@ def dump_record(session: Session,
     Parameters
     ----------
     session
-        A py:class:`~nexusLIMS.db.session_handler.Session` object
+        A :py:class:`~nexusLIMS.db.session_handler.Session` object
         representing a unit of time on one of the instruments known to NexusLIMS
     filename : None or str
         The filename of the dumped xml file to write. If None, a default name
@@ -384,7 +384,7 @@ def build_new_session_records() -> List[str]:
 
     Returns
     -------
-    xml_files
+    xml_files : list of str
         A list of record files that were successfully built and saved to
         centralized storage
     """
@@ -538,7 +538,7 @@ def dry_run_get_sharepoint_reservation_event(s: Session) -> _ResEvent:
 
     Returns
     -------
-    res_event
+    res_event : ~nexusLIMS.harvesters.ReservationEvent
         A list of strings containing the files that would be included for the
         record of this session (if it were not a dry run)
     """
@@ -560,7 +560,7 @@ def dry_run_file_find(s: Session) -> List[str]:
 
     Returns
     -------
-    files
+    files : list of str
         A list of strings containing the files that would be included for the
         record of this session (if it were not a dry run)
     """

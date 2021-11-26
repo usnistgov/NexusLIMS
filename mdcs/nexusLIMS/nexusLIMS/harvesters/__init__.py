@@ -129,7 +129,7 @@ class ReservationEvent:
 
         Returns
         -------
-        root
+        root : lxml.etree.Element
             The reservation event serialized as XML that matches the
             Nexus Experiment schema
         """

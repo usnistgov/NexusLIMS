@@ -85,7 +85,7 @@ class NemoConnector:
 
         Returns
         -------
-        tools
+        tools : list
             A list (could be empty) of tools that match the id (or ids) given
             in ``tool_id``
 
@@ -131,7 +131,7 @@ class NemoConnector:
 
         Returns
         -------
-        users
+        users : list
             A list (could be empty) of users that match the ids and/or
             usernames given
 
@@ -175,7 +175,7 @@ class NemoConnector:
 
         Returns
         -------
-        users
+        users : list
             A list (could be empty) of users that match the ids and/or
             usernames given
 
@@ -216,7 +216,7 @@ class NemoConnector:
 
         Returns
         -------
-        projects
+        projects : list
             A list (could be empty) of projects that match the id (or ids) given
             in ``proj_id``
 
@@ -285,7 +285,7 @@ class NemoConnector:
 
         Returns
         -------
-        reservations
+        reservations : list
             A list (could be empty) of reservations that match the date range
             supplied
         """
@@ -369,7 +369,7 @@ class NemoConnector:
 
         Returns
         -------
-        usage_events
+        usage_events : list
             A list (could be empty) of usage events that match the filters
             supplied
         """
@@ -502,7 +502,7 @@ class NemoConnector:
 
         Returns
         -------
-        session
+        session : ~nexusLIMS.db.session_handler.Session
             A representation of the usage_event from NEMO as a
             :py:class:`~nexusLIMS.db.session_handler.Session` object
         """
@@ -600,7 +600,7 @@ def get_harvesters_enabled() -> List[NemoConnector]:
 
     Returns
     -------
-    harvesters_enabled
+    harvesters_enabled : list of ~nexusLIMS.harvesters.nemo.NemoConnector
         A list of NemoConnector objects representing the NEMO APIs enabled
         via environment settings
     """
@@ -650,7 +650,7 @@ def get_usage_events_as_sessions(user: Union[str, int] = None,
         List[Session]:
     """
     Loop through enabled NEMO connectors and return each one's usage events to
-    as py:class:`~nexusLIMS.db.session_handler.Session` objects without
+    as :py:class:`~nexusLIMS.db.session_handler.Session` objects without
     writing logs to the ``session_log`` table. Mostly used for doing dry runs
     of the record builder.
 
@@ -686,8 +686,8 @@ def get_usage_events_as_sessions(user: Union[str, int] = None,
 
 def get_connector_for_session(session: Session) -> Union[NemoConnector, None]:
     """
-    Given a py:class:`~nexusLIMS.db.session_handler.Session`, find the matching
-    py:class:`~nexusLIMS.harvesters.nemo.NemoConnector` from the enabled
+    Given a :py:class:`~nexusLIMS.db.session_handler.Session`, find the matching
+    :py:class:`~nexusLIMS.harvesters.nemo.NemoConnector` from the enabled
     list of NEMO harvesters
 
     Parameters
@@ -697,7 +697,7 @@ def get_connector_for_session(session: Session) -> Union[NemoConnector, None]:
 
     Returns
     -------
-    n
+    n : ~nexusLIMS.harvesters.nemo.NemoConnector
         The connector object that allows for querying the NEMO API for the
         instrument contained in ``session``
     """
@@ -715,7 +715,7 @@ def get_connector_for_session(session: Session) -> Union[NemoConnector, None]:
 
 def res_event_from_session(session: Session) -> ReservationEvent:
     """
-    Create an internal py:class:`~nexusLIMS.harvesters.ReservationEvent`
+    Create an internal :py:class:`~nexusLIMS.harvesters.ReservationEvent`
     representation of a session by finding a matching reservation in the NEMO
     system and parsing the data contained within into a ``ReservationEvent``
 
@@ -726,7 +726,7 @@ def res_event_from_session(session: Session) -> ReservationEvent:
 
     Returns
     -------
-    res_event
+    res_event : ~nexusLIMS.harvesters.ReservationEvent
         The matching reservation event
     """
     # a session has instrument, dt_from, dt_to, and user
@@ -832,7 +832,7 @@ def id_from_url(url: str) -> Union[None, int]:
 
     Returns
     -------
-    this_id
+    this_id : None or int
         The id value if one is present, otherwise ``None``
     """
     query = parse_qs(urlparse(url).query)

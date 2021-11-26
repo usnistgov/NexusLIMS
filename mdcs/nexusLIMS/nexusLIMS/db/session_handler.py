@@ -60,7 +60,7 @@ class SessionLog:
     session_identifier
          A unique string that is consistent among a single
          record's `"START"`, `"END"`, and `"RECORD_GENERATION"` events (often a
-          UUID, but is not required to be so)
+         UUID, but is not required to be so)
     instrument
         The instrument associated with this session (foreign key reference to
         the ``instruments`` table)
@@ -102,7 +102,7 @@ class SessionLog:
 
         Returns
         -------
-        success
+        success : bool
             Whether or not the session log row was inserted successfully
         """
         query = "SELECT * FROM session_log " \
@@ -254,7 +254,7 @@ def get_sessions_to_build() -> List[Session]:
 
     Returns
     -------
-    sessions
+    sessions : list of ~nexusLIMS.db.session_handler.Session
         A list of :py:class:`~nexusLIMS.db.session_handler.Session` objects
         containing the sessions that the need their record built. Will be an
         empty list if there's nothing to do.
