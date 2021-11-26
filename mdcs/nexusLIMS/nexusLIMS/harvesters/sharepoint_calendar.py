@@ -43,6 +43,7 @@ import ldap3 as _ldap3
 from datetime import datetime as _datetime
 from datetime import timedelta as _timedelta
 from configparser import ConfigParser as _ConfigParser
+from nexusLIMS.db.session_handler import Session as _Session
 from nexusLIMS.instruments import Instrument as _Instrument
 from nexusLIMS.instruments import instrument_db as _instr_db
 from nexusLIMS.instruments import get_instr_from_calendar_name as _from_cal
@@ -51,14 +52,11 @@ from nexusLIMS.utils import _get_timespan_overlap
 from nexusLIMS.harvesters import ReservationEvent
 
 _logger = _logging.getLogger(__name__)
-XSLT_PATH = _os.path.join(_os.path.dirname(__file__), "cal_parser.xsl")
-CA_BUNDLE_PATH = _os.path.join(_os.path.dirname(__file__),
-                               "sharepoint_cert_bundle.pem")
 INDENT = '  '
 
-__all__ = ['res_event_from_xml', 'AuthenticationError', 'get_auth', 'fetch_xml',
-           'get_div_and_group', 'get_events', '_wrap_events',
-           'dump_calendars', 'CA_BUNDLE_PATH']
+__all__ = ['res_event_from_session', 'res_event_from_xml',
+           'AuthenticationError', 'get_auth', 'fetch_xml',
+           'get_div_and_group', 'get_events', 'dump_calendars']
 
 
 class AuthenticationError(Exception):
@@ -145,7 +143,10 @@ def res_event_from_xml(xml, date=None):
     updated = _get_el_text('entry/updated')
     if updated is not None:
         updated = _datetime.fromisoformat(updated)
+    user_full_name = _get_el_text('entry/link[@title="UserName"]//d:Name')
     username = _get_el_text('entry/link[@title="UserName"]//d:UserName')
+    created_by_full_name = _get_el_text(
+        'entry/link[@title="CreatedBy"]//d:Name')
     created_by = _get_el_text('entry/link[@title="CreatedBy"]//d:UserName')
     start_time = _get_el_text('entry//d:StartTime')
     if start_time is not None:
@@ -163,10 +164,12 @@ def res_event_from_xml(xml, date=None):
 
     return ReservationEvent(
         experiment_title=title, instrument=instrument, last_updated=updated,
-        username=username, created_by=created_by, start_time=start_time,
-        end_time=end_time, reservation_type=category_value,
-        experiment_purpose=purpose, sample_details=sample_details,
-        project_name=project_name, internal_id=sharepoint_id
+        username=username, user_full_name=user_full_name,
+        created_by=created_by, created_by_full_name=created_by_full_name,
+        start_time=start_time, end_time=end_time,
+        reservation_type=category_value, experiment_purpose=purpose,
+        sample_details=sample_details, project_name=project_name,
+        internal_id=sharepoint_id
     )
 
 
@@ -496,40 +499,6 @@ def get_events(instrument=None,
     return res_event
 
 
-def _wrap_events(events_string):
-    """
-    Helper function to turn events string from :py:func:`~.get_events` into a
-    well-formed XML file with proper indentation
-
-    .. deprecated:: 1.0.1
-          `_wrap_events` is no longer used since API responses and
-          reservation information is managed as ``lxml`` elements now instead of
-          as strings
-
-    Parameters
-    ----------
-    events_string : str
-
-    Returns
-    -------
-    result : str
-        The full XML file as a string
-    """
-    # Holder for final XML output with proper header
-    result = """<?xml version="1.0"?>
-    <events>
-    {}<dateRetrieved>{}</dateRetrieved>
-    """.format(INDENT, _datetime.now().isoformat())
-    # add indent to first line and all newlines:
-    events_string = INDENT + events_string
-    events_string = events_string.replace('\n', '\n' + INDENT)
-    result += events_string
-    result = result.strip().strip('\n')
-    result += "\n</events>"
-
-    return result
-
-
 def dump_calendars(instrument=None, user=None, dt_from=None, dt_to=None,
                    group=None, division=None,
                    filename='cal_events.xml'):
@@ -655,3 +624,10 @@ def _get_sharepoint_tz():
         timezone = 'Pacific/Honolulu'
 
     return timezone
+
+
+def res_event_from_session(session: _Session) -> ReservationEvent:
+    return get_events(instrument=session.instrument,
+                      dt_from=session.dt_from,
+                      dt_to=session.dt_to,
+                      user=session.user)

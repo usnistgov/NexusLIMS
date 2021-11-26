@@ -37,6 +37,8 @@ instrument_db : dict
     NexusLIMS remote database.
 """
 
+from typing import Union
+
 from nexusLIMS.utils import is_subpath as _is_subpath
 import sqlite3 as _sql3
 import contextlib as _contextlib
@@ -111,6 +113,7 @@ class Instrument:
     computer_mount : str or None
         The full path where the files are saved on the 'support PC' for the
         instrument (e.g. 'M:/')
+    harvester
     """
     def __init__(self,
                  api_url=None,
@@ -123,7 +126,8 @@ class Instrument:
                  filestore_path=None,
                  computer_ip=None,
                  computer_name=None,
-                 computer_mount=None):
+                 computer_mount=None,
+                 harvester=None):
         """
         Create a new Instrument
         """
@@ -138,6 +142,8 @@ class Instrument:
         self.computer_ip = computer_ip
         self.computer_name = computer_name
         self.computer_mount = computer_mount
+        self.harvester = harvester
+        # TODO: we need to add timezone information here (maybe?)
 
     def __repr__(self):
         return f'Nexus Instrument: {self.name}\n' \
@@ -150,7 +156,8 @@ class Instrument:
                f'Filestore path:   {self.filestore_path}\n' \
                f'Computer IP:      {self.computer_ip}\n' \
                f'Computer name:    {self.computer_name}\n' \
-               f'Computer mount:   {self.computer_mount}\n'
+               f'Computer mount:   {self.computer_mount}\n' \
+               f'Harvester:        {self.harvester}\n'
 
     def __str__(self):
         return f'{self.name}' + f' in {self.location}' if self.location else ''
@@ -215,6 +222,35 @@ def get_instr_from_calendar_name(cal_name):
     """
     for k, v in instrument_db.items():
         if cal_name in v.api_url:
+            return v
+
+    return None
+
+
+def get_instr_from_api_url(api_url: str) -> Union[None, Instrument]:
+    """
+    Using the NexusLIMS database, get an instrument object by a given api_url.
+
+    Parameters
+    ----------
+    api_url
+        An api_url (e.g. "FEITitanTEMEvents") that will be used to search
+        for a matching instrument in the ``api_url`` values
+
+    Returns
+    -------
+    instrument
+        An ``Instrument`` instance matching the ``api_url``, or ``None`` if no
+        match was found
+
+    Examples
+    --------
+    >>> inst = get_instr_from_api_url('https://***REMOVED***/api/tools/?id=1')
+    >>> str(inst)
+    'FEI-Titan-STEM-630901_n in ***REMOVED***'
+    """
+    for k, v in instrument_db.items():
+        if api_url == v.api_url:
             return v
 
     return None

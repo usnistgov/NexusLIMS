@@ -74,7 +74,8 @@ class TestInstruments:
             f'Filestore path:   ./Titan\n' \
             f'Computer IP:      ***REMOVED***\n' \
             f'Computer name:    ***REMOVED***\n' \
-            f'Computer mount:   M:/\n'
+            f'Computer mount:   M:/\n' \
+            f'Harvester:        sharepoint_calendar\n'
 
     def test_get_instr_from_filepath(self):
         path = os.path.join(os.environ['mmfnexus_path'],

@@ -134,7 +134,6 @@ def cluster_filelist_mtimes(filelist):
     return aa_boundaries
 
 
-# TODO: tests for all of AcquisitionActivity
 class AcquisitionActivity:
     """
     A collection of files/metadata attributed to a physical acquisition activity
