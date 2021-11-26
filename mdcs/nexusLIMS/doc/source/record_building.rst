@@ -5,7 +5,7 @@
 Record building workflow
 ========================
 
-    `Last updated: February 23, 2020`
+    `Last updated: November 26, 2021`
 
 This page describes the process used to build records based on the data saved by
 instruments in the
@@ -31,6 +31,9 @@ running ``python -m nexusLIMS.builder.record_builder``, which will run the
 function initiates one iteration of the record builder, which will query the
 NexusLIMS database for any sessions that are waiting to have their record built
 and then proceed to build them and upload them to the NexusLIMS CDCS instance.
+As of November 2021, it also queries the API for any enabled NEMO-based
+harvesters, and will fetch any recent "usage events" to determine if a record
+needs to be built.
 As part of this process (and explained in detail below), the centralized file
 system is searched for files matching the session logs in the database, which
 then have their metadata extracted and are parsed into `Acquisition Activities`.
@@ -53,15 +56,26 @@ and the operators of NexusLIMS are notified so the issue can be corrected.
     `pipenv <https://pipenv.readthedocs.io/en/latest/>`_, the easiest way to do
     this is by editing the ``.env.example`` file in the root of the NexusLIMS
     repository and renaming it to ``.env`` (make sure not to push this file to
-    any remote source, since it has a password in it!).
+    any remote source, since it has a password in it!). Furthermore, NEMO-based
+    session harvesting is enabled by specifying one or more sets of environment
+    variables named ``NEMO_address_X`` and ``NEMO_token_X``, where ``X`` is an
+    integer value (``1``, ``2``, ``3``, etc.). The address variable should be
+    a path to the API endpoint for a particular server (e.g.
+    ``https://***REMOVED***/api/``), while the token should be an API
+    authentication token created on the "Detailed administration" page of the
+    NEMO administration tools (ask your NEMO system administrator for more
+    direction if this is unclear).
 
 
 Finding New Sessions
 ++++++++++++++++++++
 
 The session finding is initiated by
-:py:func:`~nexusLIMS.builder.record_builder.process_new_records`, which
-immediately calls
+:py:func:`~nexusLIMS.builder.record_builder.process_new_records`. This method
+uses :py:func:`~nexusLIMS.harvesters.nemo.add_all_usage_events_to_db` to first
+query any enabled NEMO API Connectors, and adds rows to the NexusLIMS session
+log database for any newly created usage events (default is to look back seven
+days for usage events). The record builder then calls
 :py:func:`~nexusLIMS.builder.record_builder.build_new_session_records`, which in
 turn uses :py:func:`~nexusLIMS.db.session_handler.get_sessions_to_build` to
 query the NexusLIMS database for sessions awaiting processing (the database
@@ -85,7 +99,9 @@ that are used when building a record:
 .. _session-contents:
 
     session_identifier : :py:class:`str`
-        The UUIDv4 identifier for an individual session on an instrument
+        An identifier for an individual session on an instrument. This is a UUIDv4
+        for any Sharepoint Calendar events, but will be a resolvable URL for any
+        NEMO-based events
     instrument : :py:class:`~nexusLIMS.instruments.Instrument`
         An object representing the instrument associated with this session
     dt_from : :py:class:`~datetime.datetime`
@@ -121,6 +137,9 @@ Overview
     Execute :py:func:`~nexusLIMS.builder.record_builder.build_record` for the
     :py:class:`~nexusLIMS.instruments.Instrument` and time range specified by
     the :py:class:`~nexusLIMS.db.session_handler.Session`
+
+.. TODO: clarify multiple harvesters here
+
 2.  `(link) <querying-sharepoint_>`_
     Fetch any associated calendar information for this
     :py:class:`~nexusLIMS.db.session_handler.Session` using
