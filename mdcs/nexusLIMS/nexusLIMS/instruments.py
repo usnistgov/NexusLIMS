@@ -36,13 +36,19 @@ instrument_db : dict
     Each object in this dictionary represents an instrument detected in the
     NexusLIMS remote database.
 """
-
+import datetime
 from typing import Union
 
 from nexusLIMS.utils import is_subpath as _is_subpath
 import sqlite3 as _sql3
 import contextlib as _contextlib
 import os as _os
+import logging as _logging
+import pytz as _pytz
+
+_logging.basicConfig()
+_logger = _logging.getLogger(__name__)
+_logger.setLevel(_logging.INFO)
 
 
 def _get_instrument_db():
@@ -74,6 +80,14 @@ def _get_instrument_db():
 
         key = this_dict.pop('instrument_pid')
         this_dict['name'] = key
+        # remove keys from this_dict that we don't know about yet so we don't
+        # crash and burn if a new column is added
+        known_cols = \
+            ['api_url', 'calendar_name', 'calendar_url', 'location',
+             'name', 'schema_name', 'property_tag', 'filestore_path',
+             'computer_ip', 'computer_name', 'computer_mount', 'harvester',
+             'timezone']
+        this_dict = {k: this_dict[k] for k in known_cols}
         instr_db[key] = Instrument(**this_dict)
 
     return instr_db
@@ -113,7 +127,12 @@ class Instrument:
     computer_mount : str or None
         The full path where the files are saved on the 'support PC' for the
         instrument (e.g. 'M:/')
-    harvester
+    harvester : str or None
+        The sub-module of :py:mod:`~nexusLIMS.harvesters` to use to harvest
+        calendar events
+    timezone : pytz.timezone, str, or None
+        The timezone (as in the tzdata database) where this instrument is
+        located. Used for properly localizing the display of timestamps.
     """
     def __init__(self,
                  api_url=None,
@@ -127,7 +146,8 @@ class Instrument:
                  computer_ip=None,
                  computer_name=None,
                  computer_mount=None,
-                 harvester=None):
+                 harvester=None,
+                 timezone=None):
         """
         Create a new Instrument
         """
@@ -143,7 +163,10 @@ class Instrument:
         self.computer_name = computer_name
         self.computer_mount = computer_mount
         self.harvester = harvester
-        # TODO: we need to add timezone information here (maybe?)
+        if isinstance(timezone, str):
+            self.timezone = _pytz.timezone(timezone)
+        else:
+            self.timezone = timezone
 
     def __repr__(self):
         return f'Nexus Instrument: {self.name}\n' \
@@ -157,10 +180,63 @@ class Instrument:
                f'Computer IP:      {self.computer_ip}\n' \
                f'Computer name:    {self.computer_name}\n' \
                f'Computer mount:   {self.computer_mount}\n' \
-               f'Harvester:        {self.harvester}\n'
+               f'Harvester:        {self.harvester}\n' \
+               f'Timezone:         {self.timezone}'
 
     def __str__(self):
         return f'{self.name}' + f' in {self.location}' if self.location else ''
+
+    def localize_datetime(self, dt: datetime.datetime) -> datetime.datetime:
+        """
+        Convert a date and time to the timezone of this instrument. If the
+        supplied datetime is naive (i.e. does not have a timezone), it will be
+        assumed to already be in the timezone of the instrument, and the
+        displayed time will not change. If the timezone of the supplied
+        datetime is different than the instrument's, the time will be
+        adjusted to compensate for the timezone offset.
+
+        Parameters
+        ----------
+        dt
+            The datetime object to localize
+
+        Returns
+        -------
+        datetime.datetime
+            A datetime object with the same timezone as the instrument
+        """
+        if self.timezone is None:
+            _logger.warning(f"Tried to localize a datetime with instrument "
+                            f"that does not have timezone information ("
+                            f"{self.name})")
+            return dt
+        if dt.tzinfo is None:
+            # dt is timezone naive
+            return self.timezone.localize(dt)
+        else:
+            # dt has timezone info
+            return dt.astimezone(self.timezone)
+
+    def localize_datetime_str(self, dt: datetime.datetime,
+                              fmt: str = '%Y-%m-%d %H:%M:%S %Z') -> str:
+        """
+        Convert a date and time to the timezone of this instrument, returning
+        a textual representation of the object, rather than the datetime
+        itself. Uses :py:meth:`localize_datetime` for the actual conversion.
+
+        Parameters
+        ----------
+        dt
+            The datetime object ot localize
+        fmt
+            The strftime format string to use to format the output
+
+        Returns
+        -------
+        str
+            The formatted textual representation of the localized datetime
+        """
+        return self.localize_datetime(dt).strftime(fmt)
 
 
 instrument_db = _get_instrument_db()

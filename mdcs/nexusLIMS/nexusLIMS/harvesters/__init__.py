@@ -118,8 +118,9 @@ class ReservationEvent:
     def __repr__(self):
         if self.username and self.start_time and self.end_time:
             return f'Event for {self.username} on {self.instrument.name} ' \
-                   f'from {self.start_time.isoformat()} to ' \
-                   f'{self.end_time.isoformat()}'
+                   f'from ' \
+                   f'{self.instrument.localize_datetime(self.start_time).isoformat()} ' \
+                   f'to {self.instrument.localize_datetime(self.end_time).isoformat()}'
         else:
             return f'No matching calendar event' + \
                    (f' for {self.instrument.name}' if self.instrument else '')
@@ -170,10 +171,18 @@ class ReservationEvent:
             instr_el.set('pid', pid)
         if self.start_time:
             start_el = etree.SubElement(summary_el, "reservationStart")
-            start_el.text = self.start_time.isoformat()
+            if self.instrument is not None:
+                start_el.text = self.instrument.localize_datetime(
+                    self.start_time).isoformat()
+            else:
+                start_el.text = self.start_time.isoformat()
         if self.end_time:
             end_el = etree.SubElement(summary_el, "reservationEnd")
-            end_el.text = self.end_time.isoformat()
+            if self.instrument is not None:
+                end_el.text = self.instrument.localize_datetime(
+                    self.end_time).isoformat()
+            else:
+                end_el.text = self.end_time.isoformat()
         if self.experiment_purpose:
             motivation_el = etree.SubElement(summary_el, "motivation")
             motivation_el.text = self.experiment_purpose

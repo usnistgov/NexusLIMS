@@ -75,7 +75,8 @@ class TestInstruments:
             f'Computer IP:      ***REMOVED***\n' \
             f'Computer name:    ***REMOVED***\n' \
             f'Computer mount:   M:/\n' \
-            f'Harvester:        sharepoint_calendar\n'
+            f'Harvester:        sharepoint_calendar\n' \
+            f'Timezone:         America/New_York'
 
     def test_get_instr_from_filepath(self):
         path = os.path.join(os.environ['mmfnexus_path'],
@@ -96,3 +97,41 @@ class TestInstruments:
     def test_get_instr_from_cal_name_none(self):
         instr = get_instr_from_calendar_name('bogus calendar name')
         assert instr is None
+
+    def test_instrument_datetime_location_no_tz(self, monkeypatch, caplog):
+        instr = instrument_db['FEI-Titan-TEM-635816']
+        monkeypatch.setattr(instr, 'timezone', None)
+        dt_naive = datetime.datetime.fromisoformat('2021-11-26T12:00:00.000')
+        assert instr.localize_datetime(dt_naive) == dt_naive
+        assert "Tried to localize a datetime with instrument" in caplog.text
+
+    def test_instrument_datetime_localization(self):
+        instr = instrument_db['FEI-Titan-TEM-635816']
+        # instr timezone should be Eastern Time
+
+        dt_naive = datetime.datetime.fromisoformat('2021-11-26T12:00:00.000')
+        dt_mt = datetime.datetime.fromisoformat('2021-11-26T12:00:00.000-07:00')
+        dt_et = datetime.datetime.fromisoformat('2021-11-26T12:00:00.000-05:00')
+
+        def _strftime(dt):
+            return dt.strftime('%Y-%m-%d %H:%M:%S %Z')
+
+        assert _strftime(instr.localize_datetime(dt_naive)) == \
+               '2021-11-26 12:00:00 EST'
+        assert _strftime(instr.localize_datetime(dt_mt)) == \
+               '2021-11-26 14:00:00 EST'
+        assert _strftime(instr.localize_datetime(dt_et)) == \
+               '2021-11-26 12:00:00 EST'
+
+    def test_instrument_datetime_localization_str(self):
+        instr = instrument_db['FEI-Titan-TEM-635816']
+        dt_naive = datetime.datetime.fromisoformat('2021-11-26T12:00:00.000')
+        dt_mt = datetime.datetime.fromisoformat('2021-11-26T12:00:00.000-07:00')
+        dt_et = datetime.datetime.fromisoformat('2021-11-26T12:00:00.000-05:00')
+
+        assert instr.localize_datetime_str(dt_naive) == \
+               '2021-11-26 12:00:00 EST'
+        assert instr.localize_datetime_str(dt_mt) == \
+               '2021-11-26 14:00:00 EST'
+        assert instr.localize_datetime_str(dt_et) == \
+               '2021-11-26 12:00:00 EST'

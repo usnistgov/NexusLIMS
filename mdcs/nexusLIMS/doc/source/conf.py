@@ -92,6 +92,8 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3.7/', None),
                        'PIL': (
                            'https://pillow.readthedocs.io/en/stable/',
                            None),
+                       'pytz': ('http://pytz.sourceforge.net/',
+                                'pytz_objects.inv'),
                        # use the custom objects.inv file above for LXML:
                        'lxml': ('https://lxml.de/', 'objects_lxml.inv'),
                        }
