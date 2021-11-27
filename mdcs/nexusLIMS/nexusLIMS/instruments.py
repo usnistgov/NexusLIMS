@@ -239,7 +239,7 @@ def get_instr_from_api_url(api_url: str) -> Union[None, Instrument]:
 
     Returns
     -------
-    instrument
+    Instrument
         An ``Instrument`` instance matching the ``api_url``, or ``None`` if no
         match was found
 

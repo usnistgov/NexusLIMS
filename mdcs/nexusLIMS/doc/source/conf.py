@@ -84,15 +84,16 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3.7/', None),
                        'hyperspy': (
                            'http://hyperspy.org/hyperspy-doc/current/', None),
                        'numpy': (
-                           'https://docs.scipy.org/doc/numpy/', None),
+                           'https://numpy.org/doc/stable/', None),
                        'matplotlib': ('https://matplotlib.org/', None),
                        'requests': (
-                           'https://2.python-requests.org/en/master', None),
+                           'https://docs.python-requests.org/en/latest/',
+                           None),
                        'PIL': (
                            'https://pillow.readthedocs.io/en/stable/',
                            None),
                        # use the custom objects.inv file above for LXML:
-                       'lxml': ('https://lxml.de/', 'objects_lxml.inv')
+                       'lxml': ('https://lxml.de/', 'objects_lxml.inv'),
                        }
 
 import sphinx_bootstrap_theme
