@@ -199,7 +199,8 @@ class TestSharepoint:
                              project_id='projectID',
                              internal_id='999')
         assert c.__repr__() == 'Event for ***REMOVED*** on FEI-Titan-TEM-635816 from ' \
-                               '2020-08-20T12:00:00 to 2020-08-20T16:00:40'
+                               '2020-08-20T12:00:00-04:00 to 2020-08-20T' \
+                               '16:00:40-04:00'
 
         c = ReservationEvent()
         assert c.__repr__() == 'No matching calendar event'
@@ -808,8 +809,9 @@ class TestReservationEvent:
         assert xml.find('summary/instrument').get("pid") == \
                "FEI-Titan-TEM-635816"
         assert xml.find('summary/reservationStart').text == \
-               "2021-09-15T03:00:00"
-        assert xml.find('summary/reservationEnd').text == "2021-09-15T16:00:00"
+               "2021-09-15T03:00:00-04:00"
+        assert xml.find('summary/reservationEnd').text == "2021-09-15T" \
+                                                          "16:00:00-04:00"
         assert xml.find('summary/motivation').text == "To test the constructor"
         assert xml.find('sample').get("id") == "***REMOVED***.5"
         assert xml.find('sample/name').text == "The test sample"
@@ -819,6 +821,44 @@ class TestReservationEvent:
         assert xml.find('project/division').text == "641"
         assert xml.find('project/group').text == "00"
         assert xml.find('project/project_id').text == "***REMOVED***.1.5"
+        assert xml.find('project/ref').text == "https://www.example.org"
+
+    def test_full_reservation_constructor_instr_none(self):
+        res_event = ReservationEvent(
+            experiment_title="A test title for no instrument",
+            instrument=None,
+            last_updated=dt.fromisoformat("2021-09-15T16:04:00"),
+            username='***REMOVED***', created_by='***REMOVED***',
+            start_time=dt.fromisoformat("2021-09-15T03:00:00"),
+            end_time=dt.fromisoformat("2021-09-15T16:00:00"),
+            reservation_type="A test event",
+            experiment_purpose="To test the constructor again",
+            sample_details="A sample that was loaded into a microscope for "
+                           "testing again",
+            sample_pid=["***REMOVED***.6"],
+            sample_name="The test sample again",
+            project_name="NexusLIMS!", project_id="***REMOVED***.1.6",
+            project_ref="https://www.example.org", internal_id="42309",
+            division="641", group="00"
+        )
+        xml = res_event.as_xml()
+        assert xml.find('title').text == "A test title for no instrument"
+        assert xml.find('id').text == "42309"
+        assert xml.find('summary/experimenter').text == "***REMOVED***"
+        assert xml.find('summary/reservationStart').text == \
+               "2021-09-15T03:00:00"
+        assert xml.find('summary/reservationEnd').text == "2021-09-15T" \
+                                                          "16:00:00"
+        assert xml.find('summary/motivation').text == "To test the " \
+                                                      "constructor again"
+        assert xml.find('sample').get("id") == "***REMOVED***.6"
+        assert xml.find('sample/name').text == "The test sample again"
+        assert xml.find('sample/description').text == \
+               "A sample that was loaded into a microscope for testing again"
+        assert xml.find('project/name').text == "NexusLIMS!"
+        assert xml.find('project/division').text == "641"
+        assert xml.find('project/group').text == "00"
+        assert xml.find('project/project_id').text == "***REMOVED***.1.6"
         assert xml.find('project/ref').text == "https://www.example.org"
 
     def test_res_event_without_title(self):
@@ -849,8 +889,9 @@ class TestReservationEvent:
         assert xml.find('summary/instrument').get("pid") == \
                "FEI-Titan-TEM-635816"
         assert xml.find('summary/reservationStart').text == \
-               "2021-09-15T04:00:00"
-        assert xml.find('summary/reservationEnd').text == "2021-09-15T17:00:00"
+               "2021-09-15T04:00:00-04:00"
+        assert xml.find('summary/reservationEnd').text == "2021-09-15T" \
+                                                          "17:00:00-04:00"
         assert xml.find('summary/motivation').text == "To test a reservation " \
                                                       "with no title"
         assert xml.find('sample').get("id") == "***REMOVED***.6"
