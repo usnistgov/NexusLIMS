@@ -46,6 +46,7 @@ while test $# -ge 1; do
         --cov=mdcs/nexusLIMS/nexusLIMS \
         --cov-report html:$(pwd)/htmlcov \
         --mpl --mpl-baseline-path=mdcs/nexusLIMS/nexusLIMS/tests/files/figs
+      pipenv run python -m http.server --directory htmlcov/
       break
       ;;
     -rb)

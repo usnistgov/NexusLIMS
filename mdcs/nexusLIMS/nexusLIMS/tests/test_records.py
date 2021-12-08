@@ -30,7 +30,7 @@ class TestRecordBuilder:
     def test_dry_run_sharepoint_calendar(self):
         sessions = session_handler.get_sessions_to_build()
         cal_event = _rb.dry_run_get_sharepoint_reservation_event(sessions[0])
-        assert cal_event.project_name == '642.03.??'
+        assert cal_event.project_name[0] == '642.03.??'
         assert cal_event.username == '***REMOVED***'
         assert cal_event.experiment_title == 'Looking for Nickel Alloys'
         assert cal_event.start_time == _dt.fromisoformat(
@@ -38,11 +38,13 @@ class TestRecordBuilder:
 
     def test_dry_run_file_find(self, fix_mountain_time):
         sessions = session_handler.get_sessions_to_build()
-        # add at least one NEMO session to the file find
+        # add at least one NEMO session to the file find (one is already in the
+        # test database, but this get_usage_events_as_sessions call will add
+        # another)
         sessions += nemo.get_usage_events_as_sessions(
             dt_from=_dt.fromisoformat('2021-08-02T00:00:00-04:00'),
             dt_to=_dt.fromisoformat('2021-08-03T00:00:00-04:00'))
-        correct_files_per_session = [28, 37, 38, 55,  0, 18, 4]
+        correct_files_per_session = [28, 37, 38, 55,  0, 18, 4, 4]
         file_list_list = []
         for s, ans in zip(sessions, correct_files_per_session):
             found_files = _rb.dry_run_file_find(s)
@@ -57,7 +59,7 @@ class TestRecordBuilder:
         # file from NEMO session
         assert f'{os.environ["mmfnexus_path"]}' \
                f'/Titan/***REMOVED***/210801 - MTJ-MgO - ***REMOVED*** - Titan' \
-               f'/02 - 620k.dm3' in file_list_list[6]
+               f'/02 - 620k.dm3' in file_list_list[-1]
 
     def test_process_new_records_dry_run(self):
         # just running to ensure coverage, tests are included above
@@ -105,31 +107,34 @@ class TestRecordBuilder:
         # tests on the database entries
         # after processing the records, there should be size added
         # "RECORD_GENERATION" logs, for a total of 18 logs
-        assert len(make_db_query('SELECT * FROM session_log')) == 21
+        assert len(make_db_query('SELECT * FROM session_log')) == 24
         assert len(make_db_query('SELECT * FROM session_log WHERE '
-                                 '"event_type" = "RECORD_GENERATION"')) == 7
+                                 '"event_type" = "RECORD_GENERATION"')) == 8
         assert len(make_db_query('SELECT * FROM session_log WHERE '
                                  '"record_status" = "TO_BE_BUILT"')) == 0
         assert len(make_db_query('SELECT * FROM session_log WHERE'
                                  '"record_status" = "NO_FILES_FOUND"')) == 3
         assert len(make_db_query('SELECT * FROM session_log WHERE'
-                                 '"record_status" = "COMPLETED"')) == 18
+                                 '"record_status" = "COMPLETED"')) == 21
 
         # tests on the XML records
         # there should be 6 completed records in the records/uploaded/ folder
         xmls = glob(os.path.join(os.path.dirname(__file__), 'files',
                                  'records', 'uploaded', '*.xml'))
-        assert len(xmls) == 6
+        assert len(xmls) == 7
 
         # test some various values from the records saved to disk:
         expected = {
+            # ./Titan/***REMOVED***/181113 - ***REMOVED*** - ***REMOVED*** - Titan/
             '2018-11-13_FEI-Titan-TEM-635816_7de34313.xml': {
                 '/title': '***REMOVED***',
                 '//acquisitionActivity': 4,
                 '//dataset': 37,
                 '/summary/motivation': '***REMOVED***!',
-                '/summary/instrument': 'FEI-Titan-TEM-635816'
+                '/summary/instrument': 'FEI-Titan-TEM-635816',
+                '//sample': 1
             },
+            # ./JEOL3010/JEOL3010/***REMOVED***/***REMOVED***/20190724/
             '2019-07-24_JEOL-JEM3010-TEM-565989_41ec0ad1.xml': {
                 '/title': '***REMOVED***',
                 '//acquisitionActivity': 6,
@@ -137,30 +142,37 @@ class TestRecordBuilder:
                 '/summary/motivation': '***REMOVED*** '
                                        '***REMOVED*** '
                                        'beam',
-                '/summary/instrument': 'JEOL-JEM3010-TEM-565989'
+                '/summary/instrument': 'JEOL-JEM3010-TEM-565989',
+                '//sample': 1
             },
+            # ./Quanta/***REMOVED***/20190830_05... and ./Quanta/***REMOVED***/tmp/20190830_05...
             '2019-09-06_FEI-Quanta200-ESEM-633137_9c8f3a8d.xml': {
                 '/title': 'Looking for Nickel Alloys',
                 '//acquisitionActivity': 5,
                 '//dataset': 28,
                 '/summary/motivation': '***REMOVED*** '
                                        'nickel alloys using EDX spectroscopy.',
-                '/summary/instrument': 'FEI-Quanta200-ESEM-633137'
+                '/summary/instrument': 'FEI-Quanta200-ESEM-633137',
+                '//sample': 1
             },
+            # ./643Titan/***REMOVED***/191106 - Reactor Specimen - 643 Titan/
             '2019-11-06_FEI-Titan-STEM-630901_1dab79db.xml': {
                 '/title': 'Reactor Samples',
                 '//acquisitionActivity': 15,
                 '//dataset': 38,
                 '/summary/motivation': 'EELS mapping of layer intermixing.',
-                '/summary/instrument': 'FEI-Titan-STEM-630901'
+                '/summary/instrument': 'FEI-Titan-STEM-630901',
+                '//sample': 1
             },
+            # ./Titan/***REMOVED***/200204 - ***REMOVED*** - ***REMOVED*** - Titan/
             '2020-02-04_FEI-Titan-TEM-635816_1c3a6a8d.xml': {
                 '/title': 'Experiment on the FEI Titan TEM on '
                           'Tuesday Feb. 04, 2020',
                 '//acquisitionActivity': 4,
                 '//dataset': 18,
                 '/summary/motivation': None,
-                '/summary/instrument': 'FEI-Titan-TEM-635816'
+                '/summary/instrument': 'FEI-Titan-TEM-635816',
+                '//sample': 1
             },
             # DONE: add expected values for NEMO built record
             '2021-08-02_FEI-Titan-TEM-635816_n_9.xml': {
@@ -170,7 +182,17 @@ class TestRecordBuilder:
                 '/summary/motivation': '***REMOVED*** '
                                        '***REMOVED*** '
                                        '***REMOVED***.',
-                '/summary/instrument': 'FEI-Titan-TEM-635816'
+                '/summary/instrument': 'FEI-Titan-TEM-635816',
+                '//sample': 1
+            },
+            '2021-11-29_testsurface-CPU_P1111111_21.xml': {
+                '/title': 'A test with multiple samples',
+                '//acquisitionActivity': 1,
+                '//dataset': 4,
+                '/summary/motivation': 'To test the harvester with '
+                                       'multiple samples',
+                '/summary/instrument': 'testsurface-CPU_P1111111',
+                '//sample': 4
             }
         }
         for f in sorted(xmls):
@@ -195,6 +217,9 @@ class TestRecordBuilder:
 
             xpath = '/summary/instrument'
             assert root.find(xpath).get('pid') == expected[base_f][xpath]
+
+            xpath = '//sample'
+            assert len(root.findall(xpath)) == expected[base_f][xpath]
 
             # remove record
             os.remove(f)
