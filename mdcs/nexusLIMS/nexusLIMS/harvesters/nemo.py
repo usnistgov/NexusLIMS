@@ -30,7 +30,7 @@ This module contains the functionality to harvest instruments, reservations,
 etc. from an instance of NEMO (https://github.com/usnistgov/NEMO/), a
 calendering and laboratory logistics application.
 """
-from typing import Any, Callable, List, Union, Dict
+from typing import Any, Callable, List, Union, Dict, Tuple, Optional
 
 import re
 import os
@@ -46,6 +46,14 @@ from nexusLIMS.db.session_handler import SessionLog, Session, db_query
 from nexusLIMS.instruments import get_instr_from_api_url
 
 _logger = logging.getLogger(__name__)
+
+
+class NoDataConsentException(Exception):
+    """
+    Exception to raise if a user has not given their consent to have data
+    harvested
+    """
+    pass
 
 
 class NemoConnector:
@@ -285,7 +293,7 @@ class NemoConnector:
 
         Returns
         -------
-        reservations : list
+        reservations : List[Dict]
             A list (could be empty) of reservations that match the date range
             supplied
         """
@@ -369,7 +377,7 @@ class NemoConnector:
 
         Returns
         -------
-        usage_events : list
+        usage_events : List
             A list (could be empty) of usage events that match the filters
             supplied
         """
@@ -743,7 +751,7 @@ def res_event_from_session(session: Session) -> ReservationEvent:
     tool_id = id_from_url(session.instrument.api_url)
 
     # get reservation with maximum overlap (like sharepoint_calendar.fetch_xml)
-    reservations: List[dict] = c.get_reservations(
+    reservations = c.get_reservations(
         tool_id=tool_id,
         dt_from=session.dt_from - timedelta(days=2),
         dt_to=session.dt_to + timedelta(days=2)
@@ -779,6 +787,20 @@ def res_event_from_session(session: Session) -> ReservationEvent:
         # select the reservation with the most overlap
         res = reservations[max_overlap]
 
+        # DONE: check for presence of sample_group in the reservation metadata
+        #  and change the harvester to process the sample group metadata by
+        #  providing lists to the ReservationEvent constructor
+        sample_details, sample_pid, sample_name = \
+            _process_res_question_samples(res)
+
+        # DONE: respect user choice not to harvest data (data_consent)
+        consent = _get_res_question_value('data_consent', res)
+        if consent is not None:
+            if consent.lower() in ['disagree', 'no', 'false', 'negative']:
+                raise NoDataConsentException(f"Reservation {res['id']} "
+                                             f"requested not to have their "
+                                             f"data harvested")
+
         # Create ReservationEvent from NEMO reservation dict
         res_event = ReservationEvent(
             experiment_title=_get_res_question_value('experiment_title', res),
@@ -797,20 +819,66 @@ def res_event_from_session(session: Session) -> ReservationEvent:
             reservation_type=None, # reservation type is not collected in NEMO
             experiment_purpose=_get_res_question_value('experiment_purpose',
                                                        res),
-            sample_details=_get_res_question_value('sample_details', res),
-            sample_pid=None,
-            sample_name=_get_res_question_value('sample_name', res),
-            project_name=None,
-            project_id=_get_res_question_value('project_id', res),
-            project_ref=None,
+            sample_details=sample_details, sample_pid=sample_pid,
+            sample_name=sample_name,
+            project_name=[None],
+            project_id=[_get_res_question_value('project_id', res)],
+            project_ref=[None],
             internal_id=str(res['id']),
             division=None,
             group=None
         )
     return res_event
 
+def _process_res_question_samples(res_dict: Dict) -> \
+    Tuple[Union[List[Union[str, None]], None],
+          Union[List[Union[str, None]], None],
+          Union[List[Union[str, None]], None]]:
+    sample_details, sample_pid, sample_name = [], [], []
+    sample_group = _get_res_question_value('sample_group', res_dict)
+    if sample_group is not None:
+        # multiple samples form will have
+        # res_dict['question_data']['sample_group']['user_input'] of form:
+        #
+        # {
+        #   "0": {
+        #     "sample_name": "sample_pid_1",
+        #     "sample_or_pid": "PID",
+        #     "sample_details": "A sample with a PID and some more details"
+        #   },
+        #   "1": {
+        #     "sample_name": "sample name 1",
+        #     "sample_or_pid": "Sample Name",
+        #     "sample_details": "A sample with a name and some additional detail"
+        #   },
+        #   ...
+        # }
+        # each key "0", "1", "2", etc. represents a single sample the user
+        # added via the "Add" button. There should always be at least one,
+        # since sample information is required
+        for k, v in sample_group.items():
+            if v['sample_or_pid'].lower() == "pid":
+                sample_pid.append(v['sample_name'])
+                sample_name.append(None)
+            elif v['sample_or_pid'].lower() == 'sample name':
+                sample_name.append(v['sample_name'])
+                sample_pid.append(None)
+            else:
+                sample_name.append(None)
+                sample_pid.append(None)
+            if len(v['sample_details']) > 0:
+                sample_details.append(v['sample_details'])
+            else:
+                sample_details.append(None)
+    else:
+        # non-multiple samples (old-style form)
+        sample_details = [_get_res_question_value('sample_details', res_dict)]
+        sample_pid = [None]
+        sample_name = [_get_res_question_value('sample_name', res_dict)]
+    return sample_details, sample_pid, sample_name
 
-def _get_res_question_value(value: str, res_dict: Dict) -> Union[str, None]:
+def _get_res_question_value(value: str, res_dict: Dict) -> Union[str, Dict,
+                                                                 None]:
     if 'question_data' in res_dict and res_dict['question_data'] is not None:
         if value in res_dict['question_data']:
             return res_dict['question_data'][value].get('user_input', None)

@@ -51,18 +51,29 @@ class ReservationEvent:
     experiment_purpose
         The user-entered purpose of this experiment
     sample_details
-        The user-entered sample details for this experiment
+        A list of the user-entered sample details for this experiment. The
+        length of the list must match that given in ``sample_pid`` and
+        ``sample_name``.
     sample_pid
-        A list of sample names or PIDs provided by the user
+        A list of sample PIDs provided by the user. The
+        length of the list must match that given in ``sample_details`` and
+        ``sample_name``.
     sample_name
-        A user-friendly sample name (not a PID)
+        A list of user-friendly sample names (not a PID). The
+        length of the list must match that given in ``sample_details`` and
+        ``sample_pid``.
     project_name
-        The user-entered project identifier for this experiment
+        A list of the user-entered project names for this experiment. The
+        length of the list must match that given in ``project_id`` and
+        ``project_ref``.
     project_id
-        The specific project ID within a research group/division. If a ``str``
-        is provided, it will be converted to a list internally
+        A list of the specific project IDs within a research group/division. The
+        length of the list must match that given in ``project_name`` and
+        ``project_ref``.
     project_ref
-        An (optional) link to this project in another database
+        A list of (optional) links to this project in another database. The
+        length of the list must match that given in ``project_name`` and
+        ``project_id``.
     internal_id
         The identifier assigned to this event (if any) by the calendaring system
     division
@@ -85,12 +96,12 @@ class ReservationEvent:
                  end_time: Union[datetime, None] = None, 
                  reservation_type: Union[str, None] = None,
                  experiment_purpose: Union[str, None] = None,
-                 sample_details: Union[str, None] = None,
-                 sample_pid: Union[List[str], None] = None,
-                 sample_name: Union[str, None] = None,
-                 project_name: Union[str, None] = None,
-                 project_id: Union[str, List[str], None] = None,
-                 project_ref: Union[str, None] = None,
+                 sample_details: Union[List[Union[str, None]], None] = None,
+                 sample_pid: Union[List[Union[str, None]], None] = None,
+                 sample_name: Union[List[Union[str, None]], None] = None,
+                 project_name: Union[List[Union[str, None]], None] = None,
+                 project_id: Union[List[Union[str, None]], None] = None,
+                 project_ref: Union[List[Union[str, None]], None] = None,
                  internal_id: Union[str, None] = None,
                  division: Union[str, None] = None,
                  group: Union[str, None] = None):
@@ -105,15 +116,47 @@ class ReservationEvent:
         self.end_time = end_time
         self.reservation_type = reservation_type
         self.experiment_purpose = experiment_purpose
-        self.sample_details = sample_details
-        self.sample_pid = sample_pid
-        self.sample_name = sample_name
-        self.project_name = project_name
-        self.project_id = project_id
-        self.project_ref = project_ref
+
+        # coerce sample arguments into lists
+        self.sample_details = \
+            sample_details if isinstance(sample_details, list) else \
+            [sample_details]
+        self.sample_pid = \
+            sample_pid if isinstance(sample_pid, list) else [sample_pid]
+        self.sample_name = \
+            sample_name if isinstance(sample_name, list) else  [sample_name]
+
+        # coerce project arguments into lists
+        self.project_name = \
+            project_name if isinstance(project_name, list) else [project_name]
+        self.project_id = \
+            project_id if isinstance(project_id, list) else [project_id]
+        self.project_ref = \
+            project_ref if isinstance(project_ref, list) else [project_ref]
+
         self.internal_id = internal_id
         self.division = division
         self.group = group
+
+        # raise error if all sample values are not none and have different
+        # lengths (this shouldn't happen):
+        self._check_arg_lists()
+
+    def _check_arg_lists(self):
+        for check_name, arg_names, lists in zip(
+                ['sample', 'project'],
+                ['[sample_details, sample_pid, sample_name]',
+                 '[project_name, project_id, project_ref]'],
+                [[self.sample_details, self.sample_pid, self.sample_name],
+                 [self.project_name, self.project_id, self.project_ref]]):
+            if all(x is not None for x in lists):
+                length = len(lists[0])
+                if not all(len(lst) == length for lst in lists[1:]):
+                    raise ValueError(f"Length of {check_name} arguments must "
+                                     f"be the same. The lengths of the "
+                                     f"following arguments were "
+                                     f"{arg_names} : "
+                                     f"{[len(l) for l in lists]}")
 
     def __repr__(self):
         if self.username and self.start_time and self.end_time:
@@ -187,37 +230,43 @@ class ReservationEvent:
             motivation_el = etree.SubElement(summary_el, "motivation")
             motivation_el.text = self.experiment_purpose
 
-        # sample node
-        sample_el = etree.SubElement(root, "sample")
-        if self.sample_pid:
-            # just use the first one for now; eventually we should support
-            # multiple sample entry on the form, but we need to figure out
-            # how to have people input that; this will result in multiple
-            # sample nodes
-            sample_el.set("id", self.sample_pid[0])
-        if self.sample_name:
-            sample_name_el = etree.SubElement(sample_el, "name")
-            sample_name_el.text = self.sample_name
-        if self.sample_details:
-            sample_detail_el = etree.SubElement(sample_el, "description")
-            sample_detail_el.text = self.sample_details
+        # sample nodes
+        if self.sample_pid is not None:
+            # if any of the sample arguments are not none, they should be
+            # lists, so we should create a sample element for each one
+            for pid, name, details in zip(self.sample_pid, self.sample_name,
+                                          self.sample_details):
+                # create one sample subelement for each sample in our lists
+                sample_el = etree.SubElement(root, "sample")
+                if pid is not None:
+                    sample_el.set("ref", pid)
+                if name is not None:
+                    sample_name_el = etree.SubElement(sample_el, "name")
+                    sample_name_el.text = name
+                if details is not None:
+                    sample_detail_el = etree.SubElement(sample_el,
+                                                        "description")
+                    sample_detail_el.text = details
 
-        # project node
-        project_el = etree.SubElement(root, "project")
-        if self.project_name:
-            project_name_el = etree.SubElement(project_el, "name")
-            project_name_el.text = self.project_name
-        if self.division:
-            division_el = etree.SubElement(project_el, "division")
-            division_el.text = self.division
-        if self.group:
-            group_el = etree.SubElement(project_el, "group")
-            group_el.text = self.group
-        if self.project_id:
-            proj_id_el = etree.SubElement(project_el, "project_id")
-            proj_id_el.text = self.project_id
-        if self.project_ref:
-            proj_ref_el = etree.SubElement(project_el, "ref")
-            proj_ref_el.text = self.project_ref
+        # project nodes
+        if self.project_name is not None:
+            for name, pid, ref in zip(self.project_name, self.project_id,
+                                     self.project_ref):
+                project_el = etree.SubElement(root, "project")
+                if name is not None:
+                    project_name_el = etree.SubElement(project_el, "name")
+                    project_name_el.text = name
+                if self.division is not None:
+                    division_el = etree.SubElement(project_el, "division")
+                    division_el.text = self.division
+                if self.group is not None:
+                    group_el = etree.SubElement(project_el, "group")
+                    group_el.text = self.group
+                if pid is not None:
+                    proj_id_el = etree.SubElement(project_el, "project_id")
+                    proj_id_el.text = pid
+                if ref is not None:
+                    proj_ref_el = etree.SubElement(project_el, "ref")
+                    proj_ref_el.text = ref
 
         return root

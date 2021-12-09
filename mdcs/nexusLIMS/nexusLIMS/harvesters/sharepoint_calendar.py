@@ -157,7 +157,7 @@ def res_event_from_xml(xml, date=None):
         end_time = _timezone(sp_tz).localize(
             _datetime.fromisoformat(end_time))
     category_value = _get_el_text('entry//d:CategoryValue')
-    sample_details = _get_el_text('entry//d:SampleDetails')
+    sample_details = [_get_el_text('entry//d:SampleDetails')]
     purpose = _get_el_text('entry//d:ExperimentPurpose')
     project_name = _get_el_text('entry//d:ProjectID')
     sharepoint_id = _get_el_text('entry/content//d:Id')

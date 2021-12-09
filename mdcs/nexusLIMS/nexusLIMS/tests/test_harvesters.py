@@ -572,7 +572,7 @@ class TestNemoIntegration:
         assert all([d['cancelled'] is True for d in cancelled])
 
         one_tool = nemo_connector.get_reservations(tool_id=2)
-        assert all([d['tool']['id'] is 2 for d in one_tool])
+        assert all([d['tool']['id'] == 2 for d in one_tool])
 
         multi_tool = nemo_connector.get_reservations(tool_id=[2, 10])
         assert all([d['tool']['id'] in [2, 10] for d in multi_tool])
@@ -609,7 +609,7 @@ class TestNemoIntegration:
         assert len(date_both) == 2
 
         one_tool = nemo_connector.get_usage_events(tool_id=1)
-        assert all([d['tool']['id'] is 1 for d in one_tool])
+        assert all([d['tool']['id'] == 1 for d in one_tool])
 
         multi_tool = nemo_connector.get_usage_events(tool_id=[1, 5])
         assert all([d['tool']['id'] in [1, 5] for d in multi_tool])
@@ -708,8 +708,8 @@ class TestNemoIntegration:
         assert res_event.experiment_purpose == \
                '***REMOVED*** ***REMOVED*** ' \
                '***REMOVED***.'
-        assert res_event.sample_name == "***REMOVED***'s ***REMOVED***"
-        assert res_event.project_id is None
+        assert res_event.sample_name[0] == "***REMOVED***'s ***REMOVED***"
+        assert res_event.project_id[0] is None
         assert res_event.username == '***REMOVED***'
         assert res_event.internal_id == '87'
 
@@ -781,6 +781,67 @@ class TestNemoIntegration:
         this_id = nemo.id_from_url('https://test.com/?notid=4')
         assert this_id is None
 
+    def test_process_res_question_samples(self):
+        from nexusLIMS.harvesters.nemo import _process_res_question_samples
+        # use a mocked reservation API response for testing of processing
+        r = {
+            'id': 140,
+            'question_data': {
+                'project_id': { 'user_input': 'NexusLIMS' },
+                'experiment_title': { 'user_input': 'A test with multiple '
+                                                    'samples' },
+                'experiment_purpose': { 'user_input': 'To test the harvester '
+                                                      'with multiple samples' },
+                'data_consent': { 'user_input': 'Agree' },
+                'sample_group': {
+                    'user_input': {
+                        '0': {
+                            'sample_name': 'sample_pid_1',
+                            'sample_or_pid': 'PID',
+                            'sample_details': 'A sample with a PID and some '
+                                              'more details'
+                        },
+                        '1': {
+                            'sample_name': 'sample name 1',
+                            'sample_or_pid': 'Sample Name',
+                            'sample_details': 'A sample with a name and some '
+                                              'additional detail' },
+                        '2': {
+                            'sample_name': 'sample_pid_2',
+                            'sample_or_pid': 'PID',
+                            'sample_details': '' },
+                        '3': {
+                            'sample_name': 'sample name 2',
+                            'sample_or_pid': 'Sample Name',
+                            'sample_details': '' }
+                    } } },
+            'creation_time': '2021-11-29T10:38:00-07:00',
+            'start': '2021-11-29T10:00:00-07:00',
+            'end': '2021-11-29T12:00:00-07:00',
+            'title': ''
+        }
+        details, pid, name = _process_res_question_samples(r)
+        assert details == ['A sample with a PID and some more details',
+                           'A sample with a name and some additional detail',
+                           None, None]
+        assert pid == ['sample_pid_1', None, 'sample_pid_2', None]
+        assert name == [None, 'sample name 1', None, 'sample name 2']
+
+        # set some of the sample_or_pid values to something bogus to make
+        # sure name and pid get set to None
+        for i in range(4):
+            r['question_data']['sample_group'][
+                'user_input'][str(i)]['sample_or_pid'] = 'bogus'
+
+        details, pid, name = _process_res_question_samples(r)
+        assert details == ['A sample with a PID and some more details',
+                           'A sample with a name and some additional detail',
+                           None, None]
+        assert pid == [None, None, None, None]
+        assert name == [None, None, None, None]
+
+
+
 class TestReservationEvent:
     def test_full_reservation_constructor(self):
         res_event = ReservationEvent(
@@ -792,12 +853,12 @@ class TestReservationEvent:
             end_time=dt.fromisoformat("2021-09-15T16:00:00"),
             reservation_type="A test event",
             experiment_purpose="To test the constructor",
-            sample_details="A sample that was loaded into a microscope for "
-                           "testing",
+            sample_details=["A sample that was loaded into a microscope for "
+                           "testing"],
             sample_pid=["***REMOVED***.5"],
-            sample_name="The test sample",
-            project_name="NexusLIMS", project_id="***REMOVED***.1.5",
-            project_ref="https://www.example.org", internal_id="42308",
+            sample_name=["The test sample"],
+            project_name=["NexusLIMS"], project_id=["***REMOVED***.1.5"],
+            project_ref=["https://www.example.org"], internal_id="42308",
             division="641", group="00"
         )
 
@@ -813,7 +874,7 @@ class TestReservationEvent:
         assert xml.find('summary/reservationEnd').text == "2021-09-15T" \
                                                           "16:00:00-04:00"
         assert xml.find('summary/motivation').text == "To test the constructor"
-        assert xml.find('sample').get("id") == "***REMOVED***.5"
+        assert xml.find('sample').get("ref") == "***REMOVED***.5"
         assert xml.find('sample/name').text == "The test sample"
         assert xml.find('sample/description').text == \
                "A sample that was loaded into a microscope for testing"
@@ -833,12 +894,12 @@ class TestReservationEvent:
             end_time=dt.fromisoformat("2021-09-15T16:00:00"),
             reservation_type="A test event",
             experiment_purpose="To test the constructor again",
-            sample_details="A sample that was loaded into a microscope for "
-                           "testing again",
+            sample_details=["A sample that was loaded into a microscope for "
+                           "testing again"],
             sample_pid=["***REMOVED***.6"],
-            sample_name="The test sample again",
-            project_name="NexusLIMS!", project_id="***REMOVED***.1.6",
-            project_ref="https://www.example.org", internal_id="42309",
+            sample_name=["The test sample again"],
+            project_name=["NexusLIMS!"], project_id=["***REMOVED***.1.6"],
+            project_ref=["https://www.example.org"], internal_id="42309",
             division="641", group="00"
         )
         xml = res_event.as_xml()
@@ -851,7 +912,7 @@ class TestReservationEvent:
                                                           "16:00:00"
         assert xml.find('summary/motivation').text == "To test the " \
                                                       "constructor again"
-        assert xml.find('sample').get("id") == "***REMOVED***.6"
+        assert xml.find('sample').get("ref") == "***REMOVED***.6"
         assert xml.find('sample/name').text == "The test sample again"
         assert xml.find('sample/description').text == \
                "A sample that was loaded into a microscope for testing again"
@@ -871,12 +932,12 @@ class TestReservationEvent:
             end_time=dt.fromisoformat("2021-09-15T17:00:00"),
             reservation_type="A test event",
             experiment_purpose="To test a reservation with no title",
-            sample_details="A sample that was loaded into a microscope for "
-                           "testing",
+            sample_details=["A sample that was loaded into a microscope for "
+                           "testing"],
             sample_pid=["***REMOVED***.6"],
-            sample_name="The test sample name",
-            project_name="NexusLIMS", project_id="***REMOVED***.1.6",
-            project_ref="https://www.example.org", internal_id="48328",
+            sample_name=["The test sample name"],
+            project_name=["NexusLIMS"], project_id=["***REMOVED***.1.6"],
+            project_ref=["https://www.example.org"], internal_id="48328",
             division="641", group="00"
         )
 
@@ -894,7 +955,7 @@ class TestReservationEvent:
                                                           "17:00:00-04:00"
         assert xml.find('summary/motivation').text == "To test a reservation " \
                                                       "with no title"
-        assert xml.find('sample').get("id") == "***REMOVED***.6"
+        assert xml.find('sample').get("ref") == "***REMOVED***.6"
         assert xml.find('sample/name').text == "The test sample name"
         assert xml.find('sample/description').text == \
                "A sample that was loaded into a microscope for testing"
@@ -903,3 +964,31 @@ class TestReservationEvent:
         assert xml.find('project/group').text == "00"
         assert xml.find('project/project_id').text == "***REMOVED***.1.6"
         assert xml.find('project/ref').text == "https://www.example.org"
+
+    def test_check_arg_lists(self):
+        ReservationEvent(
+            sample_details=["A sample that was loaded into a microscope for "
+                            "testing"],
+            sample_pid=["***REMOVED***.6"],
+            sample_name=["The test sample name"])
+        with pytest.raises(ValueError) as e:
+            ReservationEvent(
+                sample_details=["detail 1", "detail 2"],
+                sample_pid=["***REMOVED***.6"],
+                sample_name=["sample_name1", "sample_name2", "sample_name3"])
+        assert 'Length of sample arguments must be the same' in str(e.value)
+
+        with pytest.raises(ValueError) as e:
+            ReservationEvent(
+                sample_details=["detail 1"],
+                sample_pid=["***REMOVED***.6"],
+                sample_name=["sample_name1", "sample_name2", "sample_name3"])
+        assert 'Length of sample arguments must be the same' in str(e.value)
+
+        with pytest.raises(ValueError) as e:
+            ReservationEvent(
+                project_ref=["ref 1", "ref 2"],
+                project_id=["***REMOVED***.6"],
+                project_name=["project_name1", "project_name2",
+                              "project_name3"])
+        assert 'Length of project arguments must be the same' in str(e.value)

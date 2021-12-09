@@ -260,6 +260,16 @@
             </xs:documentation>
       </xs:annotation>
     </xs:attribute>
+
+    <xs:attribute name="ref" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+              An external persistent identifier for the current sample
+              the current sample.  This can be the sample name if it
+              is unique.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
   </xs:complexType>
 
   <xs:complexType name="Project">
@@ -859,6 +869,14 @@
         </xs:annotation>
       </xs:enumeration>
 
+      <xs:enumeration value="Test Tool">
+        <xs:annotation>
+          <xs:documentation>
+            A test tool that does not exist for testing
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+
     </xs:restriction>
   </xs:simpleType>
 
@@ -950,6 +968,14 @@
         <xs:annotation>
           <xs:documentation>
             The Phillips CM30 transmission electron microscope
+          </xs:documentation>
+        </xs:annotation>
+      </xs:enumeration>
+
+      <xs:enumeration value="testsurface-CPU_P1111111">
+        <xs:annotation>
+          <xs:documentation>
+            A test tool for testing purposes
           </xs:documentation>
         </xs:annotation>
       </xs:enumeration>
