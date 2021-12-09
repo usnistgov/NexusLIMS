@@ -107,7 +107,7 @@ class TestThumbnailGenerator:
         os.remove('output.png')
         return fig
 
-    @pytest.mark.mpl_image_compare(style='default')
+    @pytest.mark.mpl_image_compare(style='default', tolerance=20)
     def test_complex_image(self):
         fig = sig_to_thumbnail(hs.load(files['FFT']), f'output.png')
         os.remove('output.png')
