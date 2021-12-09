@@ -63,7 +63,7 @@ from nexusLIMS.db.session_handler import Session
 from nexusLIMS.cdcs import upload_record_files as _upload_record_files
 from nexusLIMS import version as _version
 from timeit import default_timer as _timer
-from importlib import import_module
+from importlib import import_module, util
 
 _logger = _logging.getLogger(__name__)
 XSD_PATH: str  = _os.path.join(_os.path.dirname(_activity.__file__),
@@ -166,14 +166,24 @@ def get_reservation_event(session: Session) -> _ResEvent:
         a reservation that matches the instrument and timespan specified in
         ``session``.
     """
+    # try to find module and raise error if not found:
+    if util.find_spec(f".{session.instrument.harvester}",
+                      "nexusLIMS.harvesters") is None:
+        raise NotImplementedError(f"Harvester {session.instrument.harvester} "
+                                  f"not found in nexusLIMS.harvesters")
+
     # use import_module to choose the correct harvester based on the instrument
     harvester = \
         import_module(f".{session.instrument.harvester}",
-                      "nexusLIMS.harvesters")
+                       "nexusLIMS.harvesters")
     # for PyCharm typing, explicitly specify what modules may be in `harvester`
     harvester: Union[_nemo, _sp_cal]
-    # TODO: check if that method exists for the given harvester and raise
+    # DONE: check if that method exists for the given harvester and raise
     #  NotImplementedError if not
+    if not hasattr(harvester, 'res_event_from_session'):
+        raise NotImplementedError(f"res_event_from_session has not been "
+                                  f"implemented for {harvester}, which is "
+                                  f"required to use this method.")
     res_event = harvester.res_event_from_session(session)
     return res_event
 
