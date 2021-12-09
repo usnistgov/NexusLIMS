@@ -32,37 +32,27 @@ import os as _os
 import re as _re
 import logging as _logging
 import requests as _requests
-import urllib as _urllib
 
 import nexusLIMS
-from requests_ntlm import HttpNtlmAuth as _HttpNtlmAuth
 import pytz as _pytz
 from pytz import timezone as _timezone
 from lxml import etree as _etree
 import ldap3 as _ldap3
 from datetime import datetime as _datetime
 from datetime import timedelta as _timedelta
-from configparser import ConfigParser as _ConfigParser
 from nexusLIMS.db.session_handler import Session as _Session
 from nexusLIMS.instruments import Instrument as _Instrument
 from nexusLIMS.instruments import instrument_db as _instr_db
 from nexusLIMS.instruments import get_instr_from_calendar_name as _from_cal
-from nexusLIMS.utils import nexus_req as _nexus_req
+from nexusLIMS.utils import nexus_req as _nexus_req, AuthenticationError
 from nexusLIMS.utils import _get_timespan_overlap
 from nexusLIMS.harvesters import ReservationEvent
 
 _logger = _logging.getLogger(__name__)
 INDENT = '  '
 
-__all__ = ['res_event_from_session', 'res_event_from_xml',
-           'AuthenticationError', 'get_auth', 'fetch_xml',
+__all__ = ['res_event_from_session', 'res_event_from_xml', 'fetch_xml',
            'get_div_and_group', 'get_events', 'dump_calendars']
-
-
-class AuthenticationError(Exception):
-    """Class for showing an exception having to do with authentication"""
-    def __init__(self, message):
-        self.message = message
 
 
 def res_event_from_xml(xml, date=None):
@@ -200,74 +190,6 @@ def get_div_and_group(username):
     group = res.nistgroupnumber.value
 
     return div, group
-
-
-def get_auth(filename="credentials.ini", basic=False):
-    """
-    Set up NTLM authentication for the Microscopy Nexus using an account
-    as specified from a file that lives in the package root named
-    .credentials (or some other value provided as a parameter).
-    Alternatively, the stored credentials can be overridden by supplying two
-    environment variables: ``nexusLIMS_user`` and ``nexusLIMS_pass``. These
-    variables will be queried first, and if not found, the method will
-    attempt to use the credential file.
-
-    Parameters
-    ----------
-    filename : str
-        Name relative to this file (or absolute path) of file from which to
-        read the parameters
-    basic : bool
-        If True, return only username and password rather than NTLM
-        authentication (like what is used for CDCS access rather than for
-        NIST network resources)
-
-    Returns
-    -------
-    auth : ``requests_ntlm.HttpNtlmAuth`` or tuple
-        NTLM authentication handler for ``requests``
-
-    Notes
-    -----
-        The credentials file is expected to have a section named
-        ``[nexus_credentials]`` and two values: ``username`` and
-        ``password``. See the ``credentials.ini.example`` file included in
-        the repository as an example.
-    """
-    try:
-        username = _os.environ['nexusLIMS_user']
-        passwd = _os.environ['nexusLIMS_pass']
-        _logger.info("Authenticating using environment variables")
-    except KeyError:
-        # if absolute path was provided, use that, otherwise find filename in
-        # this directory
-        if _os.path.isabs(filename):
-            pass
-        else:
-            filename = _os.path.join(_os.path.dirname(__file__), filename)
-
-        # Raise error if the configuration file is not found
-        if not _os.path.isfile(filename):
-            raise AuthenticationError("No credentials were specified with "
-                                      "environment variables, and credential "
-                                      "file {} was not found".format(filename))
-
-        config = _ConfigParser()
-        config.read(filename)
-
-        username = config.get("nexus_credentials", "username")
-        passwd = config.get("nexus_credentials", "password")
-
-    if basic:
-        # return just username and password (for BasicAuthentication)
-        return username, passwd
-
-    domain = 'nist'
-    path = domain + '\\' + username
-
-    auth = _HttpNtlmAuth(path, passwd)
-    
-    return auth 
 
 
 def fetch_xml(instrument, dt_from=None, dt_to=None):

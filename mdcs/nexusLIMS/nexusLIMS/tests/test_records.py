@@ -19,7 +19,7 @@ from uuid import uuid4
 from datetime import datetime as _dt
 from datetime import timedelta as _td
 from nexusLIMS.tests.utils import files
-from nexusLIMS.harvesters.sharepoint_calendar import AuthenticationError
+from nexusLIMS.utils import AuthenticationError
 from nexusLIMS.harvesters import nemo
 import pytest
 

@@ -25,6 +25,7 @@
 #  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
+from configparser import ConfigParser as _ConfigParser
 from typing import Tuple
 from lxml import etree as _etree
 import certifi as _certifi
@@ -37,6 +38,8 @@ from os.path import getmtime as _getmtime
 from warnings import warn
 import logging as _logging
 import sys as _sys
+
+from requests_ntlm import HttpNtlmAuth as _HttpNtlmAuth
 
 _logger = _logging.getLogger(__name__)
 _logger.setLevel(_logging.INFO)
@@ -104,7 +107,6 @@ def nexus_req(url, fn, basic_auth=False, token_auth=None, **kwargs):
                          'Only one can be used at a time')
 
     from .harvesters import CA_BUNDLE_PATH
-    from .harvesters.sharepoint_calendar import get_auth
 
     # if token_auth is desired, add it to any existing headers passed along
     # with the request
@@ -610,3 +612,79 @@ def _get_timespan_overlap(range_1: Tuple[datetime, datetime],
     overlap = max(_timedelta(0), delta)
 
     return overlap
+
+
+def get_auth(filename="credentials.ini", basic=False):
+    """
+    Set up NTLM authentication for the Microscopy Nexus using an account
+    as specified from a file that lives in the package root named
+    .credentials (or some other value provided as a parameter).
+    Alternatively, the stored credentials can be overridden by supplying two
+    environment variables: ``nexusLIMS_user`` and ``nexusLIMS_pass``. These
+    variables will be queried first, and if not found, the method will
+    attempt to use the credential file.
+
+    Parameters
+    ----------
+    filename : str
+        Name relative to this file (or absolute path) of file from which to
+        read the parameters
+    basic : bool
+        If True, return only username and password rather than NTLM
+        authentication (like what is used for CDCS access rather than for
+        NIST network resources)
+
+    Returns
+    -------
+    auth : ``requests_ntlm.HttpNtlmAuth`` or tuple
+        NTLM authentication handler for ``requests``
+
+    Notes
+    -----
+        The credentials file is expected to have a section named
+        ``[nexus_credentials]`` and two values: ``username`` and
+        ``password``. See the ``credentials.ini.example`` file included in
+        the repository as an example.
+    """
+    # DONE: this should be moved out of sharepoint calendar an into general
+    #  utils since it's used for CDCS as well
+    try:
+        username = _os.environ['nexusLIMS_user']
+        passwd = _os.environ['nexusLIMS_pass']
+        _logger.info("Authenticating using environment variables")
+    except KeyError:
+        # if absolute path was provided, use that, otherwise find filename in
+        # this directory
+        if _os.path.isabs(filename):
+            pass
+        else:
+            filename = _os.path.join(_os.path.dirname(__file__), filename)
+
+        # Raise error if the configuration file is not found
+        if not _os.path.isfile(filename):
+            raise AuthenticationError("No credentials were specified with "
+                                      "environment variables, and credential "
+                                      "file {} was not found".format(filename))
+
+        config = _ConfigParser()
+        config.read(filename)
+
+        username = config.get("nexus_credentials", "username")
+        passwd = config.get("nexus_credentials", "password")
+
+    if basic:
+        # return just username and password (for BasicAuthentication)
+        return username, passwd
+
+    domain = 'nist'
+    path = domain + '\\' + username
+
+    auth = _HttpNtlmAuth(path, passwd)
+
+    return auth
+
+
+class AuthenticationError(Exception):
+    """Class for showing an exception having to do with authentication"""
+    def __init__(self, message):
+        self.message = message
