@@ -48,6 +48,14 @@ from nexusLIMS.instruments import get_instr_from_api_url
 _logger = logging.getLogger(__name__)
 
 
+class NoDataConsentException(Exception):
+    """
+    Exception to raise if a user has not given their consent to have data
+    harvested
+    """
+    pass
+
+
 class NemoConnector:
     tools: Dict[int, Dict]
     users: Dict[int, Dict]
@@ -285,7 +293,7 @@ class NemoConnector:
 
         Returns
         -------
-        reservations : list
+        reservations : List[Dict]
             A list (could be empty) of reservations that match the date range
             supplied
         """
@@ -369,7 +377,7 @@ class NemoConnector:
 
         Returns
         -------
-        usage_events : list
+        usage_events : List
             A list (could be empty) of usage events that match the filters
             supplied
         """
@@ -743,7 +751,7 @@ def res_event_from_session(session: Session) -> ReservationEvent:
     tool_id = id_from_url(session.instrument.api_url)
 
     # get reservation with maximum overlap (like sharepoint_calendar.fetch_xml)
-    reservations: List[dict] = c.get_reservations(
+    reservations = c.get_reservations(
         tool_id=tool_id,
         dt_from=session.dt_from - timedelta(days=2),
         dt_to=session.dt_to + timedelta(days=2)
@@ -784,6 +792,15 @@ def res_event_from_session(session: Session) -> ReservationEvent:
         #  providing lists to the ReservationEvent constructor
         sample_details, sample_pid, sample_name = \
             _process_res_question_samples(res)
+
+        # DONE: respect user choice not to harvest data (data_consent)
+        consent = _get_res_question_value('data_consent', res)
+        if consent is not None:
+            if consent.lower() in ['disagree', 'no', 'false', 'negative']:
+                raise NoDataConsentException(f"Reservation {res['id']} "
+                                             f"requested not to have their "
+                                             f"data harvested")
+
         # Create ReservationEvent from NEMO reservation dict
         res_event = ReservationEvent(
             experiment_title=_get_res_question_value('experiment_title', res),

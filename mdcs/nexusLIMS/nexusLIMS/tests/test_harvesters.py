@@ -572,7 +572,7 @@ class TestNemoIntegration:
         assert all([d['cancelled'] is True for d in cancelled])
 
         one_tool = nemo_connector.get_reservations(tool_id=2)
-        assert all([d['tool']['id'] is 2 for d in one_tool])
+        assert all([d['tool']['id'] == 2 for d in one_tool])
 
         multi_tool = nemo_connector.get_reservations(tool_id=[2, 10])
         assert all([d['tool']['id'] in [2, 10] for d in multi_tool])
@@ -609,7 +609,7 @@ class TestNemoIntegration:
         assert len(date_both) == 2
 
         one_tool = nemo_connector.get_usage_events(tool_id=1)
-        assert all([d['tool']['id'] is 1 for d in one_tool])
+        assert all([d['tool']['id'] == 1 for d in one_tool])
 
         multi_tool = nemo_connector.get_usage_events(tool_id=[1, 5])
         assert all([d['tool']['id'] in [1, 5] for d in multi_tool])

@@ -6,7 +6,6 @@ nexusLIMS_tests_37:
   stage: test
   script:
     # run tests with coverage and output coverage report to html
-    - pipenv run pip list
     - pipenv run pytest mdcs/nexusLIMS/nexusLIMS/tests --cov=mdcs/nexusLIMS/nexusLIMS --cov-report html:$(pwd)/coverage --cov-report term --mpl --mpl-baseline-path=mdcs/nexusLIMS/nexusLIMS/tests/files/figs
   # Install the environment
   before_script:
