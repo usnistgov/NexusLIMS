@@ -5,9 +5,8 @@ from lxml import etree
 from datetime import datetime as dt
 from nexusLIMS import harvesters
 from nexusLIMS.harvesters import sharepoint_calendar as sc
-from nexusLIMS.utils import nexus_req as _nexus_req
+from nexusLIMS.utils import nexus_req as _nexus_req, AuthenticationError
 from nexusLIMS.harvesters import ReservationEvent
-from nexusLIMS.harvesters.sharepoint_calendar import AuthenticationError
 from nexusLIMS.db.session_handler import db_query
 from nexusLIMS.instruments import instrument_db
 from collections import OrderedDict
@@ -29,7 +28,7 @@ class TestSharepoint:
         os.path.join(os.path.dirname(__file__),
                      '..',
                      'credentials.ini.example'))
-    CREDENTIAL_FILE_REL = os.path.join('..', 'credentials.ini.example')
+    CREDENTIAL_FILE_REL = 'credentials.ini.example'
 
     @pytest.mark.parametrize('instrument', list(instrument_db.values()),
                              ids=list(instrument_db.keys()))
@@ -77,14 +76,14 @@ class TestSharepoint:
                 sc.fetch_xml(instrument_db['FEI-Titan-TEM-635816'])
 
     def test_absolute_path_to_credentials(self, monkeypatch):
-        from nexusLIMS.harvesters.sharepoint_calendar import get_auth
+        from nexusLIMS.utils import get_auth
         with monkeypatch.context() as m:
             # remove environment variable so we get into file processing
             m.delenv('nexusLIMS_user')
             _ = get_auth(self.CREDENTIAL_FILE_ABS)
 
     def test_relative_path_to_credentials(self, monkeypatch):
-        from nexusLIMS.harvesters.sharepoint_calendar import get_auth
+        from nexusLIMS.utils import get_auth
         os.chdir(os.path.dirname(__file__))
         with monkeypatch.context() as m:
             # remove environment variable so we get into file processing
@@ -92,7 +91,7 @@ class TestSharepoint:
             _ = get_auth(self.CREDENTIAL_FILE_REL)
 
     def test_bad_path_to_credentials(self, monkeypatch):
-        from nexusLIMS.harvesters.sharepoint_calendar import get_auth
+        from nexusLIMS.utils import get_auth
         with monkeypatch.context() as m:
             # remove environment variable so we get into file processing
             m.delenv('nexusLIMS_user')
@@ -231,7 +230,7 @@ class TestSharepoint:
         assert events_1.experiment_title == '***REMOVED***'
 
     def test_basic_auth(self):
-        from nexusLIMS.harvesters.sharepoint_calendar import get_auth
+        from nexusLIMS.utils import get_auth
         res = get_auth(basic=True)
         assert isinstance(res, tuple)
 

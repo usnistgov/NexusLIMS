@@ -33,9 +33,8 @@ from urllib.parse import urljoin as _urljoin
 import sys
 import argparse
 from nexusLIMS._urls import cdcs_url as _cdcs_url
-from nexusLIMS.harvesters.sharepoint_calendar import AuthenticationError as \
-    _authError
-from nexusLIMS.utils import nexus_req as _nx_req
+from nexusLIMS.utils import nexus_req as _nx_req, \
+    AuthenticationError as _authError
 from tqdm import tqdm as _tqdm
 import logging as _logging
 

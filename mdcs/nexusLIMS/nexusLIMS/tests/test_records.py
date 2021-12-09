@@ -19,7 +19,7 @@ from uuid import uuid4
 from datetime import datetime as _dt
 from datetime import timedelta as _td
 from nexusLIMS.tests.utils import files
-from nexusLIMS.harvesters.sharepoint_calendar import AuthenticationError
+from nexusLIMS.utils import AuthenticationError
 from nexusLIMS.harvesters import nemo
 import pytest
 
@@ -306,6 +306,41 @@ class TestRecordBuilder:
         assert "Reservation 168 requested not to have their data harvested" \
                in caplog.text
         assert len(xmls_files) == 0    # no record should be returned
+
+    def test_not_implemented_harvester(self):
+        # need to create a session with an instrument with a bogus harvester
+        from nexusLIMS.instruments import Instrument
+        i = Instrument(harvester="bogus")
+        s = session_handler.Session(
+            session_identifier='identifier',
+            instrument=i,
+            dt_from=_dt.fromisoformat('2021-12-09T11:40:00-07:00'),
+            dt_to=_dt.fromisoformat('2021-12-09T11:41:00-07:00'),
+            user='miclims'
+        )
+        with pytest.raises(NotImplementedError) as e:
+            _rb.get_reservation_event(s)
+        assert "Harvester bogus not found in nexusLIMS.harvesters" in \
+               str(e.value)
+
+    def test_not_implemented_res_event_from_session(self, monkeypatch):
+        # create a session, but mock remove the res_event_from_session
+        # attribute from the nemo harvester to simulate a module that doesn't
+        # have that method defined
+        with monkeypatch.context() as m:
+            m.delattr("nexusLIMS.harvesters.nemo.res_event_from_session")
+            with pytest.raises(NotImplementedError) as e:
+                _rb.get_reservation_event(
+                    session_handler.Session(
+                        session_identifier='identifier',
+                        instrument=instrument_db['testsurface-CPU_P1111111'],
+                        dt_from=_dt.fromisoformat('2021-12-09T11:40:00-07:00'),
+                        dt_to=_dt.fromisoformat('2021-12-09T11:41:00-07:00'),
+                        user='miclims'
+                    )
+                )
+            assert 'res_event_from_session has not been implemented for' in \
+                   str(e.value)
 
 @pytest.fixture(scope='module')
 def gnu_find_activities(fix_mountain_time):
