@@ -28,4 +28,4 @@
 """
 This module is only used for keeping track of the current software version.
 """
-__version__ = '1.0.1'
+__version__ = '1.1.0'
