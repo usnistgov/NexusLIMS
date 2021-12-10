@@ -613,13 +613,13 @@
                     min-width: 25vw;
                 }
                 
-                table#summary-table > tbody > tr > * {
+                table.upper-table > tbody > tr > * {
                     border: 0;
                     padding: .1rem;
                     line-height: 1.5;
                     font-size: 0.75em;
                 }
-                table#summary-table th {
+                table.upper-table th {
                     font-weight: bold;
                 }
                 
@@ -634,23 +634,37 @@
                 
                 table.meta-table, 
                 table.aa-table,
-                table.filelist-table {
+                table.filelist-table,
+                table.sample-table {
                     border-collapse: collapse;
                 
                 }
                 
                 table.meta-table td, table.meta-table th, 
                 table.aa-table td, table.aa-table th,
-                table.filelist-table td, table.filelist-table th{
+                table.filelist-table td, table.filelist-table th,
+                table.sample-table td, table.sample-table th {
                     padding: 0.3em;
                 }
                 
                 table.meta-table th, 
                 table.aa-table th,
-                table.filelist-table th{
+                table.filelist-table th,
+                table.sample-table th {
                     background-color: #3a65a2;
                     border-color: black;
                     color: white;
+                }
+                
+                table.sample-table td {
+                    text-align: center;
+                    line-height: 1.2em;
+                    vertical-align: middle;
+                }
+                
+                table.sample-table p {
+                   margin-bottom: 0.25em;
+                   margin-top: 0.25em;
                 }
                 
                 table.filelist-table.dataTable tbody td.select-checkbox:before {
@@ -923,9 +937,11 @@
                 }
             </style>
 
+
             <div id="loading">
                 <img src="static/img/logo_bare.png"/>
             </div>
+
 
             <!-- ============= Main Generation of the Page ============= -->
             <!-- Add sidebar to the page -->
@@ -1017,7 +1033,7 @@
                             <xsl:text> </xsl:text>
                             <sup class="sup-link"
                                 data-toggle='tooltip' data-placement='right'
-                                title='Click to view associated record on the Sharepoint calendar'>
+                                title='Click to view associated record on the calendar'>
                                 <xsl:element name="a">
                                     <xsl:attribute name="target">_blank</xsl:attribute>
                                     <xsl:attribute name="href">
@@ -1067,7 +1083,7 @@
                                                     </xsl:call-template></xsl:attribute>
                                                 <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
                                                 <xsl:attribute name="data-placement">bottom</xsl:attribute> 
-                                                <xsl:attribute name="title">Click to view this instrument on the Sharepoint calendar</xsl:attribute>
+                                                <xsl:attribute name="title">Click to view this instrument on the reservation calendar</xsl:attribute>
                                                 <xsl:value-of select="summary/instrument"/>
                                             </xsl:element>
                                         </xsl:when>
@@ -1126,7 +1142,7 @@
                                             No motivation provided
                                             <xsl:call-template name="help-tip">
                                                 <xsl:with-param name="tip-placement">right</xsl:with-param>
-                                                <xsl:with-param name="tip-text">This value is pulled from the "Experiment Purpose" field of a Sharepoint calendar reservation</xsl:with-param>
+                                                <xsl:with-param name="tip-text">This value is pulled from the "Experiment Purpose" field of a calendar reservation</xsl:with-param>
                                             </xsl:call-template>
                                         </xsl:otherwise>
                                     </xsl:choose>
@@ -1137,11 +1153,11 @@
                         
                         <h3 id="res-info-header">Session Summary 
                         <xsl:call-template name="help-tip">
-                            <xsl:with-param name="tip-text">Summary information is extracted from the Sharepoint calendar reservation associated with this record</xsl:with-param>
+                            <xsl:with-param name="tip-text">Summary information is extracted from the calendar reservation associated with this record</xsl:with-param>
                         </xsl:call-template></h3>
                         <!-- Display summary information (date, time, instrument, and id) -->
     
-                        <table class="table" id="summary-table" 
+                        <table class="table upper-table" id="summary-table" 
                                style="border-collapse:collapse;">
                             <xsl:if test="summary/reservationStart/text()">
                                 <tr>
@@ -1190,15 +1206,15 @@
                             </xsl:if>
                             <xsl:if test="id/text()">
                                 <tr>
-                                    <th scope="row">Session ID:<xsl:text> </xsl:text>
+                                    <th scope="row">Reservation ID:<xsl:text> </xsl:text>
                                         <xsl:call-template name="help-tip">
                                             <xsl:with-param name="tip-placement">right</xsl:with-param>
-                                            <xsl:with-param name="tip-text">ID from this instrument's Sharepoint calendar listing</xsl:with-param>
+                                            <xsl:with-param name="tip-text">ID from this instrument's calendar reservation</xsl:with-param>
                                         </xsl:call-template></th>
                                     <td><xsl:value-of select="id"/></td>
                                 </tr>
                             </xsl:if>
-                            <xsl:if test="sample/name/text()">
+                         <!--   <xsl:if test="acquisitionActivity[@seqno=0]/sampleID/text()">
                                 <tr>
                                     <th scope="row">Sample name: </th>
                                     <td> <xsl:value-of select="sample/name"/></td>
@@ -1224,13 +1240,144 @@
                                     <th scope="row">Description: </th>
                                     <td><xsl:value-of select="$description-stripped"/></td>
                                 </tr>
-                            </xsl:if>
+                            </xsl:if> -->
                         </table>
                         
+                        <xsl:if test="sample/*/text()">
+                            <h3 id="sample-info-header">Sample Information
+                                <xsl:call-template name="help-tip">
+                                    <xsl:with-param name="tip-text">Sample information is extracted from the calendar reservation associated with this record</xsl:with-param>
+                                </xsl:call-template>
+                            </h3>
+                            <table class="table upper-table" id="sample-table" 
+                                style="border-collapse:collapse;">
+                                <xsl:choose>
+                                    <xsl:when test="count(sample) = 1">
+                                        <xsl:if test="sample/name/text()">
+                                            <tr>
+                                                <th scope="row">Name: </th>
+                                                <td> <xsl:value-of select="sample/name"/></td>
+                                            </tr>
+                                        </xsl:if>
+                                        <xsl:if test="sample/@ref/text()">
+                                            <tr>
+                                                <th scope="row">PID: </th>
+                                                <td> 
+                                                    <xsl:call-template name="link-or-text">
+                                                        <xsl:with-param name="val">
+                                                            <xsl:value-of select="sample/@ref"/>
+                                                        </xsl:with-param>
+                                                    </xsl:call-template>
+                                                </td>
+                                            </tr>  
+                                        </xsl:if>
+                                        <xsl:if test="sample/description/text()">
+                                            <tr>
+                                                <th scope="row">Description: </th>
+                                                <td> <xsl:value-of select="sample/description"/></td>
+                                            </tr>
+                                        </xsl:if>
+                                    </xsl:when>
+                                    <xsl:when test="count(sample) > 1">
+                                        <table class="table table-condensed table-hover sample-table compact wrap" border="1" 
+                                               style="width:90%; border-collapse:collapse; text-align: center;">
+                                            <thead>
+                                                <tr>
+                                                    <th style='padding-left: 1.0em; padding-right: 1.0em;'>#</th>
+                                                    <th>
+                                                        Name
+                                                        <xsl:call-template name="help-tip">
+                                                            <xsl:with-param name="tip-text">The name given to this sample (as entered at the time of reservation)</xsl:with-param>
+                                                        </xsl:call-template>
+                                                    </th>
+                                                    <th>
+                                                        PID
+                                                        <xsl:call-template name="help-tip">
+                                                            <xsl:with-param name="tip-text">A persistent identifier for this sample (if a URL, you can click to view more sample details)</xsl:with-param>
+                                                        </xsl:call-template>
+                                                    </th>
+                                                    <th>
+                                                        Description
+                                                        <xsl:call-template name="help-tip">
+                                                            <xsl:with-param name="tip-text">The description given to this sample (as entered at the time of reservation)</xsl:with-param>
+                                                        </xsl:call-template>
+                                                    </th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                        <xsl:for-each select="sample">
+                                            <xsl:variable name="i" select="position()" />
+                                            
+                                            <tr>
+                                                <td style='padding-left: 1.0em; padding-right: 1.0em;'><xsl:value-of select="$i"/></td>
+                                                <xsl:choose>
+                                                    <xsl:when test="./name/text()">
+                                                        <td><xsl:value-of select="./name"/></td>
+                                                    </xsl:when>
+                                                    <xsl:otherwise>
+                                                        <td>
+                                                            <xsl:element name="span">
+                                                            <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                                                            <xsl:attribute name="data-placement">right</xsl:attribute>
+                                                            <xsl:attribute name="title">No value entered</xsl:attribute>
+                                                                —
+                                                            </xsl:element>
+                                                        </td>
+                                                    </xsl:otherwise>
+                                                </xsl:choose>
+                                                <xsl:choose>
+                                                    <xsl:when test="normalize-space(./@ref) != ''">
+                                                        <td>
+                                                            <xsl:call-template name="link-or-text">
+                                                                <xsl:with-param name="val">
+                                                                    <xsl:value-of select="./@ref"/>
+                                                                </xsl:with-param>
+                                                            </xsl:call-template>
+                                                        </td>
+                                                    </xsl:when>
+                                                    <xsl:otherwise>
+                                                        <td>
+                                                            <xsl:element name="span">
+                                                                <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                                                                <xsl:attribute name="data-placement">right</xsl:attribute>
+                                                                <xsl:attribute name="title">No value entered</xsl:attribute>
+                                                                —
+                                                            </xsl:element>
+                                                        </td>
+                                                    </xsl:otherwise>
+                                                </xsl:choose>
+                                                <xsl:choose>
+                                                    <xsl:when test="./description/text()">
+                                                        <td> 
+                                                            <xsl:for-each select="./description">
+                                                                <p><xsl:value-of select="."/></p>
+                                                            </xsl:for-each>
+                                                        </td>
+                                                    </xsl:when>
+                                                    <xsl:otherwise>
+                                                        <td>
+                                                            <xsl:element name="span">
+                                                                <xsl:attribute name="data-toggle">tooltip</xsl:attribute>
+                                                                <xsl:attribute name="data-placement">right</xsl:attribute>
+                                                                <xsl:attribute name="title">No value entered</xsl:attribute>
+                                                                —
+                                                            </xsl:element>
+                                                        </td>
+                                                    </xsl:otherwise>
+                                                </xsl:choose>
+                                            </tr>
+                                        </xsl:for-each>
+                                            </tbody>
+                                        </table>
+                                    </xsl:when>
+                                </xsl:choose>
+                            </table>
+                        </xsl:if>
+                        
                         <xsl:if test="project/*/text()">
-                          <h3 id="res-info-header">Project Information 
+                          <h3 id="proj-info-header">Project Information 
                               <xsl:call-template name="help-tip">
-                                  <xsl:with-param name="tip-text">Project information is extracted from the user's division and group, as well as the Sharepoint calendar reservation associated with this record</xsl:with-param>
+                                  <xsl:with-param name="tip-text">Project information is extracted from the user's division and group, as well as the calendar reservation associated with this record</xsl:with-param>
                               </xsl:call-template>
                               <xsl:if test="project/ref/text()">
                                   <xsl:text> </xsl:text>
@@ -1246,7 +1393,7 @@
                               </xsl:if>
                           </h3>
                           
-                          <table class="table table-condensed" id="summary-table" 
+                            <table class="table table-condensed upper-table" id="proj-table" 
                               style="border-collapse:collapse;width:80%;">
                               <xsl:if test="project/name/text()">
                                   <tr>
@@ -1721,7 +1868,7 @@
                     </div>
                 </xsl:for-each>
                 <div id="filelist-modal" class="modal">
-                    <div class="modal-content">
+                    <div class="modal-content" style="width: 65vw;">
                         <div class="modal-body">
                             <div class="row filelist-header-row">
                                 <div class="col-xs-10" style="flex-grow: 1;">
@@ -1753,7 +1900,7 @@
 <!-- Do not indent this text, as it affects the tooltip display -->                                            
 This window shows all the datasets identified as part of this record.
 
-Rows of the table can be selected using the mouse, holding down Ctrl or Shift to select multiple rows.
+Rows of the table can be selected by clicking anywhere within the row with the mouse.
 
 The files (and metadata) associated with the selected datasets can be downloaded by clicking on the "Download selected" or "Download all" button (warning, this may take some time for large amounts of data). You can close this dialogue (but not the browser tab!) while the download is processing without interrupting its progress. Do not navigate away from the page, or the download will cancel!
 
@@ -1766,7 +1913,7 @@ The textual data from the selected rows (not the actual files) can also be expor
                             <!-- Download progressbar row ((hidden by default by jQuery) -->
                             <div id='progressbar-row' class='row'>
                                 <div class='col-xs-12 w-100' style="">
-                                    <div class="progress" id="progress_bar">
+                                    <div class="progress mb-1" id="progress_bar">
                                         <div class="progress-bar progress-bar-striped progress-bar-animated bg-info" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%">
                                             0%
                                         </div>
@@ -1775,7 +1922,7 @@ The textual data from the selected rows (not the actual files) can also be expor
                             </div>
                             <!-- Download cancel button row (hidden by default by jQuery) -->
                             <div id='btn-cancel-row' class='row'>
-                                <div class='col-xs-12 w-100'>
+                                <div class='col-xs-12 w-100 mt-0 mb-0'>
                                     <button id="btn-cancel-dl" class="btn btn-danger" type="button"
                                             data-toggle="tooltip" data-placement="right" 
                                             title="Canceling the download through the browser will not work, so be sure to use this button to actually stop the file transfer"><i class='fa fa-ban menu-fa' aria-hidden="true"/><span>Cancel download</span></button> 
@@ -1783,21 +1930,22 @@ The textual data from the selected rows (not the actual files) can also be expor
                             </div>
                             <!-- Download result text row (hidden by default by jQuery) -->
                             <div id='dl-result-row' class='row'>
-                                <div class='col-xs-12 w-100 mt-1 mb-1' style="">
-                                    <p id="download-result"></p>
+                                <div class='col-xs-12 w-100 mt-0 mb-0' style="">
+                                    <p id="download-result" class="mt-1 mb-1"></p>
                                 </div>
                             </div>
                             <!-- Download extra message row (hidden by default by jQuery) -->
                             <div id='dl-extra-row' class='row'>
-                                <div class='col-xs-12 w-100 mt-1 mb-1' style="">
-                                    <p id="download-extra"></p>
+                                <div class='col-xs-12 w-100 mt-0 mb-0' style="">
+                                    <p id="download-extra" class="mt-1 mb-1"></p>
                                 </div>
                             </div>
-                            <div class="row mt-1">
-                                <div class='col-xs-12 pt-0'>
+                            <div class="row mt-0">
+                                <div class='col-xs-12 pt-0 w-100'>
                                     <!-- Generate the table with setup conditions for each acquisition activity -->
                                     <table id="filelist-table" 
-                                           class="table table-condensed table-hover filelist-table compact" 
+                                           class="table table-condensed table-hover filelist-table compact mt-0" 
+                                           width="100%"
                                            border="1" style="">
                                         <thead>
                                             <tr>
@@ -2877,18 +3025,18 @@ The textual data from the selected rows (not the actual files) can also be expor
                         // set message width to that of the table (sometimes the
                         // table doesn't get rendered quite fast enough, so make
                         // sure width is at least 500 px
-                        let w = Math.max($('#filelist-table').width(), 500);
+                        //let w = Math.max($('#filelist-table').width(), 500);
                         
                         $("#download-extra").closest('.row').slideDown();
                         $("#download-extra")
                         .removeClass('alert-warning alert-success alert-info alert-danger')
                         .addClass("alert alert-" + type)
                         .text(text);
-                        $( "#download-extra" ).width(w);
+                        //$( "#download-extra" ).width(w);
                         // resize this element everytime the window is changed
-                        $(window).resize(function() {
-                            $( "#download-extra" ).width($('#download-result').width());
-                        });
+                        //$(window).resize(function() {
+                        //    $( "#download-extra" ).width($('#download-result').width());
+                        //});
                     }
                     function hideExtraMessage() {
                         $("#download-extra").closest('.row').slideUp();
@@ -3186,6 +3334,7 @@ The textual data from the selected rows (not the actual files) can also be expor
                             this_zip_size += window.file_sizes[this_aux_url];
                           }
                         }
+                        console.debug('this_zip_size is', humanFileSize(this_zip_size));
                         zip_total_sizes.push(this_zip_size);
 
                         var msg = '';
@@ -3224,6 +3373,8 @@ The textual data from the selected rows (not the actual files) can also be expor
                         const TransformStream = window.TransformStream ?
                           window.TransformStream : ponyfill.TransformStream;
 
+                        console.debug(`${zips.length} zips to download; ${individual_files.length} individual files to download`);
+
                         // create array of TransformStreams to process progress
                         // while downloading
                         progressArr = [];
@@ -3231,6 +3382,7 @@ The textual data from the selected rows (not the actual files) can also be expor
                           p = new TransformStream({
                             transform(chunk, ctrl) {
                               bytesDownloaded += chunk.byteLength
+                              //console.debug(`Downloaded ${humanFileSize(bytesDownloaded)} of the zip data`);
                               updateProgressBar(bytesDownloaded,
                                 arrSum(zip_total_sizes) +
                                 arrSum(indiv_dl_sizes));
@@ -3245,6 +3397,7 @@ The textual data from the selected rows (not the actual files) can also be expor
                           p = new TransformStream({
                             transform(chunk, ctrl) {
                               bytesDownloaded += chunk.byteLength
+                              console.debug(`Downloaded ${humanFileSize(bytesDownloaded)} of the individual file data`);
                               updateProgressBar(bytesDownloaded,
                                 arrSum(zip_total_sizes) +
                                 arrSum(indiv_dl_sizes));
@@ -3260,7 +3413,7 @@ The textual data from the selected rows (not the actual files) can also be expor
                         var abortController = new AbortController();
                         var abortSignal = abortController.signal;
                         var dlError = false;
-
+                        
                         // get name of zip files
                         for (var i = 0; i < zips.length; i++) {
                           if (zips.length === 1) {
@@ -3271,6 +3424,7 @@ The textual data from the selected rows (not the actual files) can also be expor
                               zips.length + '.zip');
                           }
 
+                          console.info(`Creating writeStream with name ${this_zip_title}`);
                           let ws = streamSaver.createWriteStream(
                             this_zip_title, {
                               size: zip_total_sizes[i]
@@ -3346,12 +3500,14 @@ The textual data from the selected rows (not the actual files) can also be expor
                         for (var i = 0; i < individual_files.length; i++) {
                           let url = individual_files[i];
                           let filename = decodeURIComponent(url.replace(/.*\//g, ""));
+                          console.warn(`Writing to ${filename}`);
                           let fileStream = streamSaver.createWriteStream(
                             filename, {
                               size: window.file_sizes[url]
                             }
                           );
                           let writer = fileStream.getWriter();
+                          console.warn("ran getWriter()");
                           writer.releaseLock();
                           let this_prog = progressArr[i + zips.length]
                           let p = fetch(url, {
@@ -3617,7 +3773,7 @@ The textual data from the selected rows (not the actual files) can also be expor
                     
                     // DataTables for filelist-modal table
                     var filelist_dt = $('table#filelist-table').DataTable({
-                        dom: "<'row'<'col-sm-6'f><'col-sm-6'p>><'row'<'#button-col.col-sm-12 text-center'B>><'row'<'col-sm-12't>><'#filelist_info_row.row'<'col-sm-12'i>>",
+                        dom: "<'row'<'col-sm-6'f><'col-sm-6'p>><'row'<'#button-col.col-sm-12 text-center'B>><'row'<'col-sm-12 w-100't>><'#filelist_info_row.row'<'col-sm-12'i>>",
                         ordering: false,
                         buttons: [
                             { 
@@ -4231,5 +4387,28 @@ The textual data from the selected rows (not the actual files) can also be expor
             </xsl:otherwise>
         </xsl:choose>
     </xsl:template>
-    
+
+    <!-- This template will take a value and detect if it is a link (simply
+         if it starts with http). If so, it will return the value as an anchor
+         element, if not, it will just return the value as text -->
+    <xsl:template name="link-or-text">
+        <xsl:param name='val'/>
+        <xsl:choose>
+            <xsl:when test="starts-with($val, 'http')">
+                <xsl:element name="a">
+                    <xsl:attribute name="href">
+                        <xsl:value-of select="$val"/>
+                    </xsl:attribute>
+                    <xsl:attribute name="target">
+                        _blank
+                    </xsl:attribute>
+                    <xsl:value-of select="$val"/>
+                </xsl:element>
+            </xsl:when>
+            <xsl:otherwise>
+                <xsl:value-of select="$val"/>
+            </xsl:otherwise>
+        </xsl:choose>
+    </xsl:template>
+
 </xsl:stylesheet>
