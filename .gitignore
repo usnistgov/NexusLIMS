@@ -29,6 +29,7 @@ _coverage_output
 *.sqbpro
 .tox/
 **/schemas/records
+_build
 
 # pip installation files
 *.egg-info

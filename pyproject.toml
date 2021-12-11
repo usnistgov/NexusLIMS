@@ -48,9 +48,10 @@ isolated_build = true
 envlist = py{37, 38}
 
 [testenv]
+passenv = *
 whitelist_externals = poetry
 commands = 
-    poetry install -v
+    poetry install
     poetry run pytest tests/ --cov=nexusLIMS --cov=tests \
         --cov-config=tests/.coveragerc \
         --cov-report html:tests/coverage \
@@ -58,18 +59,19 @@ commands =
         --mpl --mpl-baseline-path=tests/files/figs
 
 [testenv:gen_mpl_baseline]
+passenv = *
 description = use pytest-mpl to generate baseline figures for comparison
 commands = 
-    poetry install -v
+    poetry install
     poetry run pytest tests/test_extractors.py \
         -k TestThumbnailGenerator \
         --mpl-generate-path=tests/files/figs
 
 [testenv:docs]
+passenv = *
 description = invoke sphinx-build to build the HTML docs
 commands = 
-    poetry install -v
-    poetry run python -m sphinx.cmd.build ./docs {toxworkdir}{/}{envname}/_build -n -E -a -j auto -b html
-    poetry run python -c 'import pathlib; print("documentation available under file://%s" % pathlib.Path(r"{toxworkdir}") + "{/}" + "{envname}" + "{/}" + "_build" + "{/}" + "index.html")'           
+    poetry install
+    poetry run python -m sphinx.cmd.build ./docs ./_build -n -E -a -j auto -b html
 """
 

@@ -95,18 +95,18 @@ from dotenv import load_dotenv
 # load environment variables from a .env file if present
 load_dotenv()
 
-def _filter_hyperspy_messages(record):
+def _filter_hyperspy_messages(record):  # pragma: no cover
     """Filter to be used with logging class to hide HyperSpy API import
     warnings within the NexusLIMS codebase"""
     # this only triggers if the hs.preferences.GUIs.warn_if_guis_are_missing
     # preference is set to True
     if record.msg.startswith('The ipywidgets GUI') or \
-            record.msg.startswith('The traitsui GUI'):
-        return False
+            record.msg.startswith('The traitsui GUI'):  
+        return False   
     else:
         # unless we come across another HyperSpy error, this line won't be
         # reached, so exclude from coverage
-        return True     # pragma: no cover
+        return True    
 
 
 # connect the filter function to the HyperSpy logger
