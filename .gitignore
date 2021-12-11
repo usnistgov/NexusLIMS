@@ -10,6 +10,8 @@ backups
 gitlab_backup.log
 *credentials.ini
 .coverage
+.coverage.*
+tests/coverage
 .env
 .directory
 test_db.sqlite
@@ -25,6 +27,8 @@ mdcs/nexusLIMS/doc/source/api/*.rst
 _coverage_output
 .venv/
 *.sqbpro
+.tox/
+**/schemas/records
 
 # pip installation files
 *.egg-info
@@ -37,6 +41,3 @@ htmlcov/
 
 # Oxygen project files
 *.xpr
-/mdcs/nexusLIMS/nexusLIMS/db/build/
-
-node_modules

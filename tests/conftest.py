@@ -27,7 +27,7 @@
 #
 import tarfile
 import os
-from nexusLIMS.tests.utils import tars, files
+from .utils import tars, files
 from datetime import datetime as _dt
 from datetime import timedelta as _td
 from datetime import timezone as _tz

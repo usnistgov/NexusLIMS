@@ -25,7 +25,7 @@ warnings.filterwarnings(
 
 class TestSharepoint:
     CREDENTIAL_FILE_ABS = os.path.abspath(
-        os.path.join(os.path.dirname(__file__),
+        os.path.join(os.path.dirname(harvesters.__file__),
                      '..',
                      'credentials.ini.example'))
     CREDENTIAL_FILE_REL = 'credentials.ini.example'

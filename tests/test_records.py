@@ -18,7 +18,7 @@ from lxml import etree as et
 from uuid import uuid4
 from datetime import datetime as _dt
 from datetime import timedelta as _td
-from nexusLIMS.tests.utils import files
+from .utils import files
 from nexusLIMS.utils import AuthenticationError
 from nexusLIMS.harvesters import nemo
 import pytest

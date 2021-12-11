@@ -1,1 +1,0 @@
-https://data.nist.gov/od/dm/nexus/experiment/v1.0 ***REMOVED***/dev/NexusMicroscopyNIMS/mdcs/schemas/nexus-experiment.xsd

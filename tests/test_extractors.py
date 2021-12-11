@@ -9,7 +9,7 @@ from datetime import datetime as dt
 
 import nexusLIMS
 from nexusLIMS import instruments
-from nexusLIMS.tests.utils import tars, files
+from .utils import tars, files
 from nexusLIMS.extractors import digital_micrograph
 from nexusLIMS.extractors import fei_emi
 from nexusLIMS.extractors.quanta_tif import get_quanta_metadata

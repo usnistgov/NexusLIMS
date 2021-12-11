@@ -90,6 +90,10 @@ from ._urls import calendar_root_url
 from ._urls import ldap_url
 import logging as _logging
 
+from dotenv import load_dotenv
+
+# load environment variables from a .env file if present
+load_dotenv()
 
 def _filter_hyperspy_messages(record):
     """Filter to be used with logging class to hide HyperSpy API import

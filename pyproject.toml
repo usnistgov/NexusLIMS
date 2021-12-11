@@ -1,0 +1,75 @@
+[tool.poetry]
+name = "nexusLIMS"
+version = "1.1.0"
+description = "The NIST Electron Microscopy Nexus LIMS project"
+authors = ["Joshua Taillon <joshua.taillon@nist.gov>"]
+maintainers = ["Joshua Taillon <joshua.taillon@nist.gov>"]
+readme = "README.md"
+repository = "https://gitlab.nist.gov/nexuslims/NexusMicroscopyLIMS.git"
+documentation = "http://nexuslims.ipages.nist.gov/NexusMicroscopyLIMS/doc/"
+license = "NIST Public License"
+# necessary if we want to have a package name with capitals... see
+#  https://github.com/python-poetry/poetry/issues/1538#issuecomment-555753130
+packages = [
+    {include = "nexusLIMS"}
+]
+
+[tool.poetry.dependencies]
+python = "^3.7"
+lxml = "^4.6.4"
+requests = "^2.26.0"
+requests_ntlm = "^1.1.0"
+pytz = "^2021.3"
+ldap3 = "^2.9.1"
+hyperspy = "^1.6.5"
+scikit-learn = "^1.0.1"
+python-dotenv = "^0.19.2"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+coverage = "^6.2"
+pytest-mpl = "^0.13"
+pytest-cov = "^3.0.0"
+Sphinx = "^4.3.1"
+sphinx-bootstrap-theme = "^0.8.0"
+tox = "^3.24.4"
+
+[tool.poetry.scripts]
+
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.tox]
+legacy_tox_ini = """
+[tox]
+isolated_build = true
+envlist = py{37, 38}
+
+[testenv]
+whitelist_externals = poetry
+commands = 
+    poetry install -v
+    poetry run pytest tests/ --cov=nexusLIMS --cov=tests \
+        --cov-config=tests/.coveragerc \
+        --cov-report html:tests/coverage \
+        --cov-report term-missing \
+        --mpl --mpl-baseline-path=tests/files/figs
+
+[testenv:gen_mpl_baseline]
+description = use pytest-mpl to generate baseline figures for comparison
+commands = 
+    poetry install -v
+    poetry run pytest tests/test_extractors.py \
+        -k TestThumbnailGenerator \
+        --mpl-generate-path=tests/files/figs
+
+[testenv:docs]
+description = invoke sphinx-build to build the HTML docs
+commands = 
+    poetry install -v
+    poetry run python -m sphinx.cmd.build ./docs {toxworkdir}{/}{envname}/_build -n -E -a -j auto -b html
+    poetry run python -c 'import pathlib; print("documentation available under file://%s" % pathlib.Path(r"{toxworkdir}") + "{/}" + "{envname}" + "{/}" + "_build" + "{/}" + "index.html")'           
+"""
+
