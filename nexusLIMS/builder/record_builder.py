@@ -310,7 +310,7 @@ def get_files(path, dt_from, dt_to):
 
     Returns
     -------
-    files : list of str
+    files : List[str]
         A list of the files that have modification times within the
         time range provided (sorted by modification time)
     """
@@ -578,7 +578,7 @@ def dry_run_file_find(s: Session) -> List[str]:
 
     Returns
     -------
-    files : list of str
+    files : List[str]
         A list of strings containing the files that would be included for the
         record of this session (if it were not a dry run)
     """

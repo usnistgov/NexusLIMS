@@ -608,7 +608,7 @@ def get_harvesters_enabled() -> List[NemoConnector]:
 
     Returns
     -------
-    harvesters_enabled : list of ~nexusLIMS.harvesters.nemo.NemoConnector
+    harvesters_enabled : List[NemoConnector]
         A list of NemoConnector objects representing the NEMO APIs enabled
         via environment settings
     """

@@ -11,9 +11,9 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
-import sys
+# import sys
 import shutil
-sys.path.insert(0, os.path.abspath('../../'))
+# sys.path.insert(0, os.path.abspath('../../'))
 import nexusLIMS.version
 from datetime import datetime
 from glob import glob
@@ -238,17 +238,17 @@ html_theme_options = {
 
 rst_epilog = """
 .. |SQLSchemaLink| replace:: SQL Schema Definition
-.. _SQLSchemaLink: https://***REMOVED***nexuslims/NexusMicroscopyLIMS/blob/master/mdcs/nexusLIMS/nexusLIMS/db/NexusLIMS_db_creation_script.sql
+.. _SQLSchemaLink: https://***REMOVED***nexuslims/NexusMicroscopyLIMS/blob/master/nexusLIMS/db/dev/NexusLIMS_db_creation_script.sql
 .. |RepoLink| replace:: repository
 .. _RepoLink: https://***REMOVED***nexuslims/NexusMicroscopyLIMS
 .. |dbloggerLink| replace:: ``db_logger_gui.py``
-.. _dbloggerLink: https://***REMOVED***nexuslims/NexusMicroscopyLIMS/-/blob/master/mdcs/nexusLIMS/nexusLIMS/db/db_logger_gui/db_logger_gui.py
+.. _dbloggerLink: https://***REMOVED***nexuslims/session-logger-app/-/blob/master/db_logger_gui.py
 .. |makedbentryLink| replace:: ``make_db_entry.py``
-.. _makedbentryLink: https://***REMOVED***nexuslims/NexusMicroscopyLIMS/-/blob/master/mdcs/nexusLIMS/nexusLIMS/db/db_logger_gui/make_db_entry.py
+.. _makedbentryLink: https://***REMOVED***nexuslims/session-logger-app/-/blob/master/make_db_entry.py
 .. |specfileLink| replace:: ``db_logger_gui.spec``
-.. _specfileLink: https://***REMOVED***nexuslims/NexusMicroscopyLIMS/-/blob/master/mdcs/nexusLIMS/nexusLIMS/db/db_logger_gui/db_logger_gui.spec
+.. _specfileLink: https://***REMOVED***nexuslims/session-logger-app/-/blob/master/db_logger_gui.spec
 .. |testsLink| replace:: ``tests``
-.. _testsLink: https://***REMOVED***nexuslims/NexusMicroscopyLIMS/-/tree/master/mdcs/nexusLIMS/nexusLIMS/tests
+.. _testsLink: https://***REMOVED***nexuslims/NexusMicroscopyLIMS/-/tree/master/tests
 """
 
 
@@ -260,13 +260,18 @@ def run_apidoc(_):
     cur_dir = os.path.normpath(os.path.dirname(__file__))
     output_path = os.path.join(cur_dir, 'api')
     shutil.rmtree(output_path, ignore_errors=True)
-    modules = os.path.normpath(os.path.join(cur_dir, "../../nexusLIMS"))
+    modules = os.path.normpath(os.path.join(cur_dir, "../nexusLIMS"))
     to_exclude = list(glob(os.path.join(modules, 'dev_scripts') + '/**/*',
                            recursive=True))
     # exclude db_logger_gui files from autodoc
-    to_exclude += list(glob(os.path.join(modules, 'db', 'db_logger_gui', '*')))
+    # to_exclude += list(glob(os.path.join(modules, 'db', 'db_logger_gui', '*')))
     # to_exclude += list(glob(os.path.join(modules, 'db', 'migrate_db.py')))
     # to_exclude += [os.path.join(modules, 'builder')]
+
+    # load environment if present
+    from dotenv import load_dotenv
+    load_dotenv('../.env')
+
     main(['-f', '-M', '-T', '-d', '-1', '-o', output_path, modules] +
          to_exclude)
 

@@ -13,10 +13,9 @@ cache:
     - source $HOME/.poetry/env
     - poetry config virtualenvs.in-project true; poetry config cache-dir ${PYENV_DIR}/.poetry-cache;
     - poetry config --list
-    - poetry install
+    - poetry run pip install tox
 
-.dont-run:
-  nexusLIMS_tests:
+nexusLIMS_tests:
     stage: test
     script:
       # run tests with coverage and output coverage report to html
@@ -43,6 +42,6 @@ pages:
   artifacts:
     paths:
       - public
-  # dependencies:
-  #   - nexusLIMS_tests
-  # needs: ['nexusLIMS_tests']
+  dependencies:
+    - nexusLIMS_tests
+  needs: ['nexusLIMS_tests']

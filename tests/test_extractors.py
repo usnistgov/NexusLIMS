@@ -287,6 +287,9 @@ class TestExtractorModule:
         assert 'The .ser file could not be opened' in meta['nx_meta'][
             'Extractor Warning']
 
+        os.remove(thumb_fname)
+        os.remove(thumb_fname.replace('thumb.png', 'json'))
+
     def test_flatten_dict(self):
         dict_to_flatten = {
             'level1.1': 'level1.1v',
