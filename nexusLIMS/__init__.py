@@ -48,18 +48,17 @@ Refer to :ref:`record-building` for more details.
 **Configuration variables**
 
 The following variables should be defined as environment variables in your
-session, or in the ``.env`` file in the root of this package's repository (if
-you are running using ``pipenv``).
+session, or in the ``.env`` file in the root of this package's repository.
 
 .. _nexusLIMS-user:
 
 `nexusLIMS_user`
-    The username used to authenticate to calendar resources and CDCS
+    The username used to authenticate to sharepoint calendar resources and CDCS
 
 .. _nexusLIMS-pass:
 
 `nexusLIMS_pass`
-    The password used to authenticate to calendar resources and CDCS
+    The password used to authenticate to sharepoint calendar resources and CDCS
 
 .. _mmfnexus-path:
 
@@ -84,6 +83,32 @@ you are running using ``pipenv``).
     The direct path to the NexusLIMS SQLite database file that contains
     information about the instruments in the Nexus Facility, as well as logs
     for the sessions created by users using the Session Logger Application.
+
+.. _nemo-address:
+
+`NEMO_address_X`
+    The path to a NEMO instance's API endpoint. Should be something like
+    ``https://www.nemo.com/api/`` (make sure to include the trailing slash).
+    The value ``_X`` can be replaced with any value (such as 
+    ``NEMO_address_1``). NexusLIMS supports having multiple NEMO reservation 
+    systems enabled at once (useful if your instruments are split over a few 
+    different management systems). To enable this behavior, create multiple 
+    pairs of environment variables for each instance, where the suffix ``_X``
+    changes for each pair (`e.g.` you could have ``NEMO_address_1`` paired with
+    ``NEMO_token_1``, ``NEMO_address_2`` paired with ``NEMO_token_2``, etc.). 
+
+.. _nemo-token:
+
+`NEMO_token_X`
+    An API authentication token from the corresponding NEMO installation 
+    (specified in ``NEMO_address_X``) that
+    will be used to authorize requests to the NEMO API. This token can be
+    obtained by visiting the "Detailed Administration" page in the NEMO
+    instance, and then creating a new token under the "Tokens" menu. Note that
+    this token will authenticate as a particular user, so you may wish to set
+    up a "dummy" or "functional" user account in the NEMO instance for these
+    operations.
+
 """
 
 from ._urls import calendar_root_url

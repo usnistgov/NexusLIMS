@@ -12,7 +12,18 @@
     color: #0080ff;
 }
 
-.alert-info .admonition-title {
+.alert-danger {
+    border-color: #ecb1b1;
+    background-color: #ffebeb;
+    color: #494949;
+}
+
+.alert-danger a {
+    color: #0080ff;
+}
+
+.alert-info .admonition-title,
+.alert-danger .admonition-title {
     /*font-variant: petite-caps;*/
     font-style: italic;
 }

@@ -52,8 +52,7 @@ and the operators of NexusLIMS are notified so the issue can be corrected.
     context the code is run: :ref:`nexusLIMS_user <nexusLIMS-user>` and
     :ref:`nexusLIMS_pass <nexusLIMS-pass>`. The
     values provided in these variables will be used for authentication to all
-    network resources that require it. If running the code inside of a
-    `pipenv <https://pipenv.readthedocs.io/en/latest/>`_, the easiest way to do
+    network resources that require it. The easiest way to do
     this is by editing the ``.env.example`` file in the root of the NexusLIMS
     repository and renaming it to ``.env`` (make sure not to push this file to
     any remote source, since it has a password in it!). Furthermore, NEMO-based
@@ -61,7 +60,7 @@ and the operators of NexusLIMS are notified so the issue can be corrected.
     variables named ``NEMO_address_X`` and ``NEMO_token_X``, where ``X`` is an
     integer value (``1``, ``2``, ``3``, etc.). The address variable should be
     a path to the API endpoint for a particular server (e.g.
-    ``https://***REMOVED***/api/``), while the token should be an API
+    ``https://www.nemo.com/api/``), while the token should be an API
     authentication token created on the "Detailed administration" page of the
     NEMO administration tools (ask your NEMO system administrator for more
     direction if this is unclear).

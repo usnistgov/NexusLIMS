@@ -353,7 +353,7 @@ function main() {
     abs_script_dir=$(get_abs_filename "${script_dir}")
     # echo "Abs script dir is ${abs_script_dir}"
     cd "${abs_script_dir}"
-    pipenv run python -m nexusLIMS.builder.record_builder ${python_args}  &> "${LOGPATH}"
+    poetry run python -m nexusLIMS.builder.record_builder ${python_args}  &> "${LOGPATH}"
 
     if grep -q -i -E 'critical|error|exception|fatal|no_files_found' "${LOGPATH}"; then
       stringArr=()
