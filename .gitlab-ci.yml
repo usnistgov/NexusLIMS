@@ -35,7 +35,7 @@ pages:
   stage: deploy
   script:
     - poetry run tox -e docs
-    - mkdir -p public/doc && cp -r _build/ public/doc/
+    - mkdir -p public/doc && rsync -avr _build/ public/doc/
   extends: .env_setup
   after_script:
     - tar -xzf coverage.tar.gz -C public/ || true
