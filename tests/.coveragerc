@@ -1,0 +1,9 @@
+[run]
+omit =
+    nexusLIMS/dev_scripts/*
+    tests/conftest.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    class _CustomEncoder

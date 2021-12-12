@@ -2,80 +2,46 @@ cache:
   paths:
     - coverage.tar.gz
 
-nexusLIMS_tests_37:
-  stage: test
-  script:
-    # run tests with coverage and output coverage report to html
-    - pipenv run pytest mdcs/nexusLIMS/nexusLIMS/tests --cov=mdcs/nexusLIMS/nexusLIMS --cov-report html:$(pwd)/coverage --cov-report term --mpl --mpl-baseline-path=mdcs/nexusLIMS/nexusLIMS/tests/files/figs
-  # Install the environment
+.env_setup:
   before_script:
-    # before anything, try to remove the existing conda environment and replace
-    # with gitlab cache, returning true whether or not we succeeded
-    - echo "Removing conda environment at ${CONDA_ENV}_37"
-    - /opt/conda/bin/conda remove -y -p ${CONDA_ENV}_37 --all || true
-    # try to source the unpacked environment, and if we succeeded, continue, if not, create new environment and install pipenv
-    - echo "Use conda to install the base python environment so we don't mess with system packages"
-    - /opt/conda/bin/conda create -y -p ${CONDA_ENV}_37 python=3.7
-    - source /opt/conda/bin/activate ${CONDA_ENV}_37
-    - echo "install pipenv to build the actual environment"
-    - pip install pipenv
-    # try to remove the existing pipenv
-    - pipenv --rm || true
-    - pipenv install --dev
-  after_script:
-    # cache the coverage results so they can be published, always returning true
-    - tar -czf coverage.tar.gz coverage || true
-    - /opt/conda/bin/conda remove -y -p ${CONDA_ENV}_37 --all || true
-  artifacts:
-    paths:
-      - coverage
-    expire_in: 30 days
-  needs: []
+    - if [[ -z "${PYENV_DIR}" ]]; then export PYENV_DIR=${HOME}/.pyenv; fi 
+    - export PYENV_ROOT="${PYENV_DIR}" && export PATH="$PYENV_ROOT/bin:$PATH" && export TMPDIR="$PYENV_ROOT/.pip-tmp"
+    - if ! command -v pyenv; then rm -rf ${PYENV_DIR} || true; git clone https://github.com/pyenv/pyenv.git ${PYENV_DIR}; else eval "$(pyenv init --path)";  fi
+    - pyenv local | xargs -L1 pyenv install -s
+    - which python
+    - curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+    - source $HOME/.poetry/env
+    - poetry config virtualenvs.in-project true; poetry config cache-dir ${PYENV_DIR}/.poetry-cache;
+    - poetry config --list
+    - poetry run pip install tox
 
-nexusLIMS_tests_38:
-  stage: test
-  script:
-    # run tests with coverage and output coverage report to html
-    - pipenv run pytest mdcs/nexusLIMS/nexusLIMS/tests --mpl --mpl-baseline-path=mdcs/nexusLIMS/nexusLIMS/tests/files/figs
-  # Install the environment
-  before_script:
-    # before anything, try to remove the existing conda environment and replace
-    # with gitlab cache, returning true whether or not we succeeded
-    - echo "Removing conda environment at ${CONDA_ENV}_38"
-    - /opt/conda/bin/conda remove -y -p ${CONDA_ENV}_38 --all || true
-    # try to source the unpacked environment, and if we succeeded, continue, if not, create new environment and install pipenv
-    - echo "Use conda to install the base python environment so we don't mess with system packages"
-    - /opt/conda/bin/conda create -y -p ${CONDA_ENV}_38 python=3.8
-    - source /opt/conda/bin/activate ${CONDA_ENV}_38
-    - echo "install pipenv to build the actual environment"
-    - pip install pipenv
-    # try to remove the existing pipenv
-    - pipenv --rm || true
-    - pipenv install --dev
-  after_script:
-    - /opt/conda/bin/conda remove -y -p ${CONDA_ENV}_38 --all || true
-  needs: []
+nexusLIMS_tests:
+    stage: test
+    script:
+      # run tests with coverage and output coverage report to html
+      - poetry run tox
+    extends: .env_setup
+    after_script:
+      # cache the coverage results so they can be published, always returning true
+      - mv tests/coverage .
+      - tar -czf coverage.tar.gz coverage || true
+    artifacts:
+      paths:
+        - coverage
+      expire_in: 30 days
+    needs: []
 
 pages:
   stage: deploy
   script:
-    - pipenv run python -m sphinx.cmd.build mdcs/nexusLIMS/doc/source public/doc -n -E -a -j auto -b html
-  before_script:
-    # before anything, remove the existing conda environment and rebuild
-    # with gitlab cache, returning true whether or not we succeeded
-    - /opt/conda/bin/conda remove -y -p ${CONDA_ENV}_37 --all || true
-    - tar -xzf coverage.tar.gz -C public/ || true
-    - /opt/conda/bin/conda create -y -p ${CONDA_ENV}_37 python=3.7
-    - source /opt/conda/bin/activate ${CONDA_ENV}_37
-    - pip install pipenv
-    # try to remove the existing pipenv
-    - pipenv --rm || true
-    - pipenv install --dev
+    - poetry run tox -e docs
+    - mkdir -p public/doc && rsync -avr _build/ public/doc/
+  extends: .env_setup
   after_script:
-    - /opt/conda/bin/conda remove -y -p ${CONDA_ENV}_37 --all || true
+    - tar -xzf coverage.tar.gz -C public/ || true
   artifacts:
     paths:
       - public
   dependencies:
-    - nexusLIMS_tests_37
-  needs: ['nexusLIMS_tests_37']
+    - nexusLIMS_tests
+  needs: ['nexusLIMS_tests']

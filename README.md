@@ -18,6 +18,27 @@ however, for those who wish to learn more about the nuts and bolts of how the
 back-end operates to create the records that users view at
 https://***REMOVED***.
 
+## Developer instructions
+
+To run tests, install `pyenv` and `poetry`, run `poetry install`, then:
+
+```bash
+# install required pyenv environments:
+$ pyenv local | xargs -L1 pyenv install  # https://github.com/pyenv/pyenv/issues/919
+
+# configure poetry 
+$ poetry config virtualenvs.in-project true
+
+# to run tests for python 3.7 and 3.8 environments
+$ poetry run tox
+
+# to generate docs:
+$ poetry run tox -e docs
+
+# to generate pytest-mpl figures:
+$ poetry run tox -e gen_mpl_baseline
+```
+
 ## How to help
 
 As a Nexus Facility instrument user, the best way to help is to simply use the
@@ -59,7 +80,7 @@ NexusLIMS has been developed through a great deal of work by a number of people
 including: 
 
 - [Joshua Taillon](https://www.nist.gov/people/joshua-taillon) - Office of Data and Informatics
-- [June Lau](https://www.nist.gov/people/june-w-lau) - Materials Science and Engineering Division
+- [June Lau](https://www.nist.gov/people/june-w-lau) - Office of Data and Informatics
 - [Marcus Newrock](https://www.nist.gov/people/marcus-william-newrock) - Office of Data and Informatics
 - [Ray Plante](https://www.nist.gov/people/raymond-plante) - Office of Data and Informatics
 - [Gretchen Greene](https://www.nist.gov/people/gretchen-greene) - Office of Data and Informatics
@@ -68,4 +89,5 @@ As well as multiple SURF students/undergraduate interns:
 
 - Rachel Devers - Montgomery College/University of Maryland College Park
 - Thomas Bina - Pennsylvania State University
+- Priya Shah - University of Pennsylvania
 - Sarita Upreti - Montgomery College
