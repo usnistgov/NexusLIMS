@@ -848,6 +848,10 @@ class TestNemoIntegration:
         assert pid == [None, None, None, None]
         assert name == [None, None, None, None]
 
+    def test_get_tool_ids(self, nemo_connector):
+        tool_ids = nemo_connector.get_known_tool_ids()
+        for t_id in range(1, 11):
+            assert t_id in tool_ids
 
 
 class TestReservationEvent:
