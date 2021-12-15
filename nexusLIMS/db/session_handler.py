@@ -27,7 +27,7 @@
 #
 
 from typing import Union, List
-from nexusLIMS.instruments import instrument_db as _instr_db
+from nexusLIMS.instruments import instrument_db as _instr_db, Instrument
 import os as _os
 from datetime import datetime as _dt
 import sqlite3 as _sql3
@@ -141,12 +141,12 @@ class Session:
     ----------
     session_identifier : str
         The unique identifier for an individual session on an instrument
-    instrument : ~nexusLIMS.instruments.Instrument
+    instrument : Instrument
         An object representing the instrument associated with this session
-    dt_from : :py:class:`~datetime.datetime`
+    dt_from : datetime.datetime
         A :py:class:`~datetime.datetime` object representing the start of this
         session
-    dt_to : :py:class:`~datetime.datetime`
+    dt_to : datetime.datetime
         A :py:class:`~datetime.datetime` object representing the end of this
         session
     user : str
@@ -178,7 +178,7 @@ class Session:
         Returns
         -------
         success : bool
-            Whether or not the update operation was successful
+            Whether the update operation was successful
         """
         update_query = f"UPDATE session_log SET record_status = '{status}' " \
                        f"WHERE session_identifier = '{self.session_identifier}'"
