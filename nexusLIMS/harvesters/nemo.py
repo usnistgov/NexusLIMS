@@ -421,7 +421,7 @@ class NemoConnector:
         tool_id = [i for i in tool_id if i in this_connectors_tools]
 
         # if tool_id is empty, we should just return
-        if tool_id == []:
+        if not tool_id:
             return []
         else:
             p.update({"tool_id__in": ','.join([str(i) for i in tool_id])})

@@ -638,6 +638,11 @@ class TestNemoIntegration:
         multi_events = nemo_connector.get_usage_events(event_id=[29, 30])
         assert len(multi_events) == 2
 
+    def test_get_events_no_tool_short_circuit(self, nemo_connector):
+        # this test is to make sure we return an empty list faster if the
+        # tool requested is not part of what's in our DB
+        assert nemo_connector.get_usage_events(tool_id=[-5, -4]) == []
+
     @pytest.fixture
     def cleanup_session_log(self):
         # this fixture removes the rows for the usage event added in
