@@ -79,7 +79,7 @@ class NemoConnector:
     def __repr__(self):
         return f"Connection to NEMO API at {self.base_url}"
 
-    def get_tools(self, tool_id: Union[int, List[int]]) -> list:
+    def get_tools(self, tool_id: Union[int, List[int]]) -> List[Dict]:
         """
         Get a list of one or more tools from the NEMO API in a dictionary
         representation
@@ -94,7 +94,7 @@ class NemoConnector:
 
         Returns
         -------
-        tools : list
+        tools : List[Dict]
             A list (could be empty) of tools that match the id (or ids) given
             in ``tool_id``
 
@@ -124,7 +124,8 @@ class NemoConnector:
 
         return tools
 
-    def get_users(self, user_id: Union[int, List[int], None] = None) -> list:
+    def get_users(self, user_id: Union[int, List[int], None] = None) -> \
+            List[Dict]:
         """
         Get a list of one or more users from the NEMO API in a dictionary
         representation. The results will be cached in the NemoConnector
@@ -140,7 +141,7 @@ class NemoConnector:
 
         Returns
         -------
-        users : list
+        users : List[Dict]
             A list (could be empty) of users that match the ids and/or
             usernames given
 
@@ -209,7 +210,7 @@ class NemoConnector:
 
         return self._get_users_helper(p)
 
-    def get_projects(self, proj_id: Union[int, List[int]]) -> list:
+    def get_projects(self, proj_id: Union[int, List[int]]) -> List[Dict]:
         """
         Get a list of one or more projects from the NEMO API in a dictionary
         representation. The local cache will be checked prior to fetching
@@ -225,7 +226,7 @@ class NemoConnector:
 
         Returns
         -------
-        projects : list
+        projects : List[Dict]
             A list (could be empty) of projects that match the id (or ids) given
             in ``proj_id``
 
