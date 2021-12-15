@@ -78,7 +78,8 @@ def pytest_sessionfinish(session, exitstatus):
     """
     for _, fn_list in files.items():
         for fn in fn_list:
-            os.remove(fn)
+            if os.path.isfile(fn):
+                os.remove(fn)
 
 
 @pytest.fixture(scope='session')

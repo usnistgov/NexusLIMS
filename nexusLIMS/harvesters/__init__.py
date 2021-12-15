@@ -207,7 +207,7 @@ class ReservationEvent:
             instr_el.text = self.instrument.schema_name
             # temporary workaround for duplicate harvesters for some instruments
             if self.instrument.harvester == 'nemo' and \
-                    self.instrument.name.endswith('_n'):
+                    self.instrument.name.endswith('_n'):  # pragma: no cover
                 pid = self.instrument.name.strip('_n')
             else:
                 pid = self.instrument.name

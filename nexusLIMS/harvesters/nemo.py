@@ -44,6 +44,7 @@ from nexusLIMS.utils import nexus_req, _get_timespan_overlap
 from nexusLIMS.harvesters import ReservationEvent
 from nexusLIMS.db.session_handler import SessionLog, Session, db_query
 from nexusLIMS.instruments import get_instr_from_api_url
+from nexusLIMS.instruments import instrument_db
 
 _logger = logging.getLogger(__name__)
 
@@ -78,7 +79,7 @@ class NemoConnector:
     def __repr__(self):
         return f"Connection to NEMO API at {self.base_url}"
 
-    def get_tools(self, tool_id: Union[int, List[int]]) -> list:
+    def get_tools(self, tool_id: Union[int, List[int]]) -> List[Dict]:
         """
         Get a list of one or more tools from the NEMO API in a dictionary
         representation
@@ -93,7 +94,7 @@ class NemoConnector:
 
         Returns
         -------
-        tools : list
+        tools : List[Dict]
             A list (could be empty) of tools that match the id (or ids) given
             in ``tool_id``
 
@@ -123,7 +124,8 @@ class NemoConnector:
 
         return tools
 
-    def get_users(self, user_id: Union[int, List[int], None] = None) -> list:
+    def get_users(self, user_id: Union[int, List[int], None] = None) -> \
+            List[Dict]:
         """
         Get a list of one or more users from the NEMO API in a dictionary
         representation. The results will be cached in the NemoConnector
@@ -139,7 +141,7 @@ class NemoConnector:
 
         Returns
         -------
-        users : list
+        users : List[Dict]
             A list (could be empty) of users that match the ids and/or
             usernames given
 
@@ -208,7 +210,7 @@ class NemoConnector:
 
         return self._get_users_helper(p)
 
-    def get_projects(self, proj_id: Union[int, List[int]]) -> list:
+    def get_projects(self, proj_id: Union[int, List[int]]) -> List[Dict]:
         """
         Get a list of one or more projects from the NEMO API in a dictionary
         representation. The local cache will be checked prior to fetching
@@ -224,7 +226,7 @@ class NemoConnector:
 
         Returns
         -------
-        projects : list
+        projects : List[Dict]
             A list (could be empty) of projects that match the id (or ids) given
             in ``proj_id``
 
@@ -344,7 +346,7 @@ class NemoConnector:
                          user: Union[str, int] = None,
                          dt_from: datetime = None,
                          dt_to: datetime = None,
-                         tool_id: Union[int, List[int]] = None) -> List:
+                         tool_id: Union[int, List[int], None] = None) -> List:
         """
         Return a list of usage events from the API, filtered by date
         (inclusive). If only one argument is provided, the API will return all
@@ -373,7 +375,10 @@ class NemoConnector:
             or prior to this point in time will be returned
         tool_id
             A tool identifier (or list of them) to limit the scope of the
-            usage event search (this should be the NEMO internal integer ID)
+            usage event search (this should be the NEMO internal integer ID).
+            Regardless of what value is given, this method will always limit
+            the API query to tools specified in the NexusLIMS DB for this 
+            harvester 
 
         Returns
         -------
@@ -397,12 +402,30 @@ class NemoConnector:
             p['start__gte'] = dt_from.isoformat()
         if dt_to:
             p['end__lte'] = dt_to.isoformat()
-        if tool_id is not None:
-            if hasattr(tool_id, '__iter__'):
-                p.update({"tool_id__in": ','.join([str(i) for i in tool_id])})
-            else:
-                p.update({"tool_id": tool_id})
 
+        # filtering for tool; if at the end of this block tool_id is an empty
+        # list, we should just immediately return an empty list, since either
+        # there were no tools for this connector in our DB, or the tools 
+        # specified were not found in the DB, so we know there are no 
+        # usage_events of interest
+        this_connectors_tools = self.get_known_tool_ids()
+        if tool_id is None:
+            # by default (no tool_id specified), we should fetch events from
+            # only the tools known to the NexusLIMS DB for this connector 
+            tool_id = this_connectors_tools
+        if isinstance(tool_id, int):
+            # coerce tool_id to list to make subsequent processing easier
+            tool_id = [tool_id]
+        
+        # limit tool_id to values that are present in this_connectors_tools 
+        tool_id = [i for i in tool_id if i in this_connectors_tools]
+
+        # if tool_id is empty, we should just return
+        if not tool_id:
+            return []
+        else:
+            p.update({"tool_id__in": ','.join([str(i) for i in tool_id])})
+            
         usage_events = self._api_caller(requests.get, 'usage_events/', p)
 
         for event in usage_events:
@@ -445,7 +468,10 @@ class NemoConnector:
             event = event[0]
             tool_api_url = f"{self.base_url}tools/?id={event['tool']['id']}"
             instr = get_instr_from_api_url(tool_api_url)
-            if instr is None:
+            if instr is None:  # pragma: no cover
+                # this shouldn't happen since we limit our usage event API call
+                # only to instruments contained in our DB, but we can still
+                # defend against it regardless
                 _logger.warning(f"Usage event {event_id} was for an instrument "
                                 f"({tool_api_url}) not known "
                                 f"to NexusLIMS, so no records will be added "
@@ -539,6 +565,29 @@ class NemoConnector:
                             f"for '{self}'")
             return None
 
+    def get_known_tool_ids(self) -> List[int]:
+        """
+        Inspect the ``api_url`` values of known Instruments (from 
+        the ``instruments`` table in the DB), and extract their tool_id number
+        if it is from 
+
+        Returns
+        -------
+        tool_ids : List[int]
+            The list of tool ID numbers known to NexusLIMS for this harvester
+        """
+        tool_ids = []
+
+        for k, v in instrument_db.items():
+            if self.base_url in v.api_url:
+                # Instrument is associated with this connector
+                parsed_url = urlparse(v.api_url)
+                # extract 'id' query parameter from url
+                tool_id = parse_qs(parsed_url.query)['id'][0]
+                tool_ids.append(int(tool_id))
+
+        return tool_ids
+
     def _get_users_helper(self, p: Dict[str, str]) -> list:
         """
         Takes care of calling the users API with certain parameters
@@ -624,7 +673,7 @@ def get_harvesters_enabled() -> List[NemoConnector]:
 def add_all_usage_events_to_db(user: Union[str, int] = None,
                                dt_from: datetime = None,
                                dt_to: datetime = None,
-                               tool_id: Union[int, List[int]] = None):
+                               tool_id: Union[int, List[int], None] = None):
     """
     Loop through enabled NEMO connectors and add each one's usage events to
     the NexusLIMS ``session_log`` database table (if required).
@@ -641,8 +690,9 @@ def add_all_usage_events_to_db(user: Union[str, int] = None,
         The point in time before which usage events will be added. If
         ``None``, no date filtering will be performed
     tool_id
-        The tools(s) for which to add usage events. If ``None``, events will
-        not be filtered by tool at all
+        The tools(s) for which to add usage events. If ``'None'`` (default), 
+        the tool IDs for each instrument in the NexusLIMS DB will be extracted 
+        and used to limit the API response
     """
     for n in get_harvesters_enabled():
         events = n.get_usage_events(user=user, dt_from=dt_from,
@@ -651,11 +701,11 @@ def add_all_usage_events_to_db(user: Union[str, int] = None,
             n.write_usage_event_to_session_log(e['id'])
 
 
-def get_usage_events_as_sessions(user: Union[str, int] = None,
-                                 dt_from: datetime = None,
-                                 dt_to: datetime = None,
-                                 tool_id: Union[int, List[int]] = None) -> \
-        List[Session]:
+def get_usage_events_as_sessions(
+    user: Union[str, int] = None,
+    dt_from: datetime = None,
+    dt_to: datetime = None,
+    tool_id: Union[int, List[int], None] = None) -> List[Session]:
     """
     Loop through enabled NEMO connectors and return each one's usage events to
     as :py:class:`~nexusLIMS.db.session_handler.Session` objects without
@@ -675,7 +725,7 @@ def get_usage_events_as_sessions(user: Union[str, int] = None,
         ``None``, no date filtering will be performed
     tool_id
         The tools(s) for which to fetch usage events. If ``None``, events will
-        not be filtered by tool at all
+        only be filtered by tools known in the NexusLIMS DB for each connector 
     """
     sessions = []
     for n in get_harvesters_enabled():
@@ -830,6 +880,7 @@ def res_event_from_session(session: Session) -> ReservationEvent:
         )
     return res_event
 
+
 def _process_res_question_samples(res_dict: Dict) -> \
     Tuple[Union[List[Union[str, None]], None],
           Union[List[Union[str, None]], None],
@@ -849,7 +900,7 @@ def _process_res_question_samples(res_dict: Dict) -> \
         #   "1": {
         #     "sample_name": "sample name 1",
         #     "sample_or_pid": "Sample Name",
-        #     "sample_details": "A sample with a name and some additional detail"
+        #     "sample_details": "A sample with name and some additional detail"
         #   },
         #   ...
         # }
@@ -870,12 +921,15 @@ def _process_res_question_samples(res_dict: Dict) -> \
                 sample_details.append(v['sample_details'])
             else:
                 sample_details.append(None)
-    else:
-        # non-multiple samples (old-style form)
+    else:  # pragma: no cover
+        # non-multiple samples (old-style form) (this is deprecated,
+        # so doesn't need coverage since we don't have reservations in this
+        # style any longer)
         sample_details = [_get_res_question_value('sample_details', res_dict)]
         sample_pid = [None]
         sample_name = [_get_res_question_value('sample_name', res_dict)]
     return sample_details, sample_pid, sample_name
+
 
 def _get_res_question_value(value: str, res_dict: Dict) -> Union[str, Dict,
                                                                  None]:
@@ -886,6 +940,7 @@ def _get_res_question_value(value: str, res_dict: Dict) -> Union[str, Dict,
             return None
     else:
         return None
+
 
 def id_from_url(url: str) -> Union[None, int]:
     """

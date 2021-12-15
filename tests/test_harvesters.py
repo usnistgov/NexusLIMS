@@ -404,7 +404,7 @@ class TestNemoIntegration:
 
     def test_nemo_harvesters_enabled(self):
         from nexusLIMS.harvesters import nemo
-        assert len(nemo.get_harvesters_enabled()) == 1
+        assert len(nemo.get_harvesters_enabled()) >= 1
         assert str(nemo.get_harvesters_enabled()[0]) == \
             f"Connection to NEMO API at " \
             f"{os.environ['NEMO_address_1']}"
@@ -488,7 +488,7 @@ class TestNemoIntegration:
                                         "642 JEOL 3010 (strobo)"]),
                               ([1, 2, 3], ["643 Titan (S)TEM (probe corrected)",
                                            "642 JEOL 3010 (strobo)",
-                                           "642 Titan"]),
+                                           "642 FEI Titan"]),
                               (-1, [])])
     def test_get_tools(self, nemo_connector,
                        test_tool_id_input, expected_names):
@@ -505,18 +505,19 @@ class TestNemoIntegration:
                           os.environ['NEMO_token_1'])
         to_test = [([1, 2, 3], ["643 Titan (S)TEM (probe corrected)",
                                 "642 JEOL 3010 (strobo)",
-                                "642 Titan"]),
+                                "642 FEI Titan"]),
                    (2, ["642 JEOL 3010 (strobo)"]),
                    ([2, 3], ["642 JEOL 3010 (strobo)",
-                             "642 Titan"])]
+                             "642 FEI Titan"])]
         for t_id, expected in to_test:
             tools = n.get_tools(t_id)
             assert set([t['name'] for t in tools]) == set(expected)
 
     @pytest.mark.parametrize("test_proj_id_input,expected_names",
-                             [(6, ["610"]),
-                              ([3, 4], ["641", "642"]),
-                              ([10, 9, 8], ["735", "683", "681"]),
+                             [(16, ["Test"]),
+                              ([13, 14], ["Gaithersburg", "Boulder"]),
+                              ([13, 14, 15], ["Gaithersburg", "Boulder",
+                                              "ODI"]),
                               (-1, [])])
     def test_get_projects(self, nemo_connector,
                           test_proj_id_input, expected_names):
@@ -531,9 +532,9 @@ class TestNemoIntegration:
         from nexusLIMS.harvesters.nemo import NemoConnector
         n = NemoConnector(os.environ['NEMO_address_1'],
                           os.environ['NEMO_token_1'])
-        to_test = [([10, 9, 8], ["735", "683", "681"]),
-                   (10, ["735"]),
-                   ([9, 8], ["683", "681"])]
+        to_test = [([13, 14, 15], ["Gaithersburg", "Boulder", "ODI"]),
+                   (16, ["Test"]),
+                   ([13, 14], ["Gaithersburg", "Boulder"])]
         for p_id, expected in to_test:
             projects = n.get_projects(p_id)
             assert set([p['name'] for p in projects]) == set(expected)
@@ -570,8 +571,8 @@ class TestNemoIntegration:
         cancelled = nemo_connector.get_reservations(cancelled=True)
         assert all([d['cancelled'] is True for d in cancelled])
 
-        one_tool = nemo_connector.get_reservations(tool_id=2)
-        assert all([d['tool']['id'] == 2 for d in one_tool])
+        one_tool = nemo_connector.get_reservations(tool_id=10)
+        assert all([d['tool']['id'] == 10 for d in one_tool])
 
         multi_tool = nemo_connector.get_reservations(tool_id=[2, 10])
         assert all([d['tool']['id'] in [2, 10] for d in multi_tool])
@@ -581,14 +582,14 @@ class TestNemoIntegration:
         # as many dictionaries as were present on the day these tests were
         # written (Sept. 20, 2021)
         defaults = nemo_connector.get_usage_events()
-        assert len(defaults) >= 3
+        assert len(defaults) >= 2
         assert all([key in defaults[0] for key in ['id', 'start', 'end',
                                                    'run_data', 'user',
                                                    'operator', 'project',
                                                    'tool']])
         assert all([isinstance(d, dict) for d in defaults])
 
-        dt_test = dt.fromisoformat('2021-09-20T00:00:00-06:00')
+        dt_test = dt.fromisoformat('2021-09-01T00:00:00-06:00')
         date_gte = nemo_connector.get_usage_events(dt_from=dt_test)
         assert all([dt.fromisoformat(d['start']) >= dt_test for d in date_gte])
 
@@ -596,8 +597,8 @@ class TestNemoIntegration:
         date_lte = nemo_connector.get_usage_events(dt_to=dt_test)
         assert all([dt.fromisoformat(d['end']) <= dt_test for d in date_lte])
 
-        dt_test_from = dt.fromisoformat('2021-09-13T14:00:00-06:00')
-        dt_test_to = dt.fromisoformat('2021-09-20T00:00:00-06:00')
+        dt_test_from = dt.fromisoformat('2021-09-01T12:00:00-06:00')
+        dt_test_to = dt.fromisoformat('2021-09-01T23:00:00-06:00')
         date_both = nemo_connector.get_usage_events(dt_from=dt_test_from,
                                                     dt_to=dt_test_to)
         assert all([
@@ -605,37 +606,42 @@ class TestNemoIntegration:
             dt.fromisoformat(d['end']) <= dt_test_to
             for d in date_both
         ])
-        assert len(date_both) == 2
+        assert len(date_both) == 1
 
-        one_tool = nemo_connector.get_usage_events(tool_id=1)
-        assert all([d['tool']['id'] == 1 for d in one_tool])
+        one_tool = nemo_connector.get_usage_events(tool_id=10)
+        assert all([d['tool']['id'] == 10 for d in one_tool])
 
-        multi_tool = nemo_connector.get_usage_events(tool_id=[1, 5])
-        assert all([d['tool']['id'] in [1, 5] for d in multi_tool])
+        multi_tool = nemo_connector.get_usage_events(tool_id=[10, 3])
+        assert all([d['tool']['id'] in [10, 3] for d in multi_tool])
 
         username_test = nemo_connector.get_usage_events(user='***REMOVED***')
         assert all([d['user']['id'] == 3 for d in username_test])
 
-        user_id_test = nemo_connector.get_usage_events(user=18)  # a***REMOVED***
-        assert all([d['user']['username'] == 'a***REMOVED***' for d in user_id_test])
+        user_id_test = nemo_connector.get_usage_events(user=3)  # ***REMOVED***
+        assert all([d['user']['username'] == '***REMOVED***' for d in user_id_test])
 
-        dt_test_from = dt.fromisoformat('2021-09-13T16:01:00-06:00')
-        dt_test_to = dt.fromisoformat('2021-09-13T16:02:00-06:00')
-        multiple_test = nemo_connector.get_usage_events(user=18,
+        dt_test_from = dt.fromisoformat('2021-09-01T00:01:00-06:00')
+        dt_test_to = dt.fromisoformat('2021-09-02T16:02:00-06:00')
+        multiple_test = nemo_connector.get_usage_events(user=3,
                                                         dt_from=dt_test_from,
                                                         dt_to=dt_test_to,
-                                                        tool_id=1)
+                                                        tool_id=10)
         # should return one usage event
         assert len(multiple_test) == 1
-        assert multiple_test[0]['user']['username'] == 'a***REMOVED***'
+        assert multiple_test[0]['user']['username'] == '***REMOVED***'
 
         # test event_id
-        one_event = nemo_connector.get_usage_events(event_id=3)
+        one_event = nemo_connector.get_usage_events(event_id=29)
         assert len(one_event) == 1
         assert one_event[0]['user']['username'] == '***REMOVED***'
 
-        multi_events = nemo_connector.get_usage_events(event_id=[3, 4, 5])
-        assert len(multi_events) == 3
+        multi_events = nemo_connector.get_usage_events(event_id=[29, 30])
+        assert len(multi_events) == 2
+
+    def test_get_events_no_tool_short_circuit(self, nemo_connector):
+        # this test is to make sure we return an empty list faster if the
+        # tool requested is not part of what's in our DB
+        assert nemo_connector.get_usage_events(tool_id=[-5, -4]) == []
 
     @pytest.fixture
     def cleanup_session_log(self):
@@ -643,14 +649,22 @@ class TestNemoIntegration:
         # test_usage_event_to_session_log, so it doesn't mess up future
         # record building tests
         yield None
-        db_query('DELETE FROM session_log WHERE session_identifier LIKE ?',
-                 ('%usage_events/?id=3%',))
+        for _id in ['29', '30', '31']:
+            db_query('DELETE FROM session_log WHERE session_identifier LIKE ?',
+                     (f"%usage_events/?id={_id}%",))
+
+    def test_add_all_usage_events_to_db(self, cleanup_session_log):
+        success_before, results_before = db_query('SELECT * FROM session_log;')
+        from nexusLIMS.harvesters import nemo
+        nemo.add_all_usage_events_to_db(tool_id=10)
+        success_after, results_after = db_query('SELECT * FROM session_log;')
+        pass
 
     def test_usage_event_to_session_log(self,
                                         nemo_connector,
                                         cleanup_session_log):
         success_before, results_before = db_query('SELECT * FROM session_log;')
-        nemo_connector.write_usage_event_to_session_log(3)
+        nemo_connector.write_usage_event_to_session_log(30)
         success_after, results_after = db_query('SELECT * FROM session_log;')
         assert len(results_after) - len(results_before) == 2
 
@@ -658,7 +672,7 @@ class TestNemoIntegration:
                                     'id_session_log DESC LIMIT 2;')
         # session ids are same:
         assert results[0][1] == results[1][1]
-        assert results[0][1].endswith("/api/usage_events/?id=3")
+        assert results[0][1].endswith("/api/usage_events/?id=30")
         # record status
         assert results[0][5] == 'TO_BE_BUILT'
         assert results[1][5] == 'TO_BE_BUILT'
@@ -677,11 +691,11 @@ class TestNemoIntegration:
         assert len(results_after) == len(results_before)
 
     def test_usage_event_to_session(self, nemo_connector):
-        session = nemo_connector.get_session_from_usage_event(3)
+        session = nemo_connector.get_session_from_usage_event(30)
         assert session.dt_from == \
-               dt.fromisoformat('2021-09-20T12:02:19.930972-06:00')
+               dt.fromisoformat('2021-09-05T13:57:00.000000-06:00')
         assert session.dt_to == \
-               dt.fromisoformat('2021-09-20T13:13:49.123309-06:00')
+               dt.fromisoformat('2021-09-05T17:00:00.000000-06:00')
         assert session.user == '***REMOVED***'
         assert session.instrument == instrument_db['testsurface-CPU_P1111111']
 
@@ -697,12 +711,12 @@ class TestNemoIntegration:
         from nexusLIMS.db.session_handler import Session
         from nexusLIMS.harvesters import nemo
         s = Session('test_matching_reservation',
-                    instrument_db['FEI-Titan-TEM-635816_n'],
-                    dt.fromisoformat('2021-08-02T15:00:00-06:00'),
+                    instrument_db['testsurface-CPU_P1111111'],
+                    dt.fromisoformat('2021-08-02T11:00:00-06:00'),
                     dt.fromisoformat('2021-08-02T16:00:00-06:00'),
                     user='***REMOVED***')
         res_event = nemo.res_event_from_session(s)
-        assert res_event.instrument == instrument_db['FEI-Titan-TEM-635816_n']
+        assert res_event.instrument == instrument_db['testsurface-CPU_P1111111']
         assert res_event.experiment_title == '***REMOVED***'
         assert res_event.experiment_purpose == \
                '***REMOVED*** ***REMOVED*** ' \
@@ -710,7 +724,7 @@ class TestNemoIntegration:
         assert res_event.sample_name[0] == "***REMOVED***'s ***REMOVED***"
         assert res_event.project_id[0] is None
         assert res_event.username == '***REMOVED***'
-        assert res_event.internal_id == '87'
+        assert res_event.internal_id == '187'
 
     def test_res_event_from_session_no_matching_sessions(self):
         from nexusLIMS.db.session_handler import Session
@@ -731,7 +745,7 @@ class TestNemoIntegration:
         from nexusLIMS.db.session_handler import Session
         from nexusLIMS.harvesters import nemo
         s = Session('test_no_reservations',
-                    instrument_db['FEI-Titan-TEM-635816_n'],
+                    instrument_db['testsurface-CPU_P1111111'],
                     dt.fromisoformat('2021-08-05T15:00:00-06:00'),
                     dt.fromisoformat('2021-08-05T16:00:00-06:00'),
                     user='***REMOVED***')
@@ -761,15 +775,15 @@ class TestNemoIntegration:
         from nexusLIMS.harvesters import nemo
         dt_from = dt.fromisoformat('2021-08-02T00:00:00-06:00')
         dt_to = dt.fromisoformat('2021-08-03T00:00:00-06:00')
-        res = nemo_connector.get_reservations(tool_id=3,
+        res = nemo_connector.get_reservations(tool_id=10,
                                               dt_from=dt_from, dt_to=dt_to)[0]
         val = nemo._get_res_question_value('bad_value', res)
         assert val is None
 
     def test_no_res_questions(self, nemo_connector):
         from nexusLIMS.harvesters import nemo
-        dt_from = dt.fromisoformat('2021-09-06T00:00:00-06:00')
-        dt_to = dt.fromisoformat('2021-09-07T00:00:00-06:00')
+        dt_from = dt.fromisoformat('2021-08-03T00:00:00-06:00')
+        dt_to = dt.fromisoformat('2021-08-04T00:00:00-06:00')
         res = nemo_connector.get_reservations(tool_id=10,
                                               dt_from=dt_from, dt_to=dt_to)[0]
         val = nemo._get_res_question_value('project_id', res)
@@ -839,6 +853,10 @@ class TestNemoIntegration:
         assert pid == [None, None, None, None]
         assert name == [None, None, None, None]
 
+    def test_get_tool_ids(self, nemo_connector):
+        tool_ids = nemo_connector.get_known_tool_ids()
+        for t_id in range(1, 11):
+            assert t_id in tool_ids
 
 
 class TestReservationEvent:
