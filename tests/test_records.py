@@ -58,8 +58,7 @@ class TestRecordBuilder:
 
         # file from NEMO session
         assert f'{os.environ["mmfnexus_path"]}' \
-               f'/Titan/***REMOVED***/210801 - MTJ-MgO - ***REMOVED*** - Titan' \
-               f'/02 - 620k.dm3' in file_list_list[-1]
+               f'/NexusLIMS/test_files/02 - 620k-2.dm3' in file_list_list[-1]
 
     def test_process_new_records_dry_run(self):
         # just running to ensure coverage, tests are included above
@@ -175,14 +174,14 @@ class TestRecordBuilder:
                 '//sample': 1
             },
             # DONE: add expected values for NEMO built record
-            '2021-08-02_FEI-Titan-TEM-635816_n_9.xml': {
+            '2021-08-02_testsurface-CPU_P1111111_31.xml': {
                 '/title': '***REMOVED***',
                 '//acquisitionActivity': 1,
                 '//dataset': 4,
                 '/summary/motivation': '***REMOVED*** '
                                        '***REMOVED*** '
                                        '***REMOVED***.',
-                '/summary/instrument': 'FEI-Titan-TEM-635816',
+                '/summary/instrument': 'testsurface-CPU_P1111111',
                 '//sample': 1
             },
             '2021-11-29_testsurface-CPU_P1111111_21.xml': {

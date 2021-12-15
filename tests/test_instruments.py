@@ -135,3 +135,13 @@ class TestInstruments:
                '2021-11-26 14:00:00 EST'
         assert instr.localize_datetime_str(dt_et) == \
                '2021-11-26 12:00:00 EST'
+
+    def test_instrument_from_api_url(self):
+        returned_item = get_instr_from_api_url('https://***REMOVED***/api/'
+                                               'tools/?id=10')
+        assert returned_item == instrument_db['testsurface-CPU_P1111111']
+
+    def test_instrument_from_api_url_none(self):
+        returned_item = get_instr_from_api_url('https://***REMOVED***/api/'
+                                               'tools/?id=-1')
+        assert returned_item is None
