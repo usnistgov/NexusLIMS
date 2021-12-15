@@ -844,12 +844,19 @@ def res_event_from_session(session: Session) -> ReservationEvent:
             _process_res_question_samples(res)
 
         # DONE: respect user choice not to harvest data (data_consent)
+        consent = 'disagree'
         consent = _get_res_question_value('data_consent', res)
-        if consent is not None:
-            if consent.lower() in ['disagree', 'no', 'false', 'negative']:
-                raise NoDataConsentException(f"Reservation {res['id']} "
-                                             f"requested not to have their "
-                                             f"data harvested")
+        # consent will be None here if it wasn't given (i.e. there was no
+        # data_consent field in the reservation questions)
+        if consent is None:
+            raise NoDataConsentException(f"Reservation {res['id']} "
+                                         f"did not have data_consent defined, "
+                                         f"so we should not harvest its data")
+
+        if consent.lower() in ['disagree', 'no', 'false', 'negative']:
+            raise NoDataConsentException(f"Reservation {res['id']} "
+                                         f"requested not to have their "
+                                         f"data harvested")
 
         # Create ReservationEvent from NEMO reservation dict
         res_event = ReservationEvent(

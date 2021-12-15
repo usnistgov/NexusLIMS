@@ -858,6 +858,35 @@ class TestNemoIntegration:
         for t_id in range(1, 11):
             assert t_id in tool_ids
 
+    def test_no_consent_no_questions(self, nemo_connector):
+        from nexusLIMS.db.session_handler import Session
+        from nexusLIMS.harvesters import nemo
+
+        # should match https://***REMOVED***/api/reservations/?id=188
+        s = Session(session_identifier='blah-blah',
+                    instrument=instrument_db['testsurface-CPU_P1111111'],
+                    dt_from=dt.fromisoformat('2021-08-03T10:00-06:00'),
+                    dt_to=dt.fromisoformat('2021-08-03T17:00-06:00'),
+                    user='***REMOVED***')
+        with pytest.raises(nemo.NoDataConsentException) as e:
+            nemo.res_event_from_session(s)
+        assert 'did not have data_consent defined, so we should not harvest' \
+               in str(e.value)
+
+    def test_no_consent_user_disagree(self, nemo_connector):
+        from nexusLIMS.db.session_handler import Session
+        from nexusLIMS.harvesters import nemo
+
+        # should match https://***REMOVED***/api/reservations/?id=189
+        s = Session(session_identifier='blah-blah',
+                    instrument=instrument_db['testsurface-CPU_P1111111'],
+                    dt_from=dt.fromisoformat('2021-08-04T10:00-06:00'),
+                    dt_to=dt.fromisoformat('2021-08-04T17:00-06:00'),
+                    user='***REMOVED***')
+        with pytest.raises(nemo.NoDataConsentException) as e:
+            nemo.res_event_from_session(s)
+        assert 'requested not to have their data harvested' \
+               in str(e.value)
 
 class TestReservationEvent:
     def test_full_reservation_constructor(self):
