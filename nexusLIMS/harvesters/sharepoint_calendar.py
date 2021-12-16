@@ -118,11 +118,17 @@ def res_event_from_xml(xml, date=None):
             return el.text
 
     et = _etree.fromstring(xml)
+    sharepoint_id = _get_el_text('entry/content//d:Id')
 
     # get instrument from calendar title
     instrument = _get_el_text('title')
+    url = None
     if instrument is not None:
         instrument = _from_cal(instrument)
+        if sharepoint_id is not None:
+            url = instrument.calendar_url.replace('calendar.aspx',
+                                                  'DispForm.aspx')
+            url += f'/?ID={sharepoint_id}'
 
     if _get_el_text('entry') is None:
         # no "entry" nodes were found, so return very basic ReservationEvent
@@ -150,7 +156,6 @@ def res_event_from_xml(xml, date=None):
     sample_details = [_get_el_text('entry//d:SampleDetails')]
     purpose = _get_el_text('entry//d:ExperimentPurpose')
     project_name = _get_el_text('entry//d:ProjectID')
-    sharepoint_id = _get_el_text('entry/content//d:Id')
 
     return ReservationEvent(
         experiment_title=title, instrument=instrument, last_updated=updated,
@@ -159,7 +164,7 @@ def res_event_from_xml(xml, date=None):
         start_time=start_time, end_time=end_time,
         reservation_type=category_value, experiment_purpose=purpose,
         sample_details=sample_details, project_name=project_name,
-        internal_id=sharepoint_id
+        internal_id=sharepoint_id, url=url
     )
 
 
