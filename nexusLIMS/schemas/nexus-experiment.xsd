@@ -214,6 +214,18 @@
 
 
     </xs:sequence>
+      
+      <xs:attribute name="ref" type="xs:anyURI">
+          <xs:annotation>
+              <xs:documentation>
+                  An external link to the reservation or metadata record used
+                  to populate this Experiment record. Could be a link to
+                  a particular reservation in a facility management system,
+                  for instance.
+              </xs:documentation>
+          </xs:annotation>
+      </xs:attribute>
+      
   </xs:complexType>
 
   <xs:complexType name="Sample">
