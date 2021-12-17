@@ -158,6 +158,9 @@ class TestSharepoint:
         assert cal_event.username == '***REMOVED***'
         assert cal_event.start_time == dt.fromisoformat(
             '2018-11-13T09:00:00-05:00')
+        assert cal_event.url == 'https://***REMOVED***/Div/' + \
+                                'msed/MSED-MMF/Lists/FEI%20Titan%20Events/' + \
+                                'DispForm.aspx/?ID=470'
 
     def test_sharepoint_fetch_xml_reservation_event_no_entry(self):
         # tests when there is no matching event found
@@ -725,6 +728,8 @@ class TestNemoIntegration:
         assert res_event.project_id[0] is None
         assert res_event.username == '***REMOVED***'
         assert res_event.internal_id == '187'
+        assert res_event.url == \
+               'https://***REMOVED***/event_details/reservation/187/'
 
     def test_res_event_from_session_no_matching_sessions(self):
         from nexusLIMS.db.session_handler import Session

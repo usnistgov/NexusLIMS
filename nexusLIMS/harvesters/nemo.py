@@ -830,7 +830,7 @@ def res_event_from_session(session: Session) -> ReservationEvent:
             experiment_purpose=None, sample_details=None,
             sample_pid=None, sample_name=None, project_name=None,
             project_id=None, project_ref=None, internal_id=None,
-            division=None, group=None
+            division=None, group=None, url=None
         )
     else:
         max_overlap = overlaps.index(max(overlaps))
@@ -858,6 +858,9 @@ def res_event_from_session(session: Session) -> ReservationEvent:
                                          f"requested not to have their "
                                          f"data harvested")
 
+        url = c.base_url.replace('api/',
+                                 f'event_details/reservation/{res["id"]}/')
+
         # Create ReservationEvent from NEMO reservation dict
         res_event = ReservationEvent(
             experiment_title=_get_res_question_value('experiment_title', res),
@@ -883,7 +886,8 @@ def res_event_from_session(session: Session) -> ReservationEvent:
             project_ref=[None],
             internal_id=str(res['id']),
             division=None,
-            group=None
+            group=None,
+            url=url
         )
     return res_event
 

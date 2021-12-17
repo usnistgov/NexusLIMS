@@ -82,6 +82,8 @@ class ReservationEvent:
     group
         An identifier of the group this experiment was performed for (i.e.
         the user's group)
+    url
+        A web-accessible link to a summary of this reservation
     """
 
     def __init__(self,
@@ -104,7 +106,8 @@ class ReservationEvent:
                  project_ref: Union[List[Union[str, None]], None] = None,
                  internal_id: Union[str, None] = None,
                  division: Union[str, None] = None,
-                 group: Union[str, None] = None):
+                 group: Union[str, None] = None,
+                 url: Union[str, None] = None):
         self.experiment_title = experiment_title
         self.instrument = instrument
         self.last_updated = last_updated
@@ -137,6 +140,7 @@ class ReservationEvent:
         self.internal_id = internal_id
         self.division = division
         self.group = group
+        self.url = url
 
         # raise error if all sample values are not none and have different
         # lengths (this shouldn't happen):
@@ -229,6 +233,8 @@ class ReservationEvent:
         if self.experiment_purpose:
             motivation_el = etree.SubElement(summary_el, "motivation")
             motivation_el.text = self.experiment_purpose
+        if self.url:
+            summary_el.set("ref", self.url)
 
         # sample nodes
         if self.sample_pid is not None:
