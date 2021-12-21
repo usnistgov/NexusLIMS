@@ -316,6 +316,17 @@ class TestRecordBuilder:
                 user='None')]
 
         monkeypatch.setattr(_rb, '_get_sessions', mock_get_sessions)
+
+        # make record uploader just pretend by returning all files provided (
+        # as if they were actually uploaded)
+        monkeypatch.setattr(_rb, "_upload_record_files", lambda x: (x, x))
+
+        # overwrite nexusLIMS_path so we write records to the test folder rather
+        # than real nexusLIMS folder
+        monkeypatch.setenv("nexusLIMS_path",
+                           os.path.join(os.path.dirname(__file__), 'files',
+                                        'records'))
+
         xml_files = _rb.build_new_session_records()
         assert len(xml_files) == 1
         f = xml_files[0]
