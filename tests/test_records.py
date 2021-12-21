@@ -288,8 +288,6 @@ class TestRecordBuilder:
         assert e.type == SystemExit
 
     def test_build_record_no_consent(self, monkeypatch, caplog):
-        # DONE: test ignoring of session here. will require a
-        #  reservation on NEMO that does not have data consent
         #  https://***REMOVED***/api/reservations/?id=168
         def mock_get_sessions():
             return [session_handler.Session(
@@ -305,6 +303,35 @@ class TestRecordBuilder:
         assert "Reservation 168 requested not to have their data harvested" \
                in caplog.text
         assert len(xmls_files) == 0    # no record should be returned
+
+    def test_build_record_single_file(self, monkeypatch):
+        # test session that only has one file present
+        def mock_get_sessions():
+            return [session_handler.Session(
+                session_identifier='https://***REMOVED***/api/usage_events'
+                                   '/?id=-1',
+                instrument=instrument_db['testsurface-CPU_P1111111'],
+                dt_from=_dt.fromisoformat('2021-11-29T11:28:01.000-07:00'),
+                dt_to=_dt.fromisoformat('2021-11-29T11:28:02.000-07:00'),
+                user='None')]
+
+        monkeypatch.setattr(_rb, '_get_sessions', mock_get_sessions)
+        xml_files = _rb.build_new_session_records()
+        assert len(xml_files) == 1
+        f = xml_files[0]
+        root = et.parse(f)
+
+        assert root.find('/title').text == 'A test with multiple samples'
+        assert len(root.findall('//acquisitionActivity')) == 1
+        assert len(root.findall('//dataset')) == 1
+        assert root.find('/summary/motivation').text == \
+               'To test the harvester with multiple samples'
+        assert root.find('/summary/instrument').get('pid') == \
+               'testsurface-CPU_P1111111'
+        assert len(root.findall('//sample')) == 4
+
+        # remove record
+        os.remove(f)
 
     def test_not_implemented_harvester(self):
         # need to create a session with an instrument with a bogus harvester
@@ -340,6 +367,7 @@ class TestRecordBuilder:
                 )
             assert 'res_event_from_session has not been implemented for' in \
                    str(e.value)
+
 
 @pytest.fixture(scope='module')
 def gnu_find_activities(fix_mountain_time):

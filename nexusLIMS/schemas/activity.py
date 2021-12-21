@@ -34,6 +34,7 @@ from xml.sax.saxutils import escape
 from urllib.parse import quote as _urlquote
 from timeit import default_timer as _timer
 from lxml import etree as _etree
+from typing import List
 
 import hyperspy.api_nogui as _hs
 import numpy as _np
@@ -49,7 +50,7 @@ _logger = _logging.getLogger(__name__)
 _logger.setLevel(_logging.INFO)
 
 
-def cluster_filelist_mtimes(filelist):
+def cluster_filelist_mtimes(filelist: List[str]) -> List[float]:
     """
     Perform a statistical clustering of the timestamps (`mtime` values) of a
     list of files to find "relatively" large gaps in acquisition time. The
@@ -77,14 +78,14 @@ def cluster_filelist_mtimes(filelist):
 
     Parameters
     ----------
-    filelist : list
+    filelist : List[str]
         The files (as a list) whose timestamps will be interrogated to find
         "relatively" large gaps in acquisition time (as a means to find the
         breaks between discrete Acquisition Activities)
 
     Returns
     -------
-    aa_boundaries : list
+    aa_boundaries : List[float]
         A list of the `mtime` values that represent boundaries between
         discrete Acquisition Activities
     """
@@ -95,6 +96,11 @@ def cluster_filelist_mtimes(filelist):
     # remove duplicate file mtimes (since they cause errors below):
     mtimes = sorted(list(set(mtimes)))
     m_array = _np.array(mtimes).reshape(-1, 1)
+
+    if len(mtimes) == 1:
+        # if there was only one file, don't do any more processing and just
+        # return the one mtime as the AA boundary
+        return mtimes
 
     # mtime_diff is a discrete differentiation to find the time gap between
     # sequential files
