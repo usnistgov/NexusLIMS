@@ -487,11 +487,12 @@ class TestNemoIntegration:
 
     @pytest.mark.parametrize("test_tool_id_input,expected_names",
                              [(1, ["643 Titan (S)TEM (probe corrected)"]),
-                              ([1, 2], ["643 Titan (S)TEM (probe corrected)",
-                                        "642 JEOL 3010 (strobo)"]),
-                              ([1, 2, 3], ["643 Titan (S)TEM (probe corrected)",
-                                           "642 JEOL 3010 (strobo)",
-                                           "642 FEI Titan"]),
+                              ([1, 15], ["643 Titan (S)TEM (probe corrected)",
+                                         "642 JEOL 3010"]),
+                              ([1, 15, 3], ["643 Titan (S)TEM (probe "
+                                            "corrected)",
+                                            "642 JEOL 3010",
+                                            "642 FEI Titan"]),
                               (-1, [])])
     def test_get_tools(self, nemo_connector,
                        test_tool_id_input, expected_names):
@@ -506,12 +507,12 @@ class TestNemoIntegration:
         from nexusLIMS.harvesters.nemo import NemoConnector
         n = NemoConnector(os.environ['NEMO_address_1'],
                           os.environ['NEMO_token_1'])
-        to_test = [([1, 2, 3], ["643 Titan (S)TEM (probe corrected)",
-                                "642 JEOL 3010 (strobo)",
-                                "642 FEI Titan"]),
-                   (2, ["642 JEOL 3010 (strobo)"]),
-                   ([2, 3], ["642 JEOL 3010 (strobo)",
-                             "642 FEI Titan"])]
+        to_test = [([1, 15, 3], ["643 Titan (S)TEM (probe corrected)",
+                                 "642 JEOL 3010",
+                                 "642 FEI Titan"]),
+                   (15, ["642 JEOL 3010"]),
+                   ([15, 3], ["642 JEOL 3010",
+                              "642 FEI Titan"])]
         for t_id, expected in to_test:
             tools = n.get_tools(t_id)
             assert set([t['name'] for t in tools]) == set(expected)
@@ -577,8 +578,8 @@ class TestNemoIntegration:
         one_tool = nemo_connector.get_reservations(tool_id=10)
         assert all([d['tool']['id'] == 10 for d in one_tool])
 
-        multi_tool = nemo_connector.get_reservations(tool_id=[2, 10])
-        assert all([d['tool']['id'] in [2, 10] for d in multi_tool])
+        multi_tool = nemo_connector.get_reservations(tool_id=[15, 10])
+        assert all([d['tool']['id'] in [15, 10] for d in multi_tool])
 
     def test_get_usage_events(self, nemo_connector):
         # not sure best way to test this, but defaults should return at least
@@ -860,7 +861,7 @@ class TestNemoIntegration:
 
     def test_get_tool_ids(self, nemo_connector):
         tool_ids = nemo_connector.get_known_tool_ids()
-        for t_id in range(1, 11):
+        for t_id in [1, 3, 4, 5, 6, 7, 8, 9, 10, 15]:
             assert t_id in tool_ids
 
     def test_no_consent_no_questions(self, nemo_connector):
