@@ -12,6 +12,14 @@ gitlab_backup.log
 .coverage
 .coverage.*
 tests/coverage
+tests/files/*.dm[3-4]
+tests/files/*.ser
+tests/files/*.emi
+tests/files/*.xml
+tests/files/*.tif
+tests/files/*.hdf5
+tests/files/**/*.json
+tests/**/*.xml
 .env
 .directory
 test_db.sqlite

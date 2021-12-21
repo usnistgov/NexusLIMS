@@ -246,7 +246,7 @@ def build_acq_activities(instrument, dt_from, dt_to, generate_previews):
     # the loop below easier to process
     aa_bounds.append(_os.path.getmtime(files[-1]))
 
-    activities = [None] * len(aa_bounds)
+    activities: List[Union[None, _AcqAc]] = [None] * len(aa_bounds)
 
     i = 0
     aa_idx = 0
@@ -279,6 +279,9 @@ def build_acq_activities(instrument, dt_from, dt_to, generate_previews):
             # next activity, so increment AA counter and reprocess file (do
             # not increment i)
             aa_idx += 1
+
+    # Remove any "None" activities from list
+    activities: List[_AcqAc] = [a for a in activities if a is not None]
 
     _logger.info('Finished detecting activities')
     for i, a in enumerate(activities):
