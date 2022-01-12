@@ -20,6 +20,7 @@ nexusLIMS_tests:
     script:
       # run tests with coverage and output coverage report to html
       - poetry run tox
+    retry: 2
     extends: .env_setup
     after_script:
       # cache the coverage results so they can be published, always returning true
@@ -36,6 +37,7 @@ pages:
   script:
     - poetry run tox -e docs
     - mkdir -p public/doc && rsync -avr _build/ public/doc/
+  retry: 2
   extends: .env_setup
   after_script:
     - tar -xzf coverage.tar.gz -C public/ || true
