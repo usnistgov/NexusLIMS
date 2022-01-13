@@ -503,7 +503,7 @@ class NemoConnector:
             res = db_query("SELECT * FROM session_log WHERE session_identifier "
                            "= ? AND event_type = ?", (session_id, 'END'))
             if len(res[1]) > 0:
-                # there was already a start log, so warn and don't do anything:
+                # there was already an end log, so warn and don't do anything:
                 _logger.warning(f"An 'END'   log with session id "
                                 f"\"{session_id}\" was found in the the DB, "
                                 f"so a new one will not be inserted for this "
@@ -801,11 +801,20 @@ def res_event_from_session(session: Session) -> ReservationEvent:
     tool_id = id_from_url(session.instrument.api_url)
 
     # get reservation with maximum overlap (like sharepoint_calendar.fetch_xml)
+    dt_f = session.dt_from - timedelta(days=2)
+    dt_t = session.dt_to + timedelta(days=2)
     reservations = c.get_reservations(
         tool_id=tool_id,
-        dt_from=session.dt_from - timedelta(days=2),
-        dt_to=session.dt_to + timedelta(days=2)
+        dt_from=dt_f,
+        dt_to=dt_t
     )
+
+    _logger.info(f"Found {len(reservations)} reservations between {dt_f} and "
+                 f"{dt_t} with ids: "
+                 f"{[i['id'] for i in reservations]}")
+    for i, res in enumerate(reservations):
+        _logger.debug(f"Reservation {i+1}: {c.base_url}reservations/?id"
+                      f"={res['id']} from {res['start']} to {res['end']}")
 
     starts = [datetime.fromisoformat(r['start']) for r in reservations]
     ends = [datetime.fromisoformat(r['end']) for r in reservations]
@@ -822,6 +831,8 @@ def res_event_from_session(session: Session) -> ReservationEvent:
         # or none of the reservations overlapped with the usage event
         # so we'll use what limited information we have from the usage event
         # session
+        _logger.warning(f"No reservations found with overlap for this usage "
+                        f"event, so creating generic ReservationEvent")
         res_event = ReservationEvent(
             experiment_title=None, instrument=session.instrument,
             last_updated=session.dt_to, username=session.user,
@@ -836,6 +847,10 @@ def res_event_from_session(session: Session) -> ReservationEvent:
         max_overlap = overlaps.index(max(overlaps))
         # select the reservation with the most overlap
         res = reservations[max_overlap]
+        _logger.info(f"Using reservation "
+                     f"{c.base_url}reservations/?id={res['id']} as match for "
+                     f"usage event {session.session_identifier} with overlap "
+                     f"of {max(overlaps)}")
 
         # DONE: check for presence of sample_group in the reservation metadata
         #  and change the harvester to process the sample group metadata by
