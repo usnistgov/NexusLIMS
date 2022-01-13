@@ -175,7 +175,7 @@ def get_reservation_event(session: Session) -> _ResEvent:
     # use import_module to choose the correct harvester based on the instrument
     harvester = \
         import_module(f".{session.instrument.harvester}",
-                       "nexusLIMS.harvesters")
+                      "nexusLIMS.harvesters")
     # for PyCharm typing, explicitly specify what modules may be in `harvester`
     harvester: Union[_nemo, _sp_cal]
     # DONE: check if that method exists for the given harvester and raise
