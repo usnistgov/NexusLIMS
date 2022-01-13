@@ -894,6 +894,35 @@ class TestNemoIntegration:
         assert 'requested not to have their data harvested' \
                in str(e.value)
 
+    def test_usage_event_not_yet_ended(self,
+                                       nemo_connector,
+                                       monkeypatch,
+                                       caplog):
+        # we need to test nemo.write_usage_event_to_session_log does not write
+        # anything to the database in the event a usage event is in progress.
+        # to do so, we will mock nemo.NemoConnector.get_usage_events to return
+        # a predefined list of our making
+        our_dict = \
+            {
+                'id': 0,
+                'start': '2022-01-12T11:44:25.384309-05:00',
+                'end': None,
+                'tool': {'id': 8, 'name': '643 FEI Quanta 200 (ESEM)'}
+            }
+        monkeypatch.setattr(nemo_connector, 'get_usage_events',
+                            lambda event_id: [our_dict])
+
+        success_before, results_before = db_query('SELECT * FROM session_log;')
+        nemo_connector.write_usage_event_to_session_log(event_id=0)
+        success_after, results_after = db_query('SELECT * FROM session_log;')
+
+        # make sure warning was logged
+        assert "Usage event 0 has not yet ended" in caplog.text
+
+        # number of session logs should be identical before and after call
+        assert len(results_before) == len(results_after)
+
+
 class TestReservationEvent:
     def test_full_reservation_constructor(self):
         res_event = ReservationEvent(

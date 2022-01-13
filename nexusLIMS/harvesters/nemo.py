@@ -454,7 +454,8 @@ class NemoConnector:
         """
         Inserts two rows (if needed) into the ``session_log`` (marking the start
         and end of a usage event), only for instruments recognized by
-        NexusLIMS (i.e. that have a row in the ``instruments`` table of the DB)
+        NexusLIMS (i.e. that have a row in the ``instruments`` table of the DB).
+        If the usage event has not ended yet, no action is performed
 
         Parameters
         ----------
@@ -476,6 +477,10 @@ class NemoConnector:
                                 f"({tool_api_url}) not known "
                                 f"to NexusLIMS, so no records will be added "
                                 f"to DB.")
+                return
+            if event['end'] is None:
+                _logger.warning(f"Usage event {event_id} has not yet ended, "
+                                f"so no records will be added to DB.")
                 return
             session_id = f"{self.base_url}usage_events/?id={event['id']}"
 
