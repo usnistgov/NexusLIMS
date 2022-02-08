@@ -67,6 +67,36 @@ function script_trap_err() {
 # ARGS: None
 # OUTS: None
 function script_trap_exit() {
+    # delete lock file
+    if [ -f "${LOCKFILE}" ] && [ "$WE_CREATED_LOCKFILE" = true ] ; then
+        echo "Deleting lock file at ${LOCKFILE}" | tee -a "${LOGPATH}"
+        rm "${LOCKFILE}"
+    elif [ -f "${LOCKFILE}" ]; then
+        echo "We didn't create lock file at ${LOCKFILE}; so leaving in place" | tee -a "${LOGPATH}"
+    fi
+
+    # parse logfile for any erorr and send email (regardless of what happened
+    # in the script, since this happens in the exit trap)
+    if grep -q -i -E 'critical|error|exception|fatal|no_files_found' "${LOGPATH}"; then
+      stringArr=()
+      # do some more detailed checks to allow us to specify which text was
+      # found in the output:
+      if grep -q -i -E 'critical' "${LOGPATH}"; then
+        stringArr+=("critical")
+      elif grep -q -i -E 'error' "${LOGPATH}"; then
+        stringArr+=("error")
+      elif grep -q -i -E 'fatal' "${LOGPATH}"; then
+        stringArr+=("fatal")
+      elif grep -q -i -E 'no_files_found' "${LOGPATH}"; then
+        stringArr+=("no_files_found")
+      fi
+      found_strings=$(IFS=, ; echo "${stringArr[*]}")
+      send_email
+    else
+      # do nothing
+      :
+    fi
+
     cd "$orig_cwd"
 
     # Remove Cron mode script log
@@ -340,39 +370,33 @@ function main() {
     python_args=""
     if [[ -n ${dry_run-} ]]; then
         python_args+="-n -vv"
-        echo "Running script as dry run, not performing any actions"
         # replace end of log filepath with dryrun indicator
         LOGPATH=${LOGPATH/%.log/_dryrun.log}
+        touch "${LOGPATH}"
+        echo "Running script as dry run, not performing any actions" | tee -a "${LOGPATH}"
     else
         python_args="-vv"
+        touch "${LOGPATH}"
     fi
 
-    # actually run record builder
-    echo "Writing log to ${LOGPATH}"
-    echo "Python args is ${python_args}"
-    abs_script_dir=$(get_abs_filename "${script_dir}")
-    # echo "Abs script dir is ${abs_script_dir}"
-    cd "${abs_script_dir}"
-    poetry run python -m nexusLIMS.builder.record_builder ${python_args}  &> "${LOGPATH}"
-
-    if grep -q -i -E 'critical|error|exception|fatal|no_files_found' "${LOGPATH}"; then
-      stringArr=()
-      # do some more detailed checks to allow us to specify which text was
-      # found in the output:
-      if grep -q -i -E 'critical' "${LOGPATH}"; then
-        stringArr+=("critical")
-      elif grep -q -i -E 'error' "${LOGPATH}"; then
-        stringArr+=("error")
-      elif grep -q -i -E 'fatal' "${LOGPATH}"; then
-        stringArr+=("fatal")
-      elif grep -q -i -E 'no_files_found' "${LOGPATH}"; then
-        stringArr+=("no_files_found")
-      fi
-      found_strings=$(IFS=, ; echo "${stringArr[*]}")
-      send_email
+    # check/create lock file and exit if needed 
+    LOCKFILE=$(get_abs_filename "${nexusLIMS_path}/../.builder.lock")
+    echo "Writing log to ${LOGPATH}" | tee -a "${LOGPATH}"
+    if [ -f "${LOCKFILE}" ] ; then
+        WE_CREATED_LOCKFILE=false
+        echo "Lock file at ${LOCKFILE} already existed, so not running anything" | tee -a "${LOGPATH}"
+        echo "Existing lock file last modified at $(stat /data/smb/nexusLIMS/.builder.lock | grep Modify | cut -d ' ' -f2-)" | tee -a "${LOGPATH}"
     else
-      # do nothing
-      :
+        WE_CREATED_LOCKFILE=true
+        echo "Creating LOCKFILE at ${LOCKFILE}" | tee -a "${LOGPATH}"
+        touch "${LOCKFILE}"
+
+        # actually run record builder
+        echo "Python args is ${python_args}" | tee -a "${LOGPATH}"
+        abs_script_dir=$(get_abs_filename "${script_dir}")
+        # echo "Abs script dir is ${abs_script_dir}"
+        cd "${abs_script_dir}"
+        poetry run python -m nexusLIMS.builder.record_builder ${python_args}  2>&1 | tee -a "${LOGPATH}"
     fi
 }
 
