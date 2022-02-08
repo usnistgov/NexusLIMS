@@ -284,7 +284,9 @@ def get_sessions_to_build() -> List[Session]:
         el_list = [el for el in end_logs if el.session_identifier ==
                    sl.session_identifier]
         if len(el_list) != 1:
-            raise ValueError()
+            raise ValueError(f"There was not exactly one 'END' log for this "
+                             f"'START' log; len(el_list) was {len(el_list)};"
+                             f"sl was {sl}; el_list was {el_list}")
 
         el = el_list[0]
         dt_from = _dt.fromisoformat(sl.timestamp)
