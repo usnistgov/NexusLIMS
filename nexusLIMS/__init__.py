@@ -109,6 +109,32 @@ session, or in the ``.env`` file in the root of this package's repository.
     up a "dummy" or "functional" user account in the NEMO instance for these
     operations.
 
+.. _nemo-strftime-fmt:
+.. _nemo-strptime-fmt:
+
+`NEMO_strftime_fmt_X` and `NEMO_strptime_fmt_X`
+    These options are optional, and control how dates/times are sent to
+    (`strftime`) and interpreted from (`strptime`) the API. If "`strftime_fmt`"
+    and/or "`strptime_fmt`" are not provided, the standard ISO 8601 format
+    for datetime representation will be used (which should work with the
+    default NEMO settings). These options are configurable to allow for
+    support of non-default date format settings on a NEMO server. The formats
+    should be provided using the standard datetime library syntax for
+    encoding date and time information (see :ref:`strftime-strptime-behavior`
+    for details).
+
+.. _nemo-tz:
+
+`NEMO_tz_1`
+    Also optional; If the "`tz`" option is provided, the datetime
+    strings received from the NEMO API will be coerced into the given timezone.
+    The timezone should be specified using the IANA "tz database" name (see
+    https://en.wikipedia.org/wiki/List_of_tz_database_time_zones). This option
+    should not be supplied for NEMO servers that return time zone information in
+    their API response, since it will override the timezone of the returned
+    data. It is mostly useful for servers that return reservation/usage event
+    times without any timezone information. Providing it helps properly map
+    file creation times to usage event times.
 """
 
 from ._urls import calendar_root_url
@@ -119,6 +145,7 @@ from dotenv import load_dotenv
 
 # load environment variables from a .env file if present
 load_dotenv()
+
 
 def _filter_hyperspy_messages(record):  # pragma: no cover
     """Filter to be used with logging class to hide HyperSpy API import

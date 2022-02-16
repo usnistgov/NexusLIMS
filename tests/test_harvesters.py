@@ -3,6 +3,7 @@ import pytest
 import requests
 from lxml import etree
 from datetime import datetime as dt
+from datetime import timedelta
 from nexusLIMS import harvesters
 from nexusLIMS.harvesters import sharepoint_calendar as sc
 from nexusLIMS.utils import nexus_req as _nexus_req, AuthenticationError
@@ -350,6 +351,13 @@ class TestSharepoint:
 
 
 class TestNemoIntegration:
+    """
+    Testing NEMO integration. These tests aren't great since they're not
+    general and require a running NEMO server (but we have to test
+    integration, and I'm not about to write a whole NEMO installation into
+    the test...). All of that is to say that if you want to run these tests
+    in a different environment, these tests will have to be rewritten.
+    """
     @pytest.fixture
     def nemo_connector(self):
         """
@@ -358,8 +366,10 @@ class TestNemoIntegration:
         assert 'NEMO_address_1' in os.environ
         assert 'NEMO_token_1' in os.environ
         from nexusLIMS.harvesters.nemo import NemoConnector
-        return NemoConnector(os.environ['NEMO_address_1'],
-                             os.environ['NEMO_token_1'])
+        return NemoConnector(base_url=os.getenv('NEMO_address_1'),
+                             token=os.getenv('NEMO_token_1'),
+                             strftime_fmt=os.getenv('NEMO_strftime_fmt_1'),
+                             strptime_fmt=os.getenv('NEMO_strptime_fmt_1'))
 
     @pytest.fixture
     def bogus_nemo_connector_url(self):
@@ -909,6 +919,118 @@ class TestNemoIntegration:
 
         # number of session logs should be identical before and after call
         assert len(results_before) == len(results_after)
+
+    def test_connector_strftime(self):
+        """
+        Test the conversion of datetime objects to strings according to a
+        connector's settings.
+        """
+        from nexusLIMS.harvesters.nemo import NemoConnector
+        from pytz import timezone
+
+        ny = timezone('America/New_York')
+        date_no_ms = dt(2022, 2, 16, 9, 39, 0, 0)
+        date_w_ms = dt(2022, 2, 16, 9, 39, 0, 1)
+        date_no_ms_tz = ny.localize(date_no_ms)
+        date_w_ms_tz = ny.localize(date_w_ms)
+
+        # test with no format settings (isoformat)
+        c = NemoConnector(base_url='https://example.org',
+                          token='not_needed')
+        assert c.strftime(date_no_ms) == '2022-02-16T09:39:00'
+        assert c.strftime(date_w_ms) == '2022-02-16T09:39:00.000001'
+        assert c.strftime(date_no_ms_tz) == '2022-02-16T09:39:00-05:00'
+        assert c.strftime(date_w_ms_tz) == '2022-02-16T09:39:00.000001-05:00'
+
+        # test a few custom formats
+        c = NemoConnector(base_url='https://example.org',
+                          token='not_needed',
+                          strftime_fmt='%Y-%m-%dT%H:%M:%S%z')
+        assert c.strftime(date_no_ms) == '2022-02-16T09:39:00'
+        assert c.strftime(date_w_ms) == '2022-02-16T09:39:00'
+        assert c.strftime(date_no_ms_tz) == '2022-02-16T09:39:00-0500'
+        assert c.strftime(date_w_ms_tz) == '2022-02-16T09:39:00-0500'
+
+    def test_connector_strptime(self):
+        """
+        Test the conversion of string to datetime objects according
+        to a connector's settings.
+        """
+        from nexusLIMS.harvesters.nemo import NemoConnector
+        from pytz import timezone
+
+        ny = timezone('America/New_York')
+        datestr_no_ms = '2022-02-16T09:39:00'
+        datestr_w_ms = '2022-02-16T09:39:00.000001'
+        datestr_no_ms_tz = '2022-02-16T09:39:00-05:00'
+        datestr_w_ms_tz = '2022-02-16T09:39:00.000001-05:00'
+        date_no_ms = dt(2022, 2, 16, 9, 39, 0, 0)
+        date_w_ms = dt(2022, 2, 16, 9, 39, 0, 1)
+        date_no_ms_tz = ny.localize(date_no_ms)
+        date_w_ms_tz = ny.localize(date_w_ms)
+
+        # test with no format settings (isoformat)
+        c = NemoConnector(base_url='https://example.org', token='not_needed')
+        assert c.strptime(datestr_no_ms) == date_no_ms
+        assert c.strptime(datestr_w_ms) == date_w_ms
+        assert c.strptime(datestr_no_ms_tz) == date_no_ms_tz
+        assert c.strptime(datestr_w_ms_tz) == date_w_ms_tz
+
+        # test "iso-like" formats w/ and w/o timezone
+        c = NemoConnector(base_url='https://example.org', token='not_needed',
+                          strptime_fmt='%Y-%m-%dT%H:%M:%S')
+        c_tz = NemoConnector(base_url='https://example.org', token='not_needed',
+                             strptime_fmt='%Y-%m-%dT%H:%M:%S%z')
+
+        datestr_no_ms = '2022-02-16T09:39:00'
+        datestr_w_ms = '2022-02-16T09:39:00.000001'
+        datestr_no_ms_tz = '2022-02-16T09:39:00-05:00'
+        datestr_w_ms_tz = '2022-02-16T09:39:00.000001-05:00'
+
+        assert c.strptime(datestr_no_ms) == date_no_ms
+        with pytest.raises(ValueError):  # should error since our fmt has no ms
+            assert c.strptime(datestr_w_ms) == date_w_ms
+        with pytest.raises(ValueError):  # should error since our fmt has no TZ
+            assert c.strptime(datestr_no_ms_tz) == date_no_ms_tz
+        with pytest.raises(ValueError):  # should error since our fmt has no TZ
+            assert c.strptime(datestr_w_ms_tz) == date_w_ms_tz
+
+        with pytest.raises(ValueError):  # should error since fmt expects TZ
+            assert c_tz.strptime(datestr_no_ms) == date_no_ms
+        with pytest.raises(ValueError):  # should error since our fmt has no ms
+            assert c_tz.strptime(datestr_w_ms) == date_w_ms
+        assert c_tz.strptime(datestr_no_ms_tz) == date_no_ms_tz
+        with pytest.raises(ValueError):  # should error since our fmt has no ms
+            assert c_tz.strptime(datestr_w_ms_tz) == date_w_ms_tz
+
+        # test format seen on ***REMOVED***
+        c2 = NemoConnector(base_url='https://example.org', token='not_needed',
+                           strptime_fmt='%m-%d-%Y %H:%M:%S')
+        datestr_no_ms = '02-16-2022 09:39:00'
+        date_no_ms = dt(2022, 2, 16, 9, 39, 0, 0)
+        assert c2.strptime(datestr_no_ms) == date_no_ms
+
+        # test format seen on ***REMOVED*** coerced to timezone
+        c3 = NemoConnector(base_url='https://example.org', token='not_needed',
+                           strptime_fmt='%m-%d-%Y %H:%M:%S',
+                           timezone='America/New_York')
+        datestr_no_ms = '02-16-2022 09:39:00'
+        assert c3.strptime(datestr_no_ms) == date_no_ms_tz
+
+        # test format with timezone coerced to different timezone (this will
+        # keep the time the same, but switch the timezone to whatever
+        # specified without adjusting the time)
+        c4 = NemoConnector(base_url='https://example.org', token='not_needed',
+                           strptime_fmt='%Y-%m-%dT%H:%M:%S%z',
+                           timezone='America/Denver')
+        # input is 9AM in Eastern time
+        datestr_no_ms_tz = '2022-02-16T09:39:00-05:00'
+        # result will be 9AM MT, so 2 hours past date_no_ms_tz (which is
+        # 9AM ET)
+        assert c4.strptime(datestr_no_ms_tz) == \
+               date_no_ms_tz + timedelta(hours=2)
+        assert c4.strptime(datestr_no_ms_tz) == \
+               dt.fromisoformat('2022-02-16T09:39:00-07:00')
 
 
 class TestReservationEvent:

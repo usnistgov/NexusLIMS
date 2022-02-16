@@ -38,7 +38,7 @@ import requests
 import logging
 from urllib.parse import urljoin, urlparse, parse_qs
 from datetime import datetime, timedelta
-from uuid import uuid4
+from pytz import timezone as pytz_timezone
 
 from nexusLIMS.utils import nexus_req, _get_timespan_overlap
 from nexusLIMS.harvesters import ReservationEvent
@@ -58,14 +58,49 @@ class NoDataConsentException(Exception):
 
 
 class NemoConnector:
+    """
+    A connection to an instance of the API of the NEMO laboratory management
+    software. Provides helper methods for fetching data from the API.
+
+    Parameters
+    ----------
+    base_url : str
+        The "root" of the API including a trailing slash;
+        e.g. 'https://***REMOVED***/api/'
+    token : str
+        An authentication token for this NEMO instance
+    strftime_fmt : str
+        The "date format" to use when encoding dates to send as filters to the
+        NEMO API. Should follow the same convention as
+        :ref:`strftime-strptime-behavior`. If ``None``, ISO 8601 format
+        will be used.
+    strptime_fmt : str
+        The "date format" to use when decoding date strings received in the
+        response from the API. Should follow the same convention as
+        :ref:`strftime-strptime-behavior`. If ``None``, ISO 8601 format
+        will be used.
+    timezone : str
+        The timezone to use when decoding date strings received in the
+        response from the API. Should be a IANA time zone database string; e.g.
+        "America/New_York". Useful if no timezone information is returned
+        from an instance of the NEMO API. If ``None``, no timezone setting will
+        be done and the code will use whatever was returned from the server
+        as is.
+    """
     tools: Dict[int, Dict]
     users: Dict[int, Dict]
     users_by_username: Dict[str, Dict]
     projects: Dict[int, Dict]
     
-    def __init__(self, base_url: str, token: str):
+    def __init__(self, base_url: str, token: str,
+                 strftime_fmt: Optional[str] = None,
+                 strptime_fmt: Optional[str] = None,
+                 timezone: Optional[str] = None):
         self.base_url = base_url
         self.token = token
+        self.strftime_fmt = strftime_fmt
+        self.strptime_fmt = strptime_fmt
+        self.timezone = timezone
 
         # these attributes are used for "memoization" of NEMO content,
         # so it can be remembered and used for a cache lookup
@@ -78,6 +113,62 @@ class NemoConnector:
 
     def __repr__(self):
         return f"Connection to NEMO API at {self.base_url}"
+
+    def strftime(self, date_dt) -> str:
+        """
+        Using the settings for this NemoConnector, convert a datetime object
+        to a string that will be understood by the API. If the ``strftime_fmt``
+        attribute for this NemoConnector is ``None``, ISO 8601 format will be
+        used.
+
+        Parameters
+        ----------
+        date_dt
+            The date to be converted as a datetime object
+
+        Returns
+        -------
+        date_str : str
+            The date formatted as a string that will be understandable by the
+            API for this NemoConnector
+        """
+        if self.strftime_fmt is None:
+            return date_dt.isoformat()
+        else:
+            return date_dt.strftime(self.strftime_fmt)
+
+    def strptime(self, date_str) -> datetime:
+        """
+        Using the settings for this NemoConnector, convert a datetime string
+        representation from the API into a datetime object that can be used
+        in Python. If the ``strptime_fmt`` attribute for this NemoConnector
+        is ``None``, ISO 8601 format will be assumed. If a timezone is
+        specified for this server, the resulting datetime will be coerced to
+        that timezone.
+
+        Parameters
+        ----------
+        date_str
+            The date formatted as a string that is returned by the
+            API for this NemoConnector
+
+        Returns
+        -------
+        date_dt : ~datetime.datetime
+            The date to be converted as a datetime object
+        """
+        if self.strptime_fmt is None:
+            date_dt = datetime.fromisoformat(date_str)
+        else:
+            date_dt = datetime.strptime(date_str, self.strptime_fmt)
+
+        if self.timezone:
+            # strip any timezone information from the datetime, then localize
+            # with pytz to whatever timezone specified
+            date_dt = date_dt.replace(tzinfo=None)
+            date_dt = pytz_timezone(self.timezone).localize(date_dt)
+
+        return date_dt
 
     def get_tools(self, tool_id: Union[int, List[int]]) -> List[Dict]:
         """
@@ -302,9 +393,9 @@ class NemoConnector:
         p = {}
 
         if dt_from:
-            p['start__gte'] = dt_from.isoformat()
+            p['start__gte'] = self.strftime(dt_from)
         if dt_to:
-            p['end__lte'] = dt_to.isoformat()
+            p['end__lte'] = self.strftime(dt_to)
         if cancelled is not None:
             p['cancelled'] = cancelled
 
@@ -399,9 +490,9 @@ class NemoConnector:
                 u_id = user
             p['user_id'] = u_id
         if dt_from:
-            p['start__gte'] = dt_from.isoformat()
+            p['start__gte'] = self.strftime(dt_from)
         if dt_to:
-            p['end__lte'] = dt_to.isoformat()
+            p['end__lte'] = self.strftime(dt_to)
 
         # filtering for tool; if at the end of this block tool_id is an empty
         # list, we should just immediately return an empty list, since either
@@ -560,8 +651,8 @@ class NemoConnector:
             session = Session(
                 session_identifier=session_id,
                 instrument=instr,
-                dt_from=datetime.fromisoformat(event['start']),
-                dt_to=datetime.fromisoformat(event['end']),
+                dt_from=self.strptime(event['start']),
+                dt_to=self.strptime(event['end']),
                 user=event['user']['username']
             )
             return session
@@ -574,7 +665,7 @@ class NemoConnector:
         """
         Inspect the ``api_url`` values of known Instruments (from 
         the ``instruments`` table in the DB), and extract their tool_id number
-        if it is from 
+        if it is from this NemoConnector
 
         Returns
         -------
@@ -668,10 +759,14 @@ def get_harvesters_enabled() -> List[NemoConnector]:
     """
     harvesters_enabled_str: List[str] = \
         list(filter(lambda x: re.search('NEMO_address', x), os.environ.keys()))
-    harvesters_enabled = [NemoConnector(os.getenv(addr),
-                                        os.getenv(addr.replace('address',
-                                                               'token')))
-                          for addr in harvesters_enabled_str]
+    harvesters_enabled = [
+        NemoConnector(base_url=os.getenv(addr),
+                      token=os.getenv(addr.replace('address', 'token')),
+                      strftime_fmt=os.getenv(addr.replace('address',
+                                                          'strftime_fmt')),
+                      strptime_fmt=os.getenv(addr.replace('address',
+                                                          'strptime_fmt')))
+        for addr in harvesters_enabled_str]
     return harvesters_enabled
 
 
@@ -821,8 +916,8 @@ def res_event_from_session(session: Session) -> ReservationEvent:
         _logger.debug(f"Reservation {i+1}: {c.base_url}reservations/?id"
                       f"={res['id']} from {res['start']} to {res['end']}")
 
-    starts = [datetime.fromisoformat(r['start']) for r in reservations]
-    ends = [datetime.fromisoformat(r['end']) for r in reservations]
+    starts = [c.strptime(r['start']) for r in reservations]
+    ends = [c.strptime(r['end']) for r in reservations]
 
     overlaps = [_get_timespan_overlap((session.dt_from, session.dt_to),
                                       (s, e)) for s, e in zip(starts, ends)]
@@ -885,7 +980,7 @@ def res_event_from_session(session: Session) -> ReservationEvent:
         res_event = ReservationEvent(
             experiment_title=_get_res_question_value('experiment_title', res),
             instrument=session.instrument,
-            last_updated=datetime.fromisoformat(res['creation_time']),
+            last_updated=c.strptime(res['creation_time']),
             username=res['user']['username'],
             user_full_name=f"{res['user']['first_name']} "
                            f"{res['user']['last_name']} "
@@ -894,8 +989,8 @@ def res_event_from_session(session: Session) -> ReservationEvent:
             created_by_full_name=f"{res['creator']['first_name']} "
                                  f"{res['creator']['last_name']} "
                                  f"({res['creator']['username']})",
-            start_time=datetime.fromisoformat(res['start']),
-            end_time=datetime.fromisoformat(res['end']),
+            start_time=c.strptime(res['start']),
+            end_time=c.strptime(res['end']),
             reservation_type=None, # reservation type is not collected in NEMO
             experiment_purpose=_get_res_question_value('experiment_purpose',
                                                        res),
