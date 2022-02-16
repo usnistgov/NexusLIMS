@@ -237,18 +237,6 @@ class TestSharepoint:
         res = get_auth(basic=True)
         assert isinstance(res, tuple)
 
-    def test_get_sharepoint_date_string(self):
-        date_str = sc._get_sharepoint_date_string(
-            dt(year=2020, month=6, day=29, hour=1, minute=23, second=48))
-        assert date_str == '2020-06-28T21:23:48'
-
-    def test_get_sharepoint_date_string_no_env_var(self, monkeypatch):
-        with monkeypatch.context() as m:
-            # remove environment variable to test error raising
-            m.delenv('nexusLIMS_timezone')
-            with pytest.raises(EnvironmentError):
-                sc._get_sharepoint_date_string(dt.now())
-
     def test_get_sharepoint_tz(self, monkeypatch):
         assert sc._get_sharepoint_tz() in ['America/New_York',
                                            'America/Chicago',
@@ -806,12 +794,12 @@ class TestNemoIntegration:
         r = {
             'id': 140,
             'question_data': {
-                'project_id': { 'user_input': 'NexusLIMS' },
-                'experiment_title': { 'user_input': 'A test with multiple '
-                                                    'samples' },
-                'experiment_purpose': { 'user_input': 'To test the harvester '
-                                                      'with multiple samples' },
-                'data_consent': { 'user_input': 'Agree' },
+                'project_id': {'user_input': 'NexusLIMS'},
+                'experiment_title': {'user_input': 'A test with multiple '
+                                                   'samples'},
+                'experiment_purpose': {'user_input': 'To test the harvester '
+                                                     'with multiple samples'},
+                'data_consent': {'user_input': 'Agree'},
                 'sample_group': {
                     'user_input': {
                         '0': {
@@ -824,16 +812,16 @@ class TestNemoIntegration:
                             'sample_name': 'sample name 1',
                             'sample_or_pid': 'Sample Name',
                             'sample_details': 'A sample with a name and some '
-                                              'additional detail' },
+                                              'additional detail'},
                         '2': {
                             'sample_name': 'sample_pid_2',
                             'sample_or_pid': 'PID',
-                            'sample_details': '' },
+                            'sample_details': ''},
                         '3': {
                             'sample_name': 'sample name 2',
                             'sample_or_pid': 'Sample Name',
-                            'sample_details': '' }
-                    } } },
+                            'sample_details': ''}
+                    }}},
             'creation_time': '2021-11-29T10:38:00-07:00',
             'start': '2021-11-29T10:00:00-07:00',
             'end': '2021-11-29T12:00:00-07:00',

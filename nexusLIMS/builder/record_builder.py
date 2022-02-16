@@ -69,6 +69,7 @@ _logger = _logging.getLogger(__name__)
 XSD_PATH: str  = _os.path.join(_os.path.dirname(_activity.__file__),
                                "nexus-experiment.xsd")
 
+
 def build_record(session: Session,
                  sample_id: Union[None, str] = None,
                  generate_previews: bool = True) -> str:
