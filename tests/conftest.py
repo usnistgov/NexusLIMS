@@ -34,14 +34,17 @@ from datetime import timezone as _tz
 import time
 import pytest
 import nexusLIMS.utils
+from pathlib import Path
+import shutil
 
 # we don't want to mask both directories, because the record builder tests
 # need to look at the real files on ***REMOVED***:
-# os.environ['nexusLIMS_path'] =os.path.join(os.path.dirname(__file__), 'files')
 # os.environ['mmfnexus_path'] = os.path.join(os.path.dirname(__file__), 'files')
 
 # use our test database for all tests (don't want to impact real one)
 os.environ['nexusLIMS_db_path'] = files['DB'][0]
+os.environ['nexusLIMS_path'] = os.path.join(os.path.dirname(__file__),
+                                            'files', 'nexusLIMS_path')
 
 
 def pytest_configure(config):
@@ -81,6 +84,19 @@ def pytest_sessionfinish(session, exitstatus):
             if os.path.isfile(fn):
                 os.remove(fn)
 
+    # if nexusLIMS_path is a subdirectory of the current tests directory
+    # (which it should be since we explicitly set it at the top of this file),
+    # remove it -- the  check for subdirectory is just a safety to make sure
+    # we don't nuke the real nexusLIMS_path, which would be bad
+    this_dir = Path(os.path.dirname(__file__))
+    nx_dir = Path(os.getenv('nexusLIMS_path'))
+    if this_dir in nx_dir.parents:
+        records_dir = nx_dir / '..' / 'records'
+        if records_dir.exists():
+            shutil.rmtree(records_dir)
+        if nx_dir.exists():
+            shutil.rmtree(nx_dir)
+
 
 @pytest.fixture(scope='session')
 def monkey_session():
@@ -108,7 +124,6 @@ def fix_mountain_time(monkey_session):
     # datetime objects to match file store
     if tz_string in ['MST', 'MDT']:
         # get current timezone, and adjust tz_offset as needed
-        monkey_session.setattr(nexusLIMS.utils, "tz_offset",
-                            _td(hours=-2))
+        monkey_session.setattr(nexusLIMS.utils, "tz_offset", _td(hours=-2))
         monkey_session.setenv('ignore_mib', 'True')
         monkey_session.setenv('is_mountain_time', 'True')

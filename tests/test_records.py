@@ -82,15 +82,9 @@ class TestRecordBuilder:
         assert "No XML files built, so no files uploaded" in caplog.text
 
     def test_new_session_processor(self, monkeypatch, fix_mountain_time):
-        # make record uploader just pretend by returning all files provided (
-        # as if they were actually uploaded)
+        # make record uploader just pretend by returning all files provided
+        # (as if they were actually uploaded)
         monkeypatch.setattr(_rb, "_upload_record_files", lambda x: (x, x))
-
-        # overwrite nexusLIMS_path so we write records to the test folder rather
-        # than real nexusLIMS folder
-        monkeypatch.setenv("nexusLIMS_path",
-                           os.path.join(os.path.dirname(__file__), 'files',
-                                        'records'))
 
         # Override the build_records function to not generate previews (since
         # this is tested elsewhere) to speed things up
@@ -118,7 +112,7 @@ class TestRecordBuilder:
 
         # tests on the XML records
         # there should be 6 completed records in the records/uploaded/ folder
-        xmls = glob(os.path.join(os.path.dirname(__file__), 'files',
+        xmls = glob(os.path.join(os.getenv('nexusLIMS_path'), '..',
                                  'records', 'uploaded', '*.xml'))
         assert len(xmls) == 7
 
@@ -224,7 +218,7 @@ class TestRecordBuilder:
             os.remove(f)
 
         # clean up directory
-        shutil.rmtree(os.path.join(os.path.dirname(__file__), 'files',
+        shutil.rmtree(os.path.join(os.getenv('nexusLIMS_path'), '..',
                                    'records'))
 
     def test_new_session_bad_upload(self, monkeypatch, caplog):
@@ -320,12 +314,6 @@ class TestRecordBuilder:
         # make record uploader just pretend by returning all files provided (
         # as if they were actually uploaded)
         monkeypatch.setattr(_rb, "_upload_record_files", lambda x: (x, x))
-
-        # overwrite nexusLIMS_path so we write records to the test folder rather
-        # than real nexusLIMS folder
-        monkeypatch.setenv("nexusLIMS_path",
-                           os.path.join(os.path.dirname(__file__), 'files',
-                                        'records'))
 
         xml_files = _rb.build_new_session_records()
         assert len(xml_files) == 1
