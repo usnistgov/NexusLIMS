@@ -82,6 +82,9 @@ details.
     nexusLIMS_db_path='/path/to/nexusLIMS/nexuslims_db.sqlite'
     NEMO_address_1='https://path.to.nemo.com/api/'
     NEMO_token_1='authentication_token'
+    NEMO_strftime_fmt_1="%Y-%m-%dT%H:%M:%S%z"
+    NEMO_strptime_fmt_1="%Y-%m-%dT%H:%M:%S%z"
+    NEMO_tz_1="America/New_York"
 
 Rather than using the ``.env`` file, each of these variables could also be set 
 in the environment some other way if you desire. For example, to use Gitlab

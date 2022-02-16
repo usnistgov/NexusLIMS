@@ -78,9 +78,6 @@ add_function_parentheses = True
 #                    'doc/source/objects_lxml.inv', ztext)
 
 intersphinx_mapping = {'python': ('https://docs.python.org/3.7/', None),
-                       'dateparser': (
-                           'https://dateparser.readthedocs.io/en/latest/',
-                           None),
                        'hyperspy': (
                            'http://hyperspy.org/hyperspy-doc/current/', None),
                        'numpy': (

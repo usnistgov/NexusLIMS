@@ -478,46 +478,6 @@ def dump_calendars(instrument=None, user=None, dt_from=None, dt_to=None,
                                 encoding='UTF-8', pretty_print=True).decode())
 
 
-def _get_sharepoint_date_string(dt):
-    """
-    Using the ``nexusLIMS_timezone`` environment variable, convert a "naive"
-    datetime object to a string with the proper offset to be correctly
-    handled by the Sharepoint API. This timezone should be one listed as part
-    of the
-    `tz database <https://en.wikipedia.org/wiki/List_of_tz_database_time_zones_>`.
-
-    The reason this is necessary is that the Sharepoint calendar API uses UTC
-    datetime, but displays them in the local timezone, so we need to convert
-    our local datetime to UTC.  i.e. if you have an event that is
-    displayed on the calendar as starting at 2019-07-24T00:00:00 (midnight on
-    July 24th), an API query datetime greater than or equal to that time
-    will not work unless you convert to UTC (2019-07-23T20:00:00.000)
-
-
-    Parameters
-    ----------
-    dt : :py:class:`~datetime.datetime`
-        The "naive" local timezone datetime object (i.e. as displayed in the
-        sharepoint calendar)
-
-    Returns
-    -------
-    dt_str : str
-        The datetime formatted in ISO format, adjusted for the timezone
-        offset (for Eastern time, that's four hours during DST and 5 hours in
-        standard time)
-    """
-    if 'nexusLIMS_timezone' not in _os.environ:
-        raise EnvironmentError('Please make sure the "nexusLIMS_timezone" '
-                               'variable is set as part of your environment '
-                               'before using this function')
-
-    tz = _timezone(_os.environ['nexusLIMS_timezone'])
-    dt_str = _pytz.utc.localize(dt).astimezone(tz).strftime('%Y-%m-%dT%H:%M:%S')
-
-    return dt_str
-
-
 def _get_sharepoint_tz():
     """
     Based on the response from the Sharepoint API, get the timezone of the
