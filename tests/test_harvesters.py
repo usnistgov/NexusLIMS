@@ -369,7 +369,8 @@ class TestNemoIntegration:
         return NemoConnector(base_url=os.getenv('NEMO_address_1'),
                              token=os.getenv('NEMO_token_1'),
                              strftime_fmt=os.getenv('NEMO_strftime_fmt_1'),
-                             strptime_fmt=os.getenv('NEMO_strptime_fmt_1'))
+                             strptime_fmt=os.getenv('NEMO_strptime_fmt_1'),
+                             timezone=os.getenv('NEMO_tz_1'))
 
     @pytest.fixture
     def bogus_nemo_connector_url(self):
@@ -651,16 +652,21 @@ class TestNemoIntegration:
         # test_usage_event_to_session_log, so it doesn't mess up future
         # record building tests
         yield None
-        for _id in ['29', '30', '31']:
-            db_query('DELETE FROM session_log WHERE session_identifier LIKE ?',
-                     (f"%usage_events/?id={_id}%",))
+        to_remove = ('https://***REMOVED***/api/usage_events/?id=29',
+                     'https://***REMOVED***/api/usage_events/?id=30',
+                     'https://***REMOVED***/api/usage_events/?id=31',
+                     'https://***REMOVED***/api/usage_events/?id=385031')
+        db_query(f'DELETE FROM session_log WHERE session_identifier IN '
+                 f'({",".join("?" * len(to_remove))})', to_remove)
+        pass
 
     def test_add_all_usage_events_to_db(self, cleanup_session_log):
         success_before, results_before = db_query('SELECT * FROM session_log;')
         from nexusLIMS.harvesters import nemo
+        # currently, this only adds instruments from the test tool on
+        # ***REMOVED***
         nemo.add_all_usage_events_to_db(tool_id=10)
         success_after, results_after = db_query('SELECT * FROM session_log;')
-        pass
 
     def test_usage_event_to_session_log(self,
                                         nemo_connector,
@@ -681,6 +687,50 @@ class TestNemoIntegration:
         # event type
         assert results[0][4] == 'END'
         assert results[1][4] == 'START'
+
+    def test_nemo_dot_gov_usage_event_to_session_log(self,
+                                                     cleanup_session_log):
+        from nexusLIMS.harvesters import nemo
+        # if ***REMOVED*** connector is enabled by environment variables,
+        # run a test on the format of the resulting timestamps in the DB
+        try:
+            n = nemo.get_connector_by_base_url('***REMOVED***')
+            success_before, results_before = db_query(
+                'SELECT * FROM session_log;')
+            n.write_usage_event_to_session_log(385031)
+            success_after, results_after = db_query(
+                'SELECT * FROM session_log;')
+            assert len(results_after) - len(results_before) == 2
+
+            success, results = db_query('SELECT * FROM session_log ORDER BY '
+                                        'id_session_log DESC LIMIT 2;')
+            # session ids are same:
+            assert results[0][1] == results[1][1]
+            assert results[0][1].endswith("/api/usage_events/?id=385031")
+            # record status
+            assert results[0][5] == 'TO_BE_BUILT'
+            assert results[1][5] == 'TO_BE_BUILT'
+            # event type
+            assert results[0][4] == 'END'
+            assert results[1][4] == 'START'
+
+            # convert from isoformat and check dates to make sure we put
+            # things in the right format
+            import pytz
+            end_dt = dt.fromisoformat(results[0][3])
+            start_dt = dt.fromisoformat(results[1][3])
+            assert end_dt == pytz.timezone('America/New_York').localize(
+                dt(2022, 2, 10, 16, 4, 1))
+            assert start_dt == pytz.timezone('America/New_York').localize(
+                dt(2022, 2, 10, 14, 10, 45))
+
+        except LookupError:  # pragma: no cover
+            pytest.skip("***REMOVED*** harvester not enabled")
+
+    def test_get_connector_by_base_url(self):
+        from nexusLIMS.harvesters import nemo
+        with pytest.raises(LookupError):
+            nemo.get_connector_by_base_url('bogus_connector')
 
     def test_usage_event_to_session_log_non_existent_event(self,
                                                            caplog,
@@ -946,10 +996,18 @@ class TestNemoIntegration:
         c = NemoConnector(base_url='https://example.org',
                           token='not_needed',
                           strftime_fmt='%Y-%m-%dT%H:%M:%S%z')
-        assert c.strftime(date_no_ms) == '2022-02-16T09:39:00'
-        assert c.strftime(date_w_ms) == '2022-02-16T09:39:00'
+        assert c.strftime(date_no_ms) == '2022-02-16T09:39:00-0700'
+        assert c.strftime(date_w_ms) == '2022-02-16T09:39:00-0700'
         assert c.strftime(date_no_ms_tz) == '2022-02-16T09:39:00-0500'
         assert c.strftime(date_w_ms_tz) == '2022-02-16T09:39:00-0500'
+
+        # test %z in strftime_fmt for naive datetime with self.timezone set
+        c = NemoConnector(base_url='https://example.org',
+                          token='not_needed',
+                          strftime_fmt='%Y-%m-%dT%H:%M:%S%z',
+                          timezone='America/New_York')
+        assert c.strftime(dt(2022, 2, 16, 23, 6, 12, 50, tzinfo=None)) == \
+            '2022-02-16T23:06:12-0500'
 
     def test_connector_strptime(self):
         """
