@@ -997,8 +997,11 @@ class TestNemoIntegration:
         c = NemoConnector(base_url='https://example.org',
                           token='not_needed',
                           strftime_fmt='%Y-%m-%dT%H:%M:%S%z')
-        assert c.strftime(date_no_ms) == '2022-02-16T09:39:00-0700'
-        assert c.strftime(date_w_ms) == '2022-02-16T09:39:00-0700'
+        # these two will depend on whatever the local machine's offset is
+        assert c.strftime(date_no_ms) == \
+               '2022-02-16T09:39:00' + dt.now().astimezone().strftime('%z')
+        assert c.strftime(date_w_ms) == \
+               '2022-02-16T09:39:00' + dt.now().astimezone().strftime('%z')
         assert c.strftime(date_no_ms_tz) == '2022-02-16T09:39:00-0500'
         assert c.strftime(date_w_ms_tz) == '2022-02-16T09:39:00-0500'
 
