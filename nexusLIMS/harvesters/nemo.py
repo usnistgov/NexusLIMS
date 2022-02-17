@@ -135,6 +135,15 @@ class NemoConnector:
         if self.strftime_fmt is None:
             return date_dt.isoformat()
         else:
+            if '%z' in self.strftime_fmt or '%Z' in self.strftime_fmt:
+                # make sure datetime is timezone aware if timezone is
+                # indicated in strftime_fmt. Use NEMO_tz setting if present,
+                # otherwise use local server timezone
+                if date_dt.tzinfo is None:
+                    if self.timezone:
+                        date_dt = pytz_timezone(self.timezone).localize(date_dt)
+                    else:
+                        date_dt = date_dt.astimezone()
             return date_dt.strftime(self.strftime_fmt)
 
     def strptime(self, date_str) -> datetime:
@@ -160,7 +169,18 @@ class NemoConnector:
         if self.strptime_fmt is None:
             date_dt = datetime.fromisoformat(date_str)
         else:
-            date_dt = datetime.strptime(date_str, self.strptime_fmt)
+            # to be defensive here, try without microseconds as well if ".%f"
+            # is in strptime_fmt and it fails (since sometimes NEMO doesn't
+            # write microseconds for every time, even if it's supposed to
+            try:
+                date_dt = datetime.strptime(date_str, self.strptime_fmt)
+            except ValueError as e:
+                if '.%f' in self.strptime_fmt:
+                    date_dt = datetime.strptime(date_str,
+                                                self.strptime_fmt.replace(
+                                                    '.%f', ''))
+                else:
+                    raise e   # pragma: no cover
 
         if self.timezone:
             # strip any timezone information from the datetime, then localize
@@ -588,7 +608,8 @@ class NemoConnector:
                 start_log = SessionLog(
                     session_identifier=session_id,
                     instrument=instr.name,
-                    timestamp=event['start'],
+                    # make sure to coerce format to ISO before putting in DB
+                    timestamp=self.strptime(event['start']).isoformat(),
                     event_type='START',
                     user=event['user']['username'],
                     record_status='TO_BE_BUILT'
@@ -608,7 +629,8 @@ class NemoConnector:
                 end_log = SessionLog(
                     session_identifier=session_id,
                     instrument=instr.name,
-                    timestamp=event['end'],
+                    # make sure to coerce format to ISO before putting in DB
+                    timestamp=self.strptime(event['end']).isoformat(),
                     event_type='END',
                     user=event['user']['username'],
                     record_status='TO_BE_BUILT'
@@ -765,7 +787,8 @@ def get_harvesters_enabled() -> List[NemoConnector]:
                       strftime_fmt=os.getenv(addr.replace('address',
                                                           'strftime_fmt')),
                       strptime_fmt=os.getenv(addr.replace('address',
-                                                          'strptime_fmt')))
+                                                          'strptime_fmt')),
+                      timezone=os.getenv(addr.replace('address', 'tz')))
         for addr in harvesters_enabled_str]
     return harvesters_enabled
 
@@ -801,11 +824,11 @@ def add_all_usage_events_to_db(user: Union[str, int] = None,
             n.write_usage_event_to_session_log(e['id'])
 
 
-def get_usage_events_as_sessions(
-    user: Union[str, int] = None,
-    dt_from: datetime = None,
-    dt_to: datetime = None,
-    tool_id: Union[int, List[int], None] = None) -> List[Session]:
+def get_usage_events_as_sessions(user: Union[str, int] = None,
+                                 dt_from: datetime = None,
+                                 dt_to: datetime = None,
+                                 tool_id: Union[int, List[int], None] = None) \
+        -> List[Session]:
     """
     Loop through enabled NEMO connectors and return each one's usage events to
     as :py:class:`~nexusLIMS.db.session_handler.Session` objects without
@@ -842,7 +865,7 @@ def get_usage_events_as_sessions(
     return sessions
 
 
-def get_connector_for_session(session: Session) -> Union[NemoConnector, None]:
+def get_connector_for_session(session: Session) -> NemoConnector:
     """
     Given a :py:class:`~nexusLIMS.db.session_handler.Session`, find the matching
     :py:class:`~nexusLIMS.harvesters.nemo.NemoConnector` from the enabled
@@ -858,6 +881,11 @@ def get_connector_for_session(session: Session) -> Union[NemoConnector, None]:
     n : ~nexusLIMS.harvesters.nemo.NemoConnector
         The connector object that allows for querying the NEMO API for the
         instrument contained in ``session``
+
+    Raises
+    ------
+    LookupError
+        Raised if a matching connector is not found
     """
     instr_base_url = urljoin(session.instrument.api_url, '.')
 
@@ -867,6 +895,35 @@ def get_connector_for_session(session: Session) -> Union[NemoConnector, None]:
 
     raise LookupError(f'Did not find enabled NEMO harvester for '
                       f'"{session.instrument.name}". Perhaps check environment '
+                      f'variables? The following harvesters are enabled: '
+                      f'{get_harvesters_enabled()}')
+
+
+def get_connector_by_base_url(base_url: str) -> NemoConnector:
+    """
+    Get an enabled NemoConnector by inspecting the ``base_url``.
+
+    Parameters
+    ----------
+    base_url
+        A portion of the API url to search for
+
+    Returns
+    -------
+    n : ~nexusLIMS.harvesters.nemo.NemoConnector
+        The enabled NemoConnector instance
+
+    Raises
+    ------
+    LookupError
+        Raised if a matching connector is not found
+    """
+    for n in get_harvesters_enabled():
+        if base_url in n.base_url:
+            return n
+
+    raise LookupError(f'Did not find enabled NEMO harvester with url '
+                      f'containing "{base_url}". Perhaps check environment '
                       f'variables? The following harvesters are enabled: '
                       f'{get_harvesters_enabled()}')
 

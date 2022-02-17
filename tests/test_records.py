@@ -26,6 +26,32 @@ import pytest
 
 class TestRecordBuilder:
 
+    @pytest.fixture()
+    def remove_nemo_gov_harvester(self, monkeypatch):
+        """
+        Helper fixture to remove the ***REMOVED*** harvester from the
+        environment if it's present, since it has _a lot_ of usage events,
+        and takes a long time to fetch from the API with the current set of
+        tests.
+        """
+        nemo_var = None
+        for k in os.environ:
+            if '***REMOVED***/api' in os.getenv(k) and 'address' in k:
+                nemo_var = k
+
+        if nemo_var:
+            monkeypatch.delenv(nemo_var, raising=False)
+            monkeypatch.delenv(nemo_var.replace('address', 'token'),
+                               raising=False)
+            monkeypatch.delenv(nemo_var.replace('address', 'strftime_fmt'),
+                               raising=False)
+            monkeypatch.delenv(nemo_var.replace('address', 'strptime_fmt'),
+                               raising=False)
+            monkeypatch.delenv(nemo_var.replace('address', 'tz'),
+                               raising=False)
+            yield
+            monkeypatch.undo()
+
     # have to do these before modifying the database with the actual run tests
     def test_dry_run_sharepoint_calendar(self):
         sessions = session_handler.get_sessions_to_build()
@@ -36,7 +62,8 @@ class TestRecordBuilder:
         assert cal_event.start_time == _dt.fromisoformat(
             '2019-09-06T16:30:00-04:00')
 
-    def test_dry_run_file_find(self, fix_mountain_time):
+    def test_dry_run_file_find(self, fix_mountain_time,
+                               remove_nemo_gov_harvester):
         sessions = session_handler.get_sessions_to_build()
         # add at least one NEMO session to the file find (one is already in the
         # test database, but this get_usage_events_as_sessions call will add
@@ -44,7 +71,7 @@ class TestRecordBuilder:
         sessions += nemo.get_usage_events_as_sessions(
             dt_from=_dt.fromisoformat('2021-08-02T00:00:00-04:00'),
             dt_to=_dt.fromisoformat('2021-08-03T00:00:00-04:00'))
-        correct_files_per_session = [28, 37, 38, 55,  0, 18, 4, 4]
+        correct_files_per_session = [28, 37, 38, 55, 0, 18, 4, 4]
         file_list_list = []
         for s, ans in zip(sessions, correct_files_per_session):
             found_files = _rb.dry_run_file_find(s)
@@ -60,13 +87,15 @@ class TestRecordBuilder:
         assert f'{os.environ["mmfnexus_path"]}' \
                f'/NexusLIMS/test_files/02 - 620k-2.dm3' in file_list_list[-1]
 
-    def test_process_new_records_dry_run(self):
+    def test_process_new_records_dry_run(self, remove_nemo_gov_harvester):
         # just running to ensure coverage, tests are included above
         _rb.process_new_records(dry_run=True,
                                 dt_to=_dt.fromisoformat(
                                     '2021-08-03T00:00:00-04:00'))
 
-    def test_process_new_records_dry_run_no_sessions(self, monkeypatch, caplog):
+    def test_process_new_records_dry_run_no_sessions(self,
+                                                     remove_nemo_gov_harvester,
+                                                     monkeypatch, caplog):
         monkeypatch.setattr(_rb, '_get_sessions', lambda: [])
         # there shouldn't be any MARLIN sessions before July 1, 2021
         _rb.process_new_records(dry_run=True,
@@ -74,14 +103,17 @@ class TestRecordBuilder:
                                     '2021-07-01T00:00:00-04:00'))
         assert "No 'TO_BE_BUILT' sessions were found. Exiting." in caplog.text
 
-    def test_process_new_records_no_files_warning(self, monkeypatch, caplog):
+    def test_process_new_records_no_files_warning(self,
+                                                  remove_nemo_gov_harvester,
+                                                  monkeypatch, caplog):
         monkeypatch.setattr(_rb, "build_new_session_records", lambda: [])
         _rb.process_new_records(dry_run=False,
                                 dt_to=_dt.fromisoformat(
                                     '2021-07-01T00:00:00-04:00'))
         assert "No XML files built, so no files uploaded" in caplog.text
 
-    def test_new_session_processor(self, monkeypatch, fix_mountain_time):
+    def test_new_session_processor(self, remove_nemo_gov_harvester,
+                                   monkeypatch, fix_mountain_time):
         # make record uploader just pretend by returning all files provided
         # (as if they were actually uploaded)
         monkeypatch.setattr(_rb, "_upload_record_files", lambda x: (x, x))
@@ -221,7 +253,8 @@ class TestRecordBuilder:
         shutil.rmtree(os.path.join(os.getenv('nexusLIMS_path'), '..',
                                    'records'))
 
-    def test_new_session_bad_upload(self, monkeypatch, caplog):
+    def test_new_session_bad_upload(self, remove_nemo_gov_harvester,
+                                    monkeypatch, caplog):
         # set the methods used to determine if all records were uploaded to
         # just return known lists
         monkeypatch.setattr(_rb, 'build_new_session_records',
@@ -230,19 +263,24 @@ class TestRecordBuilder:
         monkeypatch.setattr(_rb, '_upload_record_files',
                             lambda x: ([], []))
 
-        _rb.process_new_records()
+        _rb.process_new_records(
+            dt_from=_dt.fromisoformat('2021-08-01T13:00:00-06:00'),
+            dt_to=_dt.fromisoformat('2021-09-05T20:00:00-06:00'))
         assert "Some record files were not uploaded: " \
                "['dummy_file1', 'dummy_file2', 'dummy_file3']" in caplog.text
 
-    def test_build_record_error(self, monkeypatch, caplog):
+    def test_build_record_error(self, remove_nemo_gov_harvester,
+                                monkeypatch, caplog):
         def mock_get_sessions():
             return [session_handler.Session('dummy_id', 'no_instrument',
                                             _dt.now(), _dt.now(), 'None')]
+
         monkeypatch.setattr(_rb, '_get_sessions', mock_get_sessions)
         _rb.build_new_session_records()
         assert 'Marking dummy_id as "ERROR"' in caplog.text
 
-    def test_non_validating_record(self, monkeypatch, caplog):
+    def test_non_validating_record(self, remove_nemo_gov_harvester,
+                                   monkeypatch, caplog):
         def mock_get_sessions():
             return [session_handler.Session(
                 session_identifier='1c3a6a8d-9038-41f5-b969-55fd02e12345',
@@ -263,7 +301,8 @@ class TestRecordBuilder:
         assert "ERROR" in caplog.text
         assert "Could not validate record, did not write to disk" in caplog.text
 
-    def test_dump_record(self, monkeypatch, fix_mountain_time):
+    def test_dump_record(self, remove_nemo_gov_harvester, monkeypatch,
+                         fix_mountain_time):
         from nexusLIMS.db.session_handler import Session
         session = Session(session_identifier="an-identifier-string",
                           instrument=instrument_db['FEI-Titan-TEM-635816'],
@@ -274,14 +313,15 @@ class TestRecordBuilder:
                                     generate_previews=False)
         os.remove(out_fname)
 
-    def test_no_sessions(self, monkeypatch):
+    def test_no_sessions(self, remove_nemo_gov_harvester, monkeypatch):
         # monkeypatch to return empty list (as if there are no sessions)
         monkeypatch.setattr(_rb, '_get_sessions', lambda: [])
         with pytest.raises(SystemExit) as e:
             _rb.build_new_session_records()
         assert e.type == SystemExit
 
-    def test_build_record_no_consent(self, monkeypatch, caplog):
+    def test_build_record_no_consent(self, remove_nemo_gov_harvester,
+                                     monkeypatch, caplog):
         #  https://***REMOVED***/api/reservations/?id=168
         def mock_get_sessions():
             return [session_handler.Session(
@@ -296,9 +336,10 @@ class TestRecordBuilder:
         xmls_files = _rb.build_new_session_records()
         assert "Reservation 168 requested not to have their data harvested" \
                in caplog.text
-        assert len(xmls_files) == 0    # no record should be returned
+        assert len(xmls_files) == 0  # no record should be returned
 
-    def test_build_record_single_file(self, monkeypatch):
+    def test_build_record_single_file(self, remove_nemo_gov_harvester,
+                                      monkeypatch):
         # test session that only has one file present
         def mock_get_sessions():
             return [session_handler.Session(
@@ -401,27 +442,27 @@ class TestActivity:
 
         for i in range(len(self.activities_list_python_find)):
             assert str(gnu_find_activities['activities_list'][i]) == \
-                str(self.activities_list_python_find[i])
+                   str(self.activities_list_python_find[i])
 
     def test_activity_repr(self, gnu_find_activities):
-        if 'is_mountain_time' in os.environ:    # pragma: no cover
+        if 'is_mountain_time' in os.environ:  # pragma: no cover
             expected = '             AcquisitionActivity; ' \
                        'start: 2018-11-13T11:01:28.179682; ' \
                        'end: 2018-11-13T11:19:14.635522'
-        else:                                   # pragma: no cover
+        else:  # pragma: no cover
             expected = '             AcquisitionActivity; ' \
                        'start: 2018-11-13T13:01:28.179682; ' \
                        'end: 2018-11-13T13:19:14.635522'
         assert gnu_find_activities['activities_list'][0].__repr__() == \
-            expected
+               expected
 
     def test_activity_str(self, gnu_find_activities):
-        if 'is_mountain_time' in os.environ:    # pragma: no cover
+        if 'is_mountain_time' in os.environ:  # pragma: no cover
             expected = '2018-11-13T11:01:28.179682 AcquisitionActivity '
-        else:                                   # pragma: no cover
+        else:  # pragma: no cover
             expected = '2018-11-13T13:01:28.179682 AcquisitionActivity '
         assert gnu_find_activities['activities_list'][0].__str__() == \
-            expected
+               expected
 
     def test_add_file_bad_meta(self, monkeypatch, caplog,
                                gnu_find_activities):
@@ -433,7 +474,7 @@ class TestActivity:
         gnu_find_activities['activities_list'][0].add_file(
             files['643_EELS_SI'][0])
         assert len(gnu_find_activities['activities_list'][0].files) == \
-            orig_activity_file_length + 1
+               orig_activity_file_length + 1
         assert f"Could not parse metadata of " \
                f"{files['643_EELS_SI'][0]}" in caplog.text
 
@@ -464,11 +505,11 @@ class TestActivity:
 class TestSession:
     def test_session_repr(self):
         s = session_handler.Session(
-                session_identifier='1c3a6a8d-9038-41f5-b969-55fd02e12345',
-                instrument=instrument_db['FEI-Titan-TEM-635816'],
-                dt_from=_dt.fromisoformat('2020-02-04T09:00:00.000'),
-                dt_to=_dt.fromisoformat('2020-02-04T12:00:00.000'),
-                user='None')
+            session_identifier='1c3a6a8d-9038-41f5-b969-55fd02e12345',
+            instrument=instrument_db['FEI-Titan-TEM-635816'],
+            dt_from=_dt.fromisoformat('2020-02-04T09:00:00.000'),
+            dt_to=_dt.fromisoformat('2020-02-04T12:00:00.000'),
+            user='None')
         assert s.__repr__() == '2020-02-04T09:00:00 to ' \
                                '2020-02-04T12:00:00 on FEI-Titan-TEM-635816'
 
@@ -506,16 +547,16 @@ class TestSessionLog:
         yield None
         # below runs on test teardown
         dbq(query='DELETE FROM session_log WHERE session_identifier = ?',
-            args=('testing-session-log', ))
+            args=('testing-session-log',))
 
     def test_repr(self):
         assert self.sl.__repr__() == "SessionLog " \
-            "(id=testing-session-log, " \
-            "instrument=FEI-Titan-TEM-635816, " \
-            "timestamp=2020-02-04T09:00:00.000, " \
-            "event_type=START, " \
-            "user=ear1, " \
-            "record_status=TO_BE_BUILT)"
+                                     "(id=testing-session-log, " \
+                                     "instrument=FEI-Titan-TEM-635816, " \
+                                     "timestamp=2020-02-04T09:00:00.000, " \
+                                     "event_type=START, " \
+                                     "user=ear1, " \
+                                     "record_status=TO_BE_BUILT)"
 
     def test_insert_log(self):
         _, res_before = dbq(query='SELECT * FROM session_log', args=None)
@@ -558,6 +599,7 @@ class TestCDCS:
         def mock_upload(xml_content, title):
             return Response(status_code=404,
                             text='This is a fake request error!'), 'dummy_id'
+
         monkeypatch.setattr(cdcs, 'upload_record_content', mock_upload)
 
         files_uploaded, record_ids = cdcs.upload_record_files(
@@ -592,6 +634,7 @@ class TestCDCS:
             return Response(status_code=404,
                             text='This is a fake request error!',
                             json=lambda: [{'id': 'dummy', 'current': 'dummy'}])
+
         monkeypatch.setattr(cdcs, '_nx_req', mock_req)
 
         resp = cdcs.upload_record_content('<xml>content</xml>', 'title')
