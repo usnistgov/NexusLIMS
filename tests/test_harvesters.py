@@ -401,16 +401,14 @@ class TestNemoIntegration:
 
         from nexusLIMS.harvesters import nemo
         assert len(nemo.get_harvesters_enabled()) == 2
-        assert str(nemo.get_harvesters_enabled()[1]) == \
-               f"Connection to NEMO API at " \
-               f"{os.environ['NEMO_address_2']}"
+        assert "Connection to NEMO API at https://nemo.address.com/api/" in \
+               [str(n) for n in nemo.get_harvesters_enabled()]
 
     def test_nemo_harvesters_enabled(self):
         from nexusLIMS.harvesters import nemo
         assert len(nemo.get_harvesters_enabled()) >= 1
-        assert str(nemo.get_harvesters_enabled()[0]) == \
-               f"Connection to NEMO API at " \
-               f"{os.environ['NEMO_address_1']}"
+        assert f"Connection to NEMO API at {os.environ['NEMO_address_1']}" in \
+               [str(n) for n in nemo.get_harvesters_enabled()]
 
     def test_getting_nemo_data(self):
         from nexusLIMS.utils import nexus_req
