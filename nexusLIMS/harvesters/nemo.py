@@ -824,11 +824,11 @@ def add_all_usage_events_to_db(user: Union[str, int] = None,
             n.write_usage_event_to_session_log(e['id'])
 
 
-def get_usage_events_as_sessions(
-    user: Union[str, int] = None,
-    dt_from: datetime = None,
-    dt_to: datetime = None,
-    tool_id: Union[int, List[int], None] = None) -> List[Session]:
+def get_usage_events_as_sessions(user: Union[str, int] = None,
+                                 dt_from: datetime = None,
+                                 dt_to: datetime = None,
+                                 tool_id: Union[int, List[int], None] = None) \
+        -> List[Session]:
     """
     Loop through enabled NEMO connectors and return each one's usage events to
     as :py:class:`~nexusLIMS.db.session_handler.Session` objects without
@@ -865,7 +865,7 @@ def get_usage_events_as_sessions(
     return sessions
 
 
-def get_connector_for_session(session: Session) -> Union[NemoConnector, None]:
+def get_connector_for_session(session: Session) -> NemoConnector:
     """
     Given a :py:class:`~nexusLIMS.db.session_handler.Session`, find the matching
     :py:class:`~nexusLIMS.harvesters.nemo.NemoConnector` from the enabled
@@ -881,6 +881,11 @@ def get_connector_for_session(session: Session) -> Union[NemoConnector, None]:
     n : ~nexusLIMS.harvesters.nemo.NemoConnector
         The connector object that allows for querying the NEMO API for the
         instrument contained in ``session``
+
+    Raises
+    ------
+    LookupError
+        Raised if a matching connector is not found
     """
     instr_base_url = urljoin(session.instrument.api_url, '.')
 

@@ -160,8 +160,8 @@ class TestSharepoint:
         assert cal_event.start_time == dt.fromisoformat(
             '2018-11-13T09:00:00-05:00')
         assert cal_event.url == 'https://***REMOVED***/Div/' + \
-                                'msed/MSED-MMF/Lists/FEI%20Titan%20Events/' + \
-                                'DispForm.aspx/?ID=470'
+               'msed/MSED-MMF/Lists/FEI%20Titan%20Events/' + \
+               'DispForm.aspx/?ID=470'
 
     def test_sharepoint_fetch_xml_reservation_event_no_entry(self):
         # tests when there is no matching event found
@@ -358,6 +358,7 @@ class TestNemoIntegration:
     the test...). All of that is to say that if you want to run these tests
     in a different environment, these tests will have to be rewritten.
     """
+
     @pytest.fixture
     def nemo_connector(self):
         """
@@ -401,15 +402,15 @@ class TestNemoIntegration:
         from nexusLIMS.harvesters import nemo
         assert len(nemo.get_harvesters_enabled()) == 2
         assert str(nemo.get_harvesters_enabled()[1]) == \
-            f"Connection to NEMO API at " \
-            f"{os.environ['NEMO_address_2']}"
+               f"Connection to NEMO API at " \
+               f"{os.environ['NEMO_address_2']}"
 
     def test_nemo_harvesters_enabled(self):
         from nexusLIMS.harvesters import nemo
         assert len(nemo.get_harvesters_enabled()) >= 1
         assert str(nemo.get_harvesters_enabled()[0]) == \
-            f"Connection to NEMO API at " \
-            f"{os.environ['NEMO_address_1']}"
+               f"Connection to NEMO API at " \
+               f"{os.environ['NEMO_address_1']}"
 
     def test_getting_nemo_data(self):
         from nexusLIMS.utils import nexus_req
@@ -1103,7 +1104,7 @@ class TestReservationEvent:
             reservation_type="A test event",
             experiment_purpose="To test the constructor",
             sample_details=["A sample that was loaded into a microscope for "
-                           "testing"],
+                            "testing"],
             sample_pid=["***REMOVED***.5"],
             sample_name=["The test sample"],
             project_name=["NexusLIMS"], project_id=["***REMOVED***.1.5"],
@@ -1144,7 +1145,7 @@ class TestReservationEvent:
             reservation_type="A test event",
             experiment_purpose="To test the constructor again",
             sample_details=["A sample that was loaded into a microscope for "
-                           "testing again"],
+                            "testing again"],
             sample_pid=["***REMOVED***.6"],
             sample_name=["The test sample again"],
             project_name=["NexusLIMS!"], project_id=["***REMOVED***.1.6"],
@@ -1182,7 +1183,7 @@ class TestReservationEvent:
             reservation_type="A test event",
             experiment_purpose="To test a reservation with no title",
             sample_details=["A sample that was loaded into a microscope for "
-                           "testing"],
+                            "testing"],
             sample_pid=["***REMOVED***.6"],
             sample_name=["The test sample name"],
             project_name=["NexusLIMS"], project_id=["***REMOVED***.1.6"],

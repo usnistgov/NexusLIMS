@@ -442,27 +442,27 @@ class TestActivity:
 
         for i in range(len(self.activities_list_python_find)):
             assert str(gnu_find_activities['activities_list'][i]) == \
-                str(self.activities_list_python_find[i])
+                   str(self.activities_list_python_find[i])
 
     def test_activity_repr(self, gnu_find_activities):
-        if 'is_mountain_time' in os.environ:    # pragma: no cover
+        if 'is_mountain_time' in os.environ:  # pragma: no cover
             expected = '             AcquisitionActivity; ' \
                        'start: 2018-11-13T11:01:28.179682; ' \
                        'end: 2018-11-13T11:19:14.635522'
-        else:                                   # pragma: no cover
+        else:  # pragma: no cover
             expected = '             AcquisitionActivity; ' \
                        'start: 2018-11-13T13:01:28.179682; ' \
                        'end: 2018-11-13T13:19:14.635522'
         assert gnu_find_activities['activities_list'][0].__repr__() == \
-            expected
+               expected
 
     def test_activity_str(self, gnu_find_activities):
-        if 'is_mountain_time' in os.environ:    # pragma: no cover
+        if 'is_mountain_time' in os.environ:  # pragma: no cover
             expected = '2018-11-13T11:01:28.179682 AcquisitionActivity '
-        else:                                   # pragma: no cover
+        else:  # pragma: no cover
             expected = '2018-11-13T13:01:28.179682 AcquisitionActivity '
         assert gnu_find_activities['activities_list'][0].__str__() == \
-            expected
+               expected
 
     def test_add_file_bad_meta(self, monkeypatch, caplog,
                                gnu_find_activities):
@@ -474,7 +474,7 @@ class TestActivity:
         gnu_find_activities['activities_list'][0].add_file(
             files['643_EELS_SI'][0])
         assert len(gnu_find_activities['activities_list'][0].files) == \
-            orig_activity_file_length + 1
+               orig_activity_file_length + 1
         assert f"Could not parse metadata of " \
                f"{files['643_EELS_SI'][0]}" in caplog.text
 
@@ -505,11 +505,11 @@ class TestActivity:
 class TestSession:
     def test_session_repr(self):
         s = session_handler.Session(
-                session_identifier='1c3a6a8d-9038-41f5-b969-55fd02e12345',
-                instrument=instrument_db['FEI-Titan-TEM-635816'],
-                dt_from=_dt.fromisoformat('2020-02-04T09:00:00.000'),
-                dt_to=_dt.fromisoformat('2020-02-04T12:00:00.000'),
-                user='None')
+            session_identifier='1c3a6a8d-9038-41f5-b969-55fd02e12345',
+            instrument=instrument_db['FEI-Titan-TEM-635816'],
+            dt_from=_dt.fromisoformat('2020-02-04T09:00:00.000'),
+            dt_to=_dt.fromisoformat('2020-02-04T12:00:00.000'),
+            user='None')
         assert s.__repr__() == '2020-02-04T09:00:00 to ' \
                                '2020-02-04T12:00:00 on FEI-Titan-TEM-635816'
 
@@ -547,16 +547,16 @@ class TestSessionLog:
         yield None
         # below runs on test teardown
         dbq(query='DELETE FROM session_log WHERE session_identifier = ?',
-            args=('testing-session-log', ))
+            args=('testing-session-log',))
 
     def test_repr(self):
         assert self.sl.__repr__() == "SessionLog " \
-            "(id=testing-session-log, " \
-            "instrument=FEI-Titan-TEM-635816, " \
-            "timestamp=2020-02-04T09:00:00.000, " \
-            "event_type=START, " \
-            "user=ear1, " \
-            "record_status=TO_BE_BUILT)"
+                                     "(id=testing-session-log, " \
+                                     "instrument=FEI-Titan-TEM-635816, " \
+                                     "timestamp=2020-02-04T09:00:00.000, " \
+                                     "event_type=START, " \
+                                     "user=ear1, " \
+                                     "record_status=TO_BE_BUILT)"
 
     def test_insert_log(self):
         _, res_before = dbq(query='SELECT * FROM session_log', args=None)
@@ -599,6 +599,7 @@ class TestCDCS:
         def mock_upload(xml_content, title):
             return Response(status_code=404,
                             text='This is a fake request error!'), 'dummy_id'
+
         monkeypatch.setattr(cdcs, 'upload_record_content', mock_upload)
 
         files_uploaded, record_ids = cdcs.upload_record_files(
@@ -633,6 +634,7 @@ class TestCDCS:
             return Response(status_code=404,
                             text='This is a fake request error!',
                             json=lambda: [{'id': 'dummy', 'current': 'dummy'}])
+
         monkeypatch.setattr(cdcs, '_nx_req', mock_req)
 
         resp = cdcs.upload_record_content('<xml>content</xml>', 'title')
