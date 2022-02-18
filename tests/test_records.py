@@ -574,15 +574,28 @@ class TestActivity:
 
 
 class TestSession:
-    def test_session_repr(self):
+    @pytest.fixture()
+    def session(self):
         s = session_handler.Session(
-            session_identifier='1c3a6a8d-9038-41f5-b969-55fd02e12345',
+            session_identifier='test_session',
             instrument=instrument_db['FEI-Titan-TEM-635816'],
             dt_from=_dt.fromisoformat('2020-02-04T09:00:00.000'),
             dt_to=_dt.fromisoformat('2020-02-04T12:00:00.000'),
             user='None')
-        assert s.__repr__() == '2020-02-04T09:00:00 to ' \
-                               '2020-02-04T12:00:00 on FEI-Titan-TEM-635816'
+        return s
+
+    def test_session_repr(self, session):
+        assert session.__repr__() == '2020-02-04T09:00:00 to ' \
+                                     '2020-02-04T12:00:00 on ' \
+                                     'FEI-Titan-TEM-635816'
+
+    def test_record_generation_timestamp(self, session, cleanup_session_log):
+        from nexusLIMS.db.session_handler import db_query
+        row_dict = session.insert_record_generation_event()
+        _, res = \
+            db_query("SELECT timestamp FROM session_log WHERE "
+                     "id_session_log = ?", (row_dict['id_session_log'],))
+        assert _dt.fromisoformat(res[0][0]).tzinfo is not None
 
     def test_bad_db_status(self, monkeypatch):
         uuid = uuid4()
