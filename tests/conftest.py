@@ -36,6 +36,7 @@ import pytest
 import nexusLIMS.utils
 from pathlib import Path
 import shutil
+from nexusLIMS.db.session_handler import db_query
 
 # we don't want to mask both directories, because the record builder tests
 # need to look at the real files on ***REMOVED***:
@@ -127,3 +128,19 @@ def fix_mountain_time(monkey_session):
         monkey_session.setattr(nexusLIMS.utils, "tz_offset", _td(hours=-2))
         monkey_session.setenv('ignore_mib', 'True')
         monkey_session.setenv('is_mountain_time', 'True')
+
+
+@pytest.fixture(scope='function')
+def cleanup_session_log():
+    # this fixture removes the rows for the usage event added in
+    # test_usage_event_to_session_log, so it doesn't mess up future
+    # record building tests
+    yield None
+    to_remove = ('https://***REMOVED***/api/usage_events/?id=29',
+                 'https://***REMOVED***/api/usage_events/?id=30',
+                 'https://***REMOVED***/api/usage_events/?id=31',
+                 'https://***REMOVED***/api/usage_events/?id=385031',
+                 'test_session')
+    db_query(f'DELETE FROM session_log WHERE session_identifier IN '
+             f'({",".join("?" * len(to_remove))})', to_remove)
+    pass

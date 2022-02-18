@@ -684,6 +684,52 @@ def get_auth(filename="credentials.ini", basic=False):
     return auth
 
 
+def has_delay_passed(date: datetime) -> bool:
+    """
+    Helper method to check if the current time is greater than the configured
+    (or default) record building delay configured in the
+    ``nexusLIMS_file_delay_days`` environment variable. If the date given is
+    timezone-aware, the current time in that timezone will be compared.
+
+    Parameters
+    ----------
+    date
+        The datetime to check; can be either timezone aware or naive
+
+    Returns
+    -------
+    bool
+        Whether the current time is greater than the given date plus the
+        configurable delay.
+    """
+    try:
+        # get record builder delay from environment settings
+        delay = float(_os.getenv('nexusLIMS_file_delay_days', 2))
+    except ValueError:
+        # if it cannot be coerced to a number, warn and set to the
+        # default of 2 days
+        _logger.warning(
+            f'The environment variable value of '
+            f'nexusLIMS_file_delay_days '
+            f'({_os.getenv("nexusLIMS_file_delay_days")}) could '
+            f'not be understood as a number, so using the default '
+            f'of 2 days.')
+        delay = 2
+
+    delay = _timedelta(days=delay)
+
+    if date.tzinfo is None:
+        # compare naive datetime
+        now = datetime.now()
+    else:
+        # compare timezone-aware datetime using current time in that timezone
+        now = datetime.now(date.tzinfo)
+
+    delta = now - date
+
+    return delta > delay
+
+
 class AuthenticationError(Exception):
     """Class for showing an exception having to do with authentication"""
     def __init__(self, message):

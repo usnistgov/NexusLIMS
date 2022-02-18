@@ -195,15 +195,16 @@ class Session:
 
         return success
 
-    def insert_record_generation_event(self):
+    def insert_record_generation_event(self) -> dict:
         """
-        Insert a log for this sesssion into the session database with
+        Insert a log for this session into the session database with
         ``event_type`` `"RECORD_GENERATION"`
 
         Returns
         -------
-        success : bool
-            Whether or not the update operation was successful
+        res : dict
+            A dictionary containing the results from the query to check that
+            a RECORD_GENERATION event was added
         """
         _logger.debug(f'Logging RECORD_GENERATION for '
                       f'{self.session_identifier}')
@@ -222,8 +223,8 @@ class Session:
                         conn.cursor()) as cursor:  # auto-closes
                     results = cursor.execute(insert_query)
 
-        check_query = f"SELECT event_type, session_identifier, " \
-                      f"id_session_log, " \
+        check_query = f"SELECT id_session_log, event_type, " \
+                      f"session_identifier, " \
                       f"timestamp FROM session_log " \
                       f"WHERE instrument = '{self.instrument.name}' " \
                       f"AND event_type = 'RECORD_GENERATION'" \
@@ -232,18 +233,21 @@ class Session:
         # use contextlib to auto-close the connection and database cursors
         with _contextlib.closing(_sql3.connect(
                 _os.environ['nexusLIMS_db_path'])) as conn:
+            conn.row_factory = _sql3.Row
             with conn:  # auto-commits
                 with _contextlib.closing(
                         conn.cursor()) as cursor:  # auto-closes
                     results = cursor.execute(check_query)
                     res = results.fetchone()
 
-        if res[0:2] == ('RECORD_GENERATION', self.session_identifier):
+        event_match = res['event_type'] == 'RECORD_GENERATION'
+        id_match = res['session_identifier'] == self.session_identifier
+        if event_match and id_match:
             _logger.debug(f'Confirmed RECORD_GENERATION insertion for'
                           f' {self.session_identifier}')
             success = True
 
-        return success
+        return dict(res)
 
 
 def get_sessions_to_build() -> List[Session]:
