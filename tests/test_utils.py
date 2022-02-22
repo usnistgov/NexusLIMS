@@ -26,10 +26,8 @@
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
 
-import nexusLIMS.utils
-import utils
 from nexusLIMS.utils import *
-from nexusLIMS.utils import find_dirs_by_mtime, _zero_bytes
+from nexusLIMS.utils import _zero_bytes
 from nexusLIMS.extractors import extension_reader_map as _ext
 from nexusLIMS.extractors import quanta_tif
 from datetime import datetime
@@ -195,6 +193,6 @@ class TestUtils:
 
     def test_has_delay_passed_no_val(self, monkeypatch, caplog):
         monkeypatch.setenv('nexusLIMS_file_delay_days', 'bad_float')
-        assert not utils.has_delay_passed(datetime.now())
+        assert not has_delay_passed(datetime.now())
         assert 'The environment variable value of nexusLIMS_file_delay_days' \
                in caplog.text
