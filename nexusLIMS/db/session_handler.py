@@ -198,7 +198,8 @@ class Session:
     def insert_record_generation_event(self) -> dict:
         """
         Insert a log for this session into the session database with
-        ``event_type`` `"RECORD_GENERATION"`
+        ``event_type`` `"RECORD_GENERATION"` and the current time (with local
+        system timezone) as the timestamp.
 
         Returns
         -------
@@ -208,11 +209,12 @@ class Session:
         """
         _logger.debug(f'Logging RECORD_GENERATION for '
                       f'{self.session_identifier}')
-        insert_query = f"INSERT INTO session_log " \
-                       f"(instrument, event_type, session_identifier, user) " \
-                       f"VALUES ('{self.instrument.name}', " \
-                       f"'RECORD_GENERATION', '{self.session_identifier}', " \
-                       f"'{_os.environ['nexusLIMS_user']}');"
+        insert_query = "INSERT INTO session_log " \
+                       "(instrument, event_type, session_identifier, " \
+                       "user, timestamp) VALUES (?, ?, ?, ?, ?)"
+        args = (self.instrument.name, 'RECORD_GENERATION',
+                self.session_identifier, _os.getenv('nexusLIMS_user'),
+                _dt.now().astimezone())
         success = False
 
         # use contextlib to auto-close the connection and database cursors
@@ -221,14 +223,14 @@ class Session:
             with conn:  # auto-commits
                 with _contextlib.closing(
                         conn.cursor()) as cursor:  # auto-closes
-                    results = cursor.execute(insert_query)
+                    results = cursor.execute(insert_query, args)
 
-        check_query = f"SELECT id_session_log, event_type, " \
-                      f"session_identifier, " \
-                      f"timestamp FROM session_log " \
-                      f"WHERE instrument = '{self.instrument.name}' " \
-                      f"AND event_type = 'RECORD_GENERATION'" \
-                      f"ORDER BY timestamp DESC LIMIT 1;"
+        check_query = "SELECT id_session_log, event_type, " \
+                      "session_identifier, timestamp FROM session_log " \
+                      "WHERE instrument = ?" \
+                      "AND event_type = ?" \
+                      "ORDER BY timestamp DESC LIMIT 1"
+        args = (self.instrument.name, 'RECORD_GENERATION')
 
         # use contextlib to auto-close the connection and database cursors
         with _contextlib.closing(_sql3.connect(
@@ -237,7 +239,7 @@ class Session:
             with conn:  # auto-commits
                 with _contextlib.closing(
                         conn.cursor()) as cursor:  # auto-closes
-                    results = cursor.execute(check_query)
+                    results = cursor.execute(check_query, args)
                     res = results.fetchone()
 
         event_match = res['event_type'] == 'RECORD_GENERATION'

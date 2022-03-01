@@ -114,7 +114,7 @@ class TestRecordBuilder:
         dt_str_to = '2019-09-06T18:00:00.000'
         monkeypatch.setattr(_rb, '_get_sessions', lambda: [
             Session(session_identifier='test_session',
-                    instrument=instrument_db['testsurface-CPU_P1111111'],
+                    instrument=instrument_db['FEI-Titan-TEM-635816'],
                     dt_from=_dt.fromisoformat(dt_str_from),
                     dt_to=_dt.fromisoformat(dt_str_to),
                     user='test')
@@ -141,20 +141,20 @@ class TestRecordBuilder:
             start_ts = _dt.now().astimezone() - _td(days=1)
             end_ts = _dt.now().astimezone() - _td(days=0.5)
         start = SessionLog(session_identifier='test_session',
-                           instrument='testsurface-CPU_P1111111',
+                           instrument='FEI-Titan-TEM-635816',
                            timestamp=start_ts.isoformat(),
                            event_type='START', user='test',
                            record_status='TO_BE_BUILT')
         start.insert_log()
         end = SessionLog(session_identifier='test_session',
-                         instrument='testsurface-CPU_P1111111',
+                         instrument='FEI-Titan-TEM-635816',
                          timestamp=end_ts.isoformat(),
                          event_type='END', user='test',
                          record_status='TO_BE_BUILT')
         end.insert_log()
 
         s = Session(session_identifier='test_session',
-                    instrument=instrument_db['testsurface-CPU_P1111111'],
+                    instrument=instrument_db['FEI-Titan-TEM-635816'],
                     dt_from=start_ts, dt_to=end_ts, user='test')
         # return just our session of interest to build and disable nemo
         # harvester's add_all_usage_events_to_db method
@@ -182,6 +182,50 @@ class TestRecordBuilder:
         assert res[0][5] == 'TO_BE_BUILT'
         assert res[1][5] == 'TO_BE_BUILT'
         assert res[2][5] == 'NO_FILES_FOUND'
+
+    def test_process_new_nemo_record_with_no_reservation(
+            self, remove_nemo_gov_harvester, monkeypatch,
+            caplog, cleanup_session_log):
+        """
+        This test method tests building a record from a NEMO instrument with
+        no matching reservation; should result in "COMPLETED" status
+        """
+        from nexusLIMS.db.session_handler import SessionLog, Session
+        start_ts = '2020-01-01T12:00:00.000-05:00'
+        end_ts = '2020-01-01T20:00:00.000-05:00'
+        start = SessionLog(session_identifier='test_session',
+                           instrument='FEI-Titan-TEM-635816',
+                           timestamp=start_ts, event_type='START', user='test',
+                           record_status='TO_BE_BUILT')
+        start.insert_log()
+        end = SessionLog(session_identifier='test_session',
+                         instrument='FEI-Titan-TEM-635816',
+                         timestamp=end_ts, event_type='END', user='test',
+                         record_status='TO_BE_BUILT')
+        end.insert_log()
+
+        s = Session(session_identifier='test_session',
+                    instrument=instrument_db['testsurface-CPU_P1111111'],
+                    dt_from=_dt.fromisoformat(start_ts),
+                    dt_to=_dt.fromisoformat(end_ts),
+                    user='test')
+        # return just our session of interest to build and disable nemo
+        # harvester's add_all_usage_events_to_db method
+        monkeypatch.setattr(_rb, '_get_sessions', lambda: [s])
+        monkeypatch.setattr(_rb._nemo, 'add_all_usage_events_to_db',
+                            lambda dt_from, dt_to: None)
+
+        _rb.process_new_records(dry_run=False)
+
+        assert "No reservation found matching this session, so assuming " \
+               "NexusLIMS does not have user consent for data harvesting." \
+               in caplog.text
+
+        _, res = dbq("SELECT * FROM session_log WHERE session_identifier = ?",
+                     ("test_session", ))
+        assert res[0][5] == 'COMPLETED'
+        assert res[1][5] == 'COMPLETED'
+        assert res[2][5] == 'COMPLETED'
 
     def test_new_session_processor(self, remove_nemo_gov_harvester,
                                    monkeypatch, fix_mountain_time):
@@ -574,15 +618,28 @@ class TestActivity:
 
 
 class TestSession:
-    def test_session_repr(self):
+    @pytest.fixture()
+    def session(self):
         s = session_handler.Session(
-            session_identifier='1c3a6a8d-9038-41f5-b969-55fd02e12345',
+            session_identifier='test_session',
             instrument=instrument_db['FEI-Titan-TEM-635816'],
             dt_from=_dt.fromisoformat('2020-02-04T09:00:00.000'),
             dt_to=_dt.fromisoformat('2020-02-04T12:00:00.000'),
             user='None')
-        assert s.__repr__() == '2020-02-04T09:00:00 to ' \
-                               '2020-02-04T12:00:00 on FEI-Titan-TEM-635816'
+        return s
+
+    def test_session_repr(self, session):
+        assert session.__repr__() == '2020-02-04T09:00:00 to ' \
+                                     '2020-02-04T12:00:00 on ' \
+                                     'FEI-Titan-TEM-635816'
+
+    def test_record_generation_timestamp(self, session, cleanup_session_log):
+        from nexusLIMS.db.session_handler import db_query
+        row_dict = session.insert_record_generation_event()
+        _, res = \
+            db_query("SELECT timestamp FROM session_log WHERE "
+                     "id_session_log = ?", (row_dict['id_session_log'],))
+        assert _dt.fromisoformat(res[0][0]).tzinfo is not None
 
     def test_bad_db_status(self, monkeypatch):
         uuid = uuid4()

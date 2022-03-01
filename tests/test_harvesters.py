@@ -773,12 +773,8 @@ class TestNemoIntegration:
                     dt.fromisoformat('2021-08-10T15:00:00-06:00'),
                     dt.fromisoformat('2021-08-10T16:00:00-06:00'),
                     user='***REMOVED***')
-        res_event = nemo.res_event_from_session(s)
-        assert res_event.username == '***REMOVED***'
-        assert res_event.start_time == dt.fromisoformat(
-            '2021-08-10T15:00:00-06:00')
-        assert res_event.end_time == dt.fromisoformat(
-            '2021-08-10T16:00:00-06:00')
+        with pytest.raises(nemo.NoDataConsentException):
+            nemo.res_event_from_session(s)
 
     def test_res_event_from_session_no_overlapping_sessions(self):
         from nexusLIMS.db.session_handler import Session
@@ -788,12 +784,8 @@ class TestNemoIntegration:
                     dt.fromisoformat('2021-08-05T15:00:00-06:00'),
                     dt.fromisoformat('2021-08-05T16:00:00-06:00'),
                     user='***REMOVED***')
-        res_event = nemo.res_event_from_session(s)
-        assert res_event.username == '***REMOVED***'
-        assert res_event.start_time == dt.fromisoformat(
-            '2021-08-05T15:00:00-06:00')
-        assert res_event.end_time == dt.fromisoformat(
-            '2021-08-05T16:00:00-06:00')
+        with pytest.raises(nemo.NoDataConsentException):
+            nemo.res_event_from_session(s)
 
     def test_no_connector_for_session(self):
         from nexusLIMS.db.session_handler import Session

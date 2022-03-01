@@ -989,17 +989,10 @@ def res_event_from_session(session: Session) -> ReservationEvent:
         # so we'll use what limited information we have from the usage event
         # session
         _logger.warning(f"No reservations found with overlap for this usage "
-                        f"event, so creating generic ReservationEvent")
-        res_event = ReservationEvent(
-            experiment_title=None, instrument=session.instrument,
-            last_updated=session.dt_to, username=session.user,
-            created_by=None, start_time=session.dt_from,
-            end_time=session.dt_to, reservation_type=None,
-            experiment_purpose=None, sample_details=None,
-            sample_pid=None, sample_name=None, project_name=None,
-            project_id=None, project_ref=None, internal_id=None,
-            division=None, group=None, url=None
-        )
+                        f"event, so raising NoDataConsentException")
+        raise NoDataConsentException("No reservation found matching this "
+                                     "session, so assuming NexusLIMS does not "
+                                     "have user consent for data harvesting.")
     else:
         max_overlap = overlaps.index(max(overlaps))
         # select the reservation with the most overlap
