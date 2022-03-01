@@ -57,7 +57,9 @@ from nexusLIMS.harvesters import nemo as _nemo
 from nexusLIMS.harvesters.nemo import NoDataConsentException
 from nexusLIMS.utils import find_files_by_mtime as _find_files
 from nexusLIMS.utils import gnu_find_files_by_mtime as _gnu_find_files
+from nexusLIMS.utils import has_delay_passed as _has_delay_passed
 from nexusLIMS.extractors import extension_reader_map as _ext
+from nexusLIMS.db.session_handler import db_query as _dbq
 from nexusLIMS.db.session_handler import get_sessions_to_build as _get_sessions
 from nexusLIMS.db.session_handler import Session
 from nexusLIMS.cdcs import upload_record_files as _upload_record_files
@@ -66,8 +68,8 @@ from timeit import default_timer as _timer
 from importlib import import_module, util
 
 _logger = _logging.getLogger(__name__)
-XSD_PATH: str  = _os.path.join(_os.path.dirname(_activity.__file__),
-                               "nexus-experiment.xsd")
+XSD_PATH: str = _os.path.join(_os.path.dirname(_activity.__file__),
+                              "nexus-experiment.xsd")
 
 
 def build_record(session: Session,
@@ -414,7 +416,7 @@ def build_new_session_records() -> List[str]:
     # loop through the sessions
     for s in sessions:
         try:
-            s.insert_record_generation_event()
+            db_row = s.insert_record_generation_event()
             record_text = build_record(session=s)
         except (FileNotFoundError, Exception) as e:
             if isinstance(e, FileNotFoundError):
@@ -426,9 +428,23 @@ def build_new_session_records() -> List[str]:
                                 f'{_os.path.abspath(path)} between '
                                 f'{s.dt_from.isoformat()} and '
                                 f'{s.dt_to.isoformat()}')
-                _logger.warning(f'Marking {s.session_identifier} as '
-                                f'"NO_FILES_FOUND"')
-                s.update_session_status('NO_FILES_FOUND')
+
+                if _has_delay_passed(s.dt_to):
+                    _logger.warning(f'Marking {s.session_identifier} as '
+                                    f'"NO_FILES_FOUND"')
+                    s.update_session_status('NO_FILES_FOUND')
+                else:
+                    # if the delay hasn't passed, mark just the record
+                    # generation event as NO_FILES_FOUND
+                    _logger.warning(f'Configured record building delay has '
+                                    f'not passed; Marking just the '
+                                    f'RECORD_GENERATION '
+                                    f'row for {s.session_identifier} '
+                                    f'as "NO_FILES_FOUND"')
+                    _dbq("UPDATE session_log "
+                         "SET record_status = ? "
+                         "WHERE id_session_log = ?",
+                         ("NO_FILES_FOUND", db_row['id_session_log']))
             elif isinstance(e, NoDataConsentException):
                 _logger.warning(f"User requested this session not be "
                                 f"harvested, so no record was built. "

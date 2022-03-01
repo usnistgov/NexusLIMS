@@ -1,3 +1,4 @@
+import datetime
 import os
 import nexusLIMS
 from functools import partial
@@ -105,12 +106,82 @@ class TestRecordBuilder:
 
     def test_process_new_records_no_files_warning(self,
                                                   remove_nemo_gov_harvester,
-                                                  monkeypatch, caplog):
-        monkeypatch.setattr(_rb, "build_new_session_records", lambda: [])
+                                                  monkeypatch, caplog,
+                                                  cleanup_session_log):
+        from nexusLIMS.db.session_handler import Session
+        # overload "_get_sessions" to return just one session
+        dt_str_from = '2019-09-06T17:00:00.000'
+        dt_str_to = '2019-09-06T18:00:00.000'
+        monkeypatch.setattr(_rb, '_get_sessions', lambda: [
+            Session(session_identifier='test_session',
+                    instrument=instrument_db['testsurface-CPU_P1111111'],
+                    dt_from=_dt.fromisoformat(dt_str_from),
+                    dt_to=_dt.fromisoformat(dt_str_to),
+                    user='test')
+        ])
         _rb.process_new_records(dry_run=False,
                                 dt_to=_dt.fromisoformat(
                                     '2021-07-01T00:00:00-04:00'))
-        assert "No XML files built, so no files uploaded" in caplog.text
+        assert "No files found in " in caplog.text
+
+    @pytest.fixture()
+    def add_recent_test_session(self, request, monkeypatch):
+        # insert a dummy session to DB that was within past day so it gets
+        # skipped (we assume no files are being regularly added into the test
+        # instrument folder)
+
+        # the ``request.param`` parameter controls whether the timestamps have
+        # timezones attached
+        from nexusLIMS.db.session_handler import SessionLog, Session
+
+        if request.param:
+            start_ts = _dt.now() - _td(days=1)
+            end_ts = _dt.now() - _td(days=0.5)
+        else:
+            start_ts = _dt.now().astimezone() - _td(days=1)
+            end_ts = _dt.now().astimezone() - _td(days=0.5)
+        start = SessionLog(session_identifier='test_session',
+                           instrument='testsurface-CPU_P1111111',
+                           timestamp=start_ts.isoformat(),
+                           event_type='START', user='test',
+                           record_status='TO_BE_BUILT')
+        start.insert_log()
+        end = SessionLog(session_identifier='test_session',
+                         instrument='testsurface-CPU_P1111111',
+                         timestamp=end_ts.isoformat(),
+                         event_type='END', user='test',
+                         record_status='TO_BE_BUILT')
+        end.insert_log()
+
+        s = Session(session_identifier='test_session',
+                    instrument=instrument_db['testsurface-CPU_P1111111'],
+                    dt_from=start_ts, dt_to=end_ts, user='test')
+        # return just our session of interest to build and disable nemo
+        # harvester's add_all_usage_events_to_db method
+        monkeypatch.setattr(_rb, '_get_sessions', lambda: [s])
+        monkeypatch.setattr(_rb._nemo, 'add_all_usage_events_to_db',
+                            lambda dt_from, dt_to: None)
+
+    # this parametrize call provides "request.param" with values of True and
+    # then False to the add_recent_test_session fixture, which is used to
+    # test both timezone-aware and timezone-naive delay implementations
+    # (see https://stackoverflow.com/a/36087408)
+    @pytest.mark.parametrize('add_recent_test_session', [True, False],
+                             indirect=True)
+    def test_process_new_records_within_delay(self,
+                                              add_recent_test_session,
+                                              remove_nemo_gov_harvester,
+                                              monkeypatch, caplog,
+                                              cleanup_session_log):
+        _rb.process_new_records(dry_run=False)
+        assert "Configured record building delay has not passed; " \
+               "Marking just the RECORD_GENERATION row" in caplog.text
+
+        _, res = dbq("SELECT * FROM session_log WHERE session_identifier = ?",
+                     ("test_session", ))
+        assert res[0][5] == 'TO_BE_BUILT'
+        assert res[1][5] == 'TO_BE_BUILT'
+        assert res[2][5] == 'NO_FILES_FOUND'
 
     def test_new_session_processor(self, remove_nemo_gov_harvester,
                                    monkeypatch, fix_mountain_time):

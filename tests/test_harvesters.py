@@ -645,20 +645,6 @@ class TestNemoIntegration:
         # tool requested is not part of what's in our DB
         assert nemo_connector.get_usage_events(tool_id=[-5, -4]) == []
 
-    @pytest.fixture
-    def cleanup_session_log(self):
-        # this fixture removes the rows for the usage event added in
-        # test_usage_event_to_session_log, so it doesn't mess up future
-        # record building tests
-        yield None
-        to_remove = ('https://***REMOVED***/api/usage_events/?id=29',
-                     'https://***REMOVED***/api/usage_events/?id=30',
-                     'https://***REMOVED***/api/usage_events/?id=31',
-                     'https://***REMOVED***/api/usage_events/?id=385031')
-        db_query(f'DELETE FROM session_log WHERE session_identifier IN '
-                 f'({",".join("?" * len(to_remove))})', to_remove)
-        pass
-
     def test_add_all_usage_events_to_db(self, cleanup_session_log):
         success_before, results_before = db_query('SELECT * FROM session_log;')
         from nexusLIMS.harvesters import nemo
