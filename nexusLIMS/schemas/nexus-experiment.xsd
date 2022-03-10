@@ -33,7 +33,7 @@
   xmlns:nx="https://data.nist.gov/od/dm/nexus/experiment/v1.0"
   xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema"
   xmlns:xsi="http://www.w3c.org/2001/XMLSchema-instance" elementFormDefault="unqualified"
-  attributeFormDefault="unqualified" version="0.02-26-2020">
+  attributeFormDefault="unqualified" version="1.03-10-2022">
 
   <xs:annotation>
     <xs:documentation>
@@ -77,7 +77,7 @@
                <label>Identifier</label>
              </xs:appinfo>
           <xs:documentation>
-               A unique identifier assigned to this record.
+               A unique local identifier assigned to this record.
              </xs:documentation>
         </xs:annotation>
       </xs:element>
@@ -138,6 +138,27 @@
       </xs:element>
 
     </xs:sequence>
+
+    <xs:attribute name="pid">
+      <xs:annotation>
+          <xs:appinfo>
+              <label>Persistent Identifier</label>
+          </xs:appinfo>
+          <xs:documentation> An unambiguous identifier for this resource description as
+              assigned by its author or its curating registry. </xs:documentation>
+          <xs:documentation> This attribute is required on export. </xs:documentation>
+          <xs:documentation> Authors may use this identifier for a proxy ID for the underlying
+              resource if one does not exist</xs:documentation>
+      </xs:annotation>
+      <xs:simpleType>
+          <xs:annotation>
+              <xs:appinfo>
+                  <module>module-local-id-registry</module>
+              </xs:appinfo>
+          </xs:annotation>
+          <xs:restriction base="xs:string"/>
+      </xs:simpleType>
+    </xs:attribute>
   </xs:complexType>
 
   <xs:complexType name="Summary">
