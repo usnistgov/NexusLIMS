@@ -116,7 +116,7 @@ def parse_metadata(fname, write_output=True, generate_preview=True,
         if extension == 'tif':
             instr = _get_instr(fname)
             instr_name = instr.name if instr is not None else None
-            if instr_name == 'FEI-Quanta200-ESEM-633137':
+            if instr_name == 'FEI-Quanta200-ESEM-633137_n':
                 # we know the output size we want for the Quanta
                 output_size = (512, 471)
                 _down_sample(fname,

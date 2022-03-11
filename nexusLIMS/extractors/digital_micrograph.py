@@ -392,9 +392,9 @@ def parse_642_jeol(mdict):
 
 
 _instr_specific_parsers = {
-    'FEI-Titan-STEM-630901': parse_643_titan,
-    'FEI-Titan-TEM-635816': parse_642_titan,
-    'JEOL-JEM3010-TEM-565989': parse_642_jeol
+    'FEI-Titan-STEM-630901_n': parse_643_titan,
+    'FEI-Titan-TEM-635816_n': parse_642_titan,
+    'JEOL-JEM3010-TEM-565989_n': parse_642_jeol
 }
 
 
@@ -599,9 +599,9 @@ def parse_dm3_eels_info(mdict):
 
     # different instruments have the spectrometer information in different
     # places...
-    if mdict['nx_meta']['Instrument ID'] == 'FEI-Titan-TEM-635816':
+    if mdict['nx_meta']['Instrument ID'] == 'FEI-Titan-TEM-635816_n':
         base = pre_path + ['EELS', 'Acquisition', 'Spectrometer']
-    elif mdict['nx_meta']['Instrument ID'] == 'FEI-Titan-STEM-630901':
+    elif mdict['nx_meta']['Instrument ID'] == 'FEI-Titan-STEM-630901_n':
         base = pre_path + ['EELS Spectrometer']
     else:
         base = None

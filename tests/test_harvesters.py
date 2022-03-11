@@ -24,13 +24,9 @@ warnings.filterwarnings(
     DeprecationWarning)
 
 
-class TestSharepoint:
-    CREDENTIAL_FILE_ABS = os.path.abspath(
-        os.path.join(os.path.dirname(harvesters.__file__),
-                     '..',
-                     'credentials.ini.example'))
-    CREDENTIAL_FILE_REL = 'credentials.ini.example'
-
+@pytest.mark.skip(reason="no way of currently testing SharePoint with current "
+                         "deployment environment; SP harvesting is deprecated")
+class TestSharepoint:    # pragma: no cover
     @pytest.mark.parametrize('instrument', list(instrument_db.values()),
                              ids=list(instrument_db.keys()))
     def test_downloading_valid_calendars(self, instrument):
@@ -75,30 +71,6 @@ class TestSharepoint:
             m.setenv('nexusLIMS_user', 'bad_user')
             with pytest.raises(AuthenticationError):
                 sc.fetch_xml(instrument_db['FEI-Titan-TEM-635816'])
-
-    def test_absolute_path_to_credentials(self, monkeypatch):
-        from nexusLIMS.utils import get_auth
-        with monkeypatch.context() as m:
-            # remove environment variable so we get into file processing
-            m.delenv('nexusLIMS_user')
-            _ = get_auth(self.CREDENTIAL_FILE_ABS)
-
-    def test_relative_path_to_credentials(self, monkeypatch):
-        from nexusLIMS.utils import get_auth
-        os.chdir(os.path.dirname(__file__))
-        with monkeypatch.context() as m:
-            # remove environment variable so we get into file processing
-            m.delenv('nexusLIMS_user')
-            _ = get_auth(self.CREDENTIAL_FILE_REL)
-
-    def test_bad_path_to_credentials(self, monkeypatch):
-        from nexusLIMS.utils import get_auth
-        with monkeypatch.context() as m:
-            # remove environment variable so we get into file processing
-            m.delenv('nexusLIMS_user')
-            cred_file = os.path.join('bogus_credentials.ini')
-            with pytest.raises(AuthenticationError):
-                _ = get_auth(cred_file)
 
     def test_bad_request_response(self, monkeypatch):
         with monkeypatch.context() as m:
@@ -159,9 +131,9 @@ class TestSharepoint:
         assert cal_event.username == '***REMOVED***'
         assert cal_event.start_time == dt.fromisoformat(
             '2018-11-13T09:00:00-05:00')
-        assert cal_event.url == 'https://***REMOVED***/Div/' + \
-               'msed/MSED-MMF/Lists/FEI%20Titan%20Events/' + \
-               'DispForm.aspx/?ID=470'
+        assert cal_event.url == 'https://***REMOVED***/sites/' \
+            'microscopy/Archive/Lists/FEI%20Titan%20Events/' + \
+            'DispForm.aspx/?ID=470'
 
     def test_sharepoint_fetch_xml_reservation_event_no_entry(self):
         # tests when there is no matching event found
@@ -251,7 +223,7 @@ class TestSharepoint:
             def __init__(self, text):
                 self.text = \
                     """<?xml version="1.0" encoding="utf-8"?>
-<feed xml:base="https://***REMOVED***/Div/msed/MSED-MMF/_api/"
+<feed xml:base="https://***REMOVED***/sites/microscopy/Archive/_api/"
       xmlns="http://www.w3.org/2005/Atom"
       xmlns:d="http://schemas.microsoft.com/ado/2007/08/dataservices"
       xmlns:m="http://schemas.microsoft.com/ado/2007/08/dataservices/metadata"
@@ -1072,10 +1044,11 @@ class TestNemoIntegration:
 
 
 class TestReservationEvent:
-    def test_full_reservation_constructor(self):
-        res_event = ReservationEvent(
+    @pytest.fixture()
+    def res_event(self):
+        return ReservationEvent(
             experiment_title="A test title",
-            instrument=instrument_db['FEI-Titan-TEM-635816'],
+            instrument=instrument_db['FEI-Titan-TEM-635816_n'],
             last_updated=dt.fromisoformat("2021-09-15T16:04:00"),
             username='***REMOVED***', created_by='***REMOVED***',
             start_time=dt.fromisoformat("2021-09-15T03:00:00"),
@@ -1091,6 +1064,16 @@ class TestReservationEvent:
             division="641", group="00"
         )
 
+    @pytest.fixture()
+    def res_event_no_calendar_match(self):
+        return ReservationEvent(
+            instrument=instrument_db['FEI-Titan-TEM-635816_n'])
+
+    @pytest.fixture()
+    def res_event_no_instr(self):
+        return ReservationEvent()
+
+    def test_full_reservation_constructor(self, res_event):
         xml = res_event.as_xml()
         assert xml.find('title').text == "A test title"
         assert xml.find('id').text == "42308"
@@ -1112,6 +1095,17 @@ class TestReservationEvent:
         assert xml.find('project/group').text == "00"
         assert xml.find('project/project_id').text == "***REMOVED***.1.5"
         assert xml.find('project/ref').text == "https://www.example.org"
+
+    def test_res_event_repr(self,
+                            res_event,
+                            res_event_no_calendar_match,
+                            res_event_no_instr):
+        assert res_event.__repr__() == \
+               'Event for ***REMOVED*** on FEI-Titan-TEM-635816_n from ' \
+               '2021-09-15T03:00:00-04:00 to 2021-09-15T16:00:00-04:00'
+        assert res_event_no_calendar_match.__repr__() == \
+            'No matching calendar event for FEI-Titan-TEM-635816_n'
+        assert res_event_no_instr.__repr__() == 'No matching calendar event'
 
     def test_full_reservation_constructor_instr_none(self):
         res_event = ReservationEvent(
@@ -1154,7 +1148,7 @@ class TestReservationEvent:
     def test_res_event_without_title(self):
         res_event = ReservationEvent(
             experiment_title=None,
-            instrument=instrument_db['FEI-Titan-TEM-635816'],
+            instrument=instrument_db['FEI-Titan-TEM-635816_n'],
             last_updated=dt.fromisoformat("2021-09-15T16:04:00"),
             username='***REMOVED***', created_by='***REMOVED***',
             start_time=dt.fromisoformat("2021-09-15T04:00:00"),

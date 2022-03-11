@@ -465,7 +465,7 @@ def build_new_session_records() -> List[str]:
                 if s.instrument.harvester == 'nemo':
                     # for NEMO session_identifier is a URL of usage_event
                     unique_suffix = f'{_nemo.id_from_url(s.session_identifier)}'
-                else:
+                else:  # pragma: no cover
                     # assume session_identifier is a UUID
                     unique_suffix = f'{s.session_identifier.split("-")[0]}'
                 basename = f'{s.dt_from.strftime("%Y-%m-%d")}_' \
@@ -564,7 +564,8 @@ def process_new_records(dry_run: bool = False,
                               f'{files_not_uploaded}')
 
 
-def dry_run_get_sharepoint_reservation_event(s: Session) -> _ResEvent:
+def dry_run_get_sharepoint_reservation_event(
+        s: Session) -> _ResEvent:  # pragma: no cover
     """
     Get the calendar event that would be used to create a record based off
     the supplied session
