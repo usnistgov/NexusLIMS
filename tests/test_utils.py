@@ -26,6 +26,7 @@
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
 
+from nexusLIMS import utils
 from nexusLIMS.utils import *
 from nexusLIMS.utils import _zero_bytes
 from nexusLIMS.extractors import extension_reader_map as _ext
@@ -34,14 +35,16 @@ from datetime import datetime
 from requests import get
 import os
 import sys
-from io import BytesIO
-from lxml import etree
 import pytest
 import logging
-from datetime import timedelta as _td
 
 
 class TestUtils:
+    CREDENTIAL_FILE_ABS = os.path.abspath(
+        os.path.join(os.path.dirname(utils.__file__),
+                     'credentials.ini.example'))
+    CREDENTIAL_FILE_REL = 'credentials.ini.example'
+
     def test_get_nested_dict_value(self):
         nest = {'level1': {'level2.1': {'level3.1': 'value'}}}
         assert get_nested_dict_value(nest, 'value') == ('level1', 'level2.1',
@@ -196,3 +199,27 @@ class TestUtils:
         assert not has_delay_passed(datetime.now())
         assert 'The environment variable value of nexusLIMS_file_delay_days' \
                in caplog.text
+
+    def test_absolute_path_to_credentials(self, monkeypatch):
+        from nexusLIMS.utils import get_auth
+        with monkeypatch.context() as m:
+            # remove environment variable so we get into file processing
+            m.delenv('nexusLIMS_user')
+            _ = get_auth(self.CREDENTIAL_FILE_ABS)
+
+    def test_relative_path_to_credentials(self, monkeypatch):
+        from nexusLIMS.utils import get_auth
+        os.chdir(os.path.dirname(__file__))
+        with monkeypatch.context() as m:
+            # remove environment variable so we get into file processing
+            m.delenv('nexusLIMS_user')
+            _ = get_auth(self.CREDENTIAL_FILE_REL)
+
+    def test_bad_path_to_credentials(self, monkeypatch):
+        from nexusLIMS.utils import get_auth
+        with monkeypatch.context() as m:
+            # remove environment variable so we get into file processing
+            m.delenv('nexusLIMS_user')
+            cred_file = os.path.join('bogus_credentials.ini')
+            with pytest.raises(AuthenticationError):
+                _ = get_auth(cred_file)

@@ -36,15 +36,14 @@ class TestInstruments:
 
     def test_database_contains_instruments(self):
         from nexusLIMS.instruments import instrument_db
-        instruments_to_test = ['FEI-Helios-DB-636663',
-                               'FEI-Quanta200-ESEM-633137',
-                               'FEI-Titan-STEM-630901',
-                               'FEI-Titan-TEM-635816',
-                               'Hitachi-S5500-SEM-635262',
-                               'JEOL-JEM3010-TEM-565989',
-                               'JEOL-JSM7100-SEM-N102656',
-                               'Philips-CM30-TEM-540388',
-                               'Philips-EM400-TEM-599910']
+        instruments_to_test = ['FEI-Helios-DB-636663_n',
+                               'FEI-Quanta200-ESEM-633137_n',
+                               'FEI-Titan-STEM-630901_n',
+                               'FEI-Titan-TEM-635816_n',
+                               'Hitachi-S5500-SEM-635262_n',
+                               'JEOL-JEM3010-TEM-565989_n',
+                               'JEOL-JSM7100-SEM-N102656_n',
+                               'Philips-EM400-TEM-599910_n']
         for i in instruments_to_test:
             assert i in instrument_db
             assert isinstance(instrument_db[i], Instrument)
@@ -53,29 +52,24 @@ class TestInstruments:
 
     def test_instrument_str(self):
         assert \
-            str(instrument_db['FEI-Titan-TEM-635816']) == \
-            'FEI-Titan-TEM-635816 in ***REMOVED***'
+            str(instrument_db['FEI-Titan-TEM-635816_n']) == \
+            'FEI-Titan-TEM-635816_n in ***REMOVED***'
 
     def test_instrument_repr(self):
-        api_url = 'https://***REMOVED***/Div/msed/MSED-MMF/_vti_bin/' \
-                  'ListData.svc/FEITitanTEMEvents'
-        cal_url = 'https://***REMOVED***/Div/msed/MSED-MMF/Lists/' \
-                  'FEI%20Titan%20Events/calendar.aspx'
-
         assert \
-            repr(instrument_db['FEI-Titan-TEM-635816']) == \
-            f'Nexus Instrument: FEI-Titan-TEM-635816\n' + \
-            f'API url:          {api_url}\n' + \
+            repr(instrument_db['FEI-Titan-TEM-635816_n']) == \
+            f'Nexus Instrument: FEI-Titan-TEM-635816_n\n' + \
+            f'API url:          https://***REMOVED***/api/tools/?id=3\n' + \
             f'Calendar name:    FEI Titan TEM\n' + \
-            f'Calendar url:     {cal_url}\n' + \
+            f'Calendar url:     https://***REMOVED***/calendar/\n' + \
             f'Schema name:      FEI Titan TEM\n' \
             f'Location:         ***REMOVED***\n' \
             f'Property tag:     635816\n' \
             f'Filestore path:   ./Titan\n' \
-            f'Computer IP:      ***REMOVED***\n' \
-            f'Computer name:    ***REMOVED***\n' \
-            f'Computer mount:   M:/\n' \
-            f'Harvester:        sharepoint_calendar\n' \
+            f'Computer IP:      None\n' \
+            f'Computer name:    None\n' \
+            f'Computer mount:   None\n' \
+            f'Harvester:        nemo\n' \
             f'Timezone:         America/New_York'
 
     def test_get_instr_from_filepath(self):
@@ -84,29 +78,29 @@ class TestInstruments:
                             '***REMOVED***/4_330mm.dm3')
         instr = get_instr_from_filepath(path)
         assert isinstance(instr, Instrument)
-        assert instr.name == 'FEI-Titan-TEM-635816'
+        assert instr.name == 'FEI-Titan-TEM-635816_n'
 
         instr = get_instr_from_filepath('bad_path_no_instrument')
         assert instr is None
 
     def test_get_instr_from_cal_name(self):
-        instr = get_instr_from_calendar_name('FEITitanTEMEvents')
+        instr = get_instr_from_calendar_name('id=3')
         assert isinstance(instr, Instrument)
-        assert instr == instrument_db['FEI-Titan-TEM-635816']
+        assert instr == instrument_db['FEI-Titan-TEM-635816_n']
 
     def test_get_instr_from_cal_name_none(self):
         instr = get_instr_from_calendar_name('bogus calendar name')
         assert instr is None
 
     def test_instrument_datetime_location_no_tz(self, monkeypatch, caplog):
-        instr = instrument_db['FEI-Titan-TEM-635816']
+        instr = instrument_db['FEI-Titan-TEM-635816_n']
         monkeypatch.setattr(instr, 'timezone', None)
         dt_naive = datetime.datetime.fromisoformat('2021-11-26T12:00:00.000')
         assert instr.localize_datetime(dt_naive) == dt_naive
         assert "Tried to localize a datetime with instrument" in caplog.text
 
     def test_instrument_datetime_localization(self):
-        instr = instrument_db['FEI-Titan-TEM-635816']
+        instr = instrument_db['FEI-Titan-TEM-635816_n']
         # instr timezone should be Eastern Time
 
         dt_naive = datetime.datetime.fromisoformat('2021-11-26T12:00:00.000')
@@ -124,7 +118,7 @@ class TestInstruments:
                '2021-11-26 12:00:00 EST'
 
     def test_instrument_datetime_localization_str(self):
-        instr = instrument_db['FEI-Titan-TEM-635816']
+        instr = instrument_db['FEI-Titan-TEM-635816_n']
         dt_naive = datetime.datetime.fromisoformat('2021-11-26T12:00:00.000')
         dt_mt = datetime.datetime.fromisoformat('2021-11-26T12:00:00.000-07:00')
         dt_et = datetime.datetime.fromisoformat('2021-11-26T12:00:00.000-05:00')

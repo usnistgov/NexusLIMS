@@ -36,16 +36,15 @@ import pytest
 import nexusLIMS.utils
 from pathlib import Path
 import shutil
-from nexusLIMS.db.session_handler import db_query
-
-# we don't want to mask both directories, because the record builder tests
-# need to look at the real files on ***REMOVED***:
-# os.environ['mmfnexus_path'] = os.path.join(os.path.dirname(__file__), 'files')
 
 # use our test database for all tests (don't want to impact real one)
 os.environ['nexusLIMS_db_path'] = files['DB'][0]
 os.environ['nexusLIMS_path'] = os.path.join(os.path.dirname(__file__),
                                             'files', 'nexusLIMS_path')
+
+# we don't want to mask both directories, because the record builder tests
+# need to look at the real files on ***REMOVED***:
+# os.environ['mmfnexus_path'] = os.path.join(os.path.dirname(__file__), 'files')
 
 
 def pytest_configure(config):
@@ -136,6 +135,7 @@ def cleanup_session_log():
     # test_usage_event_to_session_log, so it doesn't mess up future
     # record building tests
     yield None
+    from nexusLIMS.db.session_handler import db_query
     to_remove = ('https://***REMOVED***/api/usage_events/?id=29',
                  'https://***REMOVED***/api/usage_events/?id=30',
                  'https://***REMOVED***/api/usage_events/?id=31',

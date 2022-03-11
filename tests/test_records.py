@@ -1,6 +1,4 @@
-import datetime
 import os
-import nexusLIMS
 from functools import partial
 import shutil
 
@@ -11,8 +9,6 @@ from nexusLIMS.schemas import activity
 from nexusLIMS.db import session_handler
 from nexusLIMS.db import make_db_query
 from nexusLIMS.db.session_handler import db_query as dbq
-import nexusLIMS.utils
-import time
 from collections import namedtuple
 from glob import glob
 from lxml import etree as et
@@ -54,7 +50,10 @@ class TestRecordBuilder:
             monkeypatch.undo()
 
     # have to do these before modifying the database with the actual run tests
-    def test_dry_run_sharepoint_calendar(self):
+    @pytest.mark.skip(
+        reason="no way of currently testing SharePoint with current "
+               "deployment environment; SP harvesting is deprecated")
+    def test_dry_run_sharepoint_calendar(self):   # pragma: no cover
         sessions = session_handler.get_sessions_to_build()
         cal_event = _rb.dry_run_get_sharepoint_reservation_event(sessions[0])
         assert cal_event.project_name[0] == '642.03.??'
@@ -68,11 +67,15 @@ class TestRecordBuilder:
         sessions = session_handler.get_sessions_to_build()
         # add at least one NEMO session to the file find (one is already in the
         # test database, but this get_usage_events_as_sessions call will add
-        # another)
+        # two, including one with no files)
         sessions += nemo.get_usage_events_as_sessions(
             dt_from=_dt.fromisoformat('2021-08-02T00:00:00-04:00'),
             dt_to=_dt.fromisoformat('2021-08-03T00:00:00-04:00'))
-        correct_files_per_session = [28, 37, 38, 55, 0, 18, 4, 4]
+        sessions += nemo.get_usage_events_as_sessions(
+            dt_from=_dt.fromisoformat('2021-09-01T00:00:00-04:00'),
+            dt_to=_dt.fromisoformat('2021-09-02T00:00:00-04:00'))
+        # removal of SharePoint sessions from testing
+        correct_files_per_session = [28, 37, 38, 55, 0, 18, 4, 4, 0]
         file_list_list = []
         for s, ans in zip(sessions, correct_files_per_session):
             found_files = _rb.dry_run_file_find(s)
@@ -86,7 +89,7 @@ class TestRecordBuilder:
 
         # file from NEMO session
         assert f'{os.environ["mmfnexus_path"]}' \
-               f'/NexusLIMS/test_files/02 - 620k-2.dm3' in file_list_list[-1]
+               f'/NexusLIMS/test_files/02 - 620k-2.dm3' in file_list_list[-2]
 
     def test_process_new_records_dry_run(self, remove_nemo_gov_harvester):
         # just running to ensure coverage, tests are included above
@@ -98,10 +101,10 @@ class TestRecordBuilder:
                                                      remove_nemo_gov_harvester,
                                                      monkeypatch, caplog):
         monkeypatch.setattr(_rb, '_get_sessions', lambda: [])
-        # there shouldn't be any MARLIN sessions before July 1, 2021
+        # there shouldn't be any MARLIN sessions before July 1, 2017
         _rb.process_new_records(dry_run=True,
                                 dt_to=_dt.fromisoformat(
-                                    '2021-07-01T00:00:00-04:00'))
+                                    '2017-07-01T00:00:00-04:00'))
         assert "No 'TO_BE_BUILT' sessions were found. Exiting." in caplog.text
 
     def test_process_new_records_no_files_warning(self,
@@ -110,11 +113,11 @@ class TestRecordBuilder:
                                                   cleanup_session_log):
         from nexusLIMS.db.session_handler import Session
         # overload "_get_sessions" to return just one session
-        dt_str_from = '2019-09-06T17:00:00.000'
-        dt_str_to = '2019-09-06T18:00:00.000'
+        dt_str_from = '2019-09-06T17:00:00.000-06:00'
+        dt_str_to = '2019-09-06T18:00:00.000-06:00'
         monkeypatch.setattr(_rb, '_get_sessions', lambda: [
             Session(session_identifier='test_session',
-                    instrument=instrument_db['FEI-Titan-TEM-635816'],
+                    instrument=instrument_db['testsurface-CPU_P1111111'],
                     dt_from=_dt.fromisoformat(dt_str_from),
                     dt_to=_dt.fromisoformat(dt_str_to),
                     user='test')
@@ -133,6 +136,7 @@ class TestRecordBuilder:
         # the ``request.param`` parameter controls whether the timestamps have
         # timezones attached
         from nexusLIMS.db.session_handler import SessionLog, Session
+        from nexusLIMS.harvesters import ReservationEvent
 
         if request.param:
             start_ts = _dt.now() - _td(days=1)
@@ -141,26 +145,34 @@ class TestRecordBuilder:
             start_ts = _dt.now().astimezone() - _td(days=1)
             end_ts = _dt.now().astimezone() - _td(days=0.5)
         start = SessionLog(session_identifier='test_session',
-                           instrument='FEI-Titan-TEM-635816',
+                           instrument='FEI-Titan-TEM-635816_n',
                            timestamp=start_ts.isoformat(),
                            event_type='START', user='test',
                            record_status='TO_BE_BUILT')
         start.insert_log()
         end = SessionLog(session_identifier='test_session',
-                         instrument='FEI-Titan-TEM-635816',
+                         instrument='FEI-Titan-TEM-635816_n',
                          timestamp=end_ts.isoformat(),
                          event_type='END', user='test',
                          record_status='TO_BE_BUILT')
         end.insert_log()
 
         s = Session(session_identifier='test_session',
-                    instrument=instrument_db['FEI-Titan-TEM-635816'],
+                    instrument=instrument_db['FEI-Titan-TEM-635816_n'],
                     dt_from=start_ts, dt_to=end_ts, user='test')
         # return just our session of interest to build and disable nemo
         # harvester's add_all_usage_events_to_db method
         monkeypatch.setattr(_rb, '_get_sessions', lambda: [s])
         monkeypatch.setattr(_rb._nemo, 'add_all_usage_events_to_db',
                             lambda dt_from, dt_to: None)
+        monkeypatch.setattr(
+            _rb._nemo, 'res_event_from_session',
+            lambda session:
+                ReservationEvent(experiment_title='test',
+                                 instrument=session.instrument,
+                                 username='test',
+                                 start_time=session.dt_from,
+                                 end_time=session.dt_to))
 
     # this parametrize call provides "request.param" with values of True and
     # then False to the add_recent_test_session fixture, which is used to
@@ -194,12 +206,12 @@ class TestRecordBuilder:
         start_ts = '2020-01-01T12:00:00.000-05:00'
         end_ts = '2020-01-01T20:00:00.000-05:00'
         start = SessionLog(session_identifier='test_session',
-                           instrument='FEI-Titan-TEM-635816',
+                           instrument='FEI-Titan-TEM-635816_n',
                            timestamp=start_ts, event_type='START', user='test',
                            record_status='TO_BE_BUILT')
         start.insert_log()
         end = SessionLog(session_identifier='test_session',
-                         instrument='FEI-Titan-TEM-635816',
+                         instrument='FEI-Titan-TEM-635816_n',
                          timestamp=end_ts, event_type='END', user='test',
                          record_status='TO_BE_BUILT')
         end.insert_log()
@@ -266,7 +278,7 @@ class TestRecordBuilder:
         # test some various values from the records saved to disk:
         expected = {
             # ./Titan/***REMOVED***/181113 - ***REMOVED*** - ***REMOVED*** - Titan/
-            '2018-11-13_FEI-Titan-TEM-635816_7de34313.xml': {
+            '2018-11-13_FEI-Titan-TEM-635816_n_91.xml': {
                 '/title': '***REMOVED***',
                 '//acquisitionActivity': 4,
                 '//dataset': 37,
@@ -275,7 +287,7 @@ class TestRecordBuilder:
                 '//sample': 1
             },
             # ./JEOL3010/JEOL3010/***REMOVED***/***REMOVED***/20190724/
-            '2019-07-24_JEOL-JEM3010-TEM-565989_41ec0ad1.xml': {
+            '2019-07-24_JEOL-JEM3010-TEM-565989_n_93.xml': {
                 '/title': '***REMOVED***',
                 '//acquisitionActivity': 6,
                 '//dataset': 55,
@@ -286,7 +298,7 @@ class TestRecordBuilder:
                 '//sample': 1
             },
             # ./Quanta/***REMOVED***/20190830_05... and ./Quanta/***REMOVED***/tmp/20190830_05...
-            '2019-09-06_FEI-Quanta200-ESEM-633137_9c8f3a8d.xml': {
+            '2019-09-06_FEI-Quanta200-ESEM-633137_n_90.xml': {
                 '/title': 'Looking for Nickel Alloys',
                 '//acquisitionActivity': 5,
                 '//dataset': 28,
@@ -296,7 +308,7 @@ class TestRecordBuilder:
                 '//sample': 1
             },
             # ./643Titan/***REMOVED***/191106 - Reactor Specimen - 643 Titan/
-            '2019-11-06_FEI-Titan-STEM-630901_1dab79db.xml': {
+            '2019-11-06_FEI-Titan-STEM-630901_n_92.xml': {
                 '/title': 'Reactor Samples',
                 '//acquisitionActivity': 15,
                 '//dataset': 38,
@@ -305,7 +317,7 @@ class TestRecordBuilder:
                 '//sample': 1
             },
             # ./Titan/***REMOVED***/200204 - ***REMOVED*** - ***REMOVED*** - Titan/
-            '2020-02-04_FEI-Titan-TEM-635816_1c3a6a8d.xml': {
+            '2020-02-04_FEI-Titan-TEM-635816_n_95.xml': {
                 '/title': 'Experiment on the FEI Titan TEM on '
                           'Tuesday Feb. 04, 2020',
                 '//acquisitionActivity': 4,
@@ -399,7 +411,7 @@ class TestRecordBuilder:
         def mock_get_sessions():
             return [session_handler.Session(
                 session_identifier='1c3a6a8d-9038-41f5-b969-55fd02e12345',
-                instrument=instrument_db['FEI-Titan-TEM-635816'],
+                instrument=instrument_db['FEI-Titan-TEM-635816_n'],
                 dt_from=_dt.fromisoformat('2020-02-04T09:00:00.000'),
                 dt_to=_dt.fromisoformat('2020-02-04T12:00:00.000'),
                 user='None')]
@@ -419,10 +431,12 @@ class TestRecordBuilder:
     def test_dump_record(self, remove_nemo_gov_harvester, monkeypatch,
                          fix_mountain_time):
         from nexusLIMS.db.session_handler import Session
+        dt_str_from = '2021-08-02T12:00:00-06:00'
+        dt_str_to = '2021-08-02T15:00:00-06:00'
         session = Session(session_identifier="an-identifier-string",
-                          instrument=instrument_db['FEI-Titan-TEM-635816'],
-                          dt_from=_dt.fromisoformat('2020-02-04T09:00:00.000'),
-                          dt_to=_dt.fromisoformat('2020-02-04T12:00:00.000'),
+                          instrument=instrument_db['testsurface-CPU_P1111111'],
+                          dt_from=_dt.fromisoformat(dt_str_from),
+                          dt_to=_dt.fromisoformat(dt_str_to),
                           user='unused')
         out_fname = _rb.dump_record(session=session,
                                     generate_previews=False)
@@ -526,7 +540,7 @@ class TestRecordBuilder:
 
 @pytest.fixture(scope='module')
 def gnu_find_activities(fix_mountain_time):
-    instr = instrument_db['FEI-Titan-TEM-635816']
+    instr = instrument_db['FEI-Titan-TEM-635816_n']
     dt_from = _dt.fromisoformat('2018-11-13T13:00:00.000')
     dt_to = _dt.fromisoformat('2018-11-13T16:00:00.000')
     activities_list = _rb.build_acq_activities(
@@ -622,7 +636,7 @@ class TestSession:
     def session(self):
         s = session_handler.Session(
             session_identifier='test_session',
-            instrument=instrument_db['FEI-Titan-TEM-635816'],
+            instrument=instrument_db['FEI-Titan-TEM-635816_n'],
             dt_from=_dt.fromisoformat('2020-02-04T09:00:00.000'),
             dt_to=_dt.fromisoformat('2020-02-04T12:00:00.000'),
             user='None')
@@ -631,7 +645,7 @@ class TestSession:
     def test_session_repr(self, session):
         assert session.__repr__() == '2020-02-04T09:00:00 to ' \
                                      '2020-02-04T12:00:00 on ' \
-                                     'FEI-Titan-TEM-635816'
+                                     'FEI-Titan-TEM-635816_n'
 
     def test_record_generation_timestamp(self, session, cleanup_session_log):
         from nexusLIMS.db.session_handler import db_query
@@ -645,7 +659,7 @@ class TestSession:
         uuid = uuid4()
         q = f"INSERT INTO session_log " \
             f"(instrument, event_type, session_identifier, record_status) " \
-            f"VALUES ('FEI-Titan-TEM-635816', 'START', " \
+            f"VALUES ('FEI-Titan-TEM-635816_n', 'START', " \
             f"'{uuid}', 'TO_BE_BUILT');"
         make_db_query(q)
         # because we put in an extra START log with TO_BE_BUILT status,
@@ -661,7 +675,7 @@ class TestSession:
 class TestSessionLog:
     sl = session_handler.SessionLog(
         session_identifier='testing-session-log',
-        instrument=instrument_db['FEI-Titan-TEM-635816'].name,
+        instrument=instrument_db['FEI-Titan-TEM-635816_n'].name,
         timestamp='2020-02-04T09:00:00.000',
         event_type='START',
         user='ear1',
@@ -680,7 +694,7 @@ class TestSessionLog:
     def test_repr(self):
         assert self.sl.__repr__() == "SessionLog " \
                                      "(id=testing-session-log, " \
-                                     "instrument=FEI-Titan-TEM-635816, " \
+                                     "instrument=FEI-Titan-TEM-635816_n, " \
                                      "timestamp=2020-02-04T09:00:00.000, " \
                                      "event_type=START, " \
                                      "user=ear1, " \

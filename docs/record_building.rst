@@ -9,7 +9,7 @@ Record building workflow
 
 This page describes the process used to build records based on the data saved by
 instruments in the
-`Electron Microscopy Nexus facility <https://***REMOVED***/Div/msed/MSED-MMF/default.aspx>`_
+`Electron Microscopy Nexus facility <https://***REMOVED***/sites/microscopy/Archive/>`_
 using `NexusLIMS <https://***REMOVED***>`_.
 At the bottom is an `activity diagram <activity-diagram_>`_ that illustrates
 how the different modules work together to generate records from the centralized
@@ -258,9 +258,9 @@ case the FEI Titan TEM in Building 223):
 .. code-block::
 
     Nexus Instrument: FEI-Titan-TEM-635816
-    API url:          https://***REMOVED***/Div/msed/MSED-MMF/_vti_bin/ListData.svc/FEITitanTEMEvents
+    API url:          https://***REMOVED***/sites/microscopy/Archive/_vti_bin/ListData.svc/FEITitanTEMEvents
     Calendar name:    FEI Titan TEM
-    Calendar url:     https://***REMOVED***/Div/msed/MSED-MMF/Lists/FEI%20Titan%20Events/calendar.aspx
+    Calendar url:     https://***REMOVED***/sites/microscopy/Archive/Lists/FEI%20Titan%20Events/calendar.aspx
     Schema name:      FEI Titan TEM
     Location:         ***REMOVED***
     Property tag:     635816

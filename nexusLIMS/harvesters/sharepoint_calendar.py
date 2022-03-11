@@ -1,5 +1,13 @@
 #! /usr/bin/env python
 
+#  Note, due to changes in NIST's instrument configurations, the SharePoint
+#  harvester has been deprecated as of March 2022. It _should_ continue to
+#  work with versions of SharePoint up to 2019. It _does not_ work with 
+#  "SharePoint in Microsoft 365" due to that platform's lack of support for 
+#  NTLM authentication. This file is left in place for backwards compatibility,
+#  but is no longer actively developed nor tested (since it requires a working
+#  2019 SP - or older - server, which we do not have readily available).
+
 #  NIST Public License - 2019
 #
 #  This software was developed by employees of the National Institute of

@@ -229,7 +229,7 @@ class TestExtractorModule:
 
     def test_parse_metadata_quanta(self, monkeypatch):
         def mock_instr(_):
-            return instruments.instrument_db['FEI-Quanta200-ESEM-633137']
+            return instruments.instrument_db['FEI-Quanta200-ESEM-633137_n']
 
         monkeypatch.setattr(nexusLIMS.extractors,
                             "_get_instr", mock_instr)
@@ -313,7 +313,7 @@ class TestDigitalMicrographExtractor:
     def test_dm3_list_file(self, monkeypatch):
         # monkeypatch so DM extractor thinks this file came from FEI Titan TEM
         def mock_instr(_):
-            return instruments.instrument_db['FEI-Titan-TEM-635816']
+            return instruments.instrument_db['FEI-Titan-TEM-635816_n']
 
         monkeypatch.setattr(digital_micrograph,
                             "_get_instr", mock_instr)
@@ -329,7 +329,7 @@ class TestDigitalMicrographExtractor:
     def test_642_dm3(self, monkeypatch):
         # monkeypatch so DM extractor thinks this file came from FEI Titan TEM
         def mock_instr(_):
-            return instruments.instrument_db['FEI-Titan-TEM-635816']
+            return instruments.instrument_db['FEI-Titan-TEM-635816_n']
 
         monkeypatch.setattr(digital_micrograph,
                             "_get_instr", mock_instr)
@@ -379,7 +379,7 @@ class TestDigitalMicrographExtractor:
     def test_643_dm3(self, monkeypatch):
         # monkeypatch so DM extractor thinks this file came from FEI Titan STEM
         def mock_instr(_):
-            return instruments.instrument_db['FEI-Titan-STEM-630901']
+            return instruments.instrument_db['FEI-Titan-STEM-630901_n']
 
         monkeypatch.setattr(digital_micrograph,
                             "_get_instr", mock_instr)
@@ -474,7 +474,7 @@ class TestDigitalMicrographExtractor:
     def test_jeol3010_dm3(self, monkeypatch):
         # monkeypatch so DM extractor thinks this file came from JEOL 3010
         def mock_instr(_):
-            return instruments.instrument_db['JEOL-JEM3010-TEM-565989']
+            return instruments.instrument_db['JEOL-JEM3010-TEM-565989_n']
 
         monkeypatch.setattr(digital_micrograph,
                             "_get_instr", mock_instr)
@@ -1177,7 +1177,7 @@ class TestSerEmiExtractor:
         # instrument, but testing directory doesn't allow proper handling of
         # this, so monkeypatch get_instr_from_filepath
         def mock_get_instr(filename):
-            return instruments.instrument_db['FEI-Titan-TEM-635816']
+            return instruments.instrument_db['FEI-Titan-TEM-635816_n']
         monkeypatch.setattr(fei_emi, '_get_instr', mock_get_instr)
         meta = TestSerEmiExtractor._helper_test(caplog)
         assert meta['nx_meta']['Data Type'] == 'TEM_Imaging'
@@ -1188,7 +1188,7 @@ class TestSerEmiExtractor:
         # instrument, but testing directory doesn't allow proper handling of
         # this, so monkeypatch get_instr_from_filepath
         def mock_get_instr(filename):
-            return instruments.instrument_db['FEI-Titan-STEM-630901']
+            return instruments.instrument_db['FEI-Titan-STEM-630901_n']
         monkeypatch.setattr(fei_emi, '_get_instr', mock_get_instr)
         meta = TestSerEmiExtractor._helper_test(caplog)
         assert meta['nx_meta']['Data Type'] == 'STEM_Imaging'
