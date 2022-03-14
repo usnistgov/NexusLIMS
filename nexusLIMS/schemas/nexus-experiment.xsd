@@ -32,7 +32,7 @@
 <xs:schema targetNamespace="https://data.nist.gov/od/dm/nexus/experiment/v1.0"
   xmlns:nx="https://data.nist.gov/od/dm/nexus/experiment/v1.0"
   xmlns="http://www.w3.org/2001/XMLSchema" xmlns:xs="http://www.w3.org/2001/XMLSchema"
-  xmlns:xsi="http://www.w3c.org/2001/XMLSchema-instance" elementFormDefault="unqualified"
+  xmlns:xsi="http://www.w3c.org/2001/XMLSchema-instance" elementFormDefault="qualified"
   attributeFormDefault="unqualified" version="1.03-10-2022">
 
   <xs:annotation>
