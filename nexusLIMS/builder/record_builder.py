@@ -141,7 +141,15 @@ def build_record(session: Session,
                                       dt_from, dt_to,
                                       generate_previews)
     for i, a in enumerate(activities):
-        xml.append(a.as_xml(i, sample_id, print_xml=False))
+        a_xml = a.as_xml(i, sample_id, print_xml=False)
+        xml.append(a_xml)
+
+    # explicitly add namespace to every element in the output xml (the
+    # root-level <Experiment> element already includes the right namespace,
+    # so skip it)
+    for el in xml.iter():
+        if 'Experiment' not in el.tag:
+            el.tag = f"{{{NX}}}{el.tag}"
 
     return _etree.tostring(xml, xml_declaration=True, encoding='UTF-8',
                            pretty_print=True).decode()

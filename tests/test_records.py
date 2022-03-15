@@ -276,101 +276,109 @@ class TestRecordBuilder:
         assert len(xmls) == 7
 
         # test some various values from the records saved to disk:
+        NX = "https://data.nist.gov/od/dm/nexus/experiment/v1.0"
         expected = {
             # ./Titan/***REMOVED***/181113 - ***REMOVED*** - ***REMOVED*** - Titan/
             '2018-11-13_FEI-Titan-TEM-635816_n_91.xml': {
-                '/title': '***REMOVED***',
-                '//acquisitionActivity': 4,
-                '//dataset': 37,
-                '/summary/motivation': '***REMOVED***!',
-                '/summary/instrument': 'FEI-Titan-TEM-635816',
-                '//sample': 1
+                f'/{{{NX}}}title': '***REMOVED***',
+                f'//{{{NX}}}acquisitionActivity': 4,
+                f'//{{{NX}}}dataset': 37,
+                f'/{{{NX}}}summary/{{{NX}}}motivation': '***REMOVED*** '
+                                                        '***REMOVED***',
+                f'/{{{NX}}}summary/{{{NX}}}instrument': 'FEI-Titan-TEM-635816',
+                f'//{{{NX}}}sample': 1
             },
             # ./JEOL3010/JEOL3010/***REMOVED***/***REMOVED***/20190724/
             '2019-07-24_JEOL-JEM3010-TEM-565989_n_93.xml': {
-                '/title': '***REMOVED***',
-                '//acquisitionActivity': 6,
-                '//dataset': 55,
-                '/summary/motivation': '***REMOVED*** '
-                                       '***REMOVED*** '
-                                       'beam',
-                '/summary/instrument': 'JEOL-JEM3010-TEM-565989',
-                '//sample': 1
+                f'/{{{NX}}}title': '***REMOVED***',
+                f'//{{{NX}}}acquisitionActivity': 6,
+                f'//{{{NX}}}dataset': 55,
+                f'/{{{NX}}}summary/{{{NX}}}motivation':
+                    '***REMOVED*** paraffin polymer '
+                    '***REMOVED***',
+                f'/{{{NX}}}summary/{{{NX}}}instrument':
+                    'JEOL-JEM3010-TEM-565989',
+                f'//{{{NX}}}sample': 1
             },
             # ./Quanta/***REMOVED***/20190830_05... and ./Quanta/***REMOVED***/tmp/20190830_05...
             '2019-09-06_FEI-Quanta200-ESEM-633137_n_90.xml': {
-                '/title': 'Looking for Nickel Alloys',
-                '//acquisitionActivity': 5,
-                '//dataset': 28,
-                '/summary/motivation': '***REMOVED*** '
-                                       'nickel alloys using EDX spectroscopy.',
-                '/summary/instrument': 'FEI-Quanta200-ESEM-633137',
-                '//sample': 1
+                f'/{{{NX}}}title': 'Looking for Nickel Alloys',
+                f'//{{{NX}}}acquisitionActivity': 5,
+                f'//{{{NX}}}dataset': 28,
+                f'/{{{NX}}}summary/{{{NX}}}motivation':
+                    '***REMOVED*** nickel alloys '
+                    'using EDX spectroscopy.',
+                f'/{{{NX}}}summary/{{{NX}}}instrument':
+                    'FEI-Quanta200-ESEM-633137',
+                f'//{{{NX}}}sample': 1
             },
             # ./643Titan/***REMOVED***/191106 - Reactor Specimen - 643 Titan/
             '2019-11-06_FEI-Titan-STEM-630901_n_92.xml': {
-                '/title': 'Reactor Samples',
-                '//acquisitionActivity': 15,
-                '//dataset': 38,
-                '/summary/motivation': 'EELS mapping of layer intermixing.',
-                '/summary/instrument': 'FEI-Titan-STEM-630901',
-                '//sample': 1
+                f'/{{{NX}}}title': 'Reactor Samples',
+                f'//{{{NX}}}acquisitionActivity': 15,
+                f'//{{{NX}}}dataset': 38,
+                f'/{{{NX}}}summary/{{{NX}}}motivation': 'EELS mapping of '
+                                                        'layer intermixing.',
+                f'/{{{NX}}}summary/{{{NX}}}instrument': 'FEI-Titan-STEM-630901',
+                f'//{{{NX}}}sample': 1
             },
             # ./Titan/***REMOVED***/200204 - ***REMOVED*** - ***REMOVED*** - Titan/
             '2020-02-04_FEI-Titan-TEM-635816_n_95.xml': {
-                '/title': 'Experiment on the FEI Titan TEM on '
-                          'Tuesday Feb. 04, 2020',
-                '//acquisitionActivity': 4,
-                '//dataset': 18,
-                '/summary/motivation': None,
-                '/summary/instrument': 'FEI-Titan-TEM-635816',
-                '//sample': 1
+                f'/{{{NX}}}title': 'Experiment on the FEI Titan TEM on '
+                                   'Tuesday Feb. 04, 2020',
+                f'//{{{NX}}}acquisitionActivity': 4,
+                f'//{{{NX}}}dataset': 18,
+                f'/{{{NX}}}summary/{{{NX}}}motivation': None,
+                f'/{{{NX}}}summary/{{{NX}}}instrument': 'FEI-Titan-TEM-635816',
+                f'//{{{NX}}}sample': 1
             },
             # DONE: add expected values for NEMO built record
             '2021-08-02_testsurface-CPU_P1111111_31.xml': {
-                '/title': '***REMOVED***',
-                '//acquisitionActivity': 1,
-                '//dataset': 4,
-                '/summary/motivation': '***REMOVED*** '
-                                       '***REMOVED*** '
-                                       '***REMOVED***.',
-                '/summary/instrument': 'testsurface-CPU_P1111111',
-                '//sample': 1
+                f'/{{{NX}}}title': '***REMOVED***',
+                f'//{{{NX}}}acquisitionActivity': 1,
+                f'//{{{NX}}}dataset': 4,
+                f'/{{{NX}}}summary/{{{NX}}}motivation':
+                    '***REMOVED*** epitaxial (or not) '
+                    'registrations ***REMOVED***.',
+                f'/{{{NX}}}summary/{{{NX}}}instrument':
+                    'testsurface-CPU_P1111111',
+                f'//{{{NX}}}sample': 1
             },
             '2021-11-29_testsurface-CPU_P1111111_21.xml': {
-                '/title': 'A test with multiple samples',
-                '//acquisitionActivity': 1,
-                '//dataset': 4,
-                '/summary/motivation': 'To test the harvester with '
-                                       'multiple samples',
-                '/summary/instrument': 'testsurface-CPU_P1111111',
-                '//sample': 4
+                f'/{{{NX}}}title': 'A test with multiple samples',
+                f'//{{{NX}}}acquisitionActivity': 1,
+                f'//{{{NX}}}dataset': 4,
+                f'/{{{NX}}}summary/{{{NX}}}motivation':
+                    'To test the harvester with multiple samples',
+                f'/{{{NX}}}summary/{{{NX}}}instrument':
+                    'testsurface-CPU_P1111111',
+                f'//{{{NX}}}sample': 4
             }
         }
         for f in sorted(xmls):
             base_f = os.path.basename(f)
             root = et.parse(f)
 
-            xpath = '/title'
+            xpath = f'/{{{NX}}}title'
             if root.find(xpath) is not None:
                 assert root.find(xpath).text == expected[base_f][xpath]
 
-            xpath = '//acquisitionActivity'
+            xpath = f'//{{{NX}}}acquisitionActivity'
             assert len(root.findall(xpath)) == expected[base_f][xpath]
 
-            xpath = '//dataset'
+            xpath = f'//{{{NX}}}dataset'
             assert len(root.findall(xpath)) == expected[base_f][xpath]
 
-            xpath = '/summary/motivation'
+            xpath = f'/{{{NX}}}summary/{{{NX}}}motivation'
             if root.find(xpath) is not None:
                 assert root.find(xpath).text == expected[base_f][xpath]
             else:
                 assert root.find(xpath) == expected[base_f][xpath]
 
-            xpath = '/summary/instrument'
+            xpath = f'/{{{NX}}}summary/{{{NX}}}instrument'
             assert root.find(xpath).get('pid') == expected[base_f][xpath]
 
-            xpath = '//sample'
+            xpath = f'//{{{NX}}}sample'
             assert len(root.findall(xpath)) == expected[base_f][xpath]
 
             # remove record
@@ -479,6 +487,8 @@ class TestRecordBuilder:
                 dt_to=_dt.fromisoformat('2021-11-29T11:28:02.000-07:00'),
                 user='None')]
 
+        NX = "https://data.nist.gov/od/dm/nexus/experiment/v1.0"
+
         monkeypatch.setattr(_rb, '_get_sessions', mock_get_sessions)
 
         # make record uploader just pretend by returning all files provided (
@@ -490,14 +500,15 @@ class TestRecordBuilder:
         f = xml_files[0]
         root = et.parse(f)
 
-        assert root.find('/title').text == 'A test with multiple samples'
-        assert len(root.findall('//acquisitionActivity')) == 1
-        assert len(root.findall('//dataset')) == 1
-        assert root.find('/summary/motivation').text == \
+        assert root.find(f'/{{{NX}}}title').text == \
+               'A test with multiple samples'
+        assert len(root.findall(f'//{{{NX}}}acquisitionActivity')) == 1
+        assert len(root.findall(f'//{{{NX}}}dataset')) == 1
+        assert root.find(f'/{{{NX}}}summary/{{{NX}}}motivation').text == \
                'To test the harvester with multiple samples'
-        assert root.find('/summary/instrument').get('pid') == \
+        assert root.find(f'/{{{NX}}}summary/{{{NX}}}instrument').get('pid') == \
                'testsurface-CPU_P1111111'
-        assert len(root.findall('//sample')) == 4
+        assert len(root.findall(f'//{{{NX}}}sample')) == 4
 
         # remove record
         os.remove(f)

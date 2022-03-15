@@ -27,7 +27,7 @@
 #
 from configparser import ConfigParser as _ConfigParser
 from typing import Tuple
-from lxml import etree as _etree
+
 import certifi as _certifi
 import tempfile as _tempfile
 import os as _os
@@ -35,7 +35,6 @@ import subprocess as _sp
 from datetime import datetime
 from datetime import timedelta as _timedelta
 from os.path import getmtime as _getmtime
-from warnings import warn
 import logging as _logging
 import sys as _sys
 
