@@ -677,9 +677,9 @@ class TestNemoIntegration:
             end_dt = dt.fromisoformat(results[0][3])
             start_dt = dt.fromisoformat(results[1][3])
             assert end_dt == pytz.timezone('America/New_York').localize(
-                dt(2022, 2, 10, 16, 4, 1))
+                dt(2022, 2, 10, 16, 4, 1, 920306))
             assert start_dt == pytz.timezone('America/New_York').localize(
-                dt(2022, 2, 10, 14, 10, 45))
+                dt(2022, 2, 10, 14, 10, 45, 780530))
 
         except LookupError:  # pragma: no cover
             pytest.skip("***REMOVED*** harvester not enabled")
@@ -947,9 +947,11 @@ class TestNemoIntegration:
                           strftime_fmt='%Y-%m-%dT%H:%M:%S%z')
         # these two will depend on whatever the local machine's offset is
         assert c.strftime(date_no_ms) == \
-               '2022-02-16T09:39:00' + dt.now().astimezone().strftime('%z')
+               '2022-02-16T09:39:00' + \
+               dt(2022, 2, 16, 9, 39, 0).astimezone().strftime('%z')
         assert c.strftime(date_w_ms) == \
-               '2022-02-16T09:39:00' + dt.now().astimezone().strftime('%z')
+               '2022-02-16T09:39:00' + \
+               dt(2022, 2, 16, 9, 39, 0).astimezone().strftime('%z')
         assert c.strftime(date_no_ms_tz) == '2022-02-16T09:39:00-0500'
         assert c.strftime(date_w_ms_tz) == '2022-02-16T09:39:00-0500'
 

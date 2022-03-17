@@ -114,8 +114,8 @@ def build_record(session: Session,
     # setup XML namespaces
     NX = "https://data.nist.gov/od/dm/nexus/experiment/v1.0"
     XSI = "http://www.w3.org/2001/XMLSchema-instance"
-    NSMAP = {None: "", "xsi": XSI, "nx": NX}
-    xml = _etree.Element(f"{{{NX}}}Experiment", nsmap=NSMAP)
+    NSMAP = {None: NX, "xsi": XSI, "nx": NX}
+    xml = _etree.Element(f"Experiment", nsmap=NSMAP)
 
     _logger.info(f"Getting calendar events with instrument: {instrument.name}, "
                  f"from {dt_from.isoformat()} to {dt_to.isoformat()}, "
@@ -141,7 +141,8 @@ def build_record(session: Session,
                                       dt_from, dt_to,
                                       generate_previews)
     for i, a in enumerate(activities):
-        xml.append(a.as_xml(i, sample_id, print_xml=False))
+        a_xml = a.as_xml(i, sample_id, print_xml=False)
+        xml.append(a_xml)
 
     return _etree.tostring(xml, xml_declaration=True, encoding='UTF-8',
                            pretty_print=True).decode()
