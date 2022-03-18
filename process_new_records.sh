@@ -77,7 +77,8 @@ function script_trap_exit() {
 
     # parse logfile for any erorr and send email (regardless of what happened
     # in the script, since this happens in the exit trap)
-    if grep -q -i -E 'critical|error|exception|fatal|no_files_found' "${LOGPATH}"; then
+    #if grep -q -i -E 'critical|error|exception|fatal|no_files_found' "${LOGPATH}"; then
+    if grep -q -i -E 'critical|error|fatal' "${LOGPATH}"; then
       stringArr=()
       # do some more detailed checks to allow us to specify which text was
       # found in the output:
@@ -91,7 +92,13 @@ function script_trap_exit() {
         stringArr+=("no_files_found")
       fi
       found_strings=$(IFS=, ; echo "${stringArr[*]}")
-      send_email
+      # ignore (somewhat) common DNS issues and don't alert
+      if grep -q -i -E "Temporary failure in name resolution" "${LOGPATH}"; then
+        # do nothing
+        :
+      else
+        send_email
+      fi
     else
       # do nothing
       :
