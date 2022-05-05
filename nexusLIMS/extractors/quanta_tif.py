@@ -92,6 +92,8 @@ def get_quanta_metadata(filename):
         return mdict
 
     metadata_bytes = content[user_idx:]
+    # remove any null bytes since they break the extractor
+    metadata_bytes = metadata_bytes.replace(b'\x00', b'')
     metadata_str = metadata_bytes.decode().replace('\r\n', '\n')
     buf = _io.StringIO(metadata_str)
     config = _cp.ConfigParser()
