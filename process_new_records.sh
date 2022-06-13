@@ -334,9 +334,9 @@ function get_abs_filename() {
 }
 
 function send_email() {
-sendmail ***REMOVED*** << EOF
-To: ***REMOVED***
-From: ***REMOVED***
+sendmail "${email_recipients}" << EOF
+To: ${email_recipients}
+From: ${email_sender}
 Subject: ERROR in NexusLIMS record builder
 
 There was an error (or unusual output) in the record builder. Here is the
