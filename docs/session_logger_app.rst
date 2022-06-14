@@ -331,7 +331,7 @@ These commands are run using the
 are explained here so Nexus microscope operators have a reference for every
 command that is run on their machines:
 
-- The first two system calls are used by the GUI code (|dbloggerLink|_)
+- The first two system calls are used by the GUI code (``db_logger_gui.py``)
   and query the local system to get the current
   monitor resolution and display DPI, so the logger application can be reliably
   placed in the center of the screen::

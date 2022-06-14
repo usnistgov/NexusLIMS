@@ -227,7 +227,7 @@ import, rather than every time information is needed.
 |                    |              | App`)                                   |
 +--------------------+--------------+-----------------------------------------+
 | ``harvester``      | TEXT         | The specific submodule within           |
-|                    |              | py:mod:`~nexusLIMS.harvesters` that     |
+|                    |              | :py:mod:`nexusLIMS.harvesters` that     |
 |                    |              | should be used to harvest reservation   |
 |                    |              | information for this instrument. At the |
 |                    |              | time of writing, the only possible      |
