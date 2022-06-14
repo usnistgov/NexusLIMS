@@ -63,7 +63,7 @@ written by the CDCS developers (and as a result, will look just like
 
 .. _CDCSdocs: https://www.nist.gov/itl/ssd/information-systems-group/configurable-data-curation-system-cdcs/cdcs-help-and-resources
 .. _CDCScontact: https://www.nist.gov/itl/ssd/information-systems-group/configurable-data-curation-system-cdcs/contact-cdcs
-.. _NexusLIMSdocker: https://***REMOVED***nexuslims/nexuslims-cdcs-docker-setup/tree/master
+.. _NexusLIMSdocker: https://github.com/usnistgov/NexusLIMS-CDCS-Docker
 
 After setting up an installation of CDCS (assuming an `MDCS` install rather than
 a `registry` install), there will be a few directories within the top-level
@@ -104,7 +104,7 @@ each of these in more detail. To view the specific changes that were made,
 the `NexusLIMS` CDCS `git commit history <nexuslimsCDCSGitCommits_>`_ will show
 every change in detail from what is provided in the default CDCS installation.
 
-.. _nexuslimsCDCSGitCommits: https://***REMOVED***nexuslims/nexuslims-cdcs/commits/NexusLIMS_master
+.. _nexuslimsCDCSGitCommits: https://github.com/usnistgov/NexusLIMS-CDCS/commits/NexusLIMS_master
 
 General tips
 ++++++++++++
@@ -481,7 +481,7 @@ Django template files) are defined. Small modifications were made to the methods
 as well to allow the passing of parameters to directly to the XSLT stylesheets
 on the list and detail view pages.
 
-.. _xmlUtilsLink: https://***REMOVED***nexuslims/nexuslims-cdcs/blob/8511bd12a354ef4809489369ab0960af27c512aa/mdcs_home/utils/xml.py#L45
+.. _xmlUtilsLink: https://github.com/usnistgov/NexusLIMS-CDCS/blob/NexusLIMS_master/mdcs_home/utils/xml.py
 
 The ``mdcs_home`` folder
 ++++++++++++++++++++++++
@@ -549,12 +549,10 @@ you should be able to access the debugger in your web browser at whatever host
 IP is running your instance over port 3000 (something like
 http://localhost:3000). Note, this port is already forwarded from the CDCS
 container to ``localhost`` by default if you use the ``NexusLIMS``-customized
-Docker installation. See `line 84 <NexusLIMSDockerCompose3000_>`_ of the
-``docker-compose.yml`` file used during installation.
+Docker installation.
 
 ..  |web_pdb| replace:: ``web-pdb``
 ..  _web_pdb: https://github.com/romanvm/python-web-pdb
-..  _NexusLIMSDockerCompose3000: https://***REMOVED***nexuslims/nexuslims-cdcs-docker-setup/blob/90bdc073163633b5e6c2de94efad823edfcc3982/docker-compose.yml#L84
 
 ------------
 

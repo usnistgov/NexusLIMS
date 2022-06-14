@@ -138,20 +138,21 @@ and bolts of how the back-end operates.
 
 ## Developer instructions
 
-To develop on the NexusLIMS code, the install process is similar to above. First install `pyenv` and `poetry`, then 
-run `poetry install`, then:
+For further details, see the [developer documentation](http://pages.nist.gov/NexusLIMS/development) page, but in 
+brief... to develop on the NexusLIMS code, the install process is similar to above. First install `pyenv` and `poetry`,
+then run `poetry install`, then:
 
 ```bash
 # install required pyenv environments:
 $ pyenv local | xargs -L1 pyenv install  # https://github.com/pyenv/pyenv/issues/919
 
-# configure poetry 
+# configure poetry to put the virtual environment in a local .venv folder (if you want)
 $ poetry config virtualenvs.in-project true
 
-# to run tests for python 3.7 and 3.8 environments
+# to run tests for python 3.7 and 3.8 environments:
 $ poetry run tox
 
-# to generate docs:
+# to generate the documentation:
 $ poetry run tox -e docs
 
 # to generate pytest-mpl figures:

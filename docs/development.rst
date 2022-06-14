@@ -216,7 +216,7 @@ branch to have it included in the project. Contributing to the package
 requires that every line of code is covered by a test case. This project uses
 testing through the `pytest <https://docs.pytest.org/en/latest/>`_ library,
 and features that do not pass the test cases or decrease coverage will not be
-accepted until suitable tests are included (see the |testsLink|_ directory
+accepted until suitable tests are included (see the ``tests`` directory
 for examples) and that the coverage of any new features is 100%.
 To get this information, you can use an IDE that includes coverage tracking
 (such as `PyCharm <https://www.jetbrains.com/pycharm/>`_) or include the

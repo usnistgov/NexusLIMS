@@ -11,12 +11,10 @@ a record of an experiment on a Nexus facility microscope.
 Documentation overview
 ----------------------
 
-The :doc:`data security <data_security>` page explains the approach to our
-highest priority, which is protecting users' research data. Besides this,
-there are pages describing how data about individual sessions is
-:doc:`collected <session_logger_app>` and  :doc:`stored <database>`, as
-well as a detailed description of how a record of a given experiment
-:doc:`is built <record_building>`, from beginning to end.
+The :doc:`database <database>` page describes how information about instruments
+and recorded sessions is stored. The :doc:`record building <record_building>`
+page provides a detailed description of how a record of a given experiment
+is built from beginning to end.
 There is also additional documentation about the practices used
 in :doc:`developing NexusLIMS <development>`, the
 :doc:`taxonomy <taxonomy>` used when discussing NexusLIMS, the
@@ -31,18 +29,6 @@ directly, since it operates completely automatically and builds experimental
 records without any need for user input. These pages serve mostly as reference
 for those with more interest in the nuts and bolts of how it all works together,
 and how the system may be able to be changed in the future.
-
-How to help
------------
-
-As a Nexus Facility instrument user, the best way to help is to simply use the
-system by remembering to use the :doc:`Session Logger App <session_logger_app>`
-while on a microscope, and then using the NexusLIMS front-end system at
-https://***REMOVED*** to search through and browse your experimental data.
-Beyond that, suggestions for improvements or additional features are always
-welcome by submitting a
-`new issue <https://***REMOVED***nexuslims/NexusMicroscopyLIMS/issues/new>`_
-at the project's code |repoLink|_.
 
 About the logo
 --------------
@@ -77,7 +63,8 @@ NexusLIMS has been developed through a great deal of work by a number of people
 including:
 
 - `Joshua Taillon <https://www.nist.gov/people/joshua-taillon>`_ - Office of Data and Informatics
-- `June Lau <https://www.nist.gov/people/june-w-lau>`_ - Materials Science and Engineering Division
+- `June Lau <https://www.nist.gov/people/june-w-lau>`_ - Office of Data and Informatics
+- `Ryan White <https://www.nist.gov/people/ryan-white>`_ - Applied Chemicals and Materials Division / Office of Data and Informatics
 - `Marcus Newrock <https://www.nist.gov/people/marcus-william-newrock>`_ - Office of Data and Informatics
 - `Ray Plante <https://www.nist.gov/people/raymond-plante>`_ - Office of Data and Informatics
 - `Gretchen Greene <https://www.nist.gov/people/gretchen-greene>`_ - Office of Data and Informatics
