@@ -808,4 +808,3 @@ class TestCDCS:
         monkeypatch.delenv('cdcs_url')
         with pytest.raises(ValueError):
             cdcs._cdcs_url()
-

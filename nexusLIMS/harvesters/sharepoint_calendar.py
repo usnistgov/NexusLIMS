@@ -243,11 +243,11 @@ def fetch_xml(instrument, dt_from=None, dt_to=None):
     the session logger.
     """
 
-    # Paths for Nexus Instruments that can be booked through sharepoint
+    # Paths for Nexus Instruments that can be booked through SharePoint
     # Instrument names can be found at
-    # https://***REMOVED***/***REMOVED***/_vti_bin/ListData.svc
+    # https://**REMOVED**/_vti_bin/ListData.svc
     # and
-    # https://***REMOVED***nexuslims/NexusMicroscopyLIMS/wikis/Sharepoint-Calendar-Information
+    # https://**REMOVED**/nexuslims/NexusMicroscopyLIMS/wikis/Sharepoint-Calendar-Information
 
     # Parse instrument parameter input, leaving inst_to_fetch as list of
     # nexuslims.instruments.Instrument objects
@@ -387,7 +387,7 @@ def get_events(instrument=None,
         If just ``dt_to`` is `None`, all events from the ``dt_from`` to the
         present will be returned.
     user : None or str
-        Either None or a valid NIST username (the short format: e.g. ``"ear1"``
+        Either None or a valid username (the short format: e.g. ``"ear1"``
         instead of ernst.august.ruska@nist.gov). If None, no user filtering
         will be performed. No verification of username is performed,
         so it is up to the user to make sure this is correct.
@@ -446,7 +446,7 @@ def dump_calendars(instrument=None, user=None, dt_from=None, dt_to=None,
         If just ``dt_to`` is `None`, all events from the ``dt_from`` to the
         present will be returned.
     user : None or str
-        Either None or a valid NIST username (the short format: e.g. ``"ear1"``
+        Either None or a valid username (the short format: e.g. ``"ear1"``
         instead of ernst.august.ruska@nist.gov). If None, no user filtering
         will be performed. No verification of username is performed,
         so it is up to the user to make sure this is correct.

@@ -815,8 +815,7 @@
     <xs:annotation>
       <xs:documentation>
          Controlled labels that identify available instruments in the 
-         NIST Electron Microscopy Nexus facility (as named in the SharePoint
-         calendar resource).
+         facility (matching names in the reservation calendar resource).
        </xs:documentation>
     </xs:annotation>
 
@@ -918,7 +917,7 @@
     <xs:annotation>
       <xs:documentation>
         The identification of an instrument in the
-        NIST Electron Microscopy Nexus facility.
+        facility.
       </xs:documentation>
     </xs:annotation>
 
@@ -928,8 +927,7 @@
         <xs:attribute name="pid" type="xs:token">
           <xs:annotation>
             <xs:documentation>
-              An unique identifier that identifies the instrument within
-              the NIST Electron Microscopy Nexus facility.
+              An unique identifier that identifies the instrument within facility.
             </xs:documentation>
           </xs:annotation>
         </xs:attribute>

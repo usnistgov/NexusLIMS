@@ -82,8 +82,7 @@ def nexus_req(url, fn, basic_auth=False, token_auth=None, **kwargs):
         :py:func:`~requests.post`, etc.)
     basic_auth : bool
         If True, use only username and password for authentication rather than
-        NTLM (like what is used for CDCS access rather than for NIST network
-        resources)
+        NTLM
     token_auth : None or str
         If a value is provided, it will be used as a token for authentication
         (only one of ``token_auth`` or ``basic_auth`` should be provided. The
@@ -630,8 +629,7 @@ def get_auth(filename="credentials.ini", basic=False):
         read the parameters
     basic : bool
         If True, return only username and password rather than NTLM
-        authentication (like what is used for CDCS access rather than for
-        NIST network resources)
+        authentication
 
     Returns
     -------

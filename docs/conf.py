@@ -74,7 +74,7 @@ add_function_parentheses = True
 #     inv.objects.append(o)
 #     text = inv.data_file(contract=True)
 #     ztext = soi.compress(text)
-#     soi.writebytes('***REMOVED***NexusMicroscopyLIMS/mdcs/nexusLIMS/'
+#     soi.writebytes('**REMOVED**/NexusMicroscopyLIMS/mdcs/nexusLIMS/'
 #                    'doc/source/objects_lxml.inv', ztext)
 
 intersphinx_mapping = {'python': ('https://docs.python.org/3.7/', None),
@@ -176,7 +176,7 @@ html_theme_options = {
     'navbar_links': [
         ("API Docs", 'api'),
         ("Repository",
-         "https://***REMOVED***nexuslims/NexusMicroscopyLIMS", True),
+         "https://github.com/usnistgov/NexusLIMS", True),
         ("NIST ODI", "https://www.nist.gov/mml/odi", True),
     ],
 

@@ -392,7 +392,7 @@ function main() {
     if [ -f "${LOCKFILE}" ] ; then
         WE_CREATED_LOCKFILE=false
         echo "Lock file at ${LOCKFILE} already existed, so not running anything" | tee -a "${LOGPATH}"
-        echo "Existing lock file last modified at $(stat /data/smb/nexusLIMS/.builder.lock | grep Modify | cut -d ' ' -f2-)" | tee -a "${LOGPATH}"
+        echo "Existing lock file last modified at $(stat "${LOCKFILE}" | grep Modify | cut -d ' ' -f2-)" | tee -a "${LOGPATH}"
     else
         WE_CREATED_LOCKFILE=true
         echo "Creating LOCKFILE at ${LOCKFILE}" | tee -a "${LOGPATH}"

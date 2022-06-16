@@ -100,6 +100,8 @@ Currently, the NexusLIMS back-end is configured via the use of environment varia
 to do this is to copy or rename the [`.env.example`](./.env.example) into a file named `.env`, located in the same 
 directory as this README, and then changing the values as required for your deployment environment. The `.env.example`
 file is (hopefully) well-documented, so check those comments for a description of the values that should be defined.
+Alternatively, you can set your environment variables in some other way, and they should still be understood by the
+NexusLIMS code.
 
 Primarily, you need to configure three types of settings:
 
@@ -131,6 +133,15 @@ option flag. This command will kick off the record building process via the
 method, which will check for the existence of new sessions to build, perform the data file finding operation, extract
 the metadata, build records as needed, and upload it/them to the front-end NexusLIMS CDCS application
 
+Alternatively, there is a bash script supplied in the root folder of this repository named `process_new_records.sh`.
+This script wraps the above `poetry run python -m nexusLIMS.builder.record_builder` command with additional 
+functionality, including logging the results of the run to a file, generating a "lock file" so the record builder will
+not run if it is already running, and the sending of notification emails if any errors are detected in the log output.
+This script can be configured also by settings in the `.env` file, including the `email_sender` and `email_recipients`
+values. At NIST, the deployment of NexusLIMS is automated by running this script via the `cron` scheduler. As currently
+written, the logs from this script will be saved in a file relative to the `nexusLIMS_path` environment variable and
+organized by date, generated as follows: `"${nexusLIMS_path}/../logs/${year}/${month}/${day}/$(date +%Y%m%d-%H%M).log"`.
+
 ## Where to get help?
 
 There is extensive [documentation](http://pages.nist.gov/NexusLIMS/) for those who wish to learn more about the nuts 
@@ -139,8 +150,8 @@ and bolts of how the back-end operates.
 ## Developer instructions
 
 For further details, see the [developer documentation](http://pages.nist.gov/NexusLIMS/development) page, but in 
-brief... to develop on the NexusLIMS code, the install process is similar to above. First install `pyenv` and `poetry`,
-then run `poetry install`, then:
+brief... to develop on the NexusLIMS code, the installation process is similar to above. First install `pyenv` and 
+`poetry`, then run `poetry install`, then:
 
 ```bash
 # install required pyenv environments:
@@ -148,6 +159,8 @@ $ pyenv local | xargs -L1 pyenv install  # https://github.com/pyenv/pyenv/issues
 
 # configure poetry to put the virtual environment in a local .venv folder (if you want)
 $ poetry config virtualenvs.in-project true
+
+# make sure to configure your .env settings prior to running the following commands
 
 # to run tests for python 3.7 and 3.8 environments:
 $ poetry run tox

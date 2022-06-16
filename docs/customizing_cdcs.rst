@@ -35,15 +35,14 @@ application can be modified as needed.
 
 The specific implementation of CDCS used for `NexusLIMS` is stored in a
 `forked version <NexusLIMSCDCSRepo_>`_ of the `upstream` CDCS
-`repository <CDCSRepo_>`_ available on the internal NIST Gitlab. CDCS is
-comprised of many individual Django `apps` (or `modules` -- see
-`here <CDCSModules_>`_ for a complete list), that each control a different part
-or function of the overall application. For example, the
-``core_explore_keyword_app`` controls the display of the data "search by
-keyword" page.
+`repository <CDCSRepo_>`_ available on Github. CDCS is comprised of many individual
+Django `apps` (or `modules` -- see `here <CDCSModules_>`_ for a complete list),
+that each control a different part or function of the overall application.
+For example, the ``core_explore_keyword_app`` controls the display of the data
+"search by keyword" page.
 
 .. _CDCSModules: https://www.nist.gov/itl/ssd/information-systems-group/cdcs-system-modules
-.. _NexusLIMSCDCSRepo: https://***REMOVED***nexuslims/nexuslims-cdcs
+.. _NexusLIMSCDCSRepo: https://github.com/usnistgov/NexusLIMS-CDCS
 .. _CDCSRepo: https://github.com/usnistgov/MDCS
 
 Installation

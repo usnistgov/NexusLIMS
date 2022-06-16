@@ -71,7 +71,7 @@ class SessionLog:
         The type of log for this session (either `"START"`, `"END"`,
         or `"RECORD_GENERATION"`)
     user
-        The NIST "short style" username associated with this session (if known)
+        The username associated with this session (if known)
     record_status
         The status to use for this record (defaults to ``'TO_BE_BUILT'``
     """
