@@ -105,7 +105,7 @@ Primarily, you need to configure three types of settings:
 
 - First, the username/password for a user in the NexusLIMS CDCS front-end system where the built records will be   
   uploaded. While not currently configurable, the upload functionality could be disabled if this feature is not 
-  needed.
+  needed. Also, you will need to enter the URL to your NexusLIMS instance in the `cdcs_url` variable.
 - Second, various file paths that indicate the read-only path to the centralized datafile store, a writeable path 
   in which to store preview images and extracted metadata, and the path to the SQlite database file that is used to 
   hold information about instruments and sessions

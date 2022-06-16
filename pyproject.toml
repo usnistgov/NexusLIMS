@@ -1,12 +1,12 @@
 [tool.poetry]
 name = "nexusLIMS"
-version = "1.1.0"
+version = "1.1.1"
 description = "The NIST Electron Microscopy Nexus LIMS project"
 authors = ["Joshua Taillon <joshua.taillon@nist.gov>"]
 maintainers = ["Joshua Taillon <joshua.taillon@nist.gov>"]
 readme = "README.md"
-repository = "https://gitlab.nist.gov/nexuslims/NexusMicroscopyLIMS.git"
-documentation = "http://nexuslims.ipages.nist.gov/NexusMicroscopyLIMS/doc/"
+repository = "https://github.com/usnistgov/NexusLIMS.git"
+documentation = "http://pages.nist.gov/NexusLIMS"
 license = "NIST Public License"
 # necessary if we want to have a package name with capitals... see
 #  https://github.com/python-poetry/poetry/issues/1538#issuecomment-555753130
@@ -20,7 +20,6 @@ lxml = "^4.6.4"
 requests = "^2.26.0"
 requests_ntlm = "^1.1.0"
 pytz = "^2021.3"
-ldap3 = "^2.9.1"
 hyperspy = "^1.6.5"
 scikit-learn = "^1.0.1"
 python-dotenv = "^0.19.2"

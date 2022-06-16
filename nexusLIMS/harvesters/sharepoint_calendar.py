@@ -45,7 +45,6 @@ import nexusLIMS
 import pytz as _pytz
 from pytz import timezone as _timezone
 from lxml import etree as _etree
-import ldap3 as _ldap3
 from datetime import datetime as _datetime
 from datetime import timedelta as _timedelta
 from nexusLIMS.db.session_handler import Session as _Session
@@ -60,7 +59,28 @@ _logger = _logging.getLogger(__name__)
 INDENT = '  '
 
 __all__ = ['res_event_from_session', 'res_event_from_xml', 'fetch_xml',
-           'get_div_and_group', 'get_events', 'dump_calendars']
+           'get_events', 'dump_calendars']
+
+
+def _sharepoint_url():
+    """
+    Return the url to the SharePoint calendar instance by fetching it from the environment
+
+    Returns
+    -------
+    url : str
+        The URL of the SharePoint calendar instance to use
+
+    Raises
+    ------
+    ValueError
+        If the ``sharepoint_root_url`` environment variable is not defined, raise a ``ValueError``
+    """
+    url = _os.environ.get('sharepoint_root_url', None)
+    if url is None:
+        raise ValueError("'sharepoint_root_url' environment variable is not defined")
+    else:
+        return url
 
 
 def res_event_from_xml(xml, date=None):
@@ -174,35 +194,6 @@ def res_event_from_xml(xml, date=None):
         sample_details=sample_details, project_name=project_name,
         internal_id=sharepoint_id, url=url
     )
-
-
-def get_div_and_group(username):
-    """
-    Query the NIST active directory to get division and group information for a
-    user.
-
-    Parameters
-    ----------
-    username : str
-        a valid NIST username (the short format: e.g. "ear1"
-        instead of ernst.august.ruska@nist.gov).
-
-    Returns
-    -------
-    div, group : str
-        The division and group numbers for the user (as strings)
-    """
-    server = _ldap3.Server(nexusLIMS.ldap_url)
-    with _ldap3.Connection(server, auto_bind=True) as conn:
-        conn.search('***REMOVED***',
-                    f'(***REMOVED***{username}***REMOVED***)',
-                    attributes=['*'])
-        res = conn.entries[0]
-
-    div = res.nistdivisionnumber.value
-    group = res.nistgroupnumber.value
-
-    return div, group
 
 
 def fetch_xml(instrument, dt_from=None, dt_to=None):
@@ -425,12 +416,6 @@ def get_events(instrument=None,
     res_event = res_event_from_xml(xml, date=dt_from)
     _logger.info(res_event)
 
-    # currently not using division and group code
-
-    # if not division and not group and user:
-    #     _logging.info('Querying LDAP for division and group info')
-    #     division, group = get_div_and_group(user)
-
     return res_event
 
 
@@ -497,8 +482,7 @@ def _get_sharepoint_tz():
     timezone : str or None
         The timezone in tz database format
     """
-    cdcs_url = nexusLIMS._urls.calendar_root_url
-    r = _nexus_req(cdcs_url + '/_api/web/RegionalSettings/TimeZone',
+    r = _nexus_req(_sharepoint_url() + '/_api/web/RegionalSettings/TimeZone',
                    _requests.get)
     et = _etree.fromstring(r.text.encode())
     tz_description = et.find('.//d:Description', namespaces=et.nsmap)

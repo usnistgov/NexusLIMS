@@ -190,11 +190,6 @@ class TestSharepoint:    # pragma: no cover
         dump_calendars(instrument='FEI-Titan-TEM-635816', filename=f)
         pass
 
-    def test_division_group_lookup(self):
-        from nexusLIMS.harvesters.sharepoint_calendar import get_div_and_group
-        div, group = get_div_and_group('***REMOVED***')
-        assert div == '641'
-        assert group == '02'
 
     def test_get_events_good_date(self):
         from nexusLIMS.harvesters.sharepoint_calendar import get_events

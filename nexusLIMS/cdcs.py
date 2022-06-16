@@ -24,15 +24,13 @@
 #  OR NOT INJURY WAS SUSTAINED BY PERSONS OR PROPERTY OR OTHERWISE, AND
 #  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
-
-
+import os
 import os as _os
 import requests as _requests
 from glob import glob as _glob
 from urllib.parse import urljoin as _urljoin
 import sys
 import argparse
-from nexusLIMS._urls import cdcs_url as _cdcs_url
 from nexusLIMS.utils import nexus_req as _nx_req, \
     AuthenticationError as _authError
 from tqdm import tqdm as _tqdm
@@ -41,6 +39,27 @@ import logging as _logging
 _logging.basicConfig()
 _logger = _logging.getLogger(__name__)
 _logger.setLevel(_logging.INFO)
+
+
+def _cdcs_url() -> str:
+    """
+    Return the url to the NexusLIMS CDCS instance by fetching it from the environment
+
+    Returns
+    -------
+    url : str
+        The URL of the NexusLIMS CDCS instance to use
+
+    Raises
+    ------
+    ValueError
+        If the ``cdcs_url`` environment variable is not defined, raise a ``ValueError``
+    """
+    url = os.environ.get('cdcs_url', None)
+    if url is None:
+        raise ValueError("'cdcs_url' environment variable is not defined")
+    else:
+        return url
 
 
 def get_workspace_id():
@@ -55,7 +74,7 @@ def get_workspace_id():
     """
     # assuming there's only one workspace for this user (that is the public
     # workspace)
-    _endpoint = _urljoin(_cdcs_url, 'rest/workspace/read_access')
+    _endpoint = _urljoin(_cdcs_url(), 'rest/workspace/read_access')
     _r = _nx_req(_endpoint, _requests.get, basic_auth=True)
     if _r.status_code == 401:
         raise _authError('Could not authenticate to CDCS. Are the '
@@ -75,7 +94,7 @@ def get_template_id():
         The template ID
     """
     # get the current template (XSD) id value:
-    _endpoint = _urljoin(_cdcs_url, 'rest/template-version-manager/global')
+    _endpoint = _urljoin(_cdcs_url(), 'rest/template-version-manager/global')
     _r = _nx_req(_endpoint, _requests.get, basic_auth=True)
     if _r.status_code == 401:
         raise _authError('Could not authenticate to CDCS. Are the '
@@ -104,7 +123,7 @@ def upload_record_content(xml_content, title):
     record_id : str
         The id (on the server) of the record that was uploaded
     """
-    endpoint = _urljoin(_cdcs_url, 'rest/data/')
+    endpoint = _urljoin(_cdcs_url(), 'rest/data/')
 
     payload = {
         'template': get_template_id(),
@@ -122,9 +141,9 @@ def upload_record_content(xml_content, title):
 
     # assign this record to the public workspace
     record_id = post_r.json()['id']
-    record_url = _urljoin(_cdcs_url,
+    record_url = _urljoin(_cdcs_url(),
                           f'data?id={record_id}')
-    wrk_endpoint = _urljoin(_cdcs_url,
+    wrk_endpoint = _urljoin(_cdcs_url(),
                             f'rest/data/{record_id}/assign/'
                             f'{get_workspace_id()}')
 
@@ -149,7 +168,7 @@ def delete_record(record_id):
         The REST response returned from the CDCS instance after attempting
         the delete
     """
-    endpoint = _urljoin(_cdcs_url, f'rest/data/{record_id}')
+    endpoint = _urljoin(_cdcs_url(), f'rest/data/{record_id}')
     r = _nx_req(endpoint, _requests.delete, basic_auth=True)
     if r.status_code != 204:
         # anything other than 204 status means something went wrong
