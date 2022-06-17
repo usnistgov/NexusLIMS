@@ -51,6 +51,13 @@ data harvester is currently supported/recommended. Any "harvester" for another r
 to be implemented to match with your local facility requirements (or you could adopt NEMO as a laboratory management
 system, but that may not be an option for your facility).
 
+If using NEMO, there is an expectation that a set of "reservation questions" will be associated with the instruments
+configured in the NexusLIMS database (see the section of the 
+[NEMO Feature Manual](https://github.com/usnistgov/NEMO/blob/master/documentation/NEMO_Feature_Manual.pdf) on this topic
+for more details -- approximately page 446). The documentation of the 
+[`nemo.res_event_from_session()`](https://pages.nist.gov/NexusLIMS/api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.res_event_from_session)
+method has more details about the expected format of these questions.
+
 NexusLIMS has been developed to run on a Linux-based headless server, although it _may_ work under MacOS as well. It
 is known to _not_ work under Windows, and would require some minor development effort to get it to do so. The following
 basic steps are provided as installation instructions, but it likely that some changes to the code will be required
