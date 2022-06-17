@@ -29,7 +29,7 @@ from .thumbnail_generator import down_sample_image as _down_sample
 from nexusLIMS.instruments import get_instr_from_filepath as _get_instr
 import hyperspy.api_nogui as _hs
 import logging as _logging
-import collections as _collections
+import collections.abc as _abc
 
 _logger = _logging.getLogger(__name__)
 PLACEHOLDER_PREVIEW = _os.path.join(_os.path.dirname(__file__),
@@ -166,7 +166,7 @@ def parse_metadata(fname, write_output=True, generate_preview=True,
                 _pathlib.Path(_os.path.dirname(preview_fname)).mkdir(
                     parents=True, exist_ok=True)
                 # Generate the thumbnail
-                s.compute(progressbar=False)
+                s.compute(show_progressbar=False)
                 _s2thumb(s, out_path=preview_fname)
             else:
                 _logger.info(f'Preview already exists: {preview_fname}')
@@ -201,7 +201,7 @@ def flatten_dict(d, parent_key='', separator=' '):
     items = []
     for k, v in d.items():
         new_key = parent_key + separator + k if parent_key else k
-        if isinstance(v, _collections.MutableMapping):
+        if isinstance(v, _abc.MutableMapping):
             items.extend(flatten_dict(v, new_key, separator=separator).items())
         else:
             items.append((new_key, v))
