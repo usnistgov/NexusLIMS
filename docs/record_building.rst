@@ -8,8 +8,7 @@ Record building workflow
     `Last updated: November 26, 2021`
 
 This page describes the process used to build records based on the data saved by
-instruments in the
-`Electron Microscopy Nexus facility <https://***REMOVED***/sites/microscopy/Archive/>`_
+instruments in the Electron Microscopy Nexus facility
 using `NexusLIMS <https://***REMOVED***>`_.
 At the bottom is an `activity diagram <activity-diagram_>`_ that illustrates
 how the different modules work together to generate records from the centralized
@@ -38,9 +37,8 @@ As part of this process (and explained in detail below), the centralized file
 system is searched for files matching the session logs in the database, which
 then have their metadata extracted and are parsed into `Acquisition Activities`.
 These activities are written to the .xml record, which is validated against the
-Nexus Microscopy Schema, and finally uploaded to the
-`NexusLIMS CDCS instance <https://***REMOVED***>`_ if everything goes
-according to plan. If not, an error is logged to the database for that session
+Nexus Microscopy Schema, and finally uploaded to the NexusLIMS CDCS instance if
+everything goes according to plan. If not, an error is logged to the database for that session
 and the operators of NexusLIMS are notified so the issue can be corrected.
 
 ..  admonition:: A note on authentication...
@@ -253,20 +251,20 @@ location for authoritative data. Thus, if something changes about the
 instruments' configuration, the data needs to be updated in one location only.
 The following is an example of the information extracted from the database and
 available to the NexusLIMS back-end software for a given instrument (in this
-case the FEI Titan TEM in Building 223):
+case the FEI Titan TEM in Building 223, connected to the SharePoint harvester):
 
 .. code-block::
 
     Nexus Instrument: FEI-Titan-TEM-635816
-    API url:          https://***REMOVED***/sites/microscopy/Archive/_vti_bin/ListData.svc/FEITitanTEMEvents
+    API url:          https://sharepoint.url.com/_vti_bin/ListData.svc/FEITitanTEMEvents
     Calendar name:    FEI Titan TEM
-    Calendar url:     https://***REMOVED***/sites/microscopy/Archive/Lists/FEI%20Titan%20Events/calendar.aspx
+    Calendar url:     https://sharepoint.url.com/Lists/FEI%20Titan%20Events/calendar.aspx
     Schema name:      FEI Titan TEM
     Location:         ***REMOVED***
     Property tag:     635816
     Filestore path:   ./Titan
     Computer IP:      ***REMOVED***
-    Computer name:    ***REMOVED***
+    Computer name:    TITAN12345678
     Computer mount:   M:/
 
 Using the `Filestore path` information, NexusLIMS searches for files
@@ -277,7 +275,7 @@ the Unix |find|_ by spawning a sub-process. This only works on Linux, and may
 fail, so a slower pure-Python implementation (implemented in
 :py:meth:`~nexusLIMS.utils.find_files_by_mtime`) is used as a fallback if so.
 All files within the :py:class:`~nexusLIMS.instruments.Instrument`'s root-level
-folder are searched and only files with modificaiton times with the timespan
+folder are searched and only files with modification times with the timespan
 of interest are returned. Currently, this process takes on the order of tens of
 seconds for typical records (depending on how many files are in the instrument's
 folder) when using the :py:meth:`~nexusLIMS.utils.gnu_find_files_by_mtime`.

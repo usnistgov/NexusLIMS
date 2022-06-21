@@ -725,7 +725,15 @@ class TestSessionLog:
         assert result
 
 
+@pytest.mark.skipif(os.environ.get('test_cdcs_url') is None,
+                    reason="Test CDCS server not defined by 'test_cdcs_url' environment variable")
 class TestCDCS:
+    @pytest.fixture(autouse=True)
+    def mock_test_cdcs_url(self, monkeypatch):
+        """Mock 'cdcs_url' environment variable with 'test_cdcs_url' one"""
+        monkeypatch.setenv('cdcs_url', os.environ.get('test_cdcs_url'))
+        yield
+
     def test_upload_and_delete_record(self):
         files_uploaded, record_ids = cdcs.upload_record_files(
             [files['RECORD'][0]])
@@ -794,3 +802,9 @@ class TestCDCS:
         assert isinstance(resp, Response)
         assert 'Got error while uploading title:' in caplog.text
         assert 'This is a fake request error!' in caplog.text
+
+    def test_no_env_variable(self, monkeypatch):
+        monkeypatch.delenv('test_cdcs_url')
+        monkeypatch.delenv('cdcs_url')
+        with pytest.raises(ValueError):
+            cdcs._cdcs_url()

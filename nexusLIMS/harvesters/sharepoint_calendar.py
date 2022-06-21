@@ -45,7 +45,6 @@ import nexusLIMS
 import pytz as _pytz
 from pytz import timezone as _timezone
 from lxml import etree as _etree
-import ldap3 as _ldap3
 from datetime import datetime as _datetime
 from datetime import timedelta as _timedelta
 from nexusLIMS.db.session_handler import Session as _Session
@@ -60,7 +59,28 @@ _logger = _logging.getLogger(__name__)
 INDENT = '  '
 
 __all__ = ['res_event_from_session', 'res_event_from_xml', 'fetch_xml',
-           'get_div_and_group', 'get_events', 'dump_calendars']
+           'get_events', 'dump_calendars']
+
+
+def _sharepoint_url():
+    """
+    Return the url to the SharePoint calendar instance by fetching it from the environment
+
+    Returns
+    -------
+    url : str
+        The URL of the SharePoint calendar instance to use
+
+    Raises
+    ------
+    ValueError
+        If the ``sharepoint_root_url`` environment variable is not defined, raise a ``ValueError``
+    """
+    url = _os.environ.get('sharepoint_root_url', None)
+    if url is None:
+        raise ValueError("'sharepoint_root_url' environment variable is not defined")
+    else:
+        return url
 
 
 def res_event_from_xml(xml, date=None):
@@ -176,35 +196,6 @@ def res_event_from_xml(xml, date=None):
     )
 
 
-def get_div_and_group(username):
-    """
-    Query the NIST active directory to get division and group information for a
-    user.
-
-    Parameters
-    ----------
-    username : str
-        a valid NIST username (the short format: e.g. "ear1"
-        instead of ernst.august.ruska@nist.gov).
-
-    Returns
-    -------
-    div, group : str
-        The division and group numbers for the user (as strings)
-    """
-    server = _ldap3.Server(nexusLIMS.ldap_url)
-    with _ldap3.Connection(server, auto_bind=True) as conn:
-        conn.search('***REMOVED***',
-                    f'(***REMOVED***{username}***REMOVED***)',
-                    attributes=['*'])
-        res = conn.entries[0]
-
-    div = res.nistdivisionnumber.value
-    group = res.nistgroupnumber.value
-
-    return div, group
-
-
 def fetch_xml(instrument, dt_from=None, dt_to=None):
     """
     Get the XML responses from the Nexus Sharepoint calendar for one,
@@ -252,11 +243,11 @@ def fetch_xml(instrument, dt_from=None, dt_to=None):
     the session logger.
     """
 
-    # Paths for Nexus Instruments that can be booked through sharepoint
+    # Paths for Nexus Instruments that can be booked through SharePoint
     # Instrument names can be found at
-    # https://***REMOVED***/***REMOVED***/_vti_bin/ListData.svc
+    # https://**REMOVED**/_vti_bin/ListData.svc
     # and
-    # https://***REMOVED***nexuslims/NexusMicroscopyLIMS/wikis/Sharepoint-Calendar-Information
+    # https://**REMOVED**/nexuslims/NexusMicroscopyLIMS/wikis/Sharepoint-Calendar-Information
 
     # Parse instrument parameter input, leaving inst_to_fetch as list of
     # nexuslims.instruments.Instrument objects
@@ -396,7 +387,7 @@ def get_events(instrument=None,
         If just ``dt_to`` is `None`, all events from the ``dt_from`` to the
         present will be returned.
     user : None or str
-        Either None or a valid NIST username (the short format: e.g. ``"ear1"``
+        Either None or a valid username (the short format: e.g. ``"ear1"``
         instead of ernst.august.ruska@nist.gov). If None, no user filtering
         will be performed. No verification of username is performed,
         so it is up to the user to make sure this is correct.
@@ -424,12 +415,6 @@ def get_events(instrument=None,
 
     res_event = res_event_from_xml(xml, date=dt_from)
     _logger.info(res_event)
-
-    # currently not using division and group code
-
-    # if not division and not group and user:
-    #     _logging.info('Querying LDAP for division and group info')
-    #     division, group = get_div_and_group(user)
 
     return res_event
 
@@ -461,7 +446,7 @@ def dump_calendars(instrument=None, user=None, dt_from=None, dt_to=None,
         If just ``dt_to`` is `None`, all events from the ``dt_from`` to the
         present will be returned.
     user : None or str
-        Either None or a valid NIST username (the short format: e.g. ``"ear1"``
+        Either None or a valid username (the short format: e.g. ``"ear1"``
         instead of ernst.august.ruska@nist.gov). If None, no user filtering
         will be performed. No verification of username is performed,
         so it is up to the user to make sure this is correct.
@@ -497,8 +482,7 @@ def _get_sharepoint_tz():
     timezone : str or None
         The timezone in tz database format
     """
-    cdcs_url = nexusLIMS._urls.calendar_root_url
-    r = _nexus_req(cdcs_url + '/_api/web/RegionalSettings/TimeZone',
+    r = _nexus_req(_sharepoint_url() + '/_api/web/RegionalSettings/TimeZone',
                    _requests.get)
     et = _etree.fromstring(r.text.encode())
     tz_description = et.find('.//d:Description', namespaces=et.nsmap)

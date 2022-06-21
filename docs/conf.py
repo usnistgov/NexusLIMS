@@ -74,7 +74,7 @@ add_function_parentheses = True
 #     inv.objects.append(o)
 #     text = inv.data_file(contract=True)
 #     ztext = soi.compress(text)
-#     soi.writebytes('***REMOVED***NexusMicroscopyLIMS/mdcs/nexusLIMS/'
+#     soi.writebytes('**REMOVED**/NexusMicroscopyLIMS/mdcs/nexusLIMS/'
 #                    'doc/source/objects_lxml.inv', ztext)
 
 intersphinx_mapping = {'python': ('https://docs.python.org/3.7/', None),
@@ -84,7 +84,7 @@ intersphinx_mapping = {'python': ('https://docs.python.org/3.7/', None),
                            'https://numpy.org/doc/stable/', None),
                        'matplotlib': ('https://matplotlib.org/', None),
                        'requests': (
-                           'https://docs.python-requests.org/en/latest/',
+                           'https://requests.readthedocs.io/en/latest/',
                            None),
                        'PIL': (
                            'https://pillow.readthedocs.io/en/stable/',
@@ -176,7 +176,7 @@ html_theme_options = {
     'navbar_links': [
         ("API Docs", 'api'),
         ("Repository",
-         "https://***REMOVED***nexuslims/NexusMicroscopyLIMS", True),
+         "https://github.com/usnistgov/NexusLIMS", True),
         ("NIST ODI", "https://www.nist.gov/mml/odi", True),
     ],
 
@@ -235,17 +235,9 @@ html_theme_options = {
 
 rst_epilog = """
 .. |SQLSchemaLink| replace:: SQL Schema Definition
-.. _SQLSchemaLink: https://***REMOVED***nexuslims/NexusMicroscopyLIMS/blob/master/nexusLIMS/db/dev/NexusLIMS_db_creation_script.sql
+.. _SQLSchemaLink: https://github.com/usnistgov/NexusLIMS/blob/public/nexusLIMS/db/dev/NexusLIMS_db_creation_script.sql
 .. |RepoLink| replace:: repository
-.. _RepoLink: https://***REMOVED***nexuslims/NexusMicroscopyLIMS
-.. |dbloggerLink| replace:: ``db_logger_gui.py``
-.. _dbloggerLink: https://***REMOVED***nexuslims/session-logger-app/-/blob/master/db_logger_gui.py
-.. |makedbentryLink| replace:: ``make_db_entry.py``
-.. _makedbentryLink: https://***REMOVED***nexuslims/session-logger-app/-/blob/master/make_db_entry.py
-.. |specfileLink| replace:: ``db_logger_gui.spec``
-.. _specfileLink: https://***REMOVED***nexuslims/session-logger-app/-/blob/master/db_logger_gui.spec
-.. |testsLink| replace:: ``tests``
-.. _testsLink: https://***REMOVED***nexuslims/NexusMicroscopyLIMS/-/tree/master/tests
+.. _RepoLink: https://github.com/usnistgov/NexusLIMS
 """
 
 

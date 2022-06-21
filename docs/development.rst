@@ -42,7 +42,7 @@ changes locally for development purposes and still run things.
 
 .. code:: bash
 
-   poetry install
+   $ poetry install
 
 .. note::
    Depending on your preferences, there are a few ``poetry``
@@ -91,7 +91,8 @@ in the environment some other way if you desire. For example, to use Gitlab
 CI/CD tools, you would set these variables in your project's CI/CD settings
 (see `their documentation <https://docs.gitlab.com/ee/ci/variables/>`_),
 since you would not want to commit a ``.env`` file into a remote repository
-that contains authorization secrets.
+that contains authorization secrets (the equivalent is available in Github,
+as well).
 
 Getting into the environment
 ----------------------------
@@ -204,21 +205,25 @@ metadata from the file.
 Contributing
 ------------
 
-To contribute, please
-`fork <https://***REMOVED***nexuslims/NexusMicroscopyLIMS/forks/new>`_
-the repository, develop your addition on a
+To contribute, please fork the repository, develop your addition on a
 `feature branch <https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow>`_
-within your forked repo, and submit a
-`merge request <https://***REMOVED***nexuslims/NexusMicroscopyLIMS/merge_requests>`_
-to the
-`master <https://***REMOVED***nexuslims/NexusMicroscopyLIMS/tree/master>`_
+within your forked repo, and submit a pull request to the ``master``
 branch to have it included in the project. Contributing to the package
 requires that every line of code is covered by a test case. This project uses
 testing through the `pytest <https://docs.pytest.org/en/latest/>`_ library,
 and features that do not pass the test cases or decrease coverage will not be
-accepted until suitable tests are included (see the |testsLink|_ directory
+accepted until suitable tests are included (see the ``tests`` directory
 for examples) and that the coverage of any new features is 100%.
-To get this information, you can use an IDE that includes coverage tracking
+
+.. note::
+
+    In the public version of this repository, the included tests will not run
+    due to the exclusion of test files and the expectation of certain files being
+    present. If you are contributing, please make sure `your changes` are covered
+    by tests, and the NexusLIMS developers will take care of integrating your
+    PR fully in the code after it is accepted.
+
+To get information about test coverage, you can use an IDE that includes coverage tracking
 (such as `PyCharm <https://www.jetbrains.com/pycharm/>`_) or include the
 ``--cov`` flag when running the tests. To test the preview image generation,
 the ``--mpl`` option should also be provided, together with the path to

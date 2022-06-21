@@ -137,8 +137,6 @@ session, or in the ``.env`` file in the root of this package's repository.
     file creation times to usage event times.
 """
 
-from ._urls import calendar_root_url
-from ._urls import ldap_url
 import logging as _logging
 
 from dotenv import load_dotenv

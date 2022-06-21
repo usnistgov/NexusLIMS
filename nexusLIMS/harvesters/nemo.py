@@ -934,6 +934,67 @@ def res_event_from_session(session: Session) -> ReservationEvent:
     representation of a session by finding a matching reservation in the NEMO
     system and parsing the data contained within into a ``ReservationEvent``
 
+    This method assumes a certain format for the "reservation questions"
+    associated with each reservation and parses that information into the resulting
+    ``ReservationEvent``. The most critical of these is the ``data_consent`` field.
+    If an affirmative response in this field is not found (because the user declined
+    consent or the reservation questions are missing), a record will not be built.
+
+    The following JSON object represents a minimal schema for a set of NEMO "Reservation
+    Questions" that will satisfy the expectations of this method. Please see the
+    NEMO documentation on this feature for more details.
+
+    .. highlight:: json
+    .. code-block:: json
+
+        [
+          {
+            "type": "textbox",
+            "name": "project_id",
+            "title": "Project ID",
+          },
+          {
+            "type": "textbox",
+            "name": "experiment_title",
+            "title": "Title of Experiment",
+          },
+          {
+            "type": "textarea",
+            "name": "experiment_purpose",
+            "title": "Experiment Purpose",
+          },
+          {
+            "type": "radio",
+            "title": "Agree to NexusLIMS curation",
+            "choices": ["Agree", "Disagree"],
+            "name": "data_consent",
+            "default_choice": "Agree"
+          },
+          {
+            "type": "group",
+            "title": "Sample information",
+            "name": "sample_group",
+            "questions": [
+              {
+                "type": "textbox",
+                "name": "sample_name",
+                "title": "Sample Name / PID",
+              },
+              {
+                "type": "radio",
+                "title": "Sample or PID?",
+                "choices": ["Sample Name", "PID"],
+                "name": "sample_or_pid",
+              },
+              {
+                "type": "textarea",
+                "name": "sample_details",
+                "title": "Sample Details",
+              }
+            ]
+          }
+        ]
+
     Parameters
     ----------
     session

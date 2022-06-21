@@ -20,6 +20,7 @@ tests/files/*.tif
 tests/files/*.hdf5
 tests/files/**/*.json
 tests/**/*.xml
+tests/test_report.xml
 .env
 .directory
 test_db.sqlite

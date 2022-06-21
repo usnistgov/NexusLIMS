@@ -37,7 +37,7 @@ used by the NexusLIMS development team and what is meant by them:
 
 - **Session Logger:**
 
-  - The session logger is the portable Windows application that runs on the
+  - The session logger (deprecated) was the portable Windows application that runs on the
     individual microscope PCs, which logs simple information to the NexusLIMS
     database about when an Experiment has occurred. See the associated
     :doc:`documentation <session_logger_app>` page for more details.

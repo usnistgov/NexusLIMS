@@ -101,38 +101,49 @@ class Instrument:
     Parameters
     ----------
     api_url : str or None
-        The calendar API url for this instrument
+        The calendar API endpoint url for this instrument’s scheduler
     calendar_name : str or None
-        The "user-friendly" name of the calendar for this instrument as
-        displayed on the sharepoint resource (e.g. "FEI Titan TEM")
+        The “user-friendly” name of the calendar for this instrument as displayed on the
+        reservation system resource (e.g. “FEI Titan TEM”)
     calendar_url : str or None
-        The URL to this instrument's web-accessible calendar on the
-        sharepoint resource
+        The URL to this instrument’s web-accessible calendar on the SharePoint
+        resource (if using)
     location : str or None
         The physical location of this instrument (building and room number)
     name : str or None
-        The unique identifier for an instrument in the Nexus Microscopy facility
+        The unique identifier for an instrument in the facility, currently (but not required to be)
+        built from the make, model, and type of instrument, plus a unique numeric code
+        (e.g. ``FEI-Titan-TEM-635816``)
     schema_name : str or None
-        The name of instrument as defined in the Nexus Microscopy schema and
-        displayed in the records
+        The human-readable name of instrument as defined in the Nexus Microscopy
+        schema and displayed in the records
     property_tag : str or None
-        The NIST property tag for this instrument
+        A unique numeric identifier for this instrument (not used by NexusLIMS,
+        but for reference and potential future use)
     filestore_path : str or None
-        The path (relative to the Nexus facility root) on the central file
-        storage where this instrument stores its data
+        The path (relative to central storage location specified in
+        :ref:`mmfnexus_path <mmfnexus-path>`) where this instrument stores its
+        data (e.g. ``./Titan``)
     computer_name : str or None
-        The name of the 'support PC' connected to this instrument
+        The hostname of the `support PC` connected to this instrument that runs
+        the `Session Logger App`. If this is incorrect (or not included), the
+        logger application will fail when attempting  to start a session from
+        the microscope (only relevant if using the `Session Logger App`)
     computer_ip : str or None
-        The REN IP address of the 'support PC' connected to this instrument
+        The IP address of the support PC connected to this instrument (not
+        currently utilized)
     computer_mount : str or None
-        The full path where the files are saved on the 'support PC' for the
-        instrument (e.g. 'M:/')
+        The full path where the central file storage is mounted and files are
+        saved on the 'support PC' for the instrument (e.g. 'M:/'; only relevant if
+        using the `Session Logger App`)
     harvester : str or None
-        The sub-module of :py:mod:`~nexusLIMS.harvesters` to use to harvest
-        calendar events
+        The specific submodule within :py:mod:`nexusLIMS.harvesters` that should be
+        used to harvest reservation information for this instrument. At the time of
+        writing, the only possible values are ``nemo`` or ``sharepoint_calendar``.
     timezone : pytz.timezone, str, or None
-        The timezone (as in the tzdata database) where this instrument is
-        located. Used for properly localizing the display of timestamps.
+        The timezone in which this instrument is located, in the format of the IANA
+        timezone database (e.g. ``America/New_York``). This is used to properly localize
+        dates and times when communicating with the harvester APIs.
     """
     def __init__(self,
                  api_url=None,

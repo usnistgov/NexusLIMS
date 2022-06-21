@@ -41,8 +41,9 @@ from matplotlib.offsetbox import AnchoredOffsetbox as _AOb
 from matplotlib.offsetbox import OffsetImage as _OIm
 from matplotlib.transforms import Bbox as _Bbox
 from PIL import Image as _PILImage
-from PIL.Image import LANCZOS as _LANCZOS
 import logging as _logging
+
+_LANCZOS = _PILImage.Resampling.LANCZOS
 
 _logger = _logging.getLogger(__name__)
 _logger.setLevel(_logging.INFO)
@@ -203,7 +204,7 @@ def _pad_to_square(im_path, new_width=500):
     old_size = im.size    # old_size[0] is in (width, height) format
     ratio = float(new_width) / max(old_size)
     new_size = tuple([int(x * ratio) for x in old_size])
-    im = im.resize(new_size, _PILImage.ANTIALIAS)
+    im = im.resize(new_size, _LANCZOS)
 
     new_im = _PILImage.new("RGBA", (new_width, new_width))
     new_im.paste(im, ((new_width - new_size[0]) // 2,
@@ -492,10 +493,17 @@ def sig_to_thumbnail(s, out_path, dpi=92):
         # signal is 1D linescan
         elif s.axes_manager.navigation_dimension == 1:
             s.plot()
-            s._plot.pointer.set_on(False)       # remove pointer
+            # this is not working due to https://github.com/hyperspy/hyperspy/issues/2965
+            # s._plot.pointer.set_on(False)       # remove pointer
+
             f = s._plot.navigator_plot.figure
             f.get_axes()[1].remove()            # remove colorbar scale
             ax = f.get_axes()[0]
+
+            # workaround for above issue to remove pointer
+            for l in list(ax.lines):
+                l.remove()
+
             _set_extent_and_save()
             return f
         elif s.axes_manager.navigation_dimension > 1:

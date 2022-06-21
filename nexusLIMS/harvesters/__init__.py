@@ -34,11 +34,11 @@ class ReservationEvent:
     last_updated : datetime.datetime
         The time this event was last updated
     username
-        The NIST "short" username of the user indicated in this event
+        The username of the user indicated in this event
     user_full_name
         The full name of the user for this event
     created_by
-        The NIST "short" username of the user that created this event
+        The username of the user that created this event
     created_by_full_name
         The full name of the user that created this event
     start_time

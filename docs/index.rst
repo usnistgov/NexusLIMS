@@ -4,14 +4,13 @@
    :hidden:
 
    Package introduction <self>
-   data_security
    database
-   session_logger_app
    record_building
    development
    taxonomy
    schema_documentation
    customizing_cdcs
+   session_logger_app
    api
 
 .. include:: README.rst
