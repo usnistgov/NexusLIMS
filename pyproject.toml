@@ -55,6 +55,7 @@ commands =
         --cov-config=tests/.coveragerc \
         --cov-report html:tests/coverage \
         --cov-report term-missing \
+        --junitxml=tests/test_report.xml \
         --mpl --mpl-baseline-path=tests/files/figs
 
 [testenv:gen_mpl_baseline]

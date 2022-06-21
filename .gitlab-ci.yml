@@ -29,6 +29,8 @@ nexusLIMS_tests:
     artifacts:
       paths:
         - coverage
+      reports:
+        junit: tests/test_report.xml
       expire_in: 30 days
     needs: []
 
