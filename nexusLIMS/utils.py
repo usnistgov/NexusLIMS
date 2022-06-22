@@ -482,7 +482,10 @@ def gnu_find_files_by_mtime(path, dt_from, dt_to, extensions):
     # Actually run find command (ignoring mib files if specified by
     # environment variable):
     filetype_regex = '|'.join(extensions)
-    cmd = f'find {_os.path.join(_os.environ["mmfnexus_path"], path)} ' + \
+    # add last '' to path join so it inserts trailing slash to handle symlinks
+    find_path = _os.path.join(_os.environ["mmfnexus_path"], path, '')
+
+    cmd = f'find {find_path} ' + \
           f'-type f ' + \
           f'-regextype posix-egrep ' + \
           f'-regex ".*\\.({filetype_regex})$" ' + \
