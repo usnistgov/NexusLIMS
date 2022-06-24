@@ -82,6 +82,16 @@ class TestUtils:
 
         assert len(files) == 37
 
+        # Test with trailing slash as well
+        files = gnu_find_files_by_mtime(
+            os.path.join(os.environ["mmfnexus_path"], "Titan/"),
+            dt_from=datetime.fromisoformat("2018-11-13T13:00:00.000"),
+            dt_to=datetime.fromisoformat("2018-11-13T16:00:00.000"),
+            extensions=_ext.keys()
+        )
+
+        assert len(files) == 37
+
     def test_gnu_and_pure_find_together(self):
         # both file-finding methods should return the same list (when sorted
         # by mtime) for the same path and date range

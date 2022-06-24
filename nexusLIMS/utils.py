@@ -320,8 +320,8 @@ def try_getting_dict_value(d, key):
 
 
 def find_dirs_by_mtime(path: str, 
-                       dt_from: datetime.datetime, 
-                       dt_to: datetime.datetime, 
+                       dt_from: datetime,
+                       dt_to: datetime,
                        followlinks: bool = True) -> List[str]:
     """
     Given two timestamps, find the directories under a path that were
@@ -365,7 +365,7 @@ def find_dirs_by_mtime(path: str,
     # comparisons than looking at every file):
     _logger.info(f'Finding directories modified between {dt_from.isoformat()} '
                  f'and {dt_to.isoformat()}')
-    for dirpath, _, _ in _os.walk(path):
+    for dirpath, _, _ in _os.walk(path, followlinks=followlinks):
         if dt_from.timestamp() < _getmtime(dirpath) < dt_to.timestamp():
             dirs.append(dirpath)
     return dirs
