@@ -67,10 +67,11 @@ class TestUtils:
         dirs = find_dirs_by_mtime(path, dt_from, dt_to, followlinks=True)
 
         assert len(dirs) == 3
-        for d in ['JEOL3010/***REMOVED***/***REMOVED***/20190724/M1_DC_Beam',
-                  'JEOL3010/***REMOVED***/***REMOVED***/20190724/M2_DC_Beam_Dose_1',
-                  'JEOL3010/***REMOVED***/***REMOVED***/20190724/M3_DC_Beam_Dose_2']:
-            assert os.path.join(path, d) in dirs
+        for d in ['***REMOVED***/20190724/M1_DC_Beam',
+                  '***REMOVED***/20190724/M2_DC_Beam_Dose_1',
+                  '***REMOVED***/20190724/M3_DC_Beam_Dose_2']:
+            # assert that d is a substring of at least one of the found dirs 
+            assert list(filter(lambda x: d in x, dirs))
 
     def test_gnu_find(self, fix_mountain_time):
         files = gnu_find_files_by_mtime(
