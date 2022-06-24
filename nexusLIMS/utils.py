@@ -26,7 +26,7 @@
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
 from configparser import ConfigParser as _ConfigParser
-from typing import Tuple
+from typing import Tuple, List
 
 import certifi as _certifi
 import tempfile as _tempfile
@@ -319,7 +319,10 @@ def try_getting_dict_value(d, key):
         return 'not found'
 
 
-def find_dirs_by_mtime(path, dt_from, dt_to):
+def find_dirs_by_mtime(path: str, 
+                       dt_from: datetime.datetime, 
+                       dt_to: datetime.datetime, 
+                       followlinks: bool = True) -> List[str]:
     """
     Given two timestamps, find the directories under a path that were
     last modified between the two
@@ -333,16 +336,19 @@ def find_dirs_by_mtime(path, dt_from, dt_to):
 
     Parameters
     ----------
-    path : str
+    path
         The root path from which to start the search
-    dt_from : datetime.datetime
+    dt_from
         The "starting" point of the search timeframe
-    dt_to : datetime.datetime
+    dt_to
         The "ending" point of the search timeframe
+    followlinks
+        Argument passed on to py:func:`os.walk` to control whether
+        symbolic links are followed
 
     Returns
     -------
-    dirs : :obj:`list` of :obj:`str`
+    dirs
         A list of the directories that have modification times within the
         time range provided
     """
@@ -403,7 +409,7 @@ def find_files_by_mtime(path, dt_from, dt_to):
     # for each of those directories, walk the file tree and inspect the
     # actual files:
     for d in dirs:
-        for dirpath, _, filenames in _os.walk(d):
+        for dirpath, _, filenames in _os.walk(d, followlinks=True):
             for f in filenames:
                 fname = _os.path.abspath(_os.path.join(dirpath, f))
                 if dt_from.timestamp() < _getmtime(fname) < dt_to.timestamp():
@@ -416,7 +422,7 @@ def find_files_by_mtime(path, dt_from, dt_to):
     return files
 
 
-def gnu_find_files_by_mtime(path, dt_from, dt_to, extensions):
+def gnu_find_files_by_mtime(path, dt_from, dt_to, extensions, followlinks=True):
     """
     Given two timestamps, find files under a path that were
     last modified between the two. Uses the system-provided GNU ``find``
@@ -427,13 +433,23 @@ def gnu_find_files_by_mtime(path, dt_from, dt_to, extensions):
     Parameters
     ----------
     path : str
-        The root path from which to start the search
+        The root path from which to start the search, relative to
+        the :ref:`mmfnexus_path <mmfnexus-path>` environment setting.
     dt_from : datetime.datetime
         The "starting" point of the search timeframe
     dt_to : datetime.datetime
         The "ending" point of the search timeframe
     extensions : :obj:`list` of :obj:`str`
         A list of strings representing the extensions to find
+    followlinks : bool
+        Whether to follow symlinks using the ``find`` command via 
+        the ``-H`` command line flag. This is useful when the 
+        :ref:`mmfnexus_path <mmfnexus-path>` is actually a directory
+        of symlinks. If this is the case and ``followlinks`` is 
+        ``False``, no files will ever be found because the ``find``
+        command will not "dereference" the symbolic links it finds.
+        See comments in the code for more comments on implementation
+        of this feature.
 
     Returns
     -------
@@ -454,6 +470,10 @@ def gnu_find_files_by_mtime(path, dt_from, dt_to, extensions):
     if not _sys.platform.startswith('linux'):
         raise NotImplementedError('gnu_find_files_by_mtime only implemented '
                                   'for Linux')
+
+    if path[-1] == '/':
+        _logger.warning(f'Removing trailing slash from path: "{path}"')
+        path = path[:-1]
 
     def _which(fname):
         def _is_exec(f):
@@ -479,13 +499,53 @@ def gnu_find_files_by_mtime(path, dt_from, dt_to, extensions):
     if dt_to.tzinfo is None:
         dt_to += tz_offset
 
+    # join the given path with the root storage folder
+    find_path = _os.path.join(_os.environ["mmfnexus_path"], path)
+
+    
+    # if "followlinks" is provided, the "find" command is split into two parts; 
+    # This code is to support when `mmfnexus_path` is a directory of symbolic links
+    # to instrument storage locations, rather than actual directories
+
+    # The simplest option would be to provide the "-L" flag to "find", which instructs
+    # the program to "dereference" all symbolic links it finds. In testing, this
+    # was found to slow the file finding operation by at least an order of magnitude,
+    # inflating run-times from a few minutes to over an hour; instead, we do
+    # a two part operation:
+
+    # First, we search from the root path for any symbolic links that point
+    # to directories; If the root path is a (relatively) small directory consisting
+    # of mostly symbolic links, this operation should be very fast.
+ 
+    # Based off the results of the first search, we then use "find" with the
+    # "-H" flag to dereference only the paths provided as a command line option
+    # for "find". We assume in this implementation there will not be symlinks 
+    # in the instrument data folders themselves. This method further assumes that
+    # the folder specified by "path" is either a symlink itself, or a directory 
+    # containing one or more symlinks. It _should_ still work if this is not the
+    # case, but may be slower, since it will run two "find" commands over the whole
+    # directory tree in that case.
+    if followlinks:
+        find_path = _os.path.join(_os.environ["mmfnexus_path"], path)
+        cmd = f'find {find_path} -type l -xtype d -print0'
+        _logger.info(f'Running followlinks find via subprocess: "{cmd}"')
+        out = _sp.Popen(cmd, shell=True,
+                    stdin=_sp.PIPE, stdout=_sp.PIPE, stderr=_sp.PIPE)
+        (stdout, stderr) = out.communicate()
+        paths = stdout.split(b'\x00')
+        paths = [f.decode() for f in paths if len(f) > 0]
+        _logger.info(f'Found the following symlinks: "{paths}"')
+        if paths:
+            find_path = ' '.join([f'"{p}"' for p in paths])
+            _logger.info(f"find_path is: '{find_path}'")
+
     # Actually run find command (ignoring mib files if specified by
     # environment variable):
     filetype_regex = '|'.join(extensions)
-    # add last '' to path join so it inserts trailing slash to handle symlinks
-    find_path = _os.path.join(_os.environ["mmfnexus_path"], path, '')
 
-    cmd = f'find {find_path} ' + \
+    cmd = f'find ' + \
+          ('-H ' if followlinks else '') + \
+          f'{find_path} ' + \
           f'-type f ' + \
           f'-regextype posix-egrep ' + \
           f'-regex ".*\\.({filetype_regex})$" ' + \
@@ -510,7 +570,7 @@ def gnu_find_files_by_mtime(path, dt_from, dt_to, extensions):
     # convert to set and back to remove duplicates and sort my mtime
     files = list(set(files))
     files.sort(key=_getmtime)
-
+    _logger.info(f"Found {len(files)} files")
     return files
 
 

@@ -64,7 +64,7 @@ class TestUtils:
         path = os.path.join(os.environ["mmfnexus_path"], "JEOL3010")
         dt_from = datetime.fromisoformat("2019-07-24T11:00:00.000")
         dt_to = datetime.fromisoformat("2019-07-24T16:00:00.000")
-        dirs = find_dirs_by_mtime(path, dt_from, dt_to)
+        dirs = find_dirs_by_mtime(path, dt_from, dt_to, followlinks=True)
 
         assert len(dirs) == 3
         for d in ['JEOL3010/***REMOVED***/***REMOVED***/20190724/M1_DC_Beam',

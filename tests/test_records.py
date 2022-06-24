@@ -83,13 +83,15 @@ class TestRecordBuilder:
             # noinspection PyTypeChecker
             assert len(found_files) == ans
 
-        assert f'{os.environ["mmfnexus_path"]}' \
-               f'/Titan/***REMOVED***/200204 - ***REMOVED*** - ***REMOVED*** ' \
-               f'- Titan/15 - 620k.dm3' in file_list_list[5]
+        assert os.path.join(os.environ["mmfnexus_path"], 
+                            'Titan/***REMOVED***/200204 - ***REMOVED*** - '
+                            '***REMOVED*** - Titan/15 - 620k.dm3') \
+                                in file_list_list[5]
 
         # file from NEMO session
-        assert f'{os.environ["mmfnexus_path"]}' \
-               f'/NexusLIMS/test_files/02 - 620k-2.dm3' in file_list_list[-2]
+        assert os.path.join(os.environ["mmfnexus_path"], 
+                            'NexusLIMS/test_files/02 - 620k-2.dm3') \
+                                in file_list_list[-2]
 
     def test_process_new_records_dry_run(self, remove_nemo_gov_harvester):
         # just running to ensure coverage, tests are included above
