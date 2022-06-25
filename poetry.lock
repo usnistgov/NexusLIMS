@@ -312,7 +312,7 @@ numpy = ">=1.14.5"
 
 [[package]]
 name = "hyperspy"
-version = "1.7.0"
+version = "1.7.1"
 description = "Multidimensional data analysis toolbox"
 category = "main"
 optional = false
@@ -1545,7 +1545,7 @@ testing = ["pytest (>=6)", "pytest-checkdocs (>=2.4)", "pytest-flake8", "pytest-
 [metadata]
 lock-version = "1.1"
 python-versions = ">=3.7,<3.9"
-content-hash = "d4e2c9af1eee2f819dec54210937978fb37dd7a60669e20ea68e1679a57179ff"
+content-hash = "5823174c32988326307a22b2d42a9b7562730ad6b274329fca31ffef16ece4fe"
 
 [metadata.files]
 alabaster = [
@@ -1797,19 +1797,19 @@ h5py = [
     {file = "h5py-3.7.0.tar.gz", hash = "sha256:3fcf37884383c5da64846ab510190720027dca0768def34dd8dcb659dbe5cbf3"},
 ]
 hyperspy = [
-    {file = "hyperspy-1.7.0-cp310-cp310-macosx_10_15_x86_64.whl", hash = "sha256:ee40a5ee169664d44e4cbf9c3738c4e0d79987069488419ad191e4b699ed02ac"},
-    {file = "hyperspy-1.7.0-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl", hash = "sha256:3091cf8522db76657cca6b795c295a5e3e54e61d3a95523ad0f49f115e15e304"},
-    {file = "hyperspy-1.7.0-cp310-cp310-win_amd64.whl", hash = "sha256:f025c3bee1c1131c1292f417882685db01253fd04bdc1ad13c5e1113780d8405"},
-    {file = "hyperspy-1.7.0-cp37-cp37m-macosx_10_14_x86_64.whl", hash = "sha256:951b3cc8d9d243dc001c9256eaeadec9c97f9997b6cfd0c87a19a41ce293c437"},
-    {file = "hyperspy-1.7.0-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl", hash = "sha256:63eb889cf6341586e02e38ca7c7a5f7479a7b3a617ad827dc4ce628de09ccac9"},
-    {file = "hyperspy-1.7.0-cp37-cp37m-win_amd64.whl", hash = "sha256:afea4bce292a77b2e3df648a5e800f18759d1c15ae0cfa127c3ab3c9bcd35f14"},
-    {file = "hyperspy-1.7.0-cp38-cp38-macosx_10_14_x86_64.whl", hash = "sha256:23ae3f668c25b6f99706bcbf65e97aaf223df6189da946b1720ea2af97dac51c"},
-    {file = "hyperspy-1.7.0-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl", hash = "sha256:6c53a7b514ca7bf1f6b35db098d0fa4a84e1e73a4a51a07929d834ed960f7e65"},
-    {file = "hyperspy-1.7.0-cp38-cp38-win_amd64.whl", hash = "sha256:8798889dcb47b3bdc0154079932ec47ebb8fb69ef862bf3d0a8da106c551351b"},
-    {file = "hyperspy-1.7.0-cp39-cp39-macosx_10_15_x86_64.whl", hash = "sha256:93ae392a5a0a4d1644df744fe96471e7de5429b49ca4383e88b717244858da55"},
-    {file = "hyperspy-1.7.0-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl", hash = "sha256:91650dc1b5e9997dc4c0dd08c409d68dd9cada0d4234ded26264d6366ca2766e"},
-    {file = "hyperspy-1.7.0-cp39-cp39-win_amd64.whl", hash = "sha256:04aaeda25ace9f8de9c80a63e8b1498102a281a420a3cc0b09b944fc8717508e"},
-    {file = "hyperspy-1.7.0.tar.gz", hash = "sha256:49b3ea491fb5392227e7bcdbd8028c47b8c5aa9346dac58e02bff08f06ea1244"},
+    {file = "hyperspy-1.7.1-cp310-cp310-macosx_10_15_universal2.whl", hash = "sha256:364c138fee6eb8015e89d1d1b7b0ba07835351386031c323aaf08b2ecaf61b7d"},
+    {file = "hyperspy-1.7.1-cp310-cp310-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl", hash = "sha256:bc485656d0b5d9c02774f2ad8e654b7ea8c644dbcc3d28787dcbd500a7c218f6"},
+    {file = "hyperspy-1.7.1-cp310-cp310-win_amd64.whl", hash = "sha256:fefadc109faa4160df31a240a9c9e8d22e5e363d40eca25da83a087f48fc193a"},
+    {file = "hyperspy-1.7.1-cp37-cp37m-macosx_10_15_x86_64.whl", hash = "sha256:f3889381ef41070e2e613675dfb0a646432eb9d352a9f9f22deee077a690abd0"},
+    {file = "hyperspy-1.7.1-cp37-cp37m-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl", hash = "sha256:aeb9f45dce6460380d0a0cfd946092256c7c8a7217f1b32cf68b624eddfe8152"},
+    {file = "hyperspy-1.7.1-cp37-cp37m-win_amd64.whl", hash = "sha256:e6b1cd9f48aa9ba7ccfb16aaa31f25a6d8edc574a6e6ec60af80d4eff5ae23c8"},
+    {file = "hyperspy-1.7.1-cp38-cp38-macosx_10_15_x86_64.whl", hash = "sha256:7050b796ca053f53fb57bf9cd15565bbaf4e5ed66b122d8865a1ae5342b8326b"},
+    {file = "hyperspy-1.7.1-cp38-cp38-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl", hash = "sha256:23ed58eb99ea2ec9bcb6d137a7d00703f5e82ac1f7ca987246b1bb19a1197a89"},
+    {file = "hyperspy-1.7.1-cp38-cp38-win_amd64.whl", hash = "sha256:5d41c5c1ccad93b92c070087962dd0c37ec957269e1fb317d1e377478634b20d"},
+    {file = "hyperspy-1.7.1-cp39-cp39-macosx_10_15_x86_64.whl", hash = "sha256:5bf8db0ab9a0c19cd7803afd18aaae991bd0099b7603f324d8eb1093c9b51656"},
+    {file = "hyperspy-1.7.1-cp39-cp39-manylinux_2_17_x86_64.manylinux2014_x86_64.manylinux_2_24_x86_64.whl", hash = "sha256:2e1f9b6d99e072e630f58eac8e6778e5de1b5c5de8de5bf841c11ba2842f53f7"},
+    {file = "hyperspy-1.7.1-cp39-cp39-win_amd64.whl", hash = "sha256:b82a2729c716d60f5ce6975a87b5cc59f24ed58fea88808111e1c2b77e0c6c54"},
+    {file = "hyperspy-1.7.1.tar.gz", hash = "sha256:d90b9a4a03f5575b8c6247cc1450d76cf156987997fdb32d316f10825c85f8bb"},
 ]
 idna = [
     {file = "idna-3.3-py3-none-any.whl", hash = "sha256:84d9dd047ffa80596e0f246e2eab0b391788b0503584e8945f2368256d2735ff"},
