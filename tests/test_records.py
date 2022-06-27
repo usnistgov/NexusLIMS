@@ -237,9 +237,9 @@ class TestRecordBuilder:
 
         _, res = dbq("SELECT * FROM session_log WHERE session_identifier = ?",
                      ("test_session", ))
-        assert res[0][5] == 'COMPLETED'
-        assert res[1][5] == 'COMPLETED'
-        assert res[2][5] == 'COMPLETED'
+        assert res[0][5] == 'NO_RESERVATION'
+        assert res[1][5] == 'NO_RESERVATION'
+        assert res[2][5] == 'NO_RESERVATION'
 
     def test_new_session_processor(self, remove_nemo_gov_harvester,
                                    monkeypatch, fix_mountain_time):
@@ -464,8 +464,7 @@ class TestRecordBuilder:
         #  https://***REMOVED***/api/reservations/?id=168
         def mock_get_sessions():
             return [session_handler.Session(
-                session_identifier='https://***REMOVED***/api/usage_events'
-                                   '/?id=-1',
+                session_identifier='test_session',
                 instrument=instrument_db['testsurface-CPU_P1111111'],
                 dt_from=_dt.fromisoformat('2021-12-08T09:00:00.000-07:00'),
                 dt_to=_dt.fromisoformat('2021-12-08T12:00:00.000-07:00'),
@@ -473,6 +472,10 @@ class TestRecordBuilder:
 
         monkeypatch.setattr(_rb, '_get_sessions', mock_get_sessions)
         xmls_files = _rb.build_new_session_records()
+
+        _, res = dbq("SELECT * FROM session_log WHERE session_identifier = ?",
+                     ("test_session", ))
+        assert res[0][5] == 'NO_CONSENT'
         assert "Reservation 168 requested not to have their data harvested" \
                in caplog.text
         assert len(xmls_files) == 0  # no record should be returned

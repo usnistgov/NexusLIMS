@@ -54,7 +54,7 @@ from nexusLIMS.instruments import Instrument
 from nexusLIMS.harvesters import ReservationEvent as _ResEvent
 from nexusLIMS.harvesters import sharepoint_calendar as _sp_cal
 from nexusLIMS.harvesters import nemo as _nemo
-from nexusLIMS.harvesters.nemo import NoDataConsentException
+from nexusLIMS.harvesters.nemo import NoDataConsentException, NoMatchingReservationException
 from nexusLIMS.utils import find_files_by_mtime as _find_files
 from nexusLIMS.utils import gnu_find_files_by_mtime as _gnu_find_files
 from nexusLIMS.utils import has_delay_passed as _has_delay_passed
@@ -449,8 +449,15 @@ def build_new_session_records() -> List[str]:
                                 f"harvested, so no record was built. "
                                 f"{e}")
                 _logger.info(f'Marking {s.session_identifier} as '
-                             f'"COMPLETED"')
-                s.update_session_status('COMPLETED')
+                             f'"NO_CONSENT"')
+                s.update_session_status('NO_CONSENT')
+            elif isinstance(e, NoMatchingReservationException):
+                _logger.warning(f"No matching reservation found for this "
+                                f"session, so assuming no consent was given. "
+                                f"{e}")
+                _logger.info(f'Marking {s.session_identifier} as '
+                             f'"NO_RESERVATION"')
+                s.update_session_status('NO_RESERVATION')
             else:
                 _logger.error(f'Could not generate record text: {e}')
                 _logger.error(f'Marking {s.session_identifier} as "ERROR"')

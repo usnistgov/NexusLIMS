@@ -171,9 +171,10 @@ class Session:
         Parameters
         ----------
         status : str
-            One of `"COMPLETED"`, `"WAITING_FOR_END"`, `"TO_BE_BUILT"`,
-            `"ERROR"`, `"NO_FILES_FOUND"` (the allowed values in the
-            NexusLIMS database). Status value will be validated by the database
+            One of ``"COMPLETED"``, ``"WAITING_FOR_END"``, ``"TO_BE_BUILT"``,
+            ``"ERROR"``, ``"NO_FILES_FOUND"``, ``"NO_CONSENT"``, or ``"NO_RESERVATION"``
+            (the allowed values in the NexusLIMS database). Status value will be
+            validated by a check constraint in the database
 
         Returns
         -------

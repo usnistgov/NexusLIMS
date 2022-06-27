@@ -740,7 +740,7 @@ class TestNemoIntegration:
                     dt.fromisoformat('2021-08-10T15:00:00-06:00'),
                     dt.fromisoformat('2021-08-10T16:00:00-06:00'),
                     user='***REMOVED***')
-        with pytest.raises(nemo.NoDataConsentException):
+        with pytest.raises(nemo.NoMatchingReservationException):
             nemo.res_event_from_session(s)
 
     def test_res_event_from_session_no_overlapping_sessions(self):
@@ -751,7 +751,7 @@ class TestNemoIntegration:
                     dt.fromisoformat('2021-08-05T15:00:00-06:00'),
                     dt.fromisoformat('2021-08-05T16:00:00-06:00'),
                     user='***REMOVED***')
-        with pytest.raises(nemo.NoDataConsentException):
+        with pytest.raises(nemo.NoMatchingReservationException):
             nemo.res_event_from_session(s)
 
     def test_no_connector_for_session(self):
