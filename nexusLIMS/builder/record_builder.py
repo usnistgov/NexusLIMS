@@ -435,17 +435,15 @@ def build_new_session_records() -> List[str]:
                                     f'"NO_FILES_FOUND"')
                     s.update_session_status('NO_FILES_FOUND')
                 else:
-                    # if the delay hasn't passed, mark just the record
-                    # generation event as NO_FILES_FOUND
+                    # if the delay hasn't passed, log and delete the record generation event
+                    # we inserted previously
                     _logger.warning(f'Configured record building delay has '
-                                    f'not passed; Marking just the '
+                                    f'not passed; Removing previously inserted '
                                     f'RECORD_GENERATION '
-                                    f'row for {s.session_identifier} '
-                                    f'as "NO_FILES_FOUND"')
-                    _dbq("UPDATE session_log "
-                         "SET record_status = ? "
+                                    f'row for {s.session_identifier}')
+                    _dbq("DELETE FROM session_log "
                          "WHERE id_session_log = ?",
-                         ("NO_FILES_FOUND", db_row['id_session_log']))
+                         (db_row['id_session_log'], ))
             elif isinstance(e, NoDataConsentException):
                 _logger.warning(f"User requested this session not be "
                                 f"harvested, so no record was built. "

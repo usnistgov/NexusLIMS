@@ -189,13 +189,13 @@ class TestRecordBuilder:
                                               cleanup_session_log):
         _rb.process_new_records(dry_run=False)
         assert "Configured record building delay has not passed; " \
-               "Marking just the RECORD_GENERATION row" in caplog.text
+               "Removing previously inserted RECORD_GENERATION " in caplog.text
 
         _, res = dbq("SELECT * FROM session_log WHERE session_identifier = ?",
                      ("test_session", ))
         assert res[0][5] == 'TO_BE_BUILT'
         assert res[1][5] == 'TO_BE_BUILT'
-        assert res[2][5] == 'NO_FILES_FOUND'
+        assert len(res) == 2
 
     def test_process_new_nemo_record_with_no_reservation(
             self, remove_nemo_gov_harvester, monkeypatch,
