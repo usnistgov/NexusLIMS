@@ -57,6 +57,14 @@ class NoDataConsentException(Exception):
     pass
 
 
+class NoMatchingReservationException(Exception):
+    """
+    Exception to raise if there was no matching reservation (so we cannot assume
+    to have consent to harvest their data)
+    """
+    pass
+
+
 class NemoConnector:
     """
     A connection to an instance of the API of the NEMO laboratory management
@@ -1051,9 +1059,9 @@ def res_event_from_session(session: Session) -> ReservationEvent:
         # session
         _logger.warning(f"No reservations found with overlap for this usage "
                         f"event, so raising NoDataConsentException")
-        raise NoDataConsentException("No reservation found matching this "
-                                     "session, so assuming NexusLIMS does not "
-                                     "have user consent for data harvesting.")
+        raise NoMatchingReservationException(
+            "No reservation found matching this session, so assuming NexusLIMS "
+            "does not have user consent for data harvesting.")
     else:
         max_overlap = overlaps.index(max(overlaps))
         # select the reservation with the most overlap
