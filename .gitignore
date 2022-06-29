@@ -22,6 +22,7 @@ tests/files/**/*.json
 tests/**/*.xml
 tests/test_report.xml
 .env
+cert_bundle.pem
 .directory
 test_db.sqlite
 

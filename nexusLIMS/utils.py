@@ -26,7 +26,7 @@
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
 from configparser import ConfigParser as _ConfigParser
-from typing import Tuple, List
+from typing import Tuple, List, Callable, Optional
 
 import certifi as _certifi
 import tempfile as _tempfile
@@ -66,7 +66,11 @@ def setup_loggers(log_level):
         logger.setLevel(log_level)
 
 
-def nexus_req(url, fn, basic_auth=False, token_auth=None, **kwargs):
+def nexus_req(url: str,
+              fn: Callable,
+              basic_auth: bool = False,
+              token_auth: Optional[str] = None,
+              **kwargs: Optional[dict]):
     """
     A helper method that wraps a function from :py:mod:`requests`, but adds a
     local certificate authority chain to validate the SharePoint server's
@@ -74,20 +78,20 @@ def nexus_req(url, fn, basic_auth=False, token_auth=None, **kwargs):
 
     Parameters
     ----------
-    url : str
+    url
         The URL to fetch
-    fn : object
+    fn
         The function from the ``requests`` library to use (e.g.
         :py:func:`~requests.get`, :py:func:`~requests.put`,
         :py:func:`~requests.post`, etc.)
-    basic_auth : bool
+    basic_auth
         If True, use only username and password for authentication rather than
         NTLM
-    token_auth : None or str
+    token_auth
         If a value is provided, it will be used as a token for authentication
         (only one of ``token_auth`` or ``basic_auth`` should be provided. The
         method will error if both are provided
-    **kwargs : dict, optional
+    **kwargs :
         Other keyword arguments are passed along to the ``fn``
 
     Returns
@@ -104,7 +108,7 @@ def nexus_req(url, fn, basic_auth=False, token_auth=None, **kwargs):
         raise ValueError('Both `basic_auth` and `token_auth` were provided. '
                          'Only one can be used at a time')
 
-    from .harvesters import CA_BUNDLE_PATH
+    from .harvesters import CA_BUNDLE_CONTENT
 
     # if token_auth is desired, add it to any existing headers passed along
     # with the request
@@ -114,19 +118,20 @@ def nexus_req(url, fn, basic_auth=False, token_auth=None, **kwargs):
         else:
             kwargs['headers'] = {'Authorization': f"Token {token_auth}"}
 
+    verify_arg = True
     with _tempfile.NamedTemporaryFile() as tmp:
-        with open(_certifi.where(), 'rb') as sys_cert:
-            lines = sys_cert.readlines()
-        tmp.writelines(lines)
-        with open(CA_BUNDLE_PATH, 'rb') as our_cert:
-            lines = our_cert.readlines()
-        tmp.writelines(lines)
-        tmp.seek(0)
+        if CA_BUNDLE_CONTENT:
+            with open(_certifi.where(), 'rb') as sys_cert:
+                lines = sys_cert.readlines()
+            tmp.writelines(lines)
+            tmp.writelines(CA_BUNDLE_CONTENT)
+            tmp.seek(0)
+            verify_arg = tmp.name
+
         if token_auth:
-            r = fn(url, verify=tmp.name, **kwargs)
+            r = fn(url, verify=verify_arg, **kwargs)
         else:
-            r = fn(url, auth=get_auth(basic=basic_auth), verify=tmp.name,
-                   **kwargs)
+            r = fn(url, auth=get_auth(basic=basic_auth), verify=verify_arg, **kwargs)
 
     return r
 
