@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 username = 'admin'
 password = 'changeme'
-url = 'https://***REMOVED***/'
+url = 'https://nexuslims.url.com/'
 fname = 'records.json'
 root_path = os.environ.get('mmfnexus_path')
 

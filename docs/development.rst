@@ -237,10 +237,10 @@ the `"reference"` images that are tested against. For example:
 
    # ================================= test session starts ==============================================================
    # platform linux -- Python 3.8.12, pytest-5.4.3, py-1.11.0, pluggy-0.13.1                                              
-   # cachedir: ***REMOVED***tmp/nexuslims/.tox/py38/.pytest_cache                                                            
+   # cachedir: nexuslims/.tox/py38/.pytest_cache                                                            
    # Matplotlib: 3.4.3                                                                                                          
    # Freetype: 2.6.1                                                                                                      
-   # rootdir: ***REMOVED***tmp/nexuslims/tests, inifile: pytest.ini                                                          
+   # rootdir: nexuslims/tests, inifile: pytest.ini                                                          
    # plugins: cov-3.0.0, mpl-0.13                                                                                      
    # collected 204 items                                                                                               
    #                                                                                                                               

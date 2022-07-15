@@ -160,8 +160,7 @@ def is_subpath(path, of_paths):
 
     Examples
     --------
-    >>> is_subpath('/mnt/***REMOVED***/Titan/***REMOVED***/190628 - Aaron ' +
-    ...            'Training/***REMOVED***/4_330mm.dm3',
+    >>> is_subpath('/path/to/file.dm3',
     ...            os.path.join(os.environ['mmfnexus_path'],
     ...                         titan.filestore_path))
     True

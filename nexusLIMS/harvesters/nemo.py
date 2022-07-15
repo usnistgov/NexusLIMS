@@ -74,7 +74,7 @@ class NemoConnector:
     ----------
     base_url : str
         The "root" of the API including a trailing slash;
-        e.g. 'https://***REMOVED***/api/'
+        e.g. 'https://nemo.url.com/api/'
     token : str
         An authentication token for this NEMO instance
     strftime_fmt : str
@@ -1196,7 +1196,7 @@ def id_from_url(url: str) -> Union[None, int]:
     ----------
     url
         The URL to parse, such as
-        ``https://***REMOVED***/api/usage_events/?id=9``
+        ``https://nemo.url.com/api/usage_events/?id=9``
 
     Returns
     -------

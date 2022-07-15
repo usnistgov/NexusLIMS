@@ -43,7 +43,7 @@ os.environ['nexusLIMS_path'] = os.path.join(os.path.dirname(__file__),
                                             'files', 'nexusLIMS_path')
 
 # we don't want to mask both directories, because the record builder tests
-# need to look at the real files on ***REMOVED***:
+# need to look at the real files on the mmfnexus storage path:
 # os.environ['mmfnexus_path'] = os.path.join(os.path.dirname(__file__), 'files')
 
 

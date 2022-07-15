@@ -34,6 +34,7 @@ test_data/
 **/doc/build
 **/db_logger_gui/build
 mdcs/nexusLIMS/doc/source/api/*.rst
+nexusLIMS/dev_scripts/read_bad_tif.py
 _coverage_output
 .venv/
 *.sqbpro

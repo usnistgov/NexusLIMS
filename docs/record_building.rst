@@ -8,8 +8,7 @@ Record building workflow
     `Last updated: November 26, 2021`
 
 This page describes the process used to build records based on the data saved by
-instruments in the Electron Microscopy Nexus facility
-using `NexusLIMS <https://***REMOVED***>`_.
+instruments in the Electron Microscopy Nexus facility using NexusLIMS.
 At the bottom is an `activity diagram <activity-diagram_>`_ that illustrates
 how the different modules work together to generate records from the centralized
 file storage and the NexusLIMS session database. Throughout this page, links

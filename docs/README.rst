@@ -65,7 +65,7 @@ including:
 - `Joshua Taillon <https://www.nist.gov/people/joshua-taillon>`_ - Office of Data and Informatics - Primary application developer
 - `June Lau <https://www.nist.gov/people/june-w-lau>`_ - Office of Data and Informatics
 - `Ryan White <https://www.nist.gov/people/ryan-white>`_ - Applied Chemicals and Materials Division / Office of Data and Informatics (detail)
-- `Michael Katz <https://www.nist.gov/people/ryan-white>`_ - Materials Science and Engineering Division / Office of Data and Informatics (detail)
+- `Michael Katz <https://www.nist.gov/people/michael-katz>`_ - Materials Science and Engineering Division / Office of Data and Informatics (detail)
 - `Marcus Newrock <https://www.nist.gov/people/marcus-william-newrock>`_ - Office of Data and Informatics
 - `Ray Plante <https://www.nist.gov/people/raymond-plante>`_ - Office of Data and Informatics
 - `Gretchen Greene <https://www.nist.gov/people/gretchen-greene>`_ - Office of Data and Informatics
