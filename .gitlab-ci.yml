@@ -19,8 +19,6 @@ nexusLIMS_tests:
     stage: test
     script:
       # run tests with coverage and output coverage report to html
-      - echo ${NexusLIMS_cert_bundle}
-      - poetry run python -c "import os; CA_BUNDLE_CONTENT = os.environ.get('NexusLIMS_cert_bundle', None); print([(i + '\n').encode() for i in CA_BUNDLE_CONTENT.split(r'\n')])"
       - poetry run tox
     retry: 2
     extends: .env_setup
