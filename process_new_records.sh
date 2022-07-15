@@ -4,7 +4,8 @@
 # https://github.com/ralish/bash-script-template/blob/stable/template.sh
 # actual running code is in the main() function towards the bottom
 
-# Uses ssmtp to send notification email if there's an error
+# Uses ssmtp to send notification email if there's an error (must be configured
+# on system running this script to send emails)
 
 # Enable xtrace if the DEBUG environment variable is set
 if [[ ${DEBUG-} =~ ^1|yes|true$ ]]; then

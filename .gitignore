@@ -22,6 +22,7 @@ tests/files/**/*.json
 tests/**/*.xml
 tests/test_report.xml
 .env
+cert_bundle.pem
 .directory
 test_db.sqlite
 
@@ -33,6 +34,7 @@ test_data/
 **/doc/build
 **/db_logger_gui/build
 mdcs/nexusLIMS/doc/source/api/*.rst
+nexusLIMS/dev_scripts/read_bad_tif.py
 _coverage_output
 .venv/
 *.sqbpro

@@ -271,11 +271,9 @@ def get_instr_from_filepath(path):
 
     Examples
     --------
-    >>> inst = get_instr_from_filepath('/mnt/***REMOVED***/Titan/***REMOVED***/' +
-    ...                                '***REMOVED***/' +
-    ...                                '***REMOVED***/4_330mm.dm3')
+    >>> inst = get_instr_from_filepath('/path/to/file.dm3')
     >>> str(inst)
-    'FEI-Titan-TEM-635816 in ***REMOVED***'
+    'FEI-Titan-TEM-635816 in xxx/xxxx'
     """
     for k, v in instrument_db.items():
         if _is_subpath(path, _os.path.join(_os.environ["mmfnexus_path"],
@@ -332,9 +330,9 @@ def get_instr_from_api_url(api_url: str) -> Union[None, Instrument]:
 
     Examples
     --------
-    >>> inst = get_instr_from_api_url('https://***REMOVED***/api/tools/?id=1')
+    >>> inst = get_instr_from_api_url('https://nemo.url.com/api/tools/?id=1')
     >>> str(inst)
-    'FEI-Titan-STEM-630901_n in ***REMOVED***'
+    'FEI-Titan-STEM-630901_n in xxx/xxxx'
     """
     for k, v in instrument_db.items():
         if api_url == v.api_url:

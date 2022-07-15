@@ -11,8 +11,17 @@ from datetime import datetime
 from lxml import etree
 import os as _os
 
-CA_BUNDLE_PATH = _os.path.join(_os.path.dirname(__file__),
-                               "cert_bundle.pem")
+CA_BUNDLE_PATH = _os.environ.get("NexusLIMS_cert_bundle_file", None)
+CA_BUNDLE_CONTENT = _os.environ.get("NexusLIMS_cert_bundle", None)
+
+if CA_BUNDLE_CONTENT is None:  # pragma: no cover
+    # no way to test this in CI/CD pipeline
+    if CA_BUNDLE_PATH:
+        with open(CA_BUNDLE_PATH, 'rb') as our_cert:
+            CA_BUNDLE_CONTENT = our_cert.readlines()
+else:
+    # split content into a list of bytes on \n characters
+    CA_BUNDLE_CONTENT = [(i + '\n').encode() for i in CA_BUNDLE_CONTENT.split(r'\n')]
 
 
 class ReservationEvent:
