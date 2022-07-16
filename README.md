@@ -28,7 +28,19 @@ First, see the standard NIST [disclaimer](https://www.nist.gov/disclaimer).
 Next, NexusLIMS was written primarily for internal use within NIST. While efforts have been made to try to generalize 
 the code to be applicable to other institutions, many design decisions and implementation details are specific to the
 infrastructure that was in place at the time of development. As such, it may not work fully (or at all!) in your
-environment without substantial changes.
+environment without substantial changes. 
+
+For example, since NexusLIMS was originally developed as an internal-only project, there are a number of references
+to internal infrastructure/users scattered throughout the commit history. The public-facing version of the NexusLIMS code
+has been "sanitized" of these various references, so you may see the term `***REMOVED***` throughout the history
+and/or current code. This is a result of the "sanitization" process. Also, the test suite relies on connections
+to various pieces of infrastructure present in the NIST environment, so if you download this code, those tests 
+_will not_ not work because it assumes those pieces are available. Furthermore, for the privacy of NIST researchers,
+we have excluded the test files used to test the extractors from the publicly published version of the code
+(since the metadata may contain information not suitable for public release). Thus, the metadata extractor tests
+will not work. If you wish to have access to these files for testing, please contact us and they may be able to be
+sent to you if necessary. The test suite files (located in the `./tests/` folder) are still present, so you can
+examine those to see how the library is used.
 
 One of the key parts of the NexusLIMS backend is the metadata extraction from various electron microscopy data formats.
 Again, the supported formats are specific to the needs of NIST at the time of development, and the code currently only
