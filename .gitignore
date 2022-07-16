@@ -1,0 +1,55 @@
+# File patterns we want git to ignore
+
+# backup
+*~
+*.bak
+backups
+
+# Other files
+.access_token
+gitlab_backup.log
+*credentials.ini
+.coverage
+.coverage.*
+tests/coverage
+tests/files/*.dm[3-4]
+tests/files/*.ser
+tests/files/*.emi
+tests/files/*.xml
+tests/files/*.tif
+tests/files/*.hdf5
+tests/files/**/*.json
+tests/**/*.xml
+tests/test_report.xml
+.env
+cert_bundle.pem
+.directory
+test_db.sqlite
+
+# dev files
+*.pyc
+.idea
+.vscode
+test_data/
+**/doc/build
+**/db_logger_gui/build
+mdcs/nexusLIMS/doc/source/api/*.rst
+nexusLIMS/dev_scripts/read_bad_tif.py
+_coverage_output
+.venv/
+*.sqbpro
+.tox/
+**/schemas/records
+_build
+
+# pip installation files
+*.egg-info
+
+# pytest coverage results
+htmlcov/
+
+# pickle save files
+*.pk
+
+# Oxygen project files
+*.xpr

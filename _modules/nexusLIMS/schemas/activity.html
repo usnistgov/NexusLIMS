@@ -4,16 +4,15 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>nexusLIMS.schemas.activity &#8212; NexusLIMS 0.0.9 documentation</title>
-    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>nexusLIMS.schemas.activity &#8212; NexusLIMS 1.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom-styles.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <script src="../../../_static/custom.js"></script>
     <link rel="shortcut icon" href="../../../_static/nexusLIMS_bare_logo.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -22,10 +21,10 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js "></script>
-<script type="text/javascript" src="../../../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
-<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js "></script>
+<script type="text/javascript" src="../../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
 
   </head><body>
 
@@ -47,7 +46,7 @@
           <ul class="nav navbar-nav">
             
                 <li><a href="../../../api.html">API Docs</a></li>
-                <li><a href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS">Repository</a></li>
+                <li><a href="https://github.com/usnistgov/NexusLIMS">Repository</a></li>
                 <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
             
             
@@ -61,20 +60,19 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Package introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_security.html">Data security in NexusLIMS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../database.html">NexusLIMS database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../session_logger_app.html">Session logging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development.html">Developer documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../taxonomy.html">NexusLIMS taxonomy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../schema_documentation.html">Schema documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../session_logger_app.html">Session logging (deprecated)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/nexusLIMS.html">nexusLIMS package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.harvester.html">nexusLIMS.harvester package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
 </ul>
 </li>
@@ -126,14 +124,13 @@
 <ul class="globaltoc">
     <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Package introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_security.html">Data security in NexusLIMS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../database.html">NexusLIMS database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../session_logger_app.html">Session logging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development.html">Developer documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../taxonomy.html">NexusLIMS taxonomy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../schema_documentation.html">Schema documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../session_logger_app.html">Session logging (deprecated)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API documentation</a></li>
 </ul>
 
@@ -189,6 +186,8 @@
 <span class="kn">from</span> <span class="nn">xml.sax.saxutils</span> <span class="kn">import</span> <span class="n">escape</span>
 <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">quote</span> <span class="k">as</span> <span class="n">_urlquote</span>
 <span class="kn">from</span> <span class="nn">timeit</span> <span class="kn">import</span> <span class="n">default_timer</span> <span class="k">as</span> <span class="n">_timer</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span> <span class="k">as</span> <span class="n">_etree</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 
 <span class="kn">import</span> <span class="nn">hyperspy.api_nogui</span> <span class="k">as</span> <span class="nn">_hs</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">_np</span>
@@ -204,7 +203,7 @@
 <span class="n">_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">_logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 
 
-<div class="viewcode-block" id="cluster_filelist_mtimes"><a class="viewcode-back" href="../../../api/nexusLIMS.schemas.html#nexusLIMS.schemas.activity.cluster_filelist_mtimes">[docs]</a><span class="k">def</span> <span class="nf">cluster_filelist_mtimes</span><span class="p">(</span><span class="n">filelist</span><span class="p">):</span>
+<div class="viewcode-block" id="cluster_filelist_mtimes"><a class="viewcode-back" href="../../../api/nexusLIMS.schemas.html#nexusLIMS.schemas.activity.cluster_filelist_mtimes">[docs]</a><span class="k">def</span> <span class="nf">cluster_filelist_mtimes</span><span class="p">(</span><span class="n">filelist</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Perform a statistical clustering of the timestamps (`mtime` values) of a</span>
 <span class="sd">    list of files to find &quot;relatively&quot; large gaps in acquisition time. The</span>
@@ -232,14 +231,14 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    filelist : list</span>
+<span class="sd">    filelist : List[str]</span>
 <span class="sd">        The files (as a list) whose timestamps will be interrogated to find</span>
 <span class="sd">        &quot;relatively&quot; large gaps in acquisition time (as a means to find the</span>
 <span class="sd">        breaks between discrete Acquisition Activities)</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    aa_boundaries : list</span>
+<span class="sd">    aa_boundaries : List[float]</span>
 <span class="sd">        A list of the `mtime` values that represent boundaries between</span>
 <span class="sd">        discrete Acquisition Activities</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -250,6 +249,11 @@
     <span class="c1"># remove duplicate file mtimes (since they cause errors below):</span>
     <span class="n">mtimes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">mtimes</span><span class="p">)))</span>
     <span class="n">m_array</span> <span class="o">=</span> <span class="n">_np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mtimes</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mtimes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="c1"># if there was only one file, don&#39;t do any more processing and just</span>
+        <span class="c1"># return the one mtime as the AA boundary</span>
+        <span class="k">return</span> <span class="n">mtimes</span>
 
     <span class="c1"># mtime_diff is a discrete differentiation to find the time gap between</span>
     <span class="c1"># sequential files</span>
@@ -265,7 +269,8 @@
                               <span class="mi">35</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="n">_math</span><span class="o">.</span><span class="n">e</span><span class="p">)</span>
     <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;KDE bandwidth grid search&#39;</span><span class="p">)</span>
     <span class="n">grid</span> <span class="o">=</span> <span class="n">_GridSearchCV</span><span class="p">(</span><span class="n">_KernelDensity</span><span class="p">(</span><span class="n">kernel</span><span class="o">=</span><span class="s1">&#39;gaussian&#39;</span><span class="p">),</span>
-                         <span class="p">{</span><span class="s1">&#39;bandwidth&#39;</span><span class="p">:</span> <span class="n">bandwidths</span><span class="p">},</span> <span class="n">cv</span><span class="o">=</span><span class="n">_LeaveOneOut</span><span class="p">(),</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+                         <span class="p">{</span><span class="s1">&#39;bandwidth&#39;</span><span class="p">:</span> <span class="n">bandwidths</span><span class="p">},</span>
+                         <span class="n">cv</span><span class="o">=</span><span class="n">_LeaveOneOut</span><span class="p">(),</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
     <span class="n">grid</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">m_array</span><span class="p">)</span>
     <span class="n">bw</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">best_params_</span><span class="p">[</span><span class="s1">&#39;bandwidth&#39;</span><span class="p">]</span>
     <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Using bandwidth of </span><span class="si">{</span><span class="n">bw</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> minutes for KDE&#39;</span><span class="p">)</span>
@@ -288,7 +293,6 @@
     <span class="k">return</span> <span class="n">aa_boundaries</span></div>
 
 
-<span class="c1"># TODO: tests for all of AcquisitionActivity</span>
 <div class="viewcode-block" id="AcquisitionActivity"><a class="viewcode-back" href="../../../api/nexusLIMS.schemas.html#nexusLIMS.schemas.activity.AcquisitionActivity">[docs]</a><span class="k">class</span> <span class="nc">AcquisitionActivity</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A collection of files/metadata attributed to a physical acquisition activity</span>
@@ -534,10 +538,9 @@
         <span class="c1"># store what we calculated as unique metadata into the attribute</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">unique_meta</span> <span class="o">=</span> <span class="n">unique_meta</span></div>
 
-<div class="viewcode-block" id="AcquisitionActivity.as_xml"><a class="viewcode-back" href="../../../api/nexusLIMS.schemas.html#nexusLIMS.schemas.activity.AcquisitionActivity.as_xml">[docs]</a>    <span class="k">def</span> <span class="nf">as_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seqno</span><span class="p">,</span> <span class="n">sample_id</span><span class="p">,</span>
-               <span class="n">indent_level</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">print_xml</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<div class="viewcode-block" id="AcquisitionActivity.as_xml"><a class="viewcode-back" href="../../../api/nexusLIMS.schemas.html#nexusLIMS.schemas.activity.AcquisitionActivity.as_xml">[docs]</a>    <span class="k">def</span> <span class="nf">as_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seqno</span><span class="p">,</span> <span class="n">sample_id</span><span class="p">,</span> <span class="n">print_xml</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Build an XML string representation of this AcquisitionActivity (for</span>
+<span class="sd">        Build an XML (``lxml``) representation of this AcquisitionActivity (for</span>
 <span class="sd">        use in instances of the NexusLIMS schema)</span>
 
 <span class="sd">        Parameters</span>
@@ -548,10 +551,6 @@
 <span class="sd">        sample_id : str</span>
 <span class="sd">            A unique identifier pointing to a sample identifier. No checks</span>
 <span class="sd">            are done on this value; it is merely reproduced in the XML output</span>
-<span class="sd">        indent_level : int</span>
-<span class="sd">            (Default is 1) the level of indentation to use in exporting. If</span>
-<span class="sd">            0, no lines will be indented. A value of 1 should be appropriate</span>
-<span class="sd">            for most cases as used in the Nexus schema</span>
 <span class="sd">        print_xml : bool</span>
 <span class="sd">            Whether to print the XML output to the console or not (Default:</span>
 <span class="sd">            False)</span>
@@ -563,16 +562,15 @@
 <span class="sd">            properly-formed complete XML document since it does not have a</span>
 <span class="sd">            header or namespace definitions)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">aqAc_xml_el</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;acquisitionActivity&quot;</span><span class="p">)</span>
+        <span class="n">aqAc_xml_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;seqno&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">seqno</span><span class="p">))</span>
+        <span class="n">start_time_el</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">aqAc_xml_el</span><span class="p">,</span> <span class="s2">&quot;startTime&quot;</span><span class="p">)</span>
+        <span class="n">start_time_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+        <span class="n">sample_id_el</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">aqAc_xml_el</span><span class="p">,</span> <span class="s2">&quot;sampleID&quot;</span><span class="p">)</span>
+        <span class="n">sample_id_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">sample_id</span>
 
-        <span class="n">aqAc_xml</span> <span class="o">=</span> <span class="s1">&#39;&#39;</span>
-        <span class="n">INDENT</span> <span class="o">=</span> <span class="s1">&#39;  &#39;</span> <span class="o">*</span> <span class="n">indent_level</span>
-        <span class="n">line_ending</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span>
+        <span class="n">setup_el</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">aqAc_xml_el</span><span class="p">,</span> <span class="s2">&quot;setup&quot;</span><span class="p">)</span>
 
-        <span class="n">aqAc_xml</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">INDENT</span><span class="si">}</span><span class="s1">&lt;acquisitionActivity seqno=&quot;</span><span class="si">{</span><span class="n">seqno</span><span class="si">}</span><span class="s1">&quot;&gt;</span><span class="si">{</span><span class="n">line_ending</span><span class="si">}</span><span class="s1">&#39;</span>
-        <span class="n">aqAc_xml</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">INDENT</span><span class="o">*</span><span class="mi">2</span><span class="si">}</span><span class="s1">&lt;startTime&gt;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span> \
-                        <span class="sa">f</span><span class="s1">&#39;&lt;/startTime&gt;</span><span class="si">{</span><span class="n">line_ending</span><span class="si">}</span><span class="s1">&#39;</span>
-        <span class="n">aqAc_xml</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">INDENT</span><span class="o">*</span><span class="mi">2</span><span class="si">}</span><span class="s1">&lt;sampleID&gt;</span><span class="si">{</span><span class="n">sample_id</span><span class="si">}</span><span class="s1">&lt;/sampleID&gt;</span><span class="si">{</span><span class="n">line_ending</span><span class="si">}</span><span class="s1">&#39;</span>
-        <span class="n">aqAc_xml</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">INDENT</span><span class="o">*</span><span class="mi">2</span><span class="si">}</span><span class="s1">&lt;setup&gt;</span><span class="si">{</span><span class="n">line_ending</span><span class="si">}</span><span class="s1">&#39;</span>
         <span class="k">for</span> <span class="n">pk</span><span class="p">,</span> <span class="n">pv</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setup_params</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
                              <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()):</span>
             <span class="c1"># metadata values to skip in XML output</span>
@@ -584,10 +582,11 @@
                 <span class="c1"># for setup parameters, a key in the first dataset&#39;s warning</span>
                 <span class="c1"># list is the same as in all of them</span>
                 <span class="n">pk_warning</span> <span class="o">=</span> <span class="n">pk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">aqAc_xml</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">INDENT</span><span class="o">*</span><span class="mi">3</span><span class="si">}</span><span class="s1">&lt;param name=&quot;</span><span class="si">{</span><span class="n">pk</span><span class="si">}</span><span class="s1">&quot;&#39;</span> <span class="o">+</span> \
-                            <span class="p">(</span><span class="s1">&#39; warning=&quot;true&quot;&gt;&#39;</span> <span class="k">if</span> <span class="n">pk_warning</span> <span class="k">else</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">)</span> <span class="o">+</span> \
-                            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">pv</span><span class="si">}</span><span class="s1">&lt;/param&gt;</span><span class="si">{</span><span class="n">line_ending</span><span class="si">}</span><span class="s1">&#39;</span>
-        <span class="n">aqAc_xml</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">INDENT</span><span class="o">*</span><span class="mi">2</span><span class="si">}</span><span class="s1">&lt;/setup&gt;</span><span class="si">{</span><span class="n">line_ending</span><span class="si">}</span><span class="s1">&#39;</span>
+                <span class="n">param_el</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">setup_el</span><span class="p">,</span> <span class="s2">&quot;param&quot;</span><span class="p">)</span>
+                <span class="n">param_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">pk</span><span class="p">))</span>
+                <span class="k">if</span> <span class="n">pk_warning</span><span class="p">:</span>
+                    <span class="n">param_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">)</span>
+                <span class="n">param_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">pv</span><span class="p">)</span>
 
         <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">um</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span>
                                <span class="bp">self</span><span class="o">.</span><span class="n">unique_meta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span><span class="p">):</span>
@@ -604,15 +603,19 @@
             <span class="n">rel_thumb_name</span> <span class="o">=</span> <span class="n">_urlquote</span><span class="p">(</span><span class="n">rel_thumb_name</span><span class="p">)</span>
 
             <span class="c1"># f is string; um is a dictionary, w is a list</span>
-            <span class="n">aqAc_xml</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">INDENT</span><span class="o">*</span><span class="mi">2</span><span class="si">}</span><span class="s1">&lt;dataset &#39;</span> \
-                        <span class="sa">f</span><span class="s1">&#39;type=&quot;</span><span class="si">{</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;DatasetType&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">&quot; &#39;</span> \
-                        <span class="sa">f</span><span class="s1">&#39;role=&quot;Experimental&quot;&gt;</span><span class="si">{</span><span class="n">line_ending</span><span class="si">}</span><span class="s1">&#39;</span>
-            <span class="n">aqAc_xml</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">INDENT</span><span class="o">*</span><span class="mi">3</span><span class="si">}</span><span class="s1">&lt;name&gt;</span><span class="si">{</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span> \
-                        <span class="sa">f</span><span class="s1">&#39;&lt;/name&gt;</span><span class="si">{</span><span class="n">line_ending</span><span class="si">}</span><span class="s1">&#39;</span>
-            <span class="n">aqAc_xml</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">INDENT</span><span class="o">*</span><span class="mi">3</span><span class="si">}</span><span class="s1">&lt;location&gt;</span><span class="si">{</span><span class="n">rel_fname</span><span class="si">}</span><span class="s1">&#39;</span> \
-                        <span class="sa">f</span><span class="s1">&#39;&lt;/location&gt;</span><span class="si">{</span><span class="n">line_ending</span><span class="si">}</span><span class="s1">&#39;</span>
-            <span class="n">aqAc_xml</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">INDENT</span><span class="o">*</span><span class="mi">3</span><span class="si">}</span><span class="s1">&lt;preview&gt;</span><span class="si">{</span><span class="n">rel_thumb_name</span><span class="si">}</span><span class="s1">&#39;</span> \
-                        <span class="sa">f</span><span class="s1">&#39;&lt;/preview&gt;</span><span class="si">{</span><span class="n">line_ending</span><span class="si">}</span><span class="s1">&#39;</span>
+            <span class="n">dset_el</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">aqAc_xml_el</span><span class="p">,</span> <span class="s2">&quot;dataset&quot;</span><span class="p">)</span>
+            <span class="n">dset_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;DatasetType&quot;</span><span class="p">]))</span>
+            <span class="n">dset_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;role&quot;</span><span class="p">,</span> <span class="s2">&quot;Experimental&quot;</span><span class="p">)</span>
+
+            <span class="n">dset_name_el</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dset_el</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span>
+            <span class="n">dset_name_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+            <span class="n">dset_loc_el</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dset_el</span><span class="p">,</span> <span class="s2">&quot;location&quot;</span><span class="p">)</span>
+            <span class="n">dset_loc_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">rel_fname</span>
+
+            <span class="n">dset_prev_el</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dset_el</span><span class="p">,</span> <span class="s2">&quot;preview&quot;</span><span class="p">)</span>
+            <span class="n">dset_prev_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">rel_thumb_name</span>
+
             <span class="k">for</span> <span class="n">meta_k</span><span class="p">,</span> <span class="n">meta_v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">um</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
                                          <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()):</span>
                 <span class="k">if</span> <span class="n">meta_k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;warnings&#39;</span><span class="p">,</span> <span class="s1">&#39;DatasetType&#39;</span><span class="p">]:</span>
@@ -622,18 +625,17 @@
                             <span class="nb">any</span><span class="p">(</span><span class="n">c</span> <span class="ow">in</span> <span class="n">meta_v</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="s1">&#39;&lt;&amp;&#39;</span><span class="p">):</span>
                         <span class="n">meta_v</span> <span class="o">=</span> <span class="n">escape</span><span class="p">(</span><span class="n">meta_v</span><span class="p">)</span>
                     <span class="n">meta_k_warning</span> <span class="o">=</span> <span class="n">meta_k</span> <span class="ow">in</span> <span class="n">w</span>
-                    <span class="n">aqAc_xml</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">INDENT</span><span class="o">*</span><span class="mi">3</span><span class="si">}</span><span class="s1">&lt;meta name=&quot;</span><span class="si">{</span><span class="n">meta_k</span><span class="si">}</span><span class="s1">&quot;&#39;</span> <span class="o">+</span> \
-                                <span class="p">(</span><span class="s1">&#39; warning=&quot;true&quot;&gt;&#39;</span> <span class="k">if</span>
-                                 <span class="n">meta_k_warning</span> <span class="k">else</span> <span class="s1">&#39;&gt;&#39;</span><span class="p">)</span> <span class="o">+</span> \
-                                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">meta_v</span><span class="si">}</span><span class="s1">&lt;/meta&gt;</span><span class="si">{</span><span class="n">line_ending</span><span class="si">}</span><span class="s1">&#39;</span>
-            <span class="n">aqAc_xml</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">INDENT</span><span class="o">*</span><span class="mi">2</span><span class="si">}</span><span class="s1">&lt;/dataset&gt;</span><span class="si">{</span><span class="n">line_ending</span><span class="si">}</span><span class="s1">&#39;</span>
-
-        <span class="n">aqAc_xml</span> <span class="o">+=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">INDENT</span><span class="si">}</span><span class="s1">&lt;/acquisitionActivity&gt;</span><span class="si">{</span><span class="n">line_ending</span><span class="si">}</span><span class="s1">&#39;</span>
+                    <span class="n">meta_el</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dset_el</span><span class="p">,</span> <span class="s2">&quot;meta&quot;</span><span class="p">)</span>
+                    <span class="n">meta_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">meta_k</span><span class="p">))</span>
+                    <span class="k">if</span> <span class="n">meta_k_warning</span><span class="p">:</span>
+                        <span class="n">meta_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">)</span>
+                    <span class="n">meta_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">meta_v</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">print_xml</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">aqAc_xml</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">_etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">aqAc_xml_el</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                                  <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;UTF-8&#39;</span><span class="p">))</span>
 
-        <span class="k">return</span> <span class="n">aqAc_xml</span></div></div>
+        <span class="k">return</span> <span class="n">aqAc_xml_el</span></div></div>
 </pre></div>
 
     </div>
@@ -651,8 +653,8 @@
       
     </p>
     <p>
-        &copy; Copyright 2020, NIST Office of Data and Informatics.<br/>
-      Last updated on Oct, 19, 2020.<br/>
+        &copy; Copyright 2022, NIST Office of Data and Informatics.<br/>
+      Last updated on Jul, 15, 2022.<br/>
     </p>
   </div>
 </footer>

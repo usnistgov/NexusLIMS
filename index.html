@@ -2,35 +2,31 @@
 <!DOCTYPE html>
 
 <html>
-  <head>    <link rel="stylesheet" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css">
-    <script src="https://pages.nist.gov/nist-header-footer/js/jquery-1.9.0.min.js" type="text/javascript" defer="defer"></script>
-    <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js" type="text/javascript" defer="defer"></script>
-
+  <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Welcome to NexusLIMS! &#8212; NexusLIMS 0.0.9 documentation</title>
-    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Welcome to NexusLIMS! &#8212; NexusLIMS 1.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="_static/custom-styles.css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
     <script src="_static/custom.js"></script>
     <link rel="shortcut icon" href="_static/nexusLIMS_bare_logo.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Data security in NexusLIMS" href="data_security.html" />
+    <link rel="next" title="NexusLIMS database" href="database.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
-<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
-<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
-
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
 
   </head><body>
 
@@ -52,7 +48,7 @@
           <ul class="nav navbar-nav">
             
                 <li><a href="api.html">API Docs</a></li>
-                <li><a href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS">Repository</a></li>
+                <li><a href="https://github.com/usnistgov/NexusLIMS">Repository</a></li>
                 <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
             
             
@@ -66,20 +62,19 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Package introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_security.html">Data security in NexusLIMS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="database.html">NexusLIMS database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="session_logger_app.html">Session logging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Developer documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="taxonomy.html">NexusLIMS taxonomy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schema_documentation.html">Schema documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session_logger_app.html">Session logging (deprecated)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/nexusLIMS.html">nexusLIMS package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.harvester.html">nexusLIMS.harvester package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
 </ul>
 </li>
@@ -98,7 +93,7 @@
     </a>
   </li>
   <li>
-    <a href="data_security.html" title="Next Chapter: Data security in NexusLIMS"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Next &raquo;</span>
+    <a href="database.html" title="Next Chapter: NexusLIMS database"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Next &raquo;</span>
     </a>
   </li>
               
@@ -131,14 +126,13 @@
 <ul class="globaltoc">
     <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Package introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_security.html">Data security in NexusLIMS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="database.html">NexusLIMS database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="session_logger_app.html">Session logging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Developer documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="taxonomy.html">NexusLIMS taxonomy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schema_documentation.html">Schema documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session_logger_app.html">Session logging (deprecated)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
 </ul>
 
@@ -149,9 +143,8 @@
 <ul>
 <li><a class="reference internal" href="#">Welcome to NexusLIMS!</a><ul>
 <li><a class="reference internal" href="#documentation-overview">Documentation overview</a></li>
-<li><a class="reference internal" href="#how-to-help">How to help</a></li>
 <li><a class="reference internal" href="#about-the-logo">About the logo</a></li>
-<li><a class="reference internal" href="#about-the-developers">About the developers</a></li>
+<li><a class="reference internal" href="#about-the-nexuslims-team">About the NexusLIMS team</a></li>
 </ul>
 </li>
 </ul>
@@ -173,7 +166,7 @@
       
   <div class="toctree-wrapper compound">
 </div>
-<div class="section" id="welcome-to-nexuslims">
+<section id="welcome-to-nexuslims">
 <h1>Welcome to NexusLIMS!<a class="headerlink" href="#welcome-to-nexuslims" title="Permalink to this headline">¶</a></h1>
 <p>The project serves as the development and documentation space for the back-end
 of the Nexus Microscopy Facility Laboratory Information Management System
@@ -181,14 +174,12 @@ of the Nexus Microscopy Facility Laboratory Information Management System
 This documentation contains a number of pages that detail the processes by
 which NexusLIMS harvests and combines data from multiple sources to build
 a record of an experiment on a Nexus facility microscope.</p>
-<div class="section" id="documentation-overview">
+<section id="documentation-overview">
 <h2>Documentation overview<a class="headerlink" href="#documentation-overview" title="Permalink to this headline">¶</a></h2>
-<p>The <a class="reference internal" href="data_security.html"><span class="doc">data security</span></a> page explains the approach to our
-highest priority, which is protecting users’ research data. Besides this,
-there are pages describing how data about individual sessions is
-<a class="reference internal" href="session_logger_app.html"><span class="doc">collected</span></a> and  <a class="reference internal" href="database.html"><span class="doc">stored</span></a>, as
-well as a detailed description of how a record of a given experiment
-<a class="reference internal" href="record_building.html"><span class="doc">is built</span></a>, from beginning to end.
+<p>The <a class="reference internal" href="database.html"><span class="doc">database</span></a> page describes how information about instruments
+and recorded sessions is stored. The <a class="reference internal" href="record_building.html"><span class="doc">record building</span></a>
+page provides a detailed description of how a record of a given experiment
+is built from beginning to end.
 There is also additional documentation about the practices used
 in <a class="reference internal" href="development.html"><span class="doc">developing NexusLIMS</span></a>, the
 <a class="reference internal" href="taxonomy.html"><span class="doc">taxonomy</span></a> used when discussing NexusLIMS, the
@@ -202,19 +193,8 @@ directly, since it operates completely automatically and builds experimental
 records without any need for user input. These pages serve mostly as reference
 for those with more interest in the nuts and bolts of how it all works together,
 and how the system may be able to be changed in the future.</p>
-</div>
-<div class="section" id="how-to-help">
-<h2>How to help<a class="headerlink" href="#how-to-help" title="Permalink to this headline">¶</a></h2>
-<p>As a Nexus Facility instrument user, the best way to help is to simply use the
-system by remembering to use the <a class="reference internal" href="session_logger_app.html"><span class="doc">Session Logger App</span></a>
-while on a microscope, and then using the NexusLIMS front-end system at
-<a class="reference external" href="https://nexuslims.nist.gov">https://nexuslims.nist.gov</a> to search through and browse your experimental data.
-Beyond that, suggestions for improvements or additional features are always
-welcome by submitting a
-<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/issues/new">new issue</a>
-at the project’s code <a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS">repository</a>.</p>
-</div>
-<div class="section" id="about-the-logo">
+</section>
+<section id="about-the-logo">
 <h2>About the logo<a class="headerlink" href="#about-the-logo" title="Permalink to this headline">¶</a></h2>
 <p>The logo for the NexusLIMS project is inspired by the Nobel Prize
 <a class="reference external" href="https://www.nobelprize.org/prizes/chemistry/2011/shechtman/facts/">winning</a>
@@ -231,17 +211,19 @@ published</a>
 diffraction pattern of a quasicrystal as inspiration for the NexusLIMS
 logo due to its significance in the electron microscopy and
 crystallography communities, together with its storied NIST heritage:</p>
-<div class="align-center figure" style="width: 80%">
+<figure class="align-center" style="width: 80%">
 <img alt="NexusLIMS Logo Inspiration" src="_images/logo_inspiration.png" />
-</div>
-</div>
-<div class="section" id="about-the-developers">
-<h2>About the developers<a class="headerlink" href="#about-the-developers" title="Permalink to this headline">¶</a></h2>
+</figure>
+</section>
+<section id="about-the-nexuslims-team">
+<h2>About the NexusLIMS team<a class="headerlink" href="#about-the-nexuslims-team" title="Permalink to this headline">¶</a></h2>
 <p>NexusLIMS has been developed through a great deal of work by a number of people
 including:</p>
 <ul class="simple">
-<li><p><a class="reference external" href="https://www.nist.gov/people/joshua-taillon">Joshua Taillon</a> - Office of Data and Informatics</p></li>
-<li><p><a class="reference external" href="https://www.nist.gov/people/june-w-lau">June Lau</a> - Materials Science and Engineering Division</p></li>
+<li><p><a class="reference external" href="https://www.nist.gov/people/joshua-taillon">Joshua Taillon</a> - Office of Data and Informatics - Primary application developer</p></li>
+<li><p><a class="reference external" href="https://www.nist.gov/people/june-w-lau">June Lau</a> - Office of Data and Informatics</p></li>
+<li><p><a class="reference external" href="https://www.nist.gov/people/ryan-white">Ryan White</a> - Applied Chemicals and Materials Division / Office of Data and Informatics (detail)</p></li>
+<li><p><a class="reference external" href="https://www.nist.gov/people/michael-katz">Michael Katz</a> - Materials Science and Engineering Division / Office of Data and Informatics (detail)</p></li>
 <li><p><a class="reference external" href="https://www.nist.gov/people/marcus-william-newrock">Marcus Newrock</a> - Office of Data and Informatics</p></li>
 <li><p><a class="reference external" href="https://www.nist.gov/people/raymond-plante">Ray Plante</a> - Office of Data and Informatics</p></li>
 <li><p><a class="reference external" href="https://www.nist.gov/people/gretchen-greene">Gretchen Greene</a> - Office of Data and Informatics</p></li>
@@ -252,8 +234,8 @@ including:</p>
 <li><p>Thomas Bina - Pennsylvania State University</p></li>
 <li><p>Sarita Upreti - Montgomery College</p></li>
 </ul>
-</div>
-</div>
+</section>
+</section>
 
 
     </div>
@@ -275,8 +257,8 @@ including:</p>
       
     </p>
     <p>
-        &copy; Copyright 2020, NIST Office of Data and Informatics.<br/>
-      Last updated on Oct, 19, 2020.<br/>
+        &copy; Copyright 2022, NIST Office of Data and Informatics.<br/>
+      Last updated on Jul, 15, 2022.<br/>
     </p>
   </div>
 </footer>

@@ -15,7 +15,7 @@ Subpackages
    nexusLIMS.builder
    nexusLIMS.db
    nexusLIMS.extractors
-   nexusLIMS.harvester
+   nexusLIMS.harvesters
    nexusLIMS.schemas
 
 Submodules
@@ -52,4 +52,3 @@ nexusLIMS.version module
    :members:
    :undoc-members:
    :show-inheritance:
-

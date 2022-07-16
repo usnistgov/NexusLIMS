@@ -2,35 +2,32 @@
 <!DOCTYPE html>
 
 <html>
-  <head><link rel="stylesheet" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css">
-    <script src="https://pages.nist.gov/nist-header-footer/js/jquery-1.9.0.min.js" type="text/javascript" defer="defer"></script>
-    <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js" type="text/javascript" defer="defer"></script>
-    
+  <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>API documentation &#8212; NexusLIMS 0.0.9 documentation</title>
-    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>API documentation &#8212; NexusLIMS 1.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="_static/custom-styles.css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
     <script src="_static/custom.js"></script>
     <link rel="shortcut icon" href="_static/nexusLIMS_bare_logo.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="nexusLIMS package" href="api/nexusLIMS.html" />
-    <link rel="prev" title="Tips for customizing CDCS" href="customizing_cdcs.html" />
+    <link rel="prev" title="Session logging (deprecated)" href="session_logger_app.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
-<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
-<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
 
   </head><body>
 
@@ -52,7 +49,7 @@
           <ul class="nav navbar-nav">
             
                 <li><a href="#">API Docs</a></li>
-                <li><a href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS">Repository</a></li>
+                <li><a href="https://github.com/usnistgov/NexusLIMS">Repository</a></li>
                 <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
             
             
@@ -66,20 +63,19 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Package introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_security.html">Data security in NexusLIMS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="database.html">NexusLIMS database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="session_logger_app.html">Session logging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Developer documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="taxonomy.html">NexusLIMS taxonomy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schema_documentation.html">Schema documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session_logger_app.html">Session logging (deprecated)</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/nexusLIMS.html">nexusLIMS package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.harvester.html">nexusLIMS.harvester package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
 </ul>
 </li>
@@ -94,7 +90,7 @@
               
                 
   <li>
-    <a href="customizing_cdcs.html" title="Previous Chapter: Tips for customizing CDCS"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Previous</span>
+    <a href="session_logger_app.html" title="Previous Chapter: Session logging (deprecated)"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Previous</span>
     </a>
   </li>
   <li>
@@ -131,14 +127,13 @@
 <ul class="globaltoc">
     <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Package introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_security.html">Data security in NexusLIMS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="database.html">NexusLIMS database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="session_logger_app.html">Session logging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Developer documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="taxonomy.html">NexusLIMS taxonomy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schema_documentation.html">Schema documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session_logger_app.html">Session logging (deprecated)</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">API documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/nexusLIMS.html">nexusLIMS package</a></li>
 </ul>
@@ -168,7 +163,7 @@
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <div class="section" id="api-documentation">
+  <section id="api-documentation">
 <h1>API documentation<a class="headerlink" href="#api-documentation" title="Permalink to this headline">¶</a></h1>
 <p>This page contains links to the automatically generated documentation
 from the specific functions, classes, and methods that are part of the
@@ -189,19 +184,19 @@ more broadly throughout the codebase.</p>
 <p>Use the links below or the <cite>Next</cite>/<cite>Previous</cite> links
 in the top header bar to browse through the documentation.</p>
 <div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Package structure:</span></p>
+<p class="caption" role="heading"><span class="caption-text">Package structure:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="api/nexusLIMS.html">nexusLIMS package</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api/nexusLIMS.harvester.html">nexusLIMS.harvester package</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
 </ul>
 </li>
 </ul>
 </div>
-</div>
+</section>
 
 
     </div>
@@ -223,8 +218,8 @@ in the top header bar to browse through the documentation.</p>
       
     </p>
     <p>
-        &copy; Copyright 2020, NIST Office of Data and Informatics.<br/>
-      Last updated on Oct, 19, 2020.<br/>
+        &copy; Copyright 2022, NIST Office of Data and Informatics.<br/>
+      Last updated on Jul, 15, 2022.<br/>
     </p>
   </div>
 </footer>

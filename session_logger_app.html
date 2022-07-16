@@ -3,35 +3,31 @@
 
 <html>
   <head>
-    <link rel="stylesheet" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css">
-<script src="https://pages.nist.gov/nist-header-footer/js/jquery-1.9.0.min.js" type="text/javascript" defer="defer"></script>
-<script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js" type="text/javascript" defer="defer"></script>
-
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Session logging &#8212; NexusLIMS 0.0.9 documentation</title>
-    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Session logging (deprecated) &#8212; NexusLIMS 1.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="_static/custom-styles.css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
     <script src="_static/custom.js"></script>
     <link rel="shortcut icon" href="_static/nexusLIMS_bare_logo.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Record building workflow" href="record_building.html" />
-    <link rel="prev" title="NexusLIMS database" href="database.html" />
+    <link rel="next" title="API documentation" href="api.html" />
+    <link rel="prev" title="Tips for customizing CDCS" href="customizing_cdcs.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
-<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
-<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
 
   </head><body>
 
@@ -53,7 +49,7 @@
           <ul class="nav navbar-nav">
             
                 <li><a href="api.html">API Docs</a></li>
-                <li><a href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS">Repository</a></li>
+                <li><a href="https://github.com/usnistgov/NexusLIMS">Repository</a></li>
                 <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
             
             
@@ -67,20 +63,19 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Package introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_security.html">Data security in NexusLIMS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="database.html">NexusLIMS database</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Session logging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Developer documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="taxonomy.html">NexusLIMS taxonomy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schema_documentation.html">Schema documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Session logging (deprecated)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/nexusLIMS.html">nexusLIMS package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.harvester.html">nexusLIMS.harvester package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
 </ul>
 </li>
@@ -95,11 +90,11 @@
               
                 
   <li>
-    <a href="database.html" title="Previous Chapter: NexusLIMS database"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Previous</span>
+    <a href="customizing_cdcs.html" title="Previous Chapter: Tips for customizing CDCS"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Previous</span>
     </a>
   </li>
   <li>
-    <a href="record_building.html" title="Next Chapter: Record building workflow"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Next &raquo;</span>
+    <a href="api.html" title="Next Chapter: API documentation"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Next &raquo;</span>
     </a>
   </li>
               
@@ -132,14 +127,13 @@
 <ul class="globaltoc">
     <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Package introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_security.html">Data security in NexusLIMS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="database.html">NexusLIMS database</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Session logging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Developer documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="taxonomy.html">NexusLIMS taxonomy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schema_documentation.html">Schema documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Session logging (deprecated)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
 </ul>
 
@@ -148,7 +142,7 @@
 </h4>
 
 <ul>
-<li><a class="reference internal" href="#">Session logging</a><ul>
+<li><a class="reference internal" href="#">Session logging (deprecated)</a><ul>
 <li><a class="reference internal" href="#how-to-use-the-logger-app">How to use the logger app</a></li>
 <li><a class="reference internal" href="#actions-performed-by-the-logger">Actions performed by the logger</a></li>
 <li><a class="reference internal" href="#information-collected">Information collected</a></li>
@@ -172,11 +166,24 @@
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <div class="section" id="session-logging">
-<h1>Session logging<a class="headerlink" href="#session-logging" title="Permalink to this headline">¶</a></h1>
+  <section id="session-logging-deprecated">
+<h1>Session logging (deprecated)<a class="headerlink" href="#session-logging-deprecated" title="Permalink to this headline">¶</a></h1>
 <blockquote>
-<div><p><cite>Last updated: March 7, 2020</cite></p>
+<div><p><cite>Last updated: June 13, 2022</cite></p>
 </div></blockquote>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Please note that the Session Logger application has been deprecated as of
+late 2021 in favor of using the NEMO laboratory management system to determine
+when experimental sessions have taken place (using the py:mod:<cite>~nexusLIMS.harvesters.nemo</cite>
+module). Maintaining the Session Logger application deployed across dozens of microscopes
+was not scalable, hence the change in approach. This documentation page is left as a
+record of prior development.</p>
+<p>If you are deploying NexusLIMS at your institution and are interested in the session logger
+application, please contact the NexusLIMS authors, as the code is available upon request.
+The following documentation describes the operation of the Session Logger application
+as of mid-2020.</p>
+</div>
 <p>To accurately know what files should be included in each Experiment’s record,
 it is important to have a timestamp for the beginning <cite>and</cite> end of when a user
 has collected data. To facilitate collecting this information, a small
@@ -185,23 +192,23 @@ control) PC and logs basic session information to the
 <a class="reference internal" href="database.html"><span class="doc">NexusLIMS database</span></a>. This document explains how this
 application is used, its design, what information it collects, and how it is
 deployed to the individual microscopes.</p>
-<div class="section" id="how-to-use-the-logger-app">
+<section id="how-to-use-the-logger-app">
 <h2>How to use the logger app<a class="headerlink" href="#how-to-use-the-logger-app" title="Permalink to this headline">¶</a></h2>
-<p>Using the Session Logger application is very simple. On each Nexus Facility
+<p>Using the Session Logger application is very simple. On each
 microscope, there will be a shortcut on the desktop that points to the
 application that has been stored within a local directory on the computer. At
 the beginning of an Experiment, double click on the following icon to start a
 session:</p>
-<div class="align-center figure">
+<figure class="align-center">
 <a class="reference internal image-reference" href="_images/logger_icon.png"><img alt="Session Logger application shortcut icon" src="_images/logger_icon.png" style="width: 15%;" /></a>
-</div>
+</figure>
 <p>After a short delay (about 5 seconds, depending on the microscope), the
 application will launch and perform a number of steps (described
 <a class="reference internal" href="#actions">below</a>), resulting in a display informing the user that a session
 has been started:</p>
-<div class="align-center figure">
+<figure class="align-center">
 <a class="reference internal image-reference" href="_images/logger_in_action.png"><img alt="Session Logger application in action" src="_images/logger_in_action.png" style="width: 30%;" /></a>
-</div>
+</figure>
 <p>Once this screen is displayed, the user should simply keep the window open
 while they work (it can be minimized with no problem). The logger does not
 perform any actions during this stage, and is simply waiting for the user to
@@ -210,29 +217,28 @@ click the <cite>“End Session”</cite> button.</p>
 <cite>“End Session”</cite> button in the application. This will trigger the application
 to mark the current Experiment as finished in the <a class="reference internal" href="database.html"><span class="doc">database</span></a>,
 and the logger application will close itself after a short delay.</p>
-<div class="section" id="what-if-something-goes-wrong">
+<section id="what-if-something-goes-wrong">
 <h3>What if something goes wrong?<a class="headerlink" href="#what-if-something-goes-wrong" title="Permalink to this headline">¶</a></h3>
 <p>In the unlikely event that the logger application encounters an unexpected
 condition in the database or other error, it will inform the user and pop-up
 a debugging log with more information (this log can also always be accessed
 by clicking the <cite>“Show debug log”</cite> button on the main screen):</p>
-<div class="align-center figure">
+<figure class="align-center">
 <a class="reference internal image-reference" href="_images/logger_log.png"><img alt="Session Logger debugging log window" src="_images/logger_log.png" style="width: 40%;" /></a>
-</div>
+</figure>
 <p>If this log window appears on its own (which it shouldn’t), we ask that that
 you click the <cite>“Copy”</cite> button to copy all the text to the clipboard and send it
-to <a class="reference external" href="mailto:miclims&#37;&#52;&#48;nist&#46;gov">miclims<span>&#64;</span>nist<span>&#46;</span>gov</a> so the NexusLIMS developers
-can resolve the issue.</p>
-</div>
-<div class="section" id="interrupted-sessions">
+to the facility managers so they can attempt to resolve the issue.</p>
+</section>
+<section id="interrupted-sessions">
 <span id="interrupted"></span><h3>Interrupted sessions<a class="headerlink" href="#interrupted-sessions" title="Permalink to this headline">¶</a></h3>
 <p>The session logger application does it’s best to ensure that if the window is
 closed by any means, it sends an <cite>“End Session”</cite> log to the
 <a class="reference internal" href="database.html"><span class="doc">database</span></a>. There is an option to “Pause Session” however,
 which is prompted if the regular “Close window” button is clicked:</p>
-<div class="align-center figure">
+<figure class="align-center">
 <a class="reference internal image-reference" href="_images/logger_pause_session.png"><img alt="Session Logger pause session option" src="_images/logger_pause_session.png" style="width: 50%;" /></a>
-</div>
+</figure>
 <p>Clicking <cite>“Pause session”</cite> will immediately close the application without
 sending any further information to the database, and should only be done if the
 user plans to resume the session before another user will use the instrument
@@ -241,22 +247,22 @@ will leave the database in an inconsistent state, which will be detected the
 next time the logger application is run. If this is the case, the user will be
 prompted to confirm whether they want to continue the existing session, or
 start a new one:</p>
-<div class="align-center figure">
+<figure class="align-center">
 <a class="reference internal image-reference" href="_images/logger_resume_session.png"><img alt="Session Logger pause session option" src="_images/logger_resume_session.png" style="width: 40%;" /></a>
-</div>
+</figure>
 <p>This dialog will also appear when the user clicks on the desktop shortcut
 in the event the computer crashed for some reason and the application was
 forcibly closed. Clicking <cite>“Continue”</cite> will cause the application to use the
 existing session (found in the database), while clicking <cite>“New session”</cite> will
 end the session that was found and start a new one.</p>
-</div>
-</div>
-<div class="section" id="actions-performed-by-the-logger">
+</section>
+</section>
+<section id="actions-performed-by-the-logger">
 <span id="actions"></span><h2>Actions performed by the logger<a class="headerlink" href="#actions-performed-by-the-logger" title="Permalink to this headline">¶</a></h2>
 <p>The NexusLIMS Session Logger performs a number of steps to record that an
 Experiment has occurred, and keeps the progress bar up to date while it is
 operating. These steps are detailed below.</p>
-<div class="section" id="mounting-the-network-share">
+<section id="mounting-the-network-share">
 <span id="step-1"></span><h3>1. Mounting the network share<a class="headerlink" href="#mounting-the-network-share" title="Permalink to this headline">¶</a></h3>
 <p>The first action performed by the logger is to “ping” the central file server
 where data is saved and the NexusLIMS database is stored. Based on the
@@ -264,31 +270,31 @@ response, the logger stores the IP address of this server (to avoid problems
 with the DNS server). The logger then looks at the currently mounted drives on
 the microscope computer and picks a drive letter that is not in use. With this
 information, the program runs a Windows command to mount the drive, such as:</p>
-<div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>net use H: \\129.6.16.126\63internal\nexuslims
+<div class="highlight-bat notranslate"><div class="highlight"><pre><span></span>net use H: \\network-path\to\directory\holding-NexusLIMS-DB
 </pre></div>
 </div>
 <p>After this command finishes, the logger confirms that it can access the
 database file as expected, and raises an error if not.</p>
-</div>
-<div class="section" id="getting-the-instrument-name">
+</section>
+<section id="getting-the-instrument-name">
 <h3>2. Getting the instrument name<a class="headerlink" href="#getting-the-instrument-name" title="Permalink to this headline">¶</a></h3>
 <p>Using the database file on the mounted drive, the logger application queries
 the <code class="docutils literal notranslate"><span class="pre">instruments</span></code> table in the database using the <cite>“hostname”</cite> of the current
 computer. In this way, a computer name (such as <code class="docutils literal notranslate"><span class="pre">TITAN52331880</span></code>) gets mapped
 to an instrument persistent identifier (PID) (such as <code class="docutils literal notranslate"><span class="pre">FEI-Titan-TEM-635816</span></code>)
 and this value is stored for later use.</p>
-</div>
-<div class="section" id="checking-instrument-status">
+</section>
+<section id="checking-instrument-status">
 <h3>3. Checking instrument status<a class="headerlink" href="#checking-instrument-status" title="Permalink to this headline">¶</a></h3>
 <p>Before logging the start of a new Experiment, first the logger application
 checks to ensure that the most recent entry logged for this instrument was
 an <code class="docutils literal notranslate"><span class="pre">'END'</span></code> entry, meaning that the last session was marked as finished.
 For example, the code runs a query such as the following to get the most
 recent entry (that was not a record generation event):</p>
-<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">SELECT</span> <span class="n">event_type</span><span class="p">,</span> <span class="n">session_identifier</span><span class="p">,</span> <span class="n">id_session_log</span><span class="p">,</span> <span class="k">timestamp</span>
-<span class="k">FROM</span> <span class="n">session_log</span> <span class="k">WHERE</span> <span class="n">instrument</span> <span class="o">=</span> <span class="s1">&#39;FEI-Titan-TEM-635816&#39;</span>
-<span class="k">AND</span> <span class="k">NOT</span> <span class="n">event_type</span> <span class="o">=</span> <span class="s1">&#39;RECORD_GENERATION&#39;</span>
-<span class="k">ORDER</span> <span class="k">BY</span> <span class="k">timestamp</span> <span class="k">DESC</span> <span class="k">LIMIT</span> <span class="mi">1</span><span class="p">;</span>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">SELECT</span><span class="w"> </span><span class="n">event_type</span><span class="p">,</span><span class="w"> </span><span class="n">session_identifier</span><span class="p">,</span><span class="w"> </span><span class="n">id_session_log</span><span class="p">,</span><span class="w"> </span><span class="k">timestamp</span><span class="w"></span>
+<span class="k">FROM</span><span class="w"> </span><span class="n">session_log</span><span class="w"> </span><span class="k">WHERE</span><span class="w"> </span><span class="n">instrument</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;FEI-Titan-TEM-635816&#39;</span><span class="w"></span>
+<span class="k">AND</span><span class="w"> </span><span class="k">NOT</span><span class="w"> </span><span class="n">event_type</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s1">&#39;RECORD_GENERATION&#39;</span><span class="w"></span>
+<span class="k">ORDER</span><span class="w"> </span><span class="k">BY</span><span class="w"> </span><span class="k">timestamp</span><span class="w"> </span><span class="k">DESC</span><span class="w"> </span><span class="k">LIMIT</span><span class="w"> </span><span class="mi">1</span><span class="p">;</span><span class="w"></span>
 </pre></div>
 </div>
 <p>If this most recent entry is an <code class="docutils literal notranslate"><span class="pre">'END'</span></code>, the database is in its expected
@@ -299,30 +305,30 @@ start a new one (see the <a class="reference internal" href="#interrupted">inter
 details). If the user chooses to continue the existing session, the logger
 application notes the session identifier from the database for that session and
 jumps to <a class="reference internal" href="#step-6">step 6</a>.</p>
-</div>
-<div class="section" id="inserting-a-start-log">
+</section>
+<section id="inserting-a-start-log">
 <span id="step-4"></span><h3>4. Inserting a <code class="docutils literal notranslate"><span class="pre">START</span></code> log<a class="headerlink" href="#inserting-a-start-log" title="Permalink to this headline">¶</a></h3>
 <p>With the instrument PID known and a randomly generated identifier string, the
 logger runs a database insertion query on the <code class="docutils literal notranslate"><span class="pre">session_log</span></code> table to record
 that a session has been started. While not explicitly specified in the query,
 the current timestamp is also included in the insertion. As an example:</p>
-<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">INSERT</span> <span class="k">INTO</span> <span class="n">session_log</span> <span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="n">event_type</span><span class="p">,</span>
-                         <span class="n">session_identifier</span><span class="p">,</span> <span class="k">user</span><span class="p">)</span>
-<span class="k">VALUES</span> <span class="p">(</span><span class="s1">&#39;FEI-Titan-TEM-635816&#39;</span><span class="p">,</span> <span class="s1">&#39;START&#39;</span><span class="p">,</span>
-        <span class="s1">&#39;c9b774c9-4a59-4154-af05-0e2477e57cc4&#39;</span><span class="p">,</span> <span class="s1">&#39;local_user&#39;</span><span class="p">);</span>
+<div class="highlight-sql notranslate"><div class="highlight"><pre><span></span><span class="k">INSERT</span><span class="w"> </span><span class="k">INTO</span><span class="w"> </span><span class="n">session_log</span><span class="w"> </span><span class="p">(</span><span class="n">instrument</span><span class="p">,</span><span class="w"> </span><span class="n">event_type</span><span class="p">,</span><span class="w"></span>
+<span class="w">                         </span><span class="n">session_identifier</span><span class="p">,</span><span class="w"> </span><span class="k">user</span><span class="p">)</span><span class="w"></span>
+<span class="k">VALUES</span><span class="w"> </span><span class="p">(</span><span class="s1">&#39;FEI-Titan-TEM-635816&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;START&#39;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="s1">&#39;c9b774c9-4a59-4154-af05-0e2477e57cc4&#39;</span><span class="p">,</span><span class="w"> </span><span class="s1">&#39;local_user&#39;</span><span class="p">);</span><span class="w"></span>
 </pre></div>
 </div>
 <p>After this has finished, the logger runs another query to verify that the row
 was inserted into the database as expected, and raises an error if not.</p>
-</div>
-<div class="section" id="unmounting-the-network-share">
+</section>
+<section id="unmounting-the-network-share">
 <h3>5. Unmounting the network share<a class="headerlink" href="#unmounting-the-network-share" title="Permalink to this headline">¶</a></h3>
 <p>After the session start log has been added, the network share created in step 1
 is unmounted to clean up while the logger application waits for the next
 action. While the application is waiting, it simply sits idle until the
 <cite>“End session”</cite> button is pressed.</p>
-</div>
-<div class="section" id="ending-the-session">
+</section>
+<section id="ending-the-session">
 <span id="step-6"></span><h3>6. Ending the session<a class="headerlink" href="#ending-the-session" title="Permalink to this headline">¶</a></h3>
 <p>Once the user clicks the <cite>“End session”</cite> button, the logger application again
 mounts the network share (as in <a class="reference internal" href="#step-1">step 1</a>) so it can communicate with
@@ -334,16 +340,16 @@ then updates the status of both the <code class="docutils literal notranslate"><
 session from <code class="docutils literal notranslate"><span class="pre">'WAITING_FOR_END'</span></code> to <code class="docutils literal notranslate"><span class="pre">'TO_BE_BUILT'</span></code>. This status indicates
 to the <a class="reference internal" href="record_building.html"><span class="doc">record builder</span></a> that it should go ahead to
 actually build and upload the record for this Experiment.</p>
-</div>
-<div class="section" id="cleaning-up">
+</section>
+<section id="cleaning-up">
 <h3>7. Cleaning up<a class="headerlink" href="#cleaning-up" title="Permalink to this headline">¶</a></h3>
 <p>After updating the logs in the previous step, the logger application unmounts
 the network share (as before), and if everything went according to plan,
 waits three seconds and then shuts itself down. At this point, it is ready
 to be run again by the next user that arrives to begin a new session.</p>
-</div>
-</div>
-<div class="section" id="information-collected">
+</section>
+</section>
+<section id="information-collected">
 <h2>Information collected<a class="headerlink" href="#information-collected" title="Permalink to this headline">¶</a></h2>
 <p>As described above and in the database <a class="reference internal" href="database.html"><span class="doc">documentation</span></a>, the
 logger application collects the bare minimum amount of information required
@@ -391,27 +397,27 @@ session has ended.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="logger-implementation-and-deployment">
+</section>
+<section id="logger-implementation-and-deployment">
 <h2>Logger implementation and deployment<a class="headerlink" href="#logger-implementation-and-deployment" title="Permalink to this headline">¶</a></h2>
-<p>As <a class="reference internal" href="data_security.html"><span class="doc">data security</span></a> is of the utmost importance in
+<p>As data security is of the utmost importance in
 NexusLIMS, the developers felt it prudent to describe in detail the specific
 implementation that was used to produce the session logger application that
 runs on the microscope PCs (since these machines control critical
 instrumentation).</p>
-<p>The logger application is implemented in two files: <a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/blob/master/mdcs/nexusLIMS/nexusLIMS/db/db_logger_gui/db_logger_gui.py"><code class="docutils literal notranslate"><span class="pre">db_logger_gui.py</span></code></a> (that
-contains the interactive GUI parts of the code) and <a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/blob/master/mdcs/nexusLIMS/nexusLIMS/db/db_logger_gui/make_db_entry.py"><code class="docutils literal notranslate"><span class="pre">make_db_entry.py</span></code></a> (that
+<p>The logger application is implemented in two files: <code class="docutils literal notranslate"><span class="pre">db_logger_gui.py</span></code> (that
+contains the interactive GUI parts of the code) and <code class="docutils literal notranslate"><span class="pre">make_db_entry.py</span></code> (that
 contains the database communication and logic code).</p>
 <p>The application is written using 32-bit Python 3.4.4 (in order to support
 computers back to Windows XP) and is compiled to a single .exe file using the
 <a class="reference external" href="https://www.pyinstaller.org/"><code class="docutils literal notranslate"><span class="pre">PyInstaller</span></code></a> package for simple deployment. The executable is built by using
-the <a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/blob/master/mdcs/nexusLIMS/nexusLIMS/db/db_logger_gui/db_logger_gui.spec"><code class="docutils literal notranslate"><span class="pre">db_logger_gui.spec</span></code></a> file and running:</p>
+the <code class="docutils literal notranslate"><span class="pre">db_logger_gui.spec</span></code> file and running:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pyinstaller.exe db_logger_gui.spec
 </pre></div>
 </div>
 <p>The logger application is compiled to <code class="docutils literal notranslate"><span class="pre">NexusLIMS</span> <span class="pre">Session</span> <span class="pre">Logger.exe</span></code>, and this
 file is then copied to the centralized file storage at
-<code class="docutils literal notranslate"><span class="pre">//cfs2e.nist.gov/63internal/mmfnexus/NexusLIMS/NexusLIMS</span> <span class="pre">Session</span> <span class="pre">Logger.exe</span></code>,
+<code class="docutils literal notranslate"><span class="pre">//network/path/to/mmfnexus/folder/NexusLIMS/NexusLIMS</span> <span class="pre">Session</span> <span class="pre">Logger.exe</span></code>,
 where it is then pulled down to the individual microscope PCs by the startup
 batch script that is used to mount the centralized file storage. Each Nexus
 microscope has a desktop shortcut that points to this copied file, so users are
@@ -435,7 +441,7 @@ database communication uses the
 <cite>Windows</cite>-specific parts of the code are used to find an unused drive letter
 to mount the central file network share using the
 <a class="reference external" href="https://docs.python.org/3.4/library/ctypes.html">ctypes</a> module.</p>
-<div class="section" id="system-calls">
+<section id="system-calls">
 <h3>System calls<a class="headerlink" href="#system-calls" title="Permalink to this headline">¶</a></h3>
 <p>While most of the logger application’s logic is implemented in the Python code,
 a few operations require interfacing directly with the microscope computer
@@ -445,7 +451,7 @@ These commands are run using the
 are explained here so Nexus microscope operators have a reference for every
 command that is run on their machines:</p>
 <ul>
-<li><p>The first two system calls are used by the GUI code (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/blob/master/mdcs/nexusLIMS/nexusLIMS/db/db_logger_gui/db_logger_gui.py"><code class="docutils literal notranslate"><span class="pre">db_logger_gui.py</span></code></a>)
+<li><p>The first two system calls are used by the GUI code (<code class="docutils literal notranslate"><span class="pre">db_logger_gui.py</span></code>)
 and query the local system to get the current
 monitor resolution and display DPI, so the logger application can be reliably
 placed in the center of the screen:</p>
@@ -465,25 +471,25 @@ of these last two commands is used to calculate the correct placement to
 ensure the GUI window opens in the center of the screen.</p>
 </li>
 <li><p>The next system call is used by the database communication module
-(<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/blob/master/mdcs/nexusLIMS/nexusLIMS/db/db_logger_gui/make_db_entry.py"><code class="docutils literal notranslate"><span class="pre">make_db_entry.py</span></code></a>) to get the IP address of the central file system where
-the database file is stored (<code class="docutils literal notranslate"><span class="pre">//cfs2e.nist.gov/</span></code>), since mounting via IP is
+(<code class="docutils literal notranslate"><span class="pre">make_db_entry.py</span></code>) to get the IP address of the central file system where
+the database file is stored (<code class="docutils literal notranslate"><span class="pre">//network.host.for.file.storage/</span></code>), since mounting via IP is
 more reliable than using the host name. The command used for this is:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ping</span> <span class="n">cfs2e</span><span class="o">.</span><span class="n">nist</span><span class="o">.</span><span class="n">gov</span> <span class="o">-</span><span class="n">n</span> <span class="mi">1</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">ping</span> <span class="n">network</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="k">for</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">storage</span> <span class="o">-</span><span class="n">n</span> <span class="mi">1</span>
 </pre></div>
 </div>
 <p>This command will send a single ping to the server and resolve the host name
 to an IP address. The output of the command is parsed to find the IP that
 should be used to mount the network location.</p>
 </li>
-<li><p>Next, the <a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/blob/master/mdcs/nexusLIMS/nexusLIMS/db/db_logger_gui/make_db_entry.py"><code class="docutils literal notranslate"><span class="pre">make_db_entry.py</span></code></a> module runs:</p>
+<li><p>Next, the <code class="docutils literal notranslate"><span class="pre">make_db_entry.py</span></code> module runs:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="n">use</span>
 </pre></div>
 </div>
 <p>to list the currently mounted network drives. If the required network location
-(<code class="docutils literal notranslate"><span class="pre">//cfs2e.nist.gov/63internal/nexusLIMS</span></code>) is already mounted, that drive
+(<code class="docutils literal notranslate"><span class="pre">//network.host.for.file.storage/nexusLIMS</span></code>) is already mounted, that drive
 path is used rather than mounting another copy. If it is not, the path will
 be mounted using a command:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="n">use</span> <span class="n">H</span><span class="p">:</span> \\<span class="n">cfs2e</span><span class="o">.</span><span class="n">nist</span><span class="o">.</span><span class="n">gov</span>\<span class="mi">63</span><span class="n">internal</span>\<span class="n">nexusLIMS</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">net</span> <span class="n">use</span> <span class="n">H</span><span class="p">:</span> \\<span class="n">network</span><span class="o">.</span><span class="n">host</span><span class="o">.</span><span class="k">for</span><span class="o">.</span><span class="n">file</span><span class="o">.</span><span class="n">storage</span>\<span class="n">nexusLIMS</span>
 </pre></div>
 </div>
 <p>The drive letter (in this example <code class="docutils literal notranslate"><span class="pre">H:</span></code>) is automatically determined by
@@ -498,8 +504,8 @@ system call:</p>
 the database.</p>
 </li>
 </ul>
-</div>
-<div class="section" id="application-dependencies">
+</section>
+<section id="application-dependencies">
 <h3>Application dependencies<a class="headerlink" href="#application-dependencies" title="Permalink to this headline">¶</a></h3>
 <p>The third-party dependencies used by the logger application are:</p>
 <table class="docutils align-default">
@@ -612,9 +618,9 @@ installed as a dependency of <code class="docutils literal notranslate"><span cl
 </tr>
 </tbody>
 </table>
-</div>
-</div>
-</div>
+</section>
+</section>
+</section>
 
 
     </div>
@@ -636,8 +642,8 @@ installed as a dependency of <code class="docutils literal notranslate"><span cl
       
     </p>
     <p>
-        &copy; Copyright 2020, NIST Office of Data and Informatics.<br/>
-      Last updated on Oct, 19, 2020.<br/>
+        &copy; Copyright 2022, NIST Office of Data and Informatics.<br/>
+      Last updated on Jul, 15, 2022.<br/>
     </p>
   </div>
 </footer>

@@ -1,9 +1,22 @@
 :tocdepth: 2
 
-Session logging
-===============
+Session logging (deprecated)
+============================
 
-    `Last updated: March 7, 2020`
+    `Last updated: June 13, 2022`
+
+.. note::
+   Please note that the Session Logger application has been deprecated as of
+   late 2021 in favor of using the NEMO laboratory management system to determine
+   when experimental sessions have taken place (using the py:mod:`~nexusLIMS.harvesters.nemo`
+   module). Maintaining the Session Logger application deployed across dozens of microscopes
+   was not scalable, hence the change in approach. This documentation page is left as a
+   record of prior development.
+
+   If you are deploying NexusLIMS at your institution and are interested in the session logger
+   application, please contact the NexusLIMS authors, as the code is available upon request.
+   The following documentation describes the operation of the Session Logger application
+   as of mid-2020.
 
 To accurately know what files should be included in each Experiment's record,
 it is important to have a timestamp for the beginning `and` end of when a user
@@ -17,7 +30,7 @@ deployed to the individual microscopes.
 How to use the logger app
 +++++++++++++++++++++++++
 
-Using the Session Logger application is very simple. On each Nexus Facility
+Using the Session Logger application is very simple. On each
 microscope, there will be a shortcut on the desktop that points to the
 application that has been stored within a local directory on the computer. At
 the beginning of an Experiment, double click on the following icon to start a
@@ -67,8 +80,7 @@ by clicking the `"Show debug log"` button on the main screen):
 
 If this log window appears on its own (which it shouldn't), we ask that that
 you click the `"Copy"` button to copy all the text to the clipboard and send it
-to `miclims@nist.gov <mailto:miclims@nist.gov>`_ so the NexusLIMS developers
-can resolve the issue.
+to the facility managers so they can attempt to resolve the issue.
 
 .. _interrupted:
 
@@ -130,7 +142,7 @@ information, the program runs a Windows command to mount the drive, such as:
 
 ..  code-block:: bat
 
-    net use H: \\129.6.16.126\63internal\nexuslims
+    net use H: \\network-path\to\directory\holding-NexusLIMS-DB
 
 After this command finishes, the logger confirms that it can access the
 database file as expected, and raises an error if not.
@@ -260,20 +272,20 @@ computer that are recorded to the database with each log are:
 Logger implementation and deployment
 ++++++++++++++++++++++++++++++++++++
 
-As :doc:`data security <data_security>` is of the utmost importance in
+As data security is of the utmost importance in
 NexusLIMS, the developers felt it prudent to describe in detail the specific
 implementation that was used to produce the session logger application that
 runs on the microscope PCs (since these machines control critical
 instrumentation).
 
-The logger application is implemented in two files: |dbloggerLink|_ (that
-contains the interactive GUI parts of the code) and |makedbentryLink|_ (that
+The logger application is implemented in two files: ``db_logger_gui.py`` (that
+contains the interactive GUI parts of the code) and ``make_db_entry.py`` (that
 contains the database communication and logic code).
 
 The application is written using 32-bit Python 3.4.4 (in order to support
 computers back to Windows XP) and is compiled to a single .exe file using the
 |PyInstaller|_ package for simple deployment. The executable is built by using
-the |specfileLink|_ file and running:
+the ``db_logger_gui.spec`` file and running:
 
 ..  code-block:: bash
 
@@ -281,7 +293,7 @@ the |specfileLink|_ file and running:
 
 The logger application is compiled to ``NexusLIMS Session Logger.exe``, and this
 file is then copied to the centralized file storage at
-``//cfs2e.nist.gov/63internal/mmfnexus/NexusLIMS/NexusLIMS Session Logger.exe``,
+``//network/path/to/mmfnexus/folder/NexusLIMS/NexusLIMS Session Logger.exe``,
 where it is then pulled down to the individual microscope PCs by the startup
 batch script that is used to mount the centralized file storage. Each Nexus
 microscope has a desktop shortcut that points to this copied file, so users are
@@ -319,7 +331,7 @@ These commands are run using the
 are explained here so Nexus microscope operators have a reference for every
 command that is run on their machines:
 
-- The first two system calls are used by the GUI code (|dbloggerLink|_)
+- The first two system calls are used by the GUI code (``db_logger_gui.py``)
   and query the local system to get the current
   monitor resolution and display DPI, so the logger application can be reliably
   placed in the center of the screen::
@@ -339,26 +351,26 @@ command that is run on their machines:
   ensure the GUI window opens in the center of the screen.
 
 - The next system call is used by the database communication module
-  (|makedbentryLink|_) to get the IP address of the central file system where
-  the database file is stored (``//cfs2e.nist.gov/``), since mounting via IP is
+  (``make_db_entry.py``) to get the IP address of the central file system where
+  the database file is stored (``//network.host.for.file.storage/``), since mounting via IP is
   more reliable than using the host name. The command used for this is::
 
-      ping cfs2e.nist.gov -n 1
+      ping network.host.for.file.storage -n 1
 
   This command will send a single ping to the server and resolve the host name
   to an IP address. The output of the command is parsed to find the IP that
   should be used to mount the network location.
 
-- Next, the |makedbentryLink|_ module runs::
+- Next, the ``make_db_entry.py`` module runs::
 
       net use
 
   to list the currently mounted network drives. If the required network location
-  (``//cfs2e.nist.gov/63internal/nexusLIMS``) is already mounted, that drive
+  (``//network.host.for.file.storage/nexusLIMS``) is already mounted, that drive
   path is used rather than mounting another copy. If it is not, the path will
   be mounted using a command::
 
-      net use H: \\cfs2e.nist.gov\63internal\nexusLIMS
+      net use H: \\network.host.for.file.storage\nexusLIMS
 
   The drive letter (in this example ``H:``) is automatically determined by
   finding a currently unused drive letter earlier in the code.

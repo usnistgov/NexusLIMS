@@ -1,0 +1,1389 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>nexusLIMS.harvesters.nemo &#8212; NexusLIMS 1.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom-styles.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/custom.js"></script>
+    <link rel="shortcut icon" href="../../../_static/nexusLIMS_bare_logo.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logo_horizontal.png"></span>
+           </a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../api.html">API Docs</a></li>
+                <li><a href="https://github.com/usnistgov/NexusLIMS">Repository</a></li>
+                <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site Map <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../session_logger_app.html">Session logging (deprecated)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/nexusLIMS.html">nexusLIMS package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li class="dummy-sidebarrel">
+    <a><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Previous</span>
+    </a>
+  </li>
+  <li class="dummy-sidebarrel">
+    <a><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Next &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><img src="../../../_static/nexusLIMS_bare_logo.png">
+<h4><a href="../../../index.html" title="Return to documentation home">
+    NexusLIMS Documentation</a></h4>
+<ul class="globaltoc">
+    <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../session_logger_app.html">Session logging (deprecated)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API documentation</a></li>
+</ul>
+
+</ul><h4>
+    <a class="no-hover">Page content</a>
+</h4>
+
+
+<form action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <h1>Source code for nexusLIMS.harvesters.nemo</h1><div class="highlight"><pre>
+<span></span><span class="c1">#  NIST Public License - 2021</span>
+<span class="c1">#</span>
+<span class="c1">#  This software was developed by employees of the National Institute of</span>
+<span class="c1">#  Standards and Technology (NIST), an agency of the Federal Government</span>
+<span class="c1">#  and is being made available as a public service. Pursuant to title 17</span>
+<span class="c1">#  United States Code Section 105, works of NIST employees are not subject</span>
+<span class="c1">#  to copyright protection in the United States.  This software may be</span>
+<span class="c1">#  subject to foreign copyright.  Permission in the United States and in</span>
+<span class="c1">#  foreign countries, to the extent that NIST may hold copyright, to use,</span>
+<span class="c1">#  copy, modify, create derivative works, and distribute this software and</span>
+<span class="c1">#  its documentation without fee is hereby granted on a non-exclusive basis,</span>
+<span class="c1">#  provided that this notice and disclaimer of warranty appears in all copies.</span>
+<span class="c1">#</span>
+<span class="c1">#  THE SOFTWARE IS PROVIDED &#39;AS IS&#39; WITHOUT ANY WARRANTY OF ANY KIND,</span>
+<span class="c1">#  EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT LIMITED</span>
+<span class="c1">#  TO, ANY WARRANTY THAT THE SOFTWARE WILL CONFORM TO SPECIFICATIONS, ANY</span>
+<span class="c1">#  IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,</span>
+<span class="c1">#  AND FREEDOM FROM INFRINGEMENT, AND ANY WARRANTY THAT THE DOCUMENTATION</span>
+<span class="c1">#  WILL CONFORM TO THE SOFTWARE, OR ANY WARRANTY THAT THE SOFTWARE WILL BE</span>
+<span class="c1">#  ERROR FREE.  IN NO EVENT SHALL NIST BE LIABLE FOR ANY DAMAGES, INCLUDING,</span>
+<span class="c1">#  BUT NOT LIMITED TO, DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES,</span>
+<span class="c1">#  ARISING OUT OF, RESULTING FROM, OR IN ANY WAY CONNECTED WITH THIS SOFTWARE,</span>
+<span class="c1">#  WHETHER OR NOT BASED UPON WARRANTY, CONTRACT, TORT, OR OTHERWISE, WHETHER</span>
+<span class="c1">#  OR NOT INJURY WAS SUSTAINED BY PERSONS OR PROPERTY OR OTHERWISE, AND</span>
+<span class="c1">#  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,</span>
+<span class="c1">#  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.</span>
+<span class="c1">#</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains the functionality to harvest instruments, reservations,</span>
+<span class="sd">etc. from an instance of NEMO (https://github.com/usnistgov/NEMO/), a</span>
+<span class="sd">calendering and laboratory logistics application.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">requests</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urljoin</span><span class="p">,</span> <span class="n">urlparse</span><span class="p">,</span> <span class="n">parse_qs</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span>
+<span class="kn">from</span> <span class="nn">pytz</span> <span class="kn">import</span> <span class="n">timezone</span> <span class="k">as</span> <span class="n">pytz_timezone</span>
+
+<span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="n">nexus_req</span><span class="p">,</span> <span class="n">_get_timespan_overlap</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.harvesters</span> <span class="kn">import</span> <span class="n">ReservationEvent</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.db.session_handler</span> <span class="kn">import</span> <span class="n">SessionLog</span><span class="p">,</span> <span class="n">Session</span><span class="p">,</span> <span class="n">db_query</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.instruments</span> <span class="kn">import</span> <span class="n">get_instr_from_api_url</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.instruments</span> <span class="kn">import</span> <span class="n">instrument_db</span>
+
+<span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="NoDataConsentException"><a class="viewcode-back" href="../../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NoDataConsentException">[docs]</a><span class="k">class</span> <span class="nc">NoDataConsentException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exception to raise if a user has not given their consent to have data</span>
+<span class="sd">    harvested</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="NoMatchingReservationException"><a class="viewcode-back" href="../../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NoMatchingReservationException">[docs]</a><span class="k">class</span> <span class="nc">NoMatchingReservationException</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Exception to raise if there was no matching reservation (so we cannot assume</span>
+<span class="sd">    to have consent to harvest their data)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span></div>
+
+
+<div class="viewcode-block" id="NemoConnector"><a class="viewcode-back" href="../../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector">[docs]</a><span class="k">class</span> <span class="nc">NemoConnector</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A connection to an instance of the API of the NEMO laboratory management</span>
+<span class="sd">    software. Provides helper methods for fetching data from the API.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    base_url : str</span>
+<span class="sd">        The &quot;root&quot; of the API including a trailing slash;</span>
+<span class="sd">        e.g. &#39;https://nemo.url.com/api/&#39;</span>
+<span class="sd">    token : str</span>
+<span class="sd">        An authentication token for this NEMO instance</span>
+<span class="sd">    strftime_fmt : str</span>
+<span class="sd">        The &quot;date format&quot; to use when encoding dates to send as filters to the</span>
+<span class="sd">        NEMO API. Should follow the same convention as</span>
+<span class="sd">        :ref:`strftime-strptime-behavior`. If ``None``, ISO 8601 format</span>
+<span class="sd">        will be used.</span>
+<span class="sd">    strptime_fmt : str</span>
+<span class="sd">        The &quot;date format&quot; to use when decoding date strings received in the</span>
+<span class="sd">        response from the API. Should follow the same convention as</span>
+<span class="sd">        :ref:`strftime-strptime-behavior`. If ``None``, ISO 8601 format</span>
+<span class="sd">        will be used.</span>
+<span class="sd">    timezone : str</span>
+<span class="sd">        The timezone to use when decoding date strings received in the</span>
+<span class="sd">        response from the API. Should be a IANA time zone database string; e.g.</span>
+<span class="sd">        &quot;America/New_York&quot;. Useful if no timezone information is returned</span>
+<span class="sd">        from an instance of the NEMO API. If ``None``, no timezone setting will</span>
+<span class="sd">        be done and the code will use whatever was returned from the server</span>
+<span class="sd">        as is.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tools</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]</span>
+    <span class="n">users</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]</span>
+    <span class="n">users_by_username</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]</span>
+    <span class="n">projects</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]</span>
+    
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">token</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">strftime_fmt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">strptime_fmt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">timezone</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="o">=</span> <span class="n">base_url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">token</span> <span class="o">=</span> <span class="n">token</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">strftime_fmt</span> <span class="o">=</span> <span class="n">strftime_fmt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">strptime_fmt</span> <span class="o">=</span> <span class="n">strptime_fmt</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">timezone</span> <span class="o">=</span> <span class="n">timezone</span>
+
+        <span class="c1"># these attributes are used for &quot;memoization&quot; of NEMO content,</span>
+        <span class="c1"># so it can be remembered and used for a cache lookup</span>
+        <span class="c1"># keys should be NEMO internal IDs and values should be the</span>
+        <span class="c1"># dictionary returned by the API</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tools</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">users</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">users_by_username</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">projects</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Connection to NEMO API at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">&quot;</span>
+
+<div class="viewcode-block" id="NemoConnector.strftime"><a class="viewcode-back" href="../../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.strftime">[docs]</a>    <span class="k">def</span> <span class="nf">strftime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date_dt</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Using the settings for this NemoConnector, convert a datetime object</span>
+<span class="sd">        to a string that will be understood by the API. If the ``strftime_fmt``</span>
+<span class="sd">        attribute for this NemoConnector is ``None``, ISO 8601 format will be</span>
+<span class="sd">        used.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        date_dt</span>
+<span class="sd">            The date to be converted as a datetime object</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        date_str : str</span>
+<span class="sd">            The date formatted as a string that will be understandable by the</span>
+<span class="sd">            API for this NemoConnector</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strftime_fmt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">date_dt</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="s1">&#39;%z&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">strftime_fmt</span> <span class="ow">or</span> <span class="s1">&#39;%Z&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">strftime_fmt</span><span class="p">:</span>
+                <span class="c1"># make sure datetime is timezone aware if timezone is</span>
+                <span class="c1"># indicated in strftime_fmt. Use NEMO_tz setting if present,</span>
+                <span class="c1"># otherwise use local server timezone</span>
+                <span class="k">if</span> <span class="n">date_dt</span><span class="o">.</span><span class="n">tzinfo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">timezone</span><span class="p">:</span>
+                        <span class="n">date_dt</span> <span class="o">=</span> <span class="n">pytz_timezone</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timezone</span><span class="p">)</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">date_dt</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">date_dt</span> <span class="o">=</span> <span class="n">date_dt</span><span class="o">.</span><span class="n">astimezone</span><span class="p">()</span>
+            <span class="k">return</span> <span class="n">date_dt</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">strftime_fmt</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NemoConnector.strptime"><a class="viewcode-back" href="../../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.strptime">[docs]</a>    <span class="k">def</span> <span class="nf">strptime</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">date_str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">datetime</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Using the settings for this NemoConnector, convert a datetime string</span>
+<span class="sd">        representation from the API into a datetime object that can be used</span>
+<span class="sd">        in Python. If the ``strptime_fmt`` attribute for this NemoConnector</span>
+<span class="sd">        is ``None``, ISO 8601 format will be assumed. If a timezone is</span>
+<span class="sd">        specified for this server, the resulting datetime will be coerced to</span>
+<span class="sd">        that timezone.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        date_str</span>
+<span class="sd">            The date formatted as a string that is returned by the</span>
+<span class="sd">            API for this NemoConnector</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        date_dt : ~datetime.datetime</span>
+<span class="sd">            The date to be converted as a datetime object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">strptime_fmt</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">date_dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">date_str</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># to be defensive here, try without microseconds as well if &quot;.%f&quot;</span>
+            <span class="c1"># is in strptime_fmt and it fails (since sometimes NEMO doesn&#39;t</span>
+            <span class="c1"># write microseconds for every time, even if it&#39;s supposed to</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">date_dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date_str</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">strptime_fmt</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="s1">&#39;.</span><span class="si">%f</span><span class="s1">&#39;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">strptime_fmt</span><span class="p">:</span>
+                    <span class="n">date_dt</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">date_str</span><span class="p">,</span>
+                                                <span class="bp">self</span><span class="o">.</span><span class="n">strptime_fmt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span>
+                                                    <span class="s1">&#39;.</span><span class="si">%f</span><span class="s1">&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">))</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">e</span>   <span class="c1"># pragma: no cover</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">timezone</span><span class="p">:</span>
+            <span class="c1"># strip any timezone information from the datetime, then localize</span>
+            <span class="c1"># with pytz to whatever timezone specified</span>
+            <span class="n">date_dt</span> <span class="o">=</span> <span class="n">date_dt</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tzinfo</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+            <span class="n">date_dt</span> <span class="o">=</span> <span class="n">pytz_timezone</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">timezone</span><span class="p">)</span><span class="o">.</span><span class="n">localize</span><span class="p">(</span><span class="n">date_dt</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">date_dt</span></div>
+
+<div class="viewcode-block" id="NemoConnector.get_tools"><a class="viewcode-back" href="../../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.get_tools">[docs]</a>    <span class="k">def</span> <span class="nf">get_tools</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">tool_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a list of one or more tools from the NEMO API in a dictionary</span>
+<span class="sd">        representation</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        tool_id</span>
+<span class="sd">            The tool(s) to fetch, as indexed by the NEMO instance (i.e.</span>
+<span class="sd">            ``tool_id`` should be the internal primary key used by NEMO to</span>
+<span class="sd">            identify the tool. If an empty list is given, all tools will be</span>
+<span class="sd">            returned.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tools : List[Dict]</span>
+<span class="sd">            A list (could be empty) of tools that match the id (or ids) given</span>
+<span class="sd">            in ``tool_id``</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        requests.exceptions.HTTPError</span>
+<span class="sd">            Raised if the request to the API did not go through correctly</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">tool_id</span><span class="p">,</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">t_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tools</span> <span class="k">for</span> <span class="n">t_id</span> <span class="ow">in</span> <span class="n">tool_id</span><span class="p">):</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using cached tool info for tools </span><span class="si">{</span><span class="n">tool_id</span><span class="si">}</span><span class="s2">&quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;: </span><span class="si">{</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="p">[</span><span class="n">t</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tool_id</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="p">[</span><span class="n">t_id</span><span class="p">]</span> <span class="k">for</span> <span class="n">t_id</span> <span class="ow">in</span> <span class="n">tool_id</span><span class="p">]</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;id__in&quot;</span><span class="p">:</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tool_id</span><span class="p">])}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">tool_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="p">:</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using cached tool info for tool </span><span class="si">{</span><span class="n">tool_id</span><span class="si">}</span><span class="s2">:&quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot; </span><span class="se">\&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="p">[</span><span class="n">tool_id</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="p">[</span><span class="n">tool_id</span><span class="p">]]</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">tool_id</span><span class="p">}</span>
+
+        <span class="n">tools</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_caller</span><span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">,</span> <span class="s1">&#39;tools/&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">tools</span><span class="p">:</span>
+            <span class="c1"># cache the tool results</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">tools</span><span class="p">[</span><span class="n">t</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">t</span>
+
+        <span class="k">return</span> <span class="n">tools</span></div>
+
+<div class="viewcode-block" id="NemoConnector.get_users"><a class="viewcode-back" href="../../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.get_users">[docs]</a>    <span class="k">def</span> <span class="nf">get_users</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">user_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> \
+            <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a list of one or more users from the NEMO API in a dictionary</span>
+<span class="sd">        representation. The results will be cached in the NemoConnector</span>
+<span class="sd">        instance to prevent multiple API queries if not necessary</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        user_id</span>
+<span class="sd">            The user(s) to fetch, as indexed by the NEMO instance (i.e.</span>
+<span class="sd">            ``user_id`` should be the internal primary key used by NEMO to</span>
+<span class="sd">            identify the user. If an empty list or None is given, all users</span>
+<span class="sd">            will be returned.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        users : List[Dict]</span>
+<span class="sd">            A list (could be empty) of users that match the ids and/or</span>
+<span class="sd">            usernames given</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        requests.exceptions.HTTPError</span>
+<span class="sd">            Raised if the request to the API did not go through correctly</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="c1"># list of user ids</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">user_id</span><span class="p">,</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">):</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;id__in&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">user_id</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">u_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">users</span> <span class="k">for</span> <span class="n">u_id</span> <span class="ow">in</span> <span class="n">user_id</span><span class="p">):</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using cached user info for users with id in&quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">user_id</span><span class="si">}</span><span class="s2">: &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">users</span><span class="p">[</span><span class="n">u</span><span class="p">][</span><span class="s1">&#39;username&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">user_id</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">users</span><span class="p">[</span><span class="n">u_id</span><span class="p">]</span> <span class="k">for</span> <span class="n">u_id</span> <span class="ow">in</span> <span class="n">user_id</span><span class="p">]</span>
+        <span class="c1"># single user id</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">user_id</span>
+            <span class="k">if</span> <span class="n">user_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">users</span><span class="p">:</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using cached user info for user id </span><span class="si">{</span><span class="n">user_id</span><span class="si">}</span><span class="s2">: &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">users</span><span class="p">[</span><span class="n">user_id</span><span class="p">][</span><span class="s1">&#39;username&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">users</span><span class="p">[</span><span class="n">user_id</span><span class="p">]]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_users_helper</span><span class="p">(</span><span class="n">p</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NemoConnector.get_users_by_username"><a class="viewcode-back" href="../../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.get_users_by_username">[docs]</a>    <span class="k">def</span> <span class="nf">get_users_by_username</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">username</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a list of one or more users from the NEMO API in a dictionary</span>
+<span class="sd">        representation. The results will be cached in the NemoConnector</span>
+<span class="sd">        instance to prevent multiple API queries if not necessary</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        username : str or :obj:`list` of :obj:`str`</span>
+<span class="sd">            The user(s) to fetch, as indexed by their usernames in the NEMO</span>
+<span class="sd">            instance. If an empty list or None is given, all users</span>
+<span class="sd">            will be returned.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        users : list</span>
+<span class="sd">            A list (could be empty) of users that match the ids and/or</span>
+<span class="sd">            usernames given</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        requests.exceptions.HTTPError</span>
+<span class="sd">            Raised if the request to the API did not go through correctly</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">username</span><span class="p">,</span> <span class="p">(</span><span class="nb">str</span><span class="p">,)):</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;username&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">username</span>
+            <span class="k">if</span> <span class="n">username</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">users_by_username</span><span class="p">:</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using cached user info for username &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\&quot;</span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">users_by_username</span><span class="p">[</span><span class="n">username</span><span class="p">]]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">p</span><span class="p">[</span><span class="s2">&quot;username__in&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">username</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">uname</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">users_by_username</span> <span class="k">for</span> <span class="n">uname</span> <span class="ow">in</span> <span class="n">username</span><span class="p">):</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using cached user info for users with id in&quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">username</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">users_by_username</span><span class="p">[</span><span class="n">uname</span><span class="p">]</span> <span class="k">for</span> <span class="n">uname</span> <span class="ow">in</span> <span class="n">username</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_users_helper</span><span class="p">(</span><span class="n">p</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NemoConnector.get_projects"><a class="viewcode-back" href="../../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.get_projects">[docs]</a>    <span class="k">def</span> <span class="nf">get_projects</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">proj_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a list of one or more projects from the NEMO API in a dictionary</span>
+<span class="sd">        representation. The local cache will be checked prior to fetching</span>
+<span class="sd">        from the API to save a network request if possible.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        proj_id</span>
+<span class="sd">            The project(s) to fetch, as indexed by the NEMO instance (i.e.</span>
+<span class="sd">            ``proj_id`` should be the internal primary key used by NEMO to</span>
+<span class="sd">            identify the project. If an empty list is given, all projects</span>
+<span class="sd">            will be returned.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        projects : List[Dict]</span>
+<span class="sd">            A list (could be empty) of projects that match the id (or ids) given</span>
+<span class="sd">            in ``proj_id``</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        requests.exceptions.HTTPError</span>
+<span class="sd">            Raised if the request to the API did not go through correctly</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">proj_id</span><span class="p">,</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">p_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">projects</span> <span class="k">for</span> <span class="n">p_id</span> <span class="ow">in</span> <span class="n">proj_id</span><span class="p">):</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using cached project info for projects&quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">proj_id</span><span class="si">}</span><span class="s2">: &quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">projects</span><span class="p">[</span><span class="n">p</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">proj_id</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">projects</span><span class="p">[</span><span class="n">p_id</span><span class="p">]</span> <span class="k">for</span> <span class="n">p_id</span> <span class="ow">in</span> <span class="n">proj_id</span><span class="p">]</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;id__in&quot;</span><span class="p">:</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">proj_id</span><span class="p">])}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">proj_id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">projects</span><span class="p">:</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using cached project info for project&quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot; </span><span class="si">{</span><span class="n">proj_id</span><span class="si">}</span><span class="s2">: </span><span class="se">\&quot;</span><span class="s2">&quot;</span>
+                              <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">projects</span><span class="p">[</span><span class="n">proj_id</span><span class="p">][</span><span class="s1">&#39;name&#39;</span><span class="p">]</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">projects</span><span class="p">[</span><span class="n">proj_id</span><span class="p">]]</span>
+            <span class="n">p</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">proj_id</span><span class="p">}</span>
+
+        <span class="n">projects</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_caller</span><span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">,</span> <span class="s1">&#39;projects/&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">projects</span><span class="p">:</span>
+            <span class="c1"># expand the only_allow_tools node</span>
+            <span class="k">if</span> <span class="s1">&#39;only_allow_tools&#39;</span> <span class="ow">in</span> <span class="n">p</span><span class="p">:</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;only_allow_tools&#39;</span><span class="p">:</span>
+                          <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">get_tools</span><span class="p">(</span><span class="n">t</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">t</span> <span class="ow">in</span> <span class="n">p</span><span class="p">[</span>
+                              <span class="s1">&#39;only_allow_tools&#39;</span><span class="p">]]})</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">projects</span><span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">p</span>
+
+        <span class="k">return</span> <span class="n">projects</span></div>
+
+<div class="viewcode-block" id="NemoConnector.get_reservations"><a class="viewcode-back" href="../../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.get_reservations">[docs]</a>    <span class="k">def</span> <span class="nf">get_reservations</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                         <span class="n">dt_from</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                         <span class="n">dt_to</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                         <span class="n">tool_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                         <span class="n">cancelled</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">bool</span><span class="p">]</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a list of reservations from the API, filtered by date</span>
+<span class="sd">        (inclusive). If only one argument is provided, the API will return all</span>
+<span class="sd">        reservations either before or after the parameter. With no arguments,</span>
+<span class="sd">        the method will return all reservations. The method will</span>
+<span class="sd">        &quot;auto-expand&quot; linked information such as user, project, tool, etc. so</span>
+<span class="sd">        results will have a full dictionary for each of those fields, rather</span>
+<span class="sd">        than just the index (as returned from the API).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        dt_from</span>
+<span class="sd">            The &quot;starting point&quot; of the time range; only reservations at or</span>
+<span class="sd">            after this point in time will be returned</span>
+<span class="sd">        dt_to</span>
+<span class="sd">            The &quot;ending point&quot; of the time range; only reservations at</span>
+<span class="sd">            or prior to this point in time will be returned</span>
+<span class="sd">        tool_id</span>
+<span class="sd">            A tool identifier (or list of them) to limit the scope of the</span>
+<span class="sd">            reservation search (this should be the NEMO internal integer ID)</span>
+<span class="sd">        cancelled</span>
+<span class="sd">            Whether to get canceled or active reservations in the response</span>
+<span class="sd">            (default is False -- meaning non-cancelled active reservations</span>
+<span class="sd">            are returned by default). Set to None to include all reservations</span>
+<span class="sd">            regardless of whether they are cancelled or active.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        reservations : List[Dict]</span>
+<span class="sd">            A list (could be empty) of reservations that match the date range</span>
+<span class="sd">            supplied</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="n">dt_from</span><span class="p">:</span>
+            <span class="n">p</span><span class="p">[</span><span class="s1">&#39;start__gte&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">dt_from</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dt_to</span><span class="p">:</span>
+            <span class="n">p</span><span class="p">[</span><span class="s1">&#39;end__lte&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">dt_to</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">cancelled</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">p</span><span class="p">[</span><span class="s1">&#39;cancelled&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cancelled</span>
+
+        <span class="k">if</span> <span class="n">tool_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tool_id</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;tool_id__in&quot;</span><span class="p">:</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tool_id</span><span class="p">])})</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;tool_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">tool_id</span><span class="p">)})</span>
+
+        <span class="n">reservations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_caller</span><span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">,</span> <span class="s1">&#39;reservations/&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">reservations</span><span class="p">:</span>
+            <span class="c1"># expand various fields within the reservation data</span>
+            <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">]:</span>
+                <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_users</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">u</span><span class="p">:</span>
+                    <span class="n">r</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]})</span>
+            <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;creator&#39;</span><span class="p">]:</span>
+                <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_users</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;creator&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">u</span><span class="p">:</span>
+                    <span class="n">r</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;creator&#39;</span><span class="p">:</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]})</span>
+            <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;tool&#39;</span><span class="p">]:</span>
+                <span class="n">t</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tools</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;tool&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">t</span><span class="p">:</span>
+                    <span class="n">r</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;tool&#39;</span><span class="p">:</span> <span class="n">t</span><span class="p">[</span><span class="mi">0</span><span class="p">]})</span>
+            <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;project&#39;</span><span class="p">]:</span>
+                <span class="n">p</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_projects</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;project&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">p</span><span class="p">:</span>
+                    <span class="n">r</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;project&#39;</span><span class="p">:</span> <span class="n">p</span><span class="p">[</span><span class="mi">0</span><span class="p">]})</span>
+            <span class="k">if</span> <span class="n">r</span><span class="p">[</span><span class="s1">&#39;cancelled_by&#39;</span><span class="p">]:</span>
+                <span class="n">u</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_users</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;cancelled_by&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">u</span><span class="p">:</span>
+                    <span class="n">r</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;cancelled_by&#39;</span><span class="p">:</span> <span class="n">u</span><span class="p">[</span><span class="mi">0</span><span class="p">]})</span>
+
+        <span class="k">return</span> <span class="n">reservations</span></div>
+
+<div class="viewcode-block" id="NemoConnector.get_usage_events"><a class="viewcode-back" href="../../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.get_usage_events">[docs]</a>    <span class="k">def</span> <span class="nf">get_usage_events</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                         <span class="n">event_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                         <span class="n">user</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                         <span class="n">dt_from</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                         <span class="n">dt_to</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                         <span class="n">tool_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Return a list of usage events from the API, filtered by date</span>
+<span class="sd">        (inclusive). If only one argument is provided, the API will return all</span>
+<span class="sd">        reservations either before or after the parameter. With no arguments,</span>
+<span class="sd">        the method will return all reservations. The method will</span>
+<span class="sd">        &quot;auto-expand&quot; linked information such as user, project, tool, etc. so</span>
+<span class="sd">        results will have a full dictionary for each of those fields, rather</span>
+<span class="sd">        than just the index (as returned from the API).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        event_id</span>
+<span class="sd">            The NEMO integer identifier (or a list of them) to fetch. If</span>
+<span class="sd">            ``None``, the returned usage events will not be filtered by ID</span>
+<span class="sd">            number</span>
+<span class="sd">        user</span>
+<span class="sd">            The user for which to fetch usage events, as either an integer</span>
+<span class="sd">            representing their id in the NEMO instance, or as a string</span>
+<span class="sd">            containing their username.  If ``None`` is given, usage events</span>
+<span class="sd">            from all users will be returned.</span>
+<span class="sd">        dt_from</span>
+<span class="sd">            The &quot;starting point&quot; of the time range; only usage events</span>
+<span class="sd">            starting at or after this point in time will be returned</span>
+<span class="sd">        dt_to</span>
+<span class="sd">            The &quot;ending point&quot; of the time range; only usage events ending at</span>
+<span class="sd">            or prior to this point in time will be returned</span>
+<span class="sd">        tool_id</span>
+<span class="sd">            A tool identifier (or list of them) to limit the scope of the</span>
+<span class="sd">            usage event search (this should be the NEMO internal integer ID).</span>
+<span class="sd">            Regardless of what value is given, this method will always limit</span>
+<span class="sd">            the API query to tools specified in the NexusLIMS DB for this </span>
+<span class="sd">            harvester </span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        usage_events : List</span>
+<span class="sd">            A list (could be empty) of usage events that match the filters</span>
+<span class="sd">            supplied</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">p</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="n">event_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">event_id</span><span class="p">,</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">):</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;id__in&quot;</span><span class="p">:</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">event_id</span><span class="p">])})</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">event_id</span><span class="p">})</span>
+        <span class="k">if</span> <span class="n">user</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">user</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                <span class="n">u_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_users_by_username</span><span class="p">(</span><span class="n">user</span><span class="p">)[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">u_id</span> <span class="o">=</span> <span class="n">user</span>
+            <span class="n">p</span><span class="p">[</span><span class="s1">&#39;user_id&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">u_id</span>
+        <span class="k">if</span> <span class="n">dt_from</span><span class="p">:</span>
+            <span class="n">p</span><span class="p">[</span><span class="s1">&#39;start__gte&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">dt_from</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">dt_to</span><span class="p">:</span>
+            <span class="n">p</span><span class="p">[</span><span class="s1">&#39;end__lte&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="n">dt_to</span><span class="p">)</span>
+
+        <span class="c1"># filtering for tool; if at the end of this block tool_id is an empty</span>
+        <span class="c1"># list, we should just immediately return an empty list, since either</span>
+        <span class="c1"># there were no tools for this connector in our DB, or the tools </span>
+        <span class="c1"># specified were not found in the DB, so we know there are no </span>
+        <span class="c1"># usage_events of interest</span>
+        <span class="n">this_connectors_tools</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_known_tool_ids</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">tool_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># by default (no tool_id specified), we should fetch events from</span>
+            <span class="c1"># only the tools known to the NexusLIMS DB for this connector </span>
+            <span class="n">tool_id</span> <span class="o">=</span> <span class="n">this_connectors_tools</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">tool_id</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="c1"># coerce tool_id to list to make subsequent processing easier</span>
+            <span class="n">tool_id</span> <span class="o">=</span> <span class="p">[</span><span class="n">tool_id</span><span class="p">]</span>
+        
+        <span class="c1"># limit tool_id to values that are present in this_connectors_tools </span>
+        <span class="n">tool_id</span> <span class="o">=</span> <span class="p">[</span><span class="n">i</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tool_id</span> <span class="k">if</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">this_connectors_tools</span><span class="p">]</span>
+
+        <span class="c1"># if tool_id is empty, we should just return</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">tool_id</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">p</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s2">&quot;tool_id__in&quot;</span><span class="p">:</span> <span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">tool_id</span><span class="p">])})</span>
+            
+        <span class="n">usage_events</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_caller</span><span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">,</span> <span class="s1">&#39;usage_events/&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">event</span> <span class="ow">in</span> <span class="n">usage_events</span><span class="p">:</span>
+            <span class="c1"># expand various fields within the usage event data</span>
+            <span class="k">if</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">]:</span>
+                <span class="n">user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_users</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">user</span><span class="p">:</span>
+                    <span class="n">event</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;user&#39;</span><span class="p">:</span> <span class="n">user</span><span class="p">[</span><span class="mi">0</span><span class="p">]})</span>
+            <span class="k">if</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;operator&#39;</span><span class="p">]:</span>
+                <span class="n">user</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_users</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;operator&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">user</span><span class="p">:</span>
+                    <span class="n">event</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;operator&#39;</span><span class="p">:</span> <span class="n">user</span><span class="p">[</span><span class="mi">0</span><span class="p">]})</span>
+            <span class="k">if</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;project&#39;</span><span class="p">]:</span>
+                <span class="n">proj</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_projects</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;project&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">proj</span><span class="p">:</span>
+                    <span class="n">event</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;project&#39;</span><span class="p">:</span> <span class="n">proj</span><span class="p">[</span><span class="mi">0</span><span class="p">]})</span>
+            <span class="k">if</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;tool&#39;</span><span class="p">]:</span>
+                <span class="n">tool</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_tools</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;tool&#39;</span><span class="p">])</span>
+                <span class="k">if</span> <span class="n">tool</span><span class="p">:</span>
+                    <span class="n">event</span><span class="o">.</span><span class="n">update</span><span class="p">({</span><span class="s1">&#39;tool&#39;</span><span class="p">:</span> <span class="n">tool</span><span class="p">[</span><span class="mi">0</span><span class="p">]})</span>
+
+        <span class="k">return</span> <span class="n">usage_events</span></div>
+
+<div class="viewcode-block" id="NemoConnector.write_usage_event_to_session_log"><a class="viewcode-back" href="../../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.write_usage_event_to_session_log">[docs]</a>    <span class="k">def</span> <span class="nf">write_usage_event_to_session_log</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                                         <span class="n">event_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Inserts two rows (if needed) into the ``session_log`` (marking the start</span>
+<span class="sd">        and end of a usage event), only for instruments recognized by</span>
+<span class="sd">        NexusLIMS (i.e. that have a row in the ``instruments`` table of the DB).</span>
+<span class="sd">        If the usage event has not ended yet, no action is performed</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        event_id</span>
+<span class="sd">            The NEMO id number for the event to insert</span>
+
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_usage_events</span><span class="p">(</span><span class="n">event_id</span><span class="o">=</span><span class="n">event_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">event</span><span class="p">:</span>
+            <span class="c1"># get_usage_events returns list, so pick out first one</span>
+            <span class="n">event</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="n">tool_api_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">tools/?id=</span><span class="si">{</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;tool&#39;</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">instr</span> <span class="o">=</span> <span class="n">get_instr_from_api_url</span><span class="p">(</span><span class="n">tool_api_url</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">instr</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+                <span class="c1"># this shouldn&#39;t happen since we limit our usage event API call</span>
+                <span class="c1"># only to instruments contained in our DB, but we can still</span>
+                <span class="c1"># defend against it regardless</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Usage event </span><span class="si">{</span><span class="n">event_id</span><span class="si">}</span><span class="s2"> was for an instrument &quot;</span>
+                                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">tool_api_url</span><span class="si">}</span><span class="s2">) not known &quot;</span>
+                                <span class="sa">f</span><span class="s2">&quot;to NexusLIMS, so no records will be added &quot;</span>
+                                <span class="sa">f</span><span class="s2">&quot;to DB.&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="k">if</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Usage event </span><span class="si">{</span><span class="n">event_id</span><span class="si">}</span><span class="s2"> has not yet ended, &quot;</span>
+                                <span class="sa">f</span><span class="s2">&quot;so no records will be added to DB.&quot;</span><span class="p">)</span>
+                <span class="k">return</span>
+            <span class="n">session_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">usage_events/?id=</span><span class="si">{</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+
+            <span class="c1"># try to insert start log</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">db_query</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM session_log WHERE session_identifier &quot;</span>
+                           <span class="s2">&quot;= ? AND event_type = ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="s1">&#39;START&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># there was already a start log, so warn and don&#39;t do anything:</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;A  &#39;START&#39; log with session id &quot;</span>
+                                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\&quot;</span><span class="si">{</span><span class="n">session_id</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2"> was found in the the DB, &quot;</span>
+                                <span class="sa">f</span><span class="s2">&quot;so a new one will not be inserted for this &quot;</span>
+                                <span class="sa">f</span><span class="s2">&quot;event&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">start_log</span> <span class="o">=</span> <span class="n">SessionLog</span><span class="p">(</span>
+                    <span class="n">session_identifier</span><span class="o">=</span><span class="n">session_id</span><span class="p">,</span>
+                    <span class="n">instrument</span><span class="o">=</span><span class="n">instr</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="c1"># make sure to coerce format to ISO before putting in DB</span>
+                    <span class="n">timestamp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+                    <span class="n">event_type</span><span class="o">=</span><span class="s1">&#39;START&#39;</span><span class="p">,</span>
+                    <span class="n">user</span><span class="o">=</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">][</span><span class="s1">&#39;username&#39;</span><span class="p">],</span>
+                    <span class="n">record_status</span><span class="o">=</span><span class="s1">&#39;TO_BE_BUILT&#39;</span>
+                <span class="p">)</span>
+                <span class="n">start_inserted</span> <span class="o">=</span> <span class="n">start_log</span><span class="o">.</span><span class="n">insert_log</span><span class="p">()</span>
+
+            <span class="c1"># try to insert end log</span>
+            <span class="n">res</span> <span class="o">=</span> <span class="n">db_query</span><span class="p">(</span><span class="s2">&quot;SELECT * FROM session_log WHERE session_identifier &quot;</span>
+                           <span class="s2">&quot;= ? AND event_type = ?&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">session_id</span><span class="p">,</span> <span class="s1">&#39;END&#39;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="c1"># there was already an end log, so warn and don&#39;t do anything:</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An &#39;END&#39;   log with session id &quot;</span>
+                                <span class="sa">f</span><span class="s2">&quot;</span><span class="se">\&quot;</span><span class="si">{</span><span class="n">session_id</span><span class="si">}</span><span class="se">\&quot;</span><span class="s2"> was found in the the DB, &quot;</span>
+                                <span class="sa">f</span><span class="s2">&quot;so a new one will not be inserted for this &quot;</span>
+                                <span class="sa">f</span><span class="s2">&quot;event&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">end_log</span> <span class="o">=</span> <span class="n">SessionLog</span><span class="p">(</span>
+                    <span class="n">session_identifier</span><span class="o">=</span><span class="n">session_id</span><span class="p">,</span>
+                    <span class="n">instrument</span><span class="o">=</span><span class="n">instr</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="c1"># make sure to coerce format to ISO before putting in DB</span>
+                    <span class="n">timestamp</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">])</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+                    <span class="n">event_type</span><span class="o">=</span><span class="s1">&#39;END&#39;</span><span class="p">,</span>
+                    <span class="n">user</span><span class="o">=</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">][</span><span class="s1">&#39;username&#39;</span><span class="p">],</span>
+                    <span class="n">record_status</span><span class="o">=</span><span class="s1">&#39;TO_BE_BUILT&#39;</span>
+                <span class="p">)</span>
+                <span class="n">end_inserted</span> <span class="o">=</span> <span class="n">end_log</span><span class="o">.</span><span class="n">insert_log</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No usage event with id = </span><span class="si">{</span><span class="n">event_id</span><span class="si">}</span><span class="s2"> was found &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;for </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="NemoConnector.get_session_from_usage_event"><a class="viewcode-back" href="../../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.get_session_from_usage_event">[docs]</a>    <span class="k">def</span> <span class="nf">get_session_from_usage_event</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">event_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Session</span><span class="p">,</span>
+                                                                   <span class="kc">None</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get a :py:class:`~nexusLIMS.db.session_handler.Session`</span>
+<span class="sd">        representation of a usage event for use in dry runs of the record</span>
+<span class="sd">        builder</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        event_id</span>
+<span class="sd">            The NEMO id number for the event to insert</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        session : ~nexusLIMS.db.session_handler.Session</span>
+<span class="sd">            A representation of the usage_event from NEMO as a</span>
+<span class="sd">            :py:class:`~nexusLIMS.db.session_handler.Session` object</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">event</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_usage_events</span><span class="p">(</span><span class="n">event_id</span><span class="o">=</span><span class="n">event_id</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">event</span><span class="p">:</span>
+            <span class="n">event</span> <span class="o">=</span> <span class="n">event</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># we cannot reliably test an unended event, so exlcude from coverage</span>
+            <span class="k">if</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">event</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span> <span class="c1"># pragma: no cover</span>
+                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Usage event with id = </span><span class="si">{</span><span class="n">event_id</span><span class="si">}</span><span class="s2"> has not yet ended &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;for &#39;</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="kc">None</span>
+            <span class="n">instr</span> <span class="o">=</span> <span class="n">get_instr_from_api_url</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">tools/?id=&quot;</span>
+                                           <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;tool&#39;</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">session_id</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">usage_events/?id=</span><span class="si">{</span><span class="n">event_id</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="n">Session</span><span class="p">(</span>
+                <span class="n">session_identifier</span><span class="o">=</span><span class="n">session_id</span><span class="p">,</span>
+                <span class="n">instrument</span><span class="o">=</span><span class="n">instr</span><span class="p">,</span>
+                <span class="n">dt_from</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]),</span>
+                <span class="n">dt_to</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">]),</span>
+                <span class="n">user</span><span class="o">=</span><span class="n">event</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">][</span><span class="s1">&#39;username&#39;</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="n">session</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No usage event with id = </span><span class="si">{</span><span class="n">event_id</span><span class="si">}</span><span class="s2"> was found &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;for &#39;</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+<div class="viewcode-block" id="NemoConnector.get_known_tool_ids"><a class="viewcode-back" href="../../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.get_known_tool_ids">[docs]</a>    <span class="k">def</span> <span class="nf">get_known_tool_ids</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Inspect the ``api_url`` values of known Instruments (from </span>
+<span class="sd">        the ``instruments`` table in the DB), and extract their tool_id number</span>
+<span class="sd">        if it is from this NemoConnector</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tool_ids : List[int]</span>
+<span class="sd">            The list of tool ID numbers known to NexusLIMS for this harvester</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">tool_ids</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">instrument_db</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_url</span> <span class="ow">in</span> <span class="n">v</span><span class="o">.</span><span class="n">api_url</span><span class="p">:</span>
+                <span class="c1"># Instrument is associated with this connector</span>
+                <span class="n">parsed_url</span> <span class="o">=</span> <span class="n">urlparse</span><span class="p">(</span><span class="n">v</span><span class="o">.</span><span class="n">api_url</span><span class="p">)</span>
+                <span class="c1"># extract &#39;id&#39; query parameter from url</span>
+                <span class="n">tool_id</span> <span class="o">=</span> <span class="n">parse_qs</span><span class="p">(</span><span class="n">parsed_url</span><span class="o">.</span><span class="n">query</span><span class="p">)[</span><span class="s1">&#39;id&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">tool_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">tool_id</span><span class="p">))</span>
+
+        <span class="k">return</span> <span class="n">tool_ids</span></div>
+
+    <span class="k">def</span> <span class="nf">_get_users_helper</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">p</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Takes care of calling the users API with certain parameters</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        p</span>
+<span class="sd">            A dictionary of query parameters for the API query</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        users</span>
+<span class="sd">            A list (could be empty) of users that match the ids and/or</span>
+<span class="sd">            usernames given</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">users</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_api_caller</span><span class="p">(</span><span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">,</span> <span class="s1">&#39;users/&#39;</span><span class="p">,</span> <span class="n">p</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">u</span> <span class="ow">in</span> <span class="n">users</span><span class="p">:</span>
+            <span class="c1"># cache the users response by ID and username</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">users</span><span class="p">[</span><span class="n">u</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">u</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">users_by_username</span><span class="p">[</span><span class="n">u</span><span class="p">[</span><span class="s2">&quot;username&quot;</span><span class="p">]]</span> <span class="o">=</span> <span class="n">u</span>
+
+        <span class="k">return</span> <span class="n">users</span>
+
+    <span class="k">def</span> <span class="nf">_api_caller</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                    <span class="n">fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
+                    <span class="n">endpoint</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                    <span class="n">p</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Helper function to deduplicate actual calls to the API. Takes care of</span>
+<span class="sd">        building the full URL from the base URL and specific endpoint,</span>
+<span class="sd">        as well as authentication, passing of parameters, and parsing the</span>
+<span class="sd">        results.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        fn</span>
+<span class="sd">            The ``requests`` function (POST, GET, PATCH, etc.) to use for the</span>
+<span class="sd">            API request</span>
+<span class="sd">        endpoint</span>
+<span class="sd">            The API endpoint to use. Should be formatted with a trailing</span>
+<span class="sd">            slash and no leading slash. i.e. the endpoint for Projects data</span>
+<span class="sd">            should be supplied as ``&#39;projects/&#39;``</span>
+<span class="sd">        p</span>
+<span class="sd">            The URL parameters to pass along with the request. These are</span>
+<span class="sd">            generally filters for the API data such as ``id`` or a date range</span>
+<span class="sd">            or something similar.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        results</span>
+<span class="sd">            The API response, formatted as a list of dict objects</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_url</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">)</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;getting data from </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2"> with parameters </span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">r</span> <span class="o">=</span> <span class="n">nexus_req</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">fn</span><span class="p">,</span>
+                      <span class="n">token_auth</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">token</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="n">p</span><span class="p">)</span>
+        <span class="n">r</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">results</span></div>
+
+
+<span class="c1"># return enabled NEMO harvesters based on environment</span>
+<div class="viewcode-block" id="get_harvesters_enabled"><a class="viewcode-back" href="../../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.get_harvesters_enabled">[docs]</a><span class="k">def</span> <span class="nf">get_harvesters_enabled</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">NemoConnector</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check the environment for NEMO settings and return a list of connectors</span>
+<span class="sd">    based off the values found</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    harvesters_enabled : List[NemoConnector]</span>
+<span class="sd">        A list of NemoConnector objects representing the NEMO APIs enabled</span>
+<span class="sd">        via environment settings</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">harvesters_enabled_str</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> \
+        <span class="nb">list</span><span class="p">(</span><span class="nb">filter</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s1">&#39;NEMO_address&#39;</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span>
+    <span class="n">harvesters_enabled</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">NemoConnector</span><span class="p">(</span><span class="n">base_url</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">addr</span><span class="p">),</span>
+                      <span class="n">token</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">addr</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="s1">&#39;token&#39;</span><span class="p">)),</span>
+                      <span class="n">strftime_fmt</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">addr</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span>
+                                                          <span class="s1">&#39;strftime_fmt&#39;</span><span class="p">)),</span>
+                      <span class="n">strptime_fmt</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">addr</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span>
+                                                          <span class="s1">&#39;strptime_fmt&#39;</span><span class="p">)),</span>
+                      <span class="n">timezone</span><span class="o">=</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="n">addr</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;address&#39;</span><span class="p">,</span> <span class="s1">&#39;tz&#39;</span><span class="p">)))</span>
+        <span class="k">for</span> <span class="n">addr</span> <span class="ow">in</span> <span class="n">harvesters_enabled_str</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">harvesters_enabled</span></div>
+
+
+<div class="viewcode-block" id="add_all_usage_events_to_db"><a class="viewcode-back" href="../../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.add_all_usage_events_to_db">[docs]</a><span class="k">def</span> <span class="nf">add_all_usage_events_to_db</span><span class="p">(</span><span class="n">user</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                               <span class="n">dt_from</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                               <span class="n">dt_to</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                               <span class="n">tool_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loop through enabled NEMO connectors and add each one&#39;s usage events to</span>
+<span class="sd">    the NexusLIMS ``session_log`` database table (if required).</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    user</span>
+<span class="sd">        The user(s) for which to add usage events. If ``None``, events will</span>
+<span class="sd">        not be filtered by user at all</span>
+<span class="sd">    dt_from</span>
+<span class="sd">        The point in time after which usage events will be added. If ``None``,</span>
+<span class="sd">        no date filtering will be performed</span>
+<span class="sd">    dt_to</span>
+<span class="sd">        The point in time before which usage events will be added. If</span>
+<span class="sd">        ``None``, no date filtering will be performed</span>
+<span class="sd">    tool_id</span>
+<span class="sd">        The tools(s) for which to add usage events. If ``&#39;None&#39;`` (default), </span>
+<span class="sd">        the tool IDs for each instrument in the NexusLIMS DB will be extracted </span>
+<span class="sd">        and used to limit the API response</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">get_harvesters_enabled</span><span class="p">():</span>
+        <span class="n">events</span> <span class="o">=</span> <span class="n">n</span><span class="o">.</span><span class="n">get_usage_events</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">,</span> <span class="n">dt_from</span><span class="o">=</span><span class="n">dt_from</span><span class="p">,</span>
+                                    <span class="n">dt_to</span><span class="o">=</span><span class="n">dt_to</span><span class="p">,</span> <span class="n">tool_id</span><span class="o">=</span><span class="n">tool_id</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
+            <span class="n">n</span><span class="o">.</span><span class="n">write_usage_event_to_session_log</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span></div>
+
+
+<div class="viewcode-block" id="get_usage_events_as_sessions"><a class="viewcode-back" href="../../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.get_usage_events_as_sessions">[docs]</a><span class="k">def</span> <span class="nf">get_usage_events_as_sessions</span><span class="p">(</span><span class="n">user</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">dt_from</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">dt_to</span><span class="p">:</span> <span class="n">datetime</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                                 <span class="n">tool_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> \
+        <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Session</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Loop through enabled NEMO connectors and return each one&#39;s usage events to</span>
+<span class="sd">    as :py:class:`~nexusLIMS.db.session_handler.Session` objects without</span>
+<span class="sd">    writing logs to the ``session_log`` table. Mostly used for doing dry runs</span>
+<span class="sd">    of the record builder.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    user</span>
+<span class="sd">        The user(s) for which to fetch usage events. If ``None``, events will</span>
+<span class="sd">        not be filtered by user at all</span>
+<span class="sd">    dt_from</span>
+<span class="sd">        The point in time after which usage events will be fetched. If ``None``,</span>
+<span class="sd">        no date filtering will be performed</span>
+<span class="sd">    dt_to</span>
+<span class="sd">        The point in time before which usage events will be fetched. If</span>
+<span class="sd">        ``None``, no date filtering will be performed</span>
+<span class="sd">    tool_id</span>
+<span class="sd">        The tools(s) for which to fetch usage events. If ``None``, events will</span>
+<span class="sd">        only be filtered by tools known in the NexusLIMS DB for each connector </span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">sessions</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">get_harvesters_enabled</span><span class="p">():</span>
+        <span class="n">events</span> <span class="o">=</span> <span class="n">n</span><span class="o">.</span><span class="n">get_usage_events</span><span class="p">(</span><span class="n">user</span><span class="o">=</span><span class="n">user</span><span class="p">,</span> <span class="n">dt_from</span><span class="o">=</span><span class="n">dt_from</span><span class="p">,</span>
+                                    <span class="n">dt_to</span><span class="o">=</span><span class="n">dt_to</span><span class="p">,</span> <span class="n">tool_id</span><span class="o">=</span><span class="n">tool_id</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">events</span><span class="p">:</span>
+            <span class="n">this_session</span> <span class="o">=</span> <span class="n">n</span><span class="o">.</span><span class="n">get_session_from_usage_event</span><span class="p">(</span><span class="n">e</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">])</span>
+            <span class="c1"># this_session could be None, and if the instrument from the</span>
+            <span class="c1"># usage event is not in our DB, this_session.instrument could</span>
+            <span class="c1"># also be None. In each case, we should ignore that one</span>
+            <span class="k">if</span> <span class="n">this_session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">this_session</span><span class="o">.</span><span class="n">instrument</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">sessions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">this_session</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">sessions</span></div>
+
+
+<div class="viewcode-block" id="get_connector_for_session"><a class="viewcode-back" href="../../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.get_connector_for_session">[docs]</a><span class="k">def</span> <span class="nf">get_connector_for_session</span><span class="p">(</span><span class="n">session</span><span class="p">:</span> <span class="n">Session</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NemoConnector</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given a :py:class:`~nexusLIMS.db.session_handler.Session`, find the matching</span>
+<span class="sd">    :py:class:`~nexusLIMS.harvesters.nemo.NemoConnector` from the enabled</span>
+<span class="sd">    list of NEMO harvesters</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    session</span>
+<span class="sd">        The session for which a NemoConnector is needed</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    n : ~nexusLIMS.harvesters.nemo.NemoConnector</span>
+<span class="sd">        The connector object that allows for querying the NEMO API for the</span>
+<span class="sd">        instrument contained in ``session``</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    LookupError</span>
+<span class="sd">        Raised if a matching connector is not found</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">instr_base_url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">api_url</span><span class="p">,</span> <span class="s1">&#39;.&#39;</span><span class="p">)</span>
+
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">get_harvesters_enabled</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">n</span><span class="o">.</span><span class="n">base_url</span> <span class="ow">in</span> <span class="n">instr_base_url</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">n</span>
+
+    <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Did not find enabled NEMO harvester for &#39;</span>
+                      <span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&quot;. Perhaps check environment &#39;</span>
+                      <span class="sa">f</span><span class="s1">&#39;variables? The following harvesters are enabled: &#39;</span>
+                      <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">get_harvesters_enabled</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_connector_by_base_url"><a class="viewcode-back" href="../../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.get_connector_by_base_url">[docs]</a><span class="k">def</span> <span class="nf">get_connector_by_base_url</span><span class="p">(</span><span class="n">base_url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">NemoConnector</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get an enabled NemoConnector by inspecting the ``base_url``.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    base_url</span>
+<span class="sd">        A portion of the API url to search for</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    n : ~nexusLIMS.harvesters.nemo.NemoConnector</span>
+<span class="sd">        The enabled NemoConnector instance</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    LookupError</span>
+<span class="sd">        Raised if a matching connector is not found</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">n</span> <span class="ow">in</span> <span class="n">get_harvesters_enabled</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">base_url</span> <span class="ow">in</span> <span class="n">n</span><span class="o">.</span><span class="n">base_url</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">n</span>
+
+    <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Did not find enabled NEMO harvester with url &#39;</span>
+                      <span class="sa">f</span><span class="s1">&#39;containing &quot;</span><span class="si">{</span><span class="n">base_url</span><span class="si">}</span><span class="s1">&quot;. Perhaps check environment &#39;</span>
+                      <span class="sa">f</span><span class="s1">&#39;variables? The following harvesters are enabled: &#39;</span>
+                      <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">get_harvesters_enabled</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="res_event_from_session"><a class="viewcode-back" href="../../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.res_event_from_session">[docs]</a><span class="k">def</span> <span class="nf">res_event_from_session</span><span class="p">(</span><span class="n">session</span><span class="p">:</span> <span class="n">Session</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReservationEvent</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Create an internal :py:class:`~nexusLIMS.harvesters.ReservationEvent`</span>
+<span class="sd">    representation of a session by finding a matching reservation in the NEMO</span>
+<span class="sd">    system and parsing the data contained within into a ``ReservationEvent``</span>
+
+<span class="sd">    This method assumes a certain format for the &quot;reservation questions&quot;</span>
+<span class="sd">    associated with each reservation and parses that information into the resulting</span>
+<span class="sd">    ``ReservationEvent``. The most critical of these is the ``data_consent`` field.</span>
+<span class="sd">    If an affirmative response in this field is not found (because the user declined</span>
+<span class="sd">    consent or the reservation questions are missing), a record will not be built.</span>
+
+<span class="sd">    The following JSON object represents a minimal schema for a set of NEMO &quot;Reservation</span>
+<span class="sd">    Questions&quot; that will satisfy the expectations of this method. Please see the</span>
+<span class="sd">    NEMO documentation on this feature for more details.</span>
+
+<span class="sd">    .. highlight:: json</span>
+<span class="sd">    .. code-block:: json</span>
+
+<span class="sd">        [</span>
+<span class="sd">          {</span>
+<span class="sd">            &quot;type&quot;: &quot;textbox&quot;,</span>
+<span class="sd">            &quot;name&quot;: &quot;project_id&quot;,</span>
+<span class="sd">            &quot;title&quot;: &quot;Project ID&quot;,</span>
+<span class="sd">          },</span>
+<span class="sd">          {</span>
+<span class="sd">            &quot;type&quot;: &quot;textbox&quot;,</span>
+<span class="sd">            &quot;name&quot;: &quot;experiment_title&quot;,</span>
+<span class="sd">            &quot;title&quot;: &quot;Title of Experiment&quot;,</span>
+<span class="sd">          },</span>
+<span class="sd">          {</span>
+<span class="sd">            &quot;type&quot;: &quot;textarea&quot;,</span>
+<span class="sd">            &quot;name&quot;: &quot;experiment_purpose&quot;,</span>
+<span class="sd">            &quot;title&quot;: &quot;Experiment Purpose&quot;,</span>
+<span class="sd">          },</span>
+<span class="sd">          {</span>
+<span class="sd">            &quot;type&quot;: &quot;radio&quot;,</span>
+<span class="sd">            &quot;title&quot;: &quot;Agree to NexusLIMS curation&quot;,</span>
+<span class="sd">            &quot;choices&quot;: [&quot;Agree&quot;, &quot;Disagree&quot;],</span>
+<span class="sd">            &quot;name&quot;: &quot;data_consent&quot;,</span>
+<span class="sd">            &quot;default_choice&quot;: &quot;Agree&quot;</span>
+<span class="sd">          },</span>
+<span class="sd">          {</span>
+<span class="sd">            &quot;type&quot;: &quot;group&quot;,</span>
+<span class="sd">            &quot;title&quot;: &quot;Sample information&quot;,</span>
+<span class="sd">            &quot;name&quot;: &quot;sample_group&quot;,</span>
+<span class="sd">            &quot;questions&quot;: [</span>
+<span class="sd">              {</span>
+<span class="sd">                &quot;type&quot;: &quot;textbox&quot;,</span>
+<span class="sd">                &quot;name&quot;: &quot;sample_name&quot;,</span>
+<span class="sd">                &quot;title&quot;: &quot;Sample Name / PID&quot;,</span>
+<span class="sd">              },</span>
+<span class="sd">              {</span>
+<span class="sd">                &quot;type&quot;: &quot;radio&quot;,</span>
+<span class="sd">                &quot;title&quot;: &quot;Sample or PID?&quot;,</span>
+<span class="sd">                &quot;choices&quot;: [&quot;Sample Name&quot;, &quot;PID&quot;],</span>
+<span class="sd">                &quot;name&quot;: &quot;sample_or_pid&quot;,</span>
+<span class="sd">              },</span>
+<span class="sd">              {</span>
+<span class="sd">                &quot;type&quot;: &quot;textarea&quot;,</span>
+<span class="sd">                &quot;name&quot;: &quot;sample_details&quot;,</span>
+<span class="sd">                &quot;title&quot;: &quot;Sample Details&quot;,</span>
+<span class="sd">              }</span>
+<span class="sd">            ]</span>
+<span class="sd">          }</span>
+<span class="sd">        ]</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    session</span>
+<span class="sd">        The session for which to get a reservation event</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    res_event : ~nexusLIMS.harvesters.ReservationEvent</span>
+<span class="sd">        The matching reservation event</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># a session has instrument, dt_from, dt_to, and user</span>
+
+    <span class="c1"># we should fetch all reservations +/- two days, and then find the one</span>
+    <span class="c1"># with the maximal overlap with the session time range</span>
+    <span class="c1"># probably don&#39;t want to filter by user for now, since sometimes users</span>
+    <span class="c1"># will enable/reserve on behalf of others, etc.</span>
+
+    <span class="c1"># in order to get reservations, we need a NemoConnector</span>
+    <span class="n">c</span> <span class="o">=</span> <span class="n">get_connector_for_session</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
+
+    <span class="c1"># tool id can be extracted from instrument api_url query parameter</span>
+    <span class="n">tool_id</span> <span class="o">=</span> <span class="n">id_from_url</span><span class="p">(</span><span class="n">session</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">api_url</span><span class="p">)</span>
+
+    <span class="c1"># get reservation with maximum overlap (like sharepoint_calendar.fetch_xml)</span>
+    <span class="n">dt_f</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">dt_from</span> <span class="o">-</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">dt_t</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">dt_to</span> <span class="o">+</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+    <span class="n">reservations</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">get_reservations</span><span class="p">(</span>
+        <span class="n">tool_id</span><span class="o">=</span><span class="n">tool_id</span><span class="p">,</span>
+        <span class="n">dt_from</span><span class="o">=</span><span class="n">dt_f</span><span class="p">,</span>
+        <span class="n">dt_to</span><span class="o">=</span><span class="n">dt_t</span>
+    <span class="p">)</span>
+
+    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">reservations</span><span class="p">)</span><span class="si">}</span><span class="s2"> reservations between </span><span class="si">{</span><span class="n">dt_f</span><span class="si">}</span><span class="s2"> and &quot;</span>
+                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dt_t</span><span class="si">}</span><span class="s2"> with ids: &quot;</span>
+                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="p">[</span><span class="n">i</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">reservations</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">res</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">reservations</span><span class="p">):</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reservation </span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">reservations/?id&quot;</span>
+                      <span class="sa">f</span><span class="s2">&quot;=</span><span class="si">{</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> from </span><span class="si">{</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="n">starts</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">reservations</span><span class="p">]</span>
+    <span class="n">ends</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">r</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">])</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">reservations</span><span class="p">]</span>
+
+    <span class="n">overlaps</span> <span class="o">=</span> <span class="p">[</span><span class="n">_get_timespan_overlap</span><span class="p">((</span><span class="n">session</span><span class="o">.</span><span class="n">dt_from</span><span class="p">,</span> <span class="n">session</span><span class="o">.</span><span class="n">dt_to</span><span class="p">),</span>
+                                      <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span> <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">starts</span><span class="p">,</span> <span class="n">ends</span><span class="p">)]</span>
+
+    <span class="c1"># DONE:</span>
+    <span class="c1">#   need to handle if there are no matching sessions (i.e. reservations is</span>
+    <span class="c1">#   an empty list</span>
+    <span class="c1">#   also need to handle if there is no overlap at all with any reservation</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">reservations</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">or</span> <span class="nb">max</span><span class="p">(</span><span class="n">overlaps</span><span class="p">)</span> <span class="o">==</span> <span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">):</span>
+        <span class="c1"># there were no reservations that matched this usage event time range,</span>
+        <span class="c1"># or none of the reservations overlapped with the usage event</span>
+        <span class="c1"># so we&#39;ll use what limited information we have from the usage event</span>
+        <span class="c1"># session</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No reservations found with overlap for this usage &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;event, so raising NoDataConsentException&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">NoMatchingReservationException</span><span class="p">(</span>
+            <span class="s2">&quot;No reservation found matching this session, so assuming NexusLIMS &quot;</span>
+            <span class="s2">&quot;does not have user consent for data harvesting.&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">max_overlap</span> <span class="o">=</span> <span class="n">overlaps</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">overlaps</span><span class="p">))</span>
+        <span class="c1"># select the reservation with the most overlap</span>
+        <span class="n">res</span> <span class="o">=</span> <span class="n">reservations</span><span class="p">[</span><span class="n">max_overlap</span><span class="p">]</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Using reservation &quot;</span>
+                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">c</span><span class="o">.</span><span class="n">base_url</span><span class="si">}</span><span class="s2">reservations/?id=</span><span class="si">{</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> as match for &quot;</span>
+                     <span class="sa">f</span><span class="s2">&quot;usage event </span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">session_identifier</span><span class="si">}</span><span class="s2"> with overlap &quot;</span>
+                     <span class="sa">f</span><span class="s2">&quot;of </span><span class="si">{</span><span class="nb">max</span><span class="p">(</span><span class="n">overlaps</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># DONE: check for presence of sample_group in the reservation metadata</span>
+        <span class="c1">#  and change the harvester to process the sample group metadata by</span>
+        <span class="c1">#  providing lists to the ReservationEvent constructor</span>
+        <span class="n">sample_details</span><span class="p">,</span> <span class="n">sample_pid</span><span class="p">,</span> <span class="n">sample_name</span> <span class="o">=</span> \
+            <span class="n">_process_res_question_samples</span><span class="p">(</span><span class="n">res</span><span class="p">)</span>
+
+        <span class="c1"># DONE: respect user choice not to harvest data (data_consent)</span>
+        <span class="n">consent</span> <span class="o">=</span> <span class="s1">&#39;disagree&#39;</span>
+        <span class="n">consent</span> <span class="o">=</span> <span class="n">_get_res_question_value</span><span class="p">(</span><span class="s1">&#39;data_consent&#39;</span><span class="p">,</span> <span class="n">res</span><span class="p">)</span>
+        <span class="c1"># consent will be None here if it wasn&#39;t given (i.e. there was no</span>
+        <span class="c1"># data_consent field in the reservation questions)</span>
+        <span class="k">if</span> <span class="n">consent</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">NoDataConsentException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reservation </span><span class="si">{</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> &quot;</span>
+                                         <span class="sa">f</span><span class="s2">&quot;did not have data_consent defined, &quot;</span>
+                                         <span class="sa">f</span><span class="s2">&quot;so we should not harvest its data&quot;</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">consent</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;disagree&#39;</span><span class="p">,</span> <span class="s1">&#39;no&#39;</span><span class="p">,</span> <span class="s1">&#39;false&#39;</span><span class="p">,</span> <span class="s1">&#39;negative&#39;</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="n">NoDataConsentException</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reservation </span><span class="si">{</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> &quot;</span>
+                                         <span class="sa">f</span><span class="s2">&quot;requested not to have their &quot;</span>
+                                         <span class="sa">f</span><span class="s2">&quot;data harvested&quot;</span><span class="p">)</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="n">c</span><span class="o">.</span><span class="n">base_url</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">&#39;api/&#39;</span><span class="p">,</span>
+                                 <span class="sa">f</span><span class="s1">&#39;event_details/reservation/</span><span class="si">{</span><span class="n">res</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span><span class="si">}</span><span class="s1">/&#39;</span><span class="p">)</span>
+
+        <span class="c1"># Create ReservationEvent from NEMO reservation dict</span>
+        <span class="n">res_event</span> <span class="o">=</span> <span class="n">ReservationEvent</span><span class="p">(</span>
+            <span class="n">experiment_title</span><span class="o">=</span><span class="n">_get_res_question_value</span><span class="p">(</span><span class="s1">&#39;experiment_title&#39;</span><span class="p">,</span> <span class="n">res</span><span class="p">),</span>
+            <span class="n">instrument</span><span class="o">=</span><span class="n">session</span><span class="o">.</span><span class="n">instrument</span><span class="p">,</span>
+            <span class="n">last_updated</span><span class="o">=</span><span class="n">c</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;creation_time&#39;</span><span class="p">]),</span>
+            <span class="n">username</span><span class="o">=</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">][</span><span class="s1">&#39;username&#39;</span><span class="p">],</span>
+            <span class="n">user_full_name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">][</span><span class="s1">&#39;first_name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> &quot;</span>
+                           <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">][</span><span class="s1">&#39;last_name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> &quot;</span>
+                           <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;user&#39;</span><span class="p">][</span><span class="s1">&#39;username&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+            <span class="n">created_by</span><span class="o">=</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;creator&#39;</span><span class="p">][</span><span class="s1">&#39;username&#39;</span><span class="p">],</span>
+            <span class="n">created_by_full_name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;creator&#39;</span><span class="p">][</span><span class="s1">&#39;first_name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> &quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;creator&#39;</span><span class="p">][</span><span class="s1">&#39;last_name&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2"> &quot;</span>
+                                 <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;creator&#39;</span><span class="p">][</span><span class="s1">&#39;username&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+            <span class="n">start_time</span><span class="o">=</span><span class="n">c</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;start&#39;</span><span class="p">]),</span>
+            <span class="n">end_time</span><span class="o">=</span><span class="n">c</span><span class="o">.</span><span class="n">strptime</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;end&#39;</span><span class="p">]),</span>
+            <span class="n">reservation_type</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="c1"># reservation type is not collected in NEMO</span>
+            <span class="n">experiment_purpose</span><span class="o">=</span><span class="n">_get_res_question_value</span><span class="p">(</span><span class="s1">&#39;experiment_purpose&#39;</span><span class="p">,</span>
+                                                       <span class="n">res</span><span class="p">),</span>
+            <span class="n">sample_details</span><span class="o">=</span><span class="n">sample_details</span><span class="p">,</span> <span class="n">sample_pid</span><span class="o">=</span><span class="n">sample_pid</span><span class="p">,</span>
+            <span class="n">sample_name</span><span class="o">=</span><span class="n">sample_name</span><span class="p">,</span>
+            <span class="n">project_name</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">],</span>
+            <span class="n">project_id</span><span class="o">=</span><span class="p">[</span><span class="n">_get_res_question_value</span><span class="p">(</span><span class="s1">&#39;project_id&#39;</span><span class="p">,</span> <span class="n">res</span><span class="p">)],</span>
+            <span class="n">project_ref</span><span class="o">=</span><span class="p">[</span><span class="kc">None</span><span class="p">],</span>
+            <span class="n">internal_id</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">res</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">]),</span>
+            <span class="n">division</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">group</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+            <span class="n">url</span><span class="o">=</span><span class="n">url</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">res_event</span></div>
+
+
+<span class="k">def</span> <span class="nf">_process_res_question_samples</span><span class="p">(</span><span class="n">res_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> \
+    <span class="n">Tuple</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]],</span> <span class="kc">None</span><span class="p">],</span>
+          <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]],</span> <span class="kc">None</span><span class="p">],</span>
+          <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]],</span> <span class="kc">None</span><span class="p">]]:</span>
+    <span class="n">sample_details</span><span class="p">,</span> <span class="n">sample_pid</span><span class="p">,</span> <span class="n">sample_name</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[],</span> <span class="p">[]</span>
+    <span class="n">sample_group</span> <span class="o">=</span> <span class="n">_get_res_question_value</span><span class="p">(</span><span class="s1">&#39;sample_group&#39;</span><span class="p">,</span> <span class="n">res_dict</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">sample_group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># multiple samples form will have</span>
+        <span class="c1"># res_dict[&#39;question_data&#39;][&#39;sample_group&#39;][&#39;user_input&#39;] of form:</span>
+        <span class="c1">#</span>
+        <span class="c1"># {</span>
+        <span class="c1">#   &quot;0&quot;: {</span>
+        <span class="c1">#     &quot;sample_name&quot;: &quot;sample_pid_1&quot;,</span>
+        <span class="c1">#     &quot;sample_or_pid&quot;: &quot;PID&quot;,</span>
+        <span class="c1">#     &quot;sample_details&quot;: &quot;A sample with a PID and some more details&quot;</span>
+        <span class="c1">#   },</span>
+        <span class="c1">#   &quot;1&quot;: {</span>
+        <span class="c1">#     &quot;sample_name&quot;: &quot;sample name 1&quot;,</span>
+        <span class="c1">#     &quot;sample_or_pid&quot;: &quot;Sample Name&quot;,</span>
+        <span class="c1">#     &quot;sample_details&quot;: &quot;A sample with name and some additional detail&quot;</span>
+        <span class="c1">#   },</span>
+        <span class="c1">#   ...</span>
+        <span class="c1"># }</span>
+        <span class="c1"># each key &quot;0&quot;, &quot;1&quot;, &quot;2&quot;, etc. represents a single sample the user</span>
+        <span class="c1"># added via the &quot;Add&quot; button. There should always be at least one,</span>
+        <span class="c1"># since sample information is required</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">sample_group</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;sample_or_pid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;pid&quot;</span><span class="p">:</span>
+                <span class="n">sample_pid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;sample_name&#39;</span><span class="p">])</span>
+                <span class="n">sample_name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="n">v</span><span class="p">[</span><span class="s1">&#39;sample_or_pid&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="o">==</span> <span class="s1">&#39;sample name&#39;</span><span class="p">:</span>
+                <span class="n">sample_name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;sample_name&#39;</span><span class="p">])</span>
+                <span class="n">sample_pid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sample_name</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+                <span class="n">sample_pid</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;sample_details&#39;</span><span class="p">])</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="n">sample_details</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="s1">&#39;sample_details&#39;</span><span class="p">])</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">sample_details</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="c1"># non-multiple samples (old-style form) (this is deprecated,</span>
+        <span class="c1"># so doesn&#39;t need coverage since we don&#39;t have reservations in this</span>
+        <span class="c1"># style any longer)</span>
+        <span class="n">sample_details</span> <span class="o">=</span> <span class="p">[</span><span class="n">_get_res_question_value</span><span class="p">(</span><span class="s1">&#39;sample_details&#39;</span><span class="p">,</span> <span class="n">res_dict</span><span class="p">)]</span>
+        <span class="n">sample_pid</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span>
+        <span class="n">sample_name</span> <span class="o">=</span> <span class="p">[</span><span class="n">_get_res_question_value</span><span class="p">(</span><span class="s1">&#39;sample_name&#39;</span><span class="p">,</span> <span class="n">res_dict</span><span class="p">)]</span>
+    <span class="k">return</span> <span class="n">sample_details</span><span class="p">,</span> <span class="n">sample_pid</span><span class="p">,</span> <span class="n">sample_name</span>
+
+
+<span class="k">def</span> <span class="nf">_get_res_question_value</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">res_dict</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span>
+                                                                 <span class="kc">None</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="s1">&#39;question_data&#39;</span> <span class="ow">in</span> <span class="n">res_dict</span> <span class="ow">and</span> <span class="n">res_dict</span><span class="p">[</span><span class="s1">&#39;question_data&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">res_dict</span><span class="p">[</span><span class="s1">&#39;question_data&#39;</span><span class="p">]:</span>
+            <span class="k">return</span> <span class="n">res_dict</span><span class="p">[</span><span class="s1">&#39;question_data&#39;</span><span class="p">][</span><span class="n">value</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;user_input&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span>
+
+
+<div class="viewcode-block" id="id_from_url"><a class="viewcode-back" href="../../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.id_from_url">[docs]</a><span class="k">def</span> <span class="nf">id_from_url</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">int</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the value of the id query parameter stored in URL string. This is</span>
+<span class="sd">    used to extract the value as needed from API strings</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    url</span>
+<span class="sd">        The URL to parse, such as</span>
+<span class="sd">        ``https://nemo.url.com/api/usage_events/?id=9``</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    this_id : None or int</span>
+<span class="sd">        The id value if one is present, otherwise ``None``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">query</span> <span class="o">=</span> <span class="n">parse_qs</span><span class="p">(</span><span class="n">urlparse</span><span class="p">(</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">query</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s1">&#39;id&#39;</span> <span class="ow">in</span> <span class="n">query</span><span class="p">:</span>
+        <span class="n">this_id</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s1">&#39;id&#39;</span><span class="p">][</span><span class="mi">0</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">this_id</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+  
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, NIST Office of Data and Informatics.<br/>
+      Last updated on Jul, 15, 2022.<br/>
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

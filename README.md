@@ -1,7 +1,7 @@
 # NexusLIMS documentation
 
-This repository will eventually hold the publication of NexusLIMS.
-For the time being, it is serving a page on pages.nist.gov using
-the `nist-pages` branch.
+This repository will hold the public-facing version of NexusLIMS.
+It also serves a page on pages.nist.gov using the `nist-pages` branch.
 
-The public-facing site should be available at https://pages.nist.gov/NexusLIMS
+The documentation site should be available at https://pages.nist.gov/NexusLIMS,
+and the code should be available at https://github.com/usnistgov/NexusLIMS.

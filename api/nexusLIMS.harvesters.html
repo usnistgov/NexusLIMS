@@ -1,0 +1,1137 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>nexusLIMS.harvesters package &#8212; NexusLIMS 1.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../_static/custom-styles.css" />
+    <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+    <script src="../_static/jquery.js"></script>
+    <script src="../_static/underscore.js"></script>
+    <script src="../_static/doctools.js"></script>
+    <script src="../_static/custom.js"></script>
+    <link rel="shortcut icon" href="../_static/nexusLIMS_bare_logo.ico"/>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="nexusLIMS.schemas package" href="nexusLIMS.schemas.html" />
+    <link rel="prev" title="nexusLIMS.extractors package" href="nexusLIMS.extractors.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../index.html"><span><img src="../_static/logo_horizontal.png"></span>
+           </a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../api.html">API Docs</a></li>
+                <li><a href="https://github.com/usnistgov/NexusLIMS">Repository</a></li>
+                <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../index.html">Site Map <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../session_logger_app.html">Session logging (deprecated)</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="nexusLIMS.html">nexusLIMS package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.db.html">nexusLIMS.db package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">nexusLIMS.harvesters package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li>
+    <a href="nexusLIMS.extractors.html" title="Previous Chapter: nexusLIMS.extractors package"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Previous</span>
+    </a>
+  </li>
+  <li>
+    <a href="nexusLIMS.schemas.html" title="Next Chapter: nexusLIMS.schemas package"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Next &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><img src="../_static/nexusLIMS_bare_logo.png">
+<h4><a href="../index.html" title="Return to documentation home">
+    NexusLIMS Documentation</a></h4>
+<ul class="globaltoc">
+    <ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../session_logger_app.html">Session logging (deprecated)</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../api.html">API documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="nexusLIMS.html">nexusLIMS package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.db.html">nexusLIMS.db package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">nexusLIMS.harvesters package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+</ul><h4>
+    <a class="no-hover">Page content</a>
+</h4>
+
+<ul>
+<li><a class="reference internal" href="#">nexusLIMS.harvesters package</a><ul>
+<li><a class="reference internal" href="#submodules">Submodules</a></li>
+<li><a class="reference internal" href="#module-nexusLIMS.harvesters.nemo">nexusLIMS.harvesters.nemo module</a></li>
+<li><a class="reference internal" href="#module-nexusLIMS.harvesters.sharepoint_calendar">nexusLIMS.harvesters.sharepoint_calendar module</a></li>
+</ul>
+</li>
+</ul>
+
+<form action="../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+<div id="sourcelink">
+  <a href="../_sources/api/nexusLIMS.harvesters.rst.txt"
+     rel="nofollow">View page source</a>
+</div>
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <section id="module-nexusLIMS.harvesters">
+<span id="nexuslims-harvesters-package"></span><h1>nexusLIMS.harvesters package<a class="headerlink" href="#module-nexusLIMS.harvesters" title="Permalink to this headline">¶</a></h1>
+<p>This module contains a top-level class to represent calendar reservations and
+associated metadata harvest metadata from various calendar sources.
+The expectation is that submodules of this module will have a method named
+<code class="docutils literal notranslate"><span class="pre">res_event_from_session</span></code> implemented to handle fetching a ReservationEvent
+object from a <a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">nexusLIMS.db.session_handler.Session</span></code></a> object.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nexusLIMS.harvesters.</span></span><span class="sig-name descname"><span class="pre">ReservationEvent</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">experiment_title</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="nexusLIMS.html#nexusLIMS.instruments.Instrument" title="nexusLIMS.instruments.Instrument"><span class="pre">nexusLIMS.instruments.Instrument</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">last_updated</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><span class="pre">datetime.datetime</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user_full_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_by</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">created_by_full_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">start_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><span class="pre">datetime.datetime</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end_time</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><span class="pre">datetime.datetime</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">reservation_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">experiment_purpose</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_pid</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_name</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">project_ref</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">internal_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">division</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/harvesters.html#ReservationEvent"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.7/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A representation of a single calendar reservation, independent of the type
+of calendar the reservation was made with. <code class="docutils literal notranslate"><span class="pre">ReservationEvent</span></code>
+is a common interface that is used by the record building code.
+Any attribute can be None to indicate it was not present or no value was
+provided. The <a class="reference internal" href="#nexusLIMS.harvesters.ReservationEvent.as_xml" title="nexusLIMS.harvesters.ReservationEvent.as_xml"><code class="xref py py-meth docutils literal notranslate"><span class="pre">as_xml()</span></code></a> method is used to serialize the information
+contained within a <code class="docutils literal notranslate"><span class="pre">ReservationEvent</span></code> into an XML representation that is
+compatible with the Nexus Facility <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> schema.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent.experiment_title">
+<span class="sig-name descname"><span class="pre">experiment_title</span></span><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent.experiment_title" title="Permalink to this definition">¶</a></dt>
+<dd><p>The title of the event</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent.instrument">
+<span class="sig-name descname"><span class="pre">instrument</span></span><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent.instrument" title="Permalink to this definition">¶</a></dt>
+<dd><p>The instrument associated with this reservation</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent.last_updated">
+<span class="sig-name descname"><span class="pre">last_updated</span></span><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent.last_updated" title="Permalink to this definition">¶</a></dt>
+<dd><p>The time this event was last updated</p>
+<dl class="field-list simple">
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)">datetime.datetime</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent.username">
+<span class="sig-name descname"><span class="pre">username</span></span><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent.username" title="Permalink to this definition">¶</a></dt>
+<dd><p>The username of the user indicated in this event</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent.user_full_name">
+<span class="sig-name descname"><span class="pre">user_full_name</span></span><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent.user_full_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The full name of the user for this event</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent.created_by">
+<span class="sig-name descname"><span class="pre">created_by</span></span><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent.created_by" title="Permalink to this definition">¶</a></dt>
+<dd><p>The username of the user that created this event</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent.created_by_full_name">
+<span class="sig-name descname"><span class="pre">created_by_full_name</span></span><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent.created_by_full_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The full name of the user that created this event</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent.start_time">
+<span class="sig-name descname"><span class="pre">start_time</span></span><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent.start_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>The time this event was scheduled to start</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent.end_time">
+<span class="sig-name descname"><span class="pre">end_time</span></span><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent.end_time" title="Permalink to this definition">¶</a></dt>
+<dd><p>The time this event was scheduled to end</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent.reservation_type">
+<span class="sig-name descname"><span class="pre">reservation_type</span></span><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent.reservation_type" title="Permalink to this definition">¶</a></dt>
+<dd><p>The “type” or category of this event (such as User session, service,
+etc.))</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent.experiment_purpose">
+<span class="sig-name descname"><span class="pre">experiment_purpose</span></span><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent.experiment_purpose" title="Permalink to this definition">¶</a></dt>
+<dd><p>The user-entered purpose of this experiment</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent.sample_details">
+<span class="sig-name descname"><span class="pre">sample_details</span></span><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent.sample_details" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of the user-entered sample details for this experiment. The
+length of the list must match that given in <code class="docutils literal notranslate"><span class="pre">sample_pid</span></code> and
+<code class="docutils literal notranslate"><span class="pre">sample_name</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent.sample_pid">
+<span class="sig-name descname"><span class="pre">sample_pid</span></span><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent.sample_pid" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of sample PIDs provided by the user. The
+length of the list must match that given in <code class="docutils literal notranslate"><span class="pre">sample_details</span></code> and
+<code class="docutils literal notranslate"><span class="pre">sample_name</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent.sample_name">
+<span class="sig-name descname"><span class="pre">sample_name</span></span><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent.sample_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of user-friendly sample names (not a PID). The
+length of the list must match that given in <code class="docutils literal notranslate"><span class="pre">sample_details</span></code> and
+<code class="docutils literal notranslate"><span class="pre">sample_pid</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent.project_name">
+<span class="sig-name descname"><span class="pre">project_name</span></span><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent.project_name" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of the user-entered project names for this experiment. The
+length of the list must match that given in <code class="docutils literal notranslate"><span class="pre">project_id</span></code> and
+<code class="docutils literal notranslate"><span class="pre">project_ref</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent.project_id">
+<span class="sig-name descname"><span class="pre">project_id</span></span><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent.project_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of the specific project IDs within a research group/division. The
+length of the list must match that given in <code class="docutils literal notranslate"><span class="pre">project_name</span></code> and
+<code class="docutils literal notranslate"><span class="pre">project_ref</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent.project_ref">
+<span class="sig-name descname"><span class="pre">project_ref</span></span><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent.project_ref" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of (optional) links to this project in another database. The
+length of the list must match that given in <code class="docutils literal notranslate"><span class="pre">project_name</span></code> and
+<code class="docutils literal notranslate"><span class="pre">project_id</span></code>.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent.internal_id">
+<span class="sig-name descname"><span class="pre">internal_id</span></span><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent.internal_id" title="Permalink to this definition">¶</a></dt>
+<dd><p>The identifier assigned to this event (if any) by the calendaring system</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent.division">
+<span class="sig-name descname"><span class="pre">division</span></span><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent.division" title="Permalink to this definition">¶</a></dt>
+<dd><p>An identifier of the division this experiment was performed for (i.e.
+the user’s division)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent.group">
+<span class="sig-name descname"><span class="pre">group</span></span><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent.group" title="Permalink to this definition">¶</a></dt>
+<dd><p>An identifier of the group this experiment was performed for (i.e.
+the user’s group)</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent.url">
+<span class="sig-name descname"><span class="pre">url</span></span><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent.url" title="Permalink to this definition">¶</a></dt>
+<dd><p>A web-accessible link to a summary of this reservation</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.ReservationEvent.as_xml">
+<span class="sig-name descname"><span class="pre">as_xml</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://lxml.de/apidoc/lxml.etree.html#lxml.etree.Element" title="(in lxml v4.6.3)"><span class="pre">lxml.etree.Element</span></a></span></span><a class="reference internal" href="../_modules/nexusLIMS/harvesters.html#ReservationEvent.as_xml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.ReservationEvent.as_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an XML representation of this ReservationEvent</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>root</strong> – The reservation event serialized as XML that matches the
+Nexus Experiment schema</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference external" href="https://lxml.de/apidoc/lxml.etree.html#lxml.etree.Element" title="(in lxml v4.6.3)">lxml.etree.Element</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<section id="submodules">
+<h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="module-nexusLIMS.harvesters.nemo">
+<span id="nexuslims-harvesters-nemo-module"></span><h2>nexusLIMS.harvesters.nemo module<a class="headerlink" href="#module-nexusLIMS.harvesters.nemo" title="Permalink to this headline">¶</a></h2>
+<p>This module contains the functionality to harvest instruments, reservations,
+etc. from an instance of NEMO (<a class="reference external" href="https://github.com/usnistgov/NEMO/">https://github.com/usnistgov/NEMO/</a>), a
+calendering and laboratory logistics application.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.NemoConnector">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nexusLIMS.harvesters.nemo.</span></span><span class="sig-name descname"><span class="pre">NemoConnector</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">token</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">strftime_fmt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strptime_fmt</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timezone</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/nemo.html#NemoConnector"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.nemo.NemoConnector" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.7/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A connection to an instance of the API of the NEMO laboratory management
+software. Provides helper methods for fetching data from the API.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_url</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The “root” of the API including a trailing slash;
+e.g. ‘<a class="reference external" href="https://nemo.url.com/api/">https://nemo.url.com/api/</a>’</p></li>
+<li><p><strong>token</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – An authentication token for this NEMO instance</p></li>
+<li><p><strong>strftime_fmt</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The “date format” to use when encoding dates to send as filters to the
+NEMO API. Should follow the same convention as
+<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#strftime-strptime-behavior" title="(in Python v3.7)"><span>strftime() and strptime() Behavior</span></a>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, ISO 8601 format
+will be used.</p></li>
+<li><p><strong>strptime_fmt</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The “date format” to use when decoding date strings received in the
+response from the API. Should follow the same convention as
+<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#strftime-strptime-behavior" title="(in Python v3.7)"><span>strftime() and strptime() Behavior</span></a>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, ISO 8601 format
+will be used.</p></li>
+<li><p><strong>timezone</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The timezone to use when decoding date strings received in the
+response from the API. Should be a IANA time zone database string; e.g.
+“America/New_York”. Useful if no timezone information is returned
+from an instance of the NEMO API. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, no timezone setting will
+be done and the code will use whatever was returned from the server
+as is.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.NemoConnector.get_known_tool_ids">
+<span class="sig-name descname"><span class="pre">get_known_tool_ids</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/nemo.html#NemoConnector.get_known_tool_ids"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.nemo.NemoConnector.get_known_tool_ids" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inspect the <code class="docutils literal notranslate"><span class="pre">api_url</span></code> values of known Instruments (from
+the <code class="docutils literal notranslate"><span class="pre">instruments</span></code> table in the DB), and extract their tool_id number
+if it is from this NemoConnector</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>tool_ids</strong> – The list of tool ID numbers known to NexusLIMS for this harvester</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>List[<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)">int</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.NemoConnector.get_projects">
+<span class="sig-name descname"><span class="pre">get_projects</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proj_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Union" title="(in Python v3.7)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Dict" title="(in Python v3.7)"><span class="pre">Dict</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/nemo.html#NemoConnector.get_projects"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.nemo.NemoConnector.get_projects" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a list of one or more projects from the NEMO API in a dictionary
+representation. The local cache will be checked prior to fetching
+from the API to save a network request if possible.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>proj_id</strong> – The project(s) to fetch, as indexed by the NEMO instance (i.e.
+<code class="docutils literal notranslate"><span class="pre">proj_id</span></code> should be the internal primary key used by NEMO to
+identify the project. If an empty list is given, all projects
+will be returned.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>projects</strong> – A list (could be empty) of projects that match the id (or ids) given
+in <code class="docutils literal notranslate"><span class="pre">proj_id</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List[Dict]</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://requests.readthedocs.io/en/latest/api/#requests.HTTPError" title="(in Requests v2.28.1)"><strong>requests.exceptions.HTTPError</strong></a> – Raised if the request to the API did not go through correctly</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.NemoConnector.get_reservations">
+<span class="sig-name descname"><span class="pre">get_reservations</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dt_from</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><span class="pre">datetime.datetime</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><span class="pre">datetime.datetime</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Union" title="(in Python v3.7)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">cancelled</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Union" title="(in Python v3.7)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/constants.html#None" title="(in Python v3.7)"><span class="pre">None</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><span class="pre">bool</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Dict" title="(in Python v3.7)"><span class="pre">Dict</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/nemo.html#NemoConnector.get_reservations"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.nemo.NemoConnector.get_reservations" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of reservations from the API, filtered by date
+(inclusive). If only one argument is provided, the API will return all
+reservations either before or after the parameter. With no arguments,
+the method will return all reservations. The method will
+“auto-expand” linked information such as user, project, tool, etc. so
+results will have a full dictionary for each of those fields, rather
+than just the index (as returned from the API).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>dt_from</strong> – The “starting point” of the time range; only reservations at or
+after this point in time will be returned</p></li>
+<li><p><strong>dt_to</strong> – The “ending point” of the time range; only reservations at
+or prior to this point in time will be returned</p></li>
+<li><p><strong>tool_id</strong> – A tool identifier (or list of them) to limit the scope of the
+reservation search (this should be the NEMO internal integer ID)</p></li>
+<li><p><strong>cancelled</strong> – Whether to get canceled or active reservations in the response
+(default is False – meaning non-cancelled active reservations
+are returned by default). Set to None to include all reservations
+regardless of whether they are cancelled or active.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>reservations</strong> – A list (could be empty) of reservations that match the date range
+supplied</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List[Dict]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.NemoConnector.get_session_from_usage_event">
+<span class="sig-name descname"><span class="pre">get_session_from_usage_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><span class="pre">nexusLIMS.db.session_handler.Session</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/nemo.html#NemoConnector.get_session_from_usage_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.nemo.NemoConnector.get_session_from_usage_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a <a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>
+representation of a usage event for use in dry runs of the record
+builder</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>event_id</strong> – The NEMO id number for the event to insert</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>session</strong> – A representation of the usage_event from NEMO as a
+<a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><em>Session</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.NemoConnector.get_tools">
+<span class="sig-name descname"><span class="pre">get_tools</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tool_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Union" title="(in Python v3.7)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Dict" title="(in Python v3.7)"><span class="pre">Dict</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/nemo.html#NemoConnector.get_tools"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.nemo.NemoConnector.get_tools" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a list of one or more tools from the NEMO API in a dictionary
+representation</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>tool_id</strong> – The tool(s) to fetch, as indexed by the NEMO instance (i.e.
+<code class="docutils literal notranslate"><span class="pre">tool_id</span></code> should be the internal primary key used by NEMO to
+identify the tool. If an empty list is given, all tools will be
+returned.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>tools</strong> – A list (could be empty) of tools that match the id (or ids) given
+in <code class="docutils literal notranslate"><span class="pre">tool_id</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List[Dict]</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://requests.readthedocs.io/en/latest/api/#requests.HTTPError" title="(in Requests v2.28.1)"><strong>requests.exceptions.HTTPError</strong></a> – Raised if the request to the API did not go through correctly</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.NemoConnector.get_usage_events">
+<span class="sig-name descname"><span class="pre">get_usage_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Union" title="(in Python v3.7)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Union" title="(in Python v3.7)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_from</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><span class="pre">datetime.datetime</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><span class="pre">datetime.datetime</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Union" title="(in Python v3.7)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a></span></span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/nemo.html#NemoConnector.get_usage_events"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.nemo.NemoConnector.get_usage_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a list of usage events from the API, filtered by date
+(inclusive). If only one argument is provided, the API will return all
+reservations either before or after the parameter. With no arguments,
+the method will return all reservations. The method will
+“auto-expand” linked information such as user, project, tool, etc. so
+results will have a full dictionary for each of those fields, rather
+than just the index (as returned from the API).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>event_id</strong> – The NEMO integer identifier (or a list of them) to fetch. If
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, the returned usage events will not be filtered by ID
+number</p></li>
+<li><p><strong>user</strong> – The user for which to fetch usage events, as either an integer
+representing their id in the NEMO instance, or as a string
+containing their username.  If <code class="docutils literal notranslate"><span class="pre">None</span></code> is given, usage events
+from all users will be returned.</p></li>
+<li><p><strong>dt_from</strong> – The “starting point” of the time range; only usage events
+starting at or after this point in time will be returned</p></li>
+<li><p><strong>dt_to</strong> – The “ending point” of the time range; only usage events ending at
+or prior to this point in time will be returned</p></li>
+<li><p><strong>tool_id</strong> – A tool identifier (or list of them) to limit the scope of the
+usage event search (this should be the NEMO internal integer ID).
+Regardless of what value is given, this method will always limit
+the API query to tools specified in the NexusLIMS DB for this
+harvester</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>usage_events</strong> – A list (could be empty) of usage events that match the filters
+supplied</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.NemoConnector.get_users">
+<span class="sig-name descname"><span class="pre">get_users</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Union" title="(in Python v3.7)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Dict" title="(in Python v3.7)"><span class="pre">Dict</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/nemo.html#NemoConnector.get_users"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.nemo.NemoConnector.get_users" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a list of one or more users from the NEMO API in a dictionary
+representation. The results will be cached in the NemoConnector
+instance to prevent multiple API queries if not necessary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>user_id</strong> – The user(s) to fetch, as indexed by the NEMO instance (i.e.
+<code class="docutils literal notranslate"><span class="pre">user_id</span></code> should be the internal primary key used by NEMO to
+identify the user. If an empty list or None is given, all users
+will be returned.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>users</strong> – A list (could be empty) of users that match the ids and/or
+usernames given</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>List[Dict]</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://requests.readthedocs.io/en/latest/api/#requests.HTTPError" title="(in Requests v2.28.1)"><strong>requests.exceptions.HTTPError</strong></a> – Raised if the request to the API did not go through correctly</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.NemoConnector.get_users_by_username">
+<span class="sig-name descname"><span class="pre">get_users_by_username</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">username</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a></span></span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/nemo.html#NemoConnector.get_users_by_username"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.nemo.NemoConnector.get_users_by_username" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a list of one or more users from the NEMO API in a dictionary
+representation. The results will be cached in the NemoConnector
+instance to prevent multiple API queries if not necessary</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>username</strong> (str or <a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">str</span></code></a>) – The user(s) to fetch, as indexed by their usernames in the NEMO
+instance. If an empty list or None is given, all users
+will be returned.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>users</strong> – A list (could be empty) of users that match the ids and/or
+usernames given</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)">list</a></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://requests.readthedocs.io/en/latest/api/#requests.HTTPError" title="(in Requests v2.28.1)"><strong>requests.exceptions.HTTPError</strong></a> – Raised if the request to the API did not go through correctly</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.NemoConnector.projects">
+<span class="sig-name descname"><span class="pre">projects</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#nexusLIMS.harvesters.nemo.NemoConnector.projects" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.NemoConnector.strftime">
+<span class="sig-name descname"><span class="pre">strftime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date_dt</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/nemo.html#NemoConnector.strftime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.nemo.NemoConnector.strftime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Using the settings for this NemoConnector, convert a datetime object
+to a string that will be understood by the API. If the <code class="docutils literal notranslate"><span class="pre">strftime_fmt</span></code>
+attribute for this NemoConnector is <code class="docutils literal notranslate"><span class="pre">None</span></code>, ISO 8601 format will be
+used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>date_dt</strong> – The date to be converted as a datetime object</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>date_str</strong> – The date formatted as a string that will be understandable by the
+API for this NemoConnector</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.NemoConnector.strptime">
+<span class="sig-name descname"><span class="pre">strptime</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">date_str</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><span class="pre">datetime.datetime</span></a></span></span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/nemo.html#NemoConnector.strptime"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.nemo.NemoConnector.strptime" title="Permalink to this definition">¶</a></dt>
+<dd><p>Using the settings for this NemoConnector, convert a datetime string
+representation from the API into a datetime object that can be used
+in Python. If the <code class="docutils literal notranslate"><span class="pre">strptime_fmt</span></code> attribute for this NemoConnector
+is <code class="docutils literal notranslate"><span class="pre">None</span></code>, ISO 8601 format will be assumed. If a timezone is
+specified for this server, the resulting datetime will be coerced to
+that timezone.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>date_str</strong> – The date formatted as a string that is returned by the
+API for this NemoConnector</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>date_dt</strong> – The date to be converted as a datetime object</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><em>datetime</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.NemoConnector.tools">
+<span class="sig-name descname"><span class="pre">tools</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#nexusLIMS.harvesters.nemo.NemoConnector.tools" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.NemoConnector.users">
+<span class="sig-name descname"><span class="pre">users</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#nexusLIMS.harvesters.nemo.NemoConnector.users" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.NemoConnector.users_by_username">
+<span class="sig-name descname"><span class="pre">users_by_username</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#nexusLIMS.harvesters.nemo.NemoConnector.users_by_username" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.NemoConnector.write_usage_event_to_session_log">
+<span class="sig-name descname"><span class="pre">write_usage_event_to_session_log</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">event_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.7/library/constants.html#None" title="(in Python v3.7)"><span class="pre">None</span></a></span></span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/nemo.html#NemoConnector.write_usage_event_to_session_log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.nemo.NemoConnector.write_usage_event_to_session_log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Inserts two rows (if needed) into the <code class="docutils literal notranslate"><span class="pre">session_log</span></code> (marking the start
+and end of a usage event), only for instruments recognized by
+NexusLIMS (i.e. that have a row in the <code class="docutils literal notranslate"><span class="pre">instruments</span></code> table of the DB).
+If the usage event has not ended yet, no action is performed</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>event_id</strong> – The NEMO id number for the event to insert</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.NoDataConsentException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nexusLIMS.harvesters.nemo.</span></span><span class="sig-name descname"><span class="pre">NoDataConsentException</span></span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/nemo.html#NoDataConsentException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.nemo.NoDataConsentException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.7/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Exception to raise if a user has not given their consent to have data
+harvested</p>
+</dd></dl>
+
+<dl class="py exception">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.NoMatchingReservationException">
+<em class="property"><span class="pre">exception</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nexusLIMS.harvesters.nemo.</span></span><span class="sig-name descname"><span class="pre">NoMatchingReservationException</span></span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/nemo.html#NoMatchingReservationException"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.nemo.NoMatchingReservationException" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.7/library/exceptions.html#Exception" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></a></p>
+<p>Exception to raise if there was no matching reservation (so we cannot assume
+to have consent to harvest their data)</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.add_all_usage_events_to_db">
+<span class="sig-prename descclassname"><span class="pre">nexusLIMS.harvesters.nemo.</span></span><span class="sig-name descname"><span class="pre">add_all_usage_events_to_db</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Union" title="(in Python v3.7)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_from</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><span class="pre">datetime.datetime</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><span class="pre">datetime.datetime</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Union" title="(in Python v3.7)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/nemo.html#add_all_usage_events_to_db"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.nemo.add_all_usage_events_to_db" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loop through enabled NEMO connectors and add each one’s usage events to
+the NexusLIMS <code class="docutils literal notranslate"><span class="pre">session_log</span></code> database table (if required).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user</strong> – The user(s) for which to add usage events. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, events will
+not be filtered by user at all</p></li>
+<li><p><strong>dt_from</strong> – The point in time after which usage events will be added. If <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+no date filtering will be performed</p></li>
+<li><p><strong>dt_to</strong> – The point in time before which usage events will be added. If
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, no date filtering will be performed</p></li>
+<li><p><strong>tool_id</strong> – The tools(s) for which to add usage events. If <code class="docutils literal notranslate"><span class="pre">'None'</span></code> (default),
+the tool IDs for each instrument in the NexusLIMS DB will be extracted
+and used to limit the API response</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.get_connector_by_base_url">
+<span class="sig-prename descclassname"><span class="pre">nexusLIMS.harvesters.nemo.</span></span><span class="sig-name descname"><span class="pre">get_connector_by_base_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">base_url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#nexusLIMS.harvesters.nemo.NemoConnector" title="nexusLIMS.harvesters.nemo.NemoConnector"><span class="pre">nexusLIMS.harvesters.nemo.NemoConnector</span></a></span></span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/nemo.html#get_connector_by_base_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.nemo.get_connector_by_base_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get an enabled NemoConnector by inspecting the <code class="docutils literal notranslate"><span class="pre">base_url</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>base_url</strong> – A portion of the API url to search for</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>n</strong> – The enabled NemoConnector instance</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#nexusLIMS.harvesters.nemo.NemoConnector" title="nexusLIMS.harvesters.nemo.NemoConnector"><em>NemoConnector</em></a></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.7/library/exceptions.html#LookupError" title="(in Python v3.7)"><strong>LookupError</strong></a> – Raised if a matching connector is not found</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.get_connector_for_session">
+<span class="sig-prename descclassname"><span class="pre">nexusLIMS.harvesters.nemo.</span></span><span class="sig-name descname"><span class="pre">get_connector_for_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><span class="pre">nexusLIMS.db.session_handler.Session</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#nexusLIMS.harvesters.nemo.NemoConnector" title="nexusLIMS.harvesters.nemo.NemoConnector"><span class="pre">nexusLIMS.harvesters.nemo.NemoConnector</span></a></span></span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/nemo.html#get_connector_for_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.nemo.get_connector_for_session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Given a <a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>, find the matching
+<a class="reference internal" href="#nexusLIMS.harvesters.nemo.NemoConnector" title="nexusLIMS.harvesters.nemo.NemoConnector"><code class="xref py py-class docutils literal notranslate"><span class="pre">NemoConnector</span></code></a> from the enabled
+list of NEMO harvesters</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>session</strong> – The session for which a NemoConnector is needed</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>n</strong> – The connector object that allows for querying the NEMO API for the
+instrument contained in <code class="docutils literal notranslate"><span class="pre">session</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#nexusLIMS.harvesters.nemo.NemoConnector" title="nexusLIMS.harvesters.nemo.NemoConnector"><em>NemoConnector</em></a></p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.7/library/exceptions.html#LookupError" title="(in Python v3.7)"><strong>LookupError</strong></a> – Raised if a matching connector is not found</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.get_harvesters_enabled">
+<span class="sig-prename descclassname"><span class="pre">nexusLIMS.harvesters.nemo.</span></span><span class="sig-name descname"><span class="pre">get_harvesters_enabled</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#nexusLIMS.harvesters.nemo.NemoConnector" title="nexusLIMS.harvesters.nemo.NemoConnector"><span class="pre">nexusLIMS.harvesters.nemo.NemoConnector</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/nemo.html#get_harvesters_enabled"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.nemo.get_harvesters_enabled" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check the environment for NEMO settings and return a list of connectors
+based off the values found</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>harvesters_enabled</strong> – A list of NemoConnector objects representing the NEMO APIs enabled
+via environment settings</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>List[<a class="reference internal" href="#nexusLIMS.harvesters.nemo.NemoConnector" title="nexusLIMS.harvesters.nemo.NemoConnector">NemoConnector</a>]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.get_usage_events_as_sessions">
+<span class="sig-prename descclassname"><span class="pre">nexusLIMS.harvesters.nemo.</span></span><span class="sig-name descname"><span class="pre">get_usage_events_as_sessions</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Union" title="(in Python v3.7)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_from</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><span class="pre">datetime.datetime</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><span class="pre">datetime.datetime</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tool_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Union" title="(in Python v3.7)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><span class="pre">nexusLIMS.db.session_handler.Session</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/nemo.html#get_usage_events_as_sessions"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.nemo.get_usage_events_as_sessions" title="Permalink to this definition">¶</a></dt>
+<dd><p>Loop through enabled NEMO connectors and return each one’s usage events to
+as <a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> objects without
+writing logs to the <code class="docutils literal notranslate"><span class="pre">session_log</span></code> table. Mostly used for doing dry runs
+of the record builder.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>user</strong> – The user(s) for which to fetch usage events. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, events will
+not be filtered by user at all</p></li>
+<li><p><strong>dt_from</strong> – The point in time after which usage events will be fetched. If <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+no date filtering will be performed</p></li>
+<li><p><strong>dt_to</strong> – The point in time before which usage events will be fetched. If
+<code class="docutils literal notranslate"><span class="pre">None</span></code>, no date filtering will be performed</p></li>
+<li><p><strong>tool_id</strong> – The tools(s) for which to fetch usage events. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, events will
+only be filtered by tools known in the NexusLIMS DB for each connector</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.id_from_url">
+<span class="sig-prename descclassname"><span class="pre">nexusLIMS.harvesters.nemo.</span></span><span class="sig-name descname"><span class="pre">id_from_url</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">url</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Union" title="(in Python v3.7)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/constants.html#None" title="(in Python v3.7)"><span class="pre">None</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><span class="pre">int</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/nemo.html#id_from_url"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.nemo.id_from_url" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the value of the id query parameter stored in URL string. This is
+used to extract the value as needed from API strings</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>url</strong> – The URL to parse, such as
+<code class="docutils literal notranslate"><span class="pre">https://nemo.url.com/api/usage_events/?id=9</span></code></p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>this_id</strong> – The id value if one is present, otherwise <code class="docutils literal notranslate"><span class="pre">None</span></code></p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>None or <a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)">int</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.nemo.res_event_from_session">
+<span class="sig-prename descclassname"><span class="pre">nexusLIMS.harvesters.nemo.</span></span><span class="sig-name descname"><span class="pre">res_event_from_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><span class="pre">nexusLIMS.db.session_handler.Session</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#nexusLIMS.harvesters.ReservationEvent" title="nexusLIMS.harvesters.ReservationEvent"><span class="pre">nexusLIMS.harvesters.ReservationEvent</span></a></span></span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/nemo.html#res_event_from_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.nemo.res_event_from_session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create an internal <a class="reference internal" href="#nexusLIMS.harvesters.ReservationEvent" title="nexusLIMS.harvesters.ReservationEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReservationEvent</span></code></a>
+representation of a session by finding a matching reservation in the NEMO
+system and parsing the data contained within into a <code class="docutils literal notranslate"><span class="pre">ReservationEvent</span></code></p>
+<p>This method assumes a certain format for the “reservation questions”
+associated with each reservation and parses that information into the resulting
+<code class="docutils literal notranslate"><span class="pre">ReservationEvent</span></code>. The most critical of these is the <code class="docutils literal notranslate"><span class="pre">data_consent</span></code> field.
+If an affirmative response in this field is not found (because the user declined
+consent or the reservation questions are missing), a record will not be built.</p>
+<p>The following JSON object represents a minimal schema for a set of NEMO “Reservation
+Questions” that will satisfy the expectations of this method. Please see the
+NEMO documentation on this feature for more details.</p>
+<div class="highlight-json notranslate"><div class="highlight"><pre><span></span><span class="p">[</span><span class="w"></span>
+<span class="w">  </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;textbox&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;project_id&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Project ID&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="p">},</span><span class="w"></span>
+<span class="w">  </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;textbox&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;experiment_title&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Title of Experiment&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="p">},</span><span class="w"></span>
+<span class="w">  </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;textarea&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;experiment_purpose&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Experiment Purpose&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">  </span><span class="p">},</span><span class="w"></span>
+<span class="w">  </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;radio&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Agree to NexusLIMS curation&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;choices&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Agree&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;Disagree&quot;</span><span class="p">],</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;data_consent&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;default_choice&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Agree&quot;</span><span class="w"></span>
+<span class="w">  </span><span class="p">},</span><span class="w"></span>
+<span class="w">  </span><span class="p">{</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;group&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Sample information&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sample_group&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">    </span><span class="nt">&quot;questions&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w"></span>
+<span class="w">      </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;textbox&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sample_name&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Sample Name / PID&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="p">},</span><span class="w"></span>
+<span class="w">      </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;radio&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Sample or PID?&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;choices&quot;</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">&quot;Sample Name&quot;</span><span class="p">,</span><span class="w"> </span><span class="s2">&quot;PID&quot;</span><span class="p">],</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sample_or_pid&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="p">},</span><span class="w"></span>
+<span class="w">      </span><span class="p">{</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;type&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;textarea&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;name&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;sample_details&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">        </span><span class="nt">&quot;title&quot;</span><span class="p">:</span><span class="w"> </span><span class="s2">&quot;Sample Details&quot;</span><span class="p">,</span><span class="w"></span>
+<span class="w">      </span><span class="p">}</span><span class="w"></span>
+<span class="w">    </span><span class="p">]</span><span class="w"></span>
+<span class="w">  </span><span class="p">}</span><span class="w"></span>
+<span class="p">]</span><span class="w"></span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>session</strong> – The session for which to get a reservation event</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>res_event</strong> – The matching reservation event</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#nexusLIMS.harvesters.ReservationEvent" title="nexusLIMS.harvesters.ReservationEvent"><em>ReservationEvent</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+<section id="module-nexusLIMS.harvesters.sharepoint_calendar">
+<span id="nexuslims-harvesters-sharepoint-calendar-module"></span><h2>nexusLIMS.harvesters.sharepoint_calendar module<a class="headerlink" href="#module-nexusLIMS.harvesters.sharepoint_calendar" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.sharepoint_calendar.dump_calendars">
+<span class="sig-prename descclassname"><span class="pre">nexusLIMS.harvesters.sharepoint_calendar.</span></span><span class="sig-name descname"><span class="pre">dump_calendars</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instrument</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_from</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">division</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cal_events.xml'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/sharepoint_calendar.html#dump_calendars"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.sharepoint_calendar.dump_calendars" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the results of <a class="reference internal" href="#nexusLIMS.harvesters.sharepoint_calendar.get_events" title="nexusLIMS.harvesters.sharepoint_calendar.get_events"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_events()</span></code></a> to a file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>instrument</strong> (<a class="reference internal" href="nexusLIMS.html#nexusLIMS.instruments.Instrument" title="nexusLIMS.instruments.Instrument"><code class="xref py py-class docutils literal notranslate"><span class="pre">Instrument</span></code></a> or str) – One of the NexusLIMS instruments contained in the
+<a class="reference internal" href="nexusLIMS.html#nexusLIMS.instruments.instrument_db" title="nexusLIMS.instruments.instrument_db"><code class="xref py py-attr docutils literal notranslate"><span class="pre">instrument_db</span></code></a> database.
+Controls what instrument calendar is used to get events. If value is
+a string, it should be one of the instrument PIDs from the Nexus
+facility</p></li>
+<li><p><strong>dt_from</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> or None) – A <a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> object representing the start of a
+calendar event to search for, as in <a class="reference internal" href="#nexusLIMS.harvesters.sharepoint_calendar.fetch_xml" title="nexusLIMS.harvesters.sharepoint_calendar.fetch_xml"><code class="xref py py-func docutils literal notranslate"><span class="pre">fetch_xml()</span></code></a>.
+If <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> and <code class="docutils literal notranslate"><span class="pre">dt_to</span></code> are <cite>None</cite>, no date filtering will be done.
+If just <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> is <cite>None</cite>, all events from the beginning of the
+calendar record will be returned up until <code class="docutils literal notranslate"><span class="pre">dt_to</span></code>.</p></li>
+<li><p><strong>dt_to</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> or None) – A <a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> object representing the end of
+calendar event to search for, as in <a class="reference internal" href="#nexusLIMS.harvesters.sharepoint_calendar.fetch_xml" title="nexusLIMS.harvesters.sharepoint_calendar.fetch_xml"><code class="xref py py-func docutils literal notranslate"><span class="pre">fetch_xml()</span></code></a>.
+If <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> and <code class="docutils literal notranslate"><span class="pre">dt_to</span></code> are <cite>None</cite>, no date filtering will be done.
+If just <code class="docutils literal notranslate"><span class="pre">dt_to</span></code> is <cite>None</cite>, all events from the <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> to the
+present will be returned.</p></li>
+<li><p><strong>user</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Either None or a valid username (the short format: e.g. <code class="docutils literal notranslate"><span class="pre">&quot;ear1&quot;</span></code>
+instead of <a class="reference external" href="mailto:ernst&#46;august&#46;ruska&#37;&#52;&#48;nist&#46;gov">ernst<span>&#46;</span>august<span>&#46;</span>ruska<span>&#64;</span>nist<span>&#46;</span>gov</a>). If None, no user filtering
+will be performed. No verification of username is performed,
+so it is up to the user to make sure this is correct.</p></li>
+<li><p><strong>division</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The division number of the project. If provided, this string will be
+replicated under the “project” information in the outputted XML. If
+<code class="docutils literal notranslate"><span class="pre">None</span></code> (and <code class="docutils literal notranslate"><span class="pre">user</span></code> is provided), the division will be queried
+from the active directory server.</p></li>
+<li><p><strong>group</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The group number of the project. If provided, this string will be
+replicated under the “project” information in the outputted XML. If
+<code class="docutils literal notranslate"><span class="pre">None</span></code> (and <code class="docutils literal notranslate"><span class="pre">user</span></code> is provided), the group will be queried
+from the active directory server.</p></li>
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The filename to which the events should be written</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.sharepoint_calendar.fetch_xml">
+<span class="sig-prename descclassname"><span class="pre">nexusLIMS.harvesters.sharepoint_calendar.</span></span><span class="sig-name descname"><span class="pre">fetch_xml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instrument</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_from</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/sharepoint_calendar.html#fetch_xml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.sharepoint_calendar.fetch_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the XML responses from the Nexus Sharepoint calendar for one,
+multiple, or all instruments.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>instrument</strong> (<a class="reference internal" href="nexusLIMS.html#nexusLIMS.instruments.Instrument" title="nexusLIMS.instruments.Instrument"><code class="xref py py-class docutils literal notranslate"><span class="pre">Instrument</span></code></a>) – As defined in <a class="reference internal" href="#nexusLIMS.harvesters.sharepoint_calendar.get_events" title="nexusLIMS.harvesters.sharepoint_calendar.get_events"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_events()</span></code></a>,
+one of the NexusLIMS instruments contained in the
+<a class="reference internal" href="nexusLIMS.html#nexusLIMS.instruments.instrument_db" title="nexusLIMS.instruments.instrument_db"><code class="xref py py-attr docutils literal notranslate"><span class="pre">instrument_db</span></code></a> database.
+Controls what instrument calendar is used to get events</p></li>
+<li><p><strong>dt_from</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> or None) – A <a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> object representing the start of a
+calendar event to search for.
+If <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> and <code class="docutils literal notranslate"><span class="pre">dt_to</span></code> are <cite>None</cite>, no date filtering will be done.
+If just <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> is <cite>None</cite>, all events from the beginning of the
+calendar record will be returned up until <code class="docutils literal notranslate"><span class="pre">dt_to</span></code>.</p></li>
+<li><p><strong>dt_to</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> or None) – A <a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> object representing the end of
+calendar event to search for.
+If <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> and <code class="docutils literal notranslate"><span class="pre">dt_to</span></code> are <cite>None</cite>, no date filtering will be done.
+If just <code class="docutils literal notranslate"><span class="pre">dt_to</span></code> is <cite>None</cite>, all events from the <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> to the
+present will be returned.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>api_response</strong> – A string containing the XML calendar information for each
+instrument requested, stripped of the empty default namespace. If
+<code class="docutils literal notranslate"><span class="pre">dt_from</span></code> and <code class="docutils literal notranslate"><span class="pre">dt_to</span></code> are provided, it will contain just one
+<cite>“entry”</cite> representing a single event on the calendar</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>To find the right event, an API request to the Sharepoint Calendar will
+be made for all events starting on the same day as <code class="docutils literal notranslate"><span class="pre">dt_from</span></code>. This
+could result in multiple events being returned if there is more than one
+session scheduled on that microscope for that day. To find the right one,
+the timespan between each event’s <code class="docutils literal notranslate"><span class="pre">StartTime</span></code> and <code class="docutils literal notranslate"><span class="pre">EndTime</span></code> returned
+from the calendar will be compared with the timespan between <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> and
+<code class="docutils literal notranslate"><span class="pre">dt_to</span></code>. The event with the greatest overlap will be taken as the
+correct one. This approach should allow for some flexibility in terms of
+non-exact matching between the reserved timespans and those recorded by
+the session logger.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.sharepoint_calendar.get_events">
+<span class="sig-prename descclassname"><span class="pre">nexusLIMS.harvesters.sharepoint_calendar.</span></span><span class="sig-name descname"><span class="pre">get_events</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instrument</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_from</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_to</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">division</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">group</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/sharepoint_calendar.html#get_events"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.sharepoint_calendar.get_events" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get calendar events for a particular instrument on the Microscopy Nexus,
+on some date, or by some user</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>instrument</strong> (<a class="reference internal" href="nexusLIMS.html#nexusLIMS.instruments.Instrument" title="nexusLIMS.instruments.Instrument"><code class="xref py py-class docutils literal notranslate"><span class="pre">Instrument</span></code></a> or str) – One of the NexusLIMS instruments contained in the
+<a class="reference internal" href="nexusLIMS.html#nexusLIMS.instruments.instrument_db" title="nexusLIMS.instruments.instrument_db"><code class="xref py py-attr docutils literal notranslate"><span class="pre">instrument_db</span></code></a> database.
+Controls what instrument calendar is used to get events. If string,
+value should be one of the instrument PIDs from the Nexus facility.</p></li>
+<li><p><strong>dt_from</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> or None) – A <a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> object representing the start of a
+calendar event to search for, as in <a class="reference internal" href="#nexusLIMS.harvesters.sharepoint_calendar.fetch_xml" title="nexusLIMS.harvesters.sharepoint_calendar.fetch_xml"><code class="xref py py-func docutils literal notranslate"><span class="pre">fetch_xml()</span></code></a>.
+If <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> and <code class="docutils literal notranslate"><span class="pre">dt_to</span></code> are <cite>None</cite>, no date filtering will be done.
+If just <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> is <cite>None</cite>, all events from the beginning of the
+calendar record will be returned up until <code class="docutils literal notranslate"><span class="pre">dt_to</span></code>.</p></li>
+<li><p><strong>dt_to</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> or None) – A <a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> object representing the end of
+calendar event to search for, as in <a class="reference internal" href="#nexusLIMS.harvesters.sharepoint_calendar.fetch_xml" title="nexusLIMS.harvesters.sharepoint_calendar.fetch_xml"><code class="xref py py-func docutils literal notranslate"><span class="pre">fetch_xml()</span></code></a>.
+If <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> and <code class="docutils literal notranslate"><span class="pre">dt_to</span></code> are <cite>None</cite>, no date filtering will be done.
+If just <code class="docutils literal notranslate"><span class="pre">dt_to</span></code> is <cite>None</cite>, all events from the <code class="docutils literal notranslate"><span class="pre">dt_from</span></code> to the
+present will be returned.</p></li>
+<li><p><strong>user</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Either None or a valid username (the short format: e.g. <code class="docutils literal notranslate"><span class="pre">&quot;ear1&quot;</span></code>
+instead of <a class="reference external" href="mailto:ernst&#46;august&#46;ruska&#37;&#52;&#48;nist&#46;gov">ernst<span>&#46;</span>august<span>&#46;</span>ruska<span>&#64;</span>nist<span>&#46;</span>gov</a>). If None, no user filtering
+will be performed. No verification of username is performed,
+so it is up to the user to make sure this is correct.</p></li>
+<li><p><strong>division</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The division number of the project. If provided, this string will be
+replicated under the “project” information in the outputted XML. If
+<code class="docutils literal notranslate"><span class="pre">None</span></code> (and <code class="docutils literal notranslate"><span class="pre">user</span></code> is provided), the division will be queried
+from the active directory server.</p></li>
+<li><p><strong>group</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The group number of the project. If provided, this string will be
+replicated under the “project” information in the outputted XML. If
+<code class="docutils literal notranslate"><span class="pre">None</span></code> (and <code class="docutils literal notranslate"><span class="pre">user</span></code> is provided), the group will be queried
+from the active directory server.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><strong>res_event</strong> – A <code class="docutils literal notranslate"><span class="pre">ReservationEvent</span></code>, containing information about a
+single reservation, including title, instrument, user information,
+reservation purpose, sample details, description, and date/time
+information.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#nexusLIMS.harvesters.ReservationEvent" title="nexusLIMS.harvesters.ReservationEvent"><em>ReservationEvent</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.sharepoint_calendar.res_event_from_session">
+<span class="sig-prename descclassname"><span class="pre">nexusLIMS.harvesters.sharepoint_calendar.</span></span><span class="sig-name descname"><span class="pre">res_event_from_session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><span class="pre">nexusLIMS.db.session_handler.Session</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="#nexusLIMS.harvesters.ReservationEvent" title="nexusLIMS.harvesters.ReservationEvent"><span class="pre">nexusLIMS.harvesters.ReservationEvent</span></a></span></span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/sharepoint_calendar.html#res_event_from_session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.sharepoint_calendar.res_event_from_session" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="nexusLIMS.harvesters.sharepoint_calendar.res_event_from_xml">
+<span class="sig-prename descclassname"><span class="pre">nexusLIMS.harvesters.sharepoint_calendar.</span></span><span class="sig-name descname"><span class="pre">res_event_from_xml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xml</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">date</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/harvesters/sharepoint_calendar.html#res_event_from_xml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.harvesters.sharepoint_calendar.res_event_from_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Creates a ReservationEvent from an xml response from
+<a class="reference internal" href="#nexusLIMS.harvesters.sharepoint_calendar.fetch_xml" title="nexusLIMS.harvesters.sharepoint_calendar.fetch_xml"><code class="xref py py-func docutils literal notranslate"><span class="pre">fetch_xml()</span></code></a> rather than providing values directly. If there are
+multiple events in the XML, it will only process the first one</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>xml</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – Output of an API query to the Sharepoint calendar that contains a
+single event (which should be the case if start and end times were
+provided to <a class="reference internal" href="#nexusLIMS.harvesters.sharepoint_calendar.fetch_xml" title="nexusLIMS.harvesters.sharepoint_calendar.fetch_xml"><code class="xref py py-func docutils literal notranslate"><span class="pre">fetch_xml()</span></code></a>)</p></li>
+<li><p><strong>date</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><em>datetime.datetime</em></a>) – (Optional) a date to use in serializing the output in case there is
+no date information in the XML response (i.e. there were no
+reservations found for the date range searched)</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>Each attribute of the resulting <code class="docutils literal notranslate"><span class="pre">ReservationEvent</span></code> is mapped to a node
+in the XML API response, and will be <code class="docutils literal notranslate"><span class="pre">None</span></code> if the node cannot be found in
+the XML. Timestamps are given in either Zulu time (UTC) or with a
+local timestamp offset, so datetime attributes should be timezone-aware.</p>
+<p>Mapping of attributes:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">experiment_title</span></code> - present at
+<code class="docutils literal notranslate"><span class="pre">/feed/entry/content/m:properties/d:TitleOfExperiment</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">instrument</span></code> - fetched using the name of the calendar, present at
+<code class="docutils literal notranslate"><span class="pre">/feed/title</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">last_updated</span></code> - present at <code class="docutils literal notranslate"><span class="pre">/feed/entry/updated</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">username</span></code> - present at
+<code class="docutils literal notranslate"><span class="pre">/feed/entry/link[&#64;title=&quot;UserName&quot;]/m:inline/feed/entry/content/m:properties/d:UserName</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">created_by</span></code> - present at
+<code class="docutils literal notranslate"><span class="pre">/feed/entry/link[&#64;title=&quot;CreatedBy&quot;]/m:inline/feed/entry/content/m:properties/d:UserName</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">start_time</span></code> - <code class="docutils literal notranslate"><span class="pre">/feed/entry/content/m:properties/d:StartTime</span></code> (The API
+response returns this value without a timezone, in the timezone of the
+sharepoint server</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">end_time</span></code> - present at <code class="docutils literal notranslate"><span class="pre">/feed/entry/content/m:properties/d:EndTime</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">reservation_type</span></code> - /feed/entry/content/m:properties/d:CategoryValue</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">experiment_purpose</span></code> - present at
+<code class="docutils literal notranslate"><span class="pre">/feed/entry/content/m:properties/d:ExperimentPurpose</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_details</span></code> - present at
+<code class="docutils literal notranslate"><span class="pre">/feed/entry/content/m:properties/d:SampleDetails</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">sample_pid</span></code> - not collected by the SharePoint form at this time</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">project_id</span></code> - a non-persistent identifier string
+present at <code class="docutils literal notranslate"><span class="pre">/feed/entry/content/m:properties/d:ProjectID</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">internal_id</span></code> - present at <code class="docutils literal notranslate"><span class="pre">/feed/entry/content/m:properties/d:Id</span></code></p></li>
+</ul>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>res_event</strong> – An object representing an entry on the SharePoint calendar. Could
+be empty if no <code class="docutils literal notranslate"><span class="pre">entry</span></code> nodes are present in XML response</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#nexusLIMS.harvesters.ReservationEvent" title="nexusLIMS.harvesters.ReservationEvent"><em>ReservationEvent</em></a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+</section>
+
+
+    </div>
+      
+  </div>
+</div>
+  
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+<div id="sourcelink">
+  <a href="../_sources/api/nexusLIMS.harvesters.rst.txt"
+     rel="nofollow">View page source</a>
+</div>
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, NIST Office of Data and Informatics.<br/>
+      Last updated on Jul, 15, 2022.<br/>
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

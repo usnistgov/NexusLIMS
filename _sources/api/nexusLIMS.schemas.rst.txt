@@ -16,4 +16,3 @@ nexusLIMS.schemas.activity module
    :members:
    :undoc-members:
    :show-inheritance:
-

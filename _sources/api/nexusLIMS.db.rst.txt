@@ -9,14 +9,6 @@ nexusLIMS.db package
 Submodules
 ----------
 
-nexusLIMS.db.migrate\_db module
--------------------------------
-
-.. automodule:: nexusLIMS.db.migrate_db
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 nexusLIMS.db.session\_handler module
 ------------------------------------
 
@@ -24,4 +16,3 @@ nexusLIMS.db.session\_handler module
    :members:
    :undoc-members:
    :show-inheritance:
-

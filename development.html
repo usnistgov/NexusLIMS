@@ -2,21 +2,18 @@
 <!DOCTYPE html>
 
 <html>
-  <head><link rel="stylesheet" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css">
-    <script src="https://pages.nist.gov/nist-header-footer/js/jquery-1.9.0.min.js" type="text/javascript" defer="defer"></script>
-    <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js" type="text/javascript" defer="defer"></script>
-    
+  <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Developer documentation &#8212; NexusLIMS 0.0.9 documentation</title>
-    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>Developer documentation &#8212; NexusLIMS 1.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="_static/custom-styles.css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
     <script src="_static/custom.js"></script>
     <link rel="shortcut icon" href="_static/nexusLIMS_bare_logo.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
@@ -27,10 +24,10 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
-<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
-<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
 
   </head><body>
 
@@ -52,7 +49,7 @@
           <ul class="nav navbar-nav">
             
                 <li><a href="api.html">API Docs</a></li>
-                <li><a href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS">Repository</a></li>
+                <li><a href="https://github.com/usnistgov/NexusLIMS">Repository</a></li>
                 <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
             
             
@@ -66,20 +63,19 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Package introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_security.html">Data security in NexusLIMS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="database.html">NexusLIMS database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="session_logger_app.html">Session logging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="record_building.html">Record building workflow</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Developer documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="taxonomy.html">NexusLIMS taxonomy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schema_documentation.html">Schema documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session_logger_app.html">Session logging (deprecated)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/nexusLIMS.html">nexusLIMS package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.harvester.html">nexusLIMS.harvester package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
 </ul>
 </li>
@@ -131,14 +127,13 @@
 <ul class="globaltoc">
     <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Package introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_security.html">Data security in NexusLIMS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="database.html">NexusLIMS database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="session_logger_app.html">Session logging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="record_building.html">Record building workflow</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Developer documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="taxonomy.html">NexusLIMS taxonomy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schema_documentation.html">Schema documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session_logger_app.html">Session logging (deprecated)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
 </ul>
 
@@ -151,6 +146,7 @@
 <li><a class="reference internal" href="#installation">Installation</a></li>
 <li><a class="reference internal" href="#setting-up-the-environment">Setting up the environment</a></li>
 <li><a class="reference internal" href="#getting-into-the-environment">Getting into the environment</a></li>
+<li><a class="reference internal" href="#using-tox-for-testing">Using <code class="docutils literal notranslate"><span class="pre">tox</span></code> for testing</a></li>
 <li><a class="reference internal" href="#building-new-records">Building new records</a></li>
 <li><a class="reference internal" href="#using-other-features-of-the-library">Using other features of the library</a></li>
 <li><a class="reference internal" href="#contributing">Contributing</a></li>
@@ -173,35 +169,60 @@
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <div class="section" id="developer-documentation">
+  <section id="developer-documentation">
 <h1>Developer documentation<a class="headerlink" href="#developer-documentation" title="Permalink to this headline">¶</a></h1>
+<blockquote>
+<div><p><cite>Last updated: December 11, 2021</cite></p>
+</div></blockquote>
 <p>If you are interested in learning about how the NexusLIMS back-end works or
 adding new features, these instructions should get you up and running with a
 development environment that will allow you to modify how the code operates.</p>
-<div class="section" id="installation">
+<p>Currently, running the NexusLIMS record building back-end code is only
+supported and tested on Linux. It may run on MacOS or other UNIX environments,
+but is known for sure not to work on Windows due to some specific
+implementation choices.</p>
+<section id="installation">
 <h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
-<p>NexusLIMS uses the <a class="reference external" href="https://docs.pipenv.org/en/latest/">pipenv</a> framework
+<p>NexusLIMS uses the <a class="reference external" href="https://python-poetry.org/">poetry</a> framework
 to manage dependencies and create reproducible deployments. This means that
 installing the <code class="docutils literal notranslate"><span class="pre">nexusLIMS</span></code> package will require
-<a class="reference external" href="https://docs.pipenv.org/en/latest/install/#installing-pipenv">installing</a>
-<code class="docutils literal notranslate"><span class="pre">pipenv</span></code>. Once you have a Python distribution of some sort
-(NexusLIMS is developed and tested using v3.7.5), installing <code class="docutils literal notranslate"><span class="pre">pipenv</span></code> is
-usually as simple as:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install --user pipenv
+<a class="reference external" href="https://python-poetry.org/docs/#installation">installing</a>
+<code class="docutils literal notranslate"><span class="pre">poetry</span></code>. Once you have a Python distribution of some sort
+(NexusLIMS is developed and tested using v3.7.12 and v3.8.12),
+installing <code class="docutils literal notranslate"><span class="pre">poetry</span></code> is usually as simple as:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py <span class="p">|</span> python -
 </pre></div>
 </div>
-<p>Once <code class="docutils literal notranslate"><span class="pre">pipenv</span></code> is installed, clone the <a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS">repository</a> using <code class="docutils literal notranslate"><span class="pre">git</span></code>, and
-then change to the root folder of the repository. Running the following
-<code class="docutils literal notranslate"><span class="pre">install</span></code>  command will cause the <code class="docutils literal notranslate"><span class="pre">Pipfile</span></code> to be examined and
-dependencies automatically resolved and installed into a local python
-virtual environment:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pipenv install --dev
+<div class="admonition danger">
+<p class="admonition-title">Danger</p>
+<p>Never run code downloaded straight from the internet just because someone
+tells you to! Make sure to download and inspect the script to ensure it
+doesn’t do anything nasty before you run it.</p>
+</div>
+<p>Once <code class="docutils literal notranslate"><span class="pre">poetry</span></code> is installed, clone the NexusLIMS <a class="reference external" href="https://github.com/usnistgov/NexusLIMS">repository</a> using <code class="docutils literal notranslate"><span class="pre">git</span></code>,
+and then change to the root folder of the repository. Running the following
+<code class="docutils literal notranslate"><span class="pre">install</span></code>  command will make <code class="docutils literal notranslate"><span class="pre">poetry</span></code> install the dependencies specified
+in the <code class="docutils literal notranslate"><span class="pre">poetry.lock</span></code> file into a local python virtual environment (so they
+don’t interfere with other Python installations on your system). It will also
+install the <code class="docutils literal notranslate"><span class="pre">nexusLIMS</span></code> Python package in “editable” mode so you can make
+changes locally for development purposes and still run things.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ poetry install
 </pre></div>
 </div>
-<p>Make sure to specify the <code class="docutils literal notranslate"><span class="pre">--dev</span></code> flag to ensure that the packages needed for
-development are installed alongside the regular NexusLIMS code.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Depending on your preferences, there are a few <code class="docutils literal notranslate"><span class="pre">poetry</span></code>
+<a class="reference external" href="https://python-poetry.org/docs/configuration/">configuration options</a>
+that you may wish to tweak. For example, running
+<code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">poetry</span> <span class="pre">config</span> <span class="pre">virtualenvs.in-project</span> <span class="pre">true</span></code> will configure <code class="docutils literal notranslate"><span class="pre">poetry</span></code>
+to create its virtual environment in a folder local to the project itself
+(by default, the <code class="docutils literal notranslate"><span class="pre">./.venv</span></code> folder). This can be useful to keep the project
+files all in one directory, rather than having the Python virtualenv in your
+user folder somewhere else on the system. To see all currently configured
+settings, run <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">poetry</span> <span class="pre">config</span> <span class="pre">--list</span></code>.</p>
 </div>
-<div class="section" id="setting-up-the-environment">
+</section>
+<section id="setting-up-the-environment">
 <h2>Setting up the environment<a class="headerlink" href="#setting-up-the-environment" title="Permalink to this headline">¶</a></h2>
 <p>To interact with the remote systems from which NexusLIMS harvests information,
 it is necessary to provide credentials for authentication and the paths in which
@@ -209,49 +230,107 @@ to search for new data files and where to write dataset previews, as well as
 the path to the <a class="reference internal" href="database.html"><span class="doc">NexusLIMS database</span></a>.
 These values should be set by copying the <code class="docutils literal notranslate"><span class="pre">.env.example</span></code> file from the git
 repository into a file named <code class="docutils literal notranslate"><span class="pre">.env</span></code> in the base directory (in the same folder
-as the <code class="docutils literal notranslate"><span class="pre">Pipfile</span></code> file). <code class="docutils literal notranslate"><span class="pre">pipenv</span></code> will source variables from this file when
-entering the environment (through the <code class="docutils literal notranslate"><span class="pre">pipenv</span> <span class="pre">shell</span></code> or <code class="docutils literal notranslate"><span class="pre">pipenv</span> <span class="pre">run</span></code>
-commands) prior to running any other code. As an example, the  <code class="docutils literal notranslate"><span class="pre">.env</span></code> file
-content should look the following (substituting real credentials, of course):</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">nexusLIMS_user</span><span class="o">=</span><span class="s1">&#39;username&#39;</span>
-<span class="n">nexusLIMS_pass</span><span class="o">=</span><span class="s1">&#39;password&#39;</span>
-<span class="n">mmfnexus_path</span><span class="o">=</span><span class="s1">&#39;/path/to/mmfnexus/mount&#39;</span>
-<span class="n">nexusLIMS_path</span><span class="o">=</span><span class="s1">&#39;/path/to/nexusLIMS/mount/mmfnexus&#39;</span>
-<span class="n">nexusLIMS_db_path</span><span class="o">=</span><span class="s1">&#39;/path/to/nexusLIMS/nexuslims_db.sqlite&#39;</span>
+as the <code class="docutils literal notranslate"><span class="pre">README.md</span></code> and <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code> files).
+<code class="docutils literal notranslate"><span class="pre">nexusLIMS</span></code> makes use of the
+<a class="reference external" href="https://pypi.org/project/python-dotenv/">dotenv</a> library to dynamically
+load variables from this file when running any <code class="docutils literal notranslate"><span class="pre">nexusLIMS</span></code> code.
+As an example, the  <code class="docutils literal notranslate"><span class="pre">.env</span></code> file content should look something like the
+following (substituting real credentials, of course). See the
+environment variables <a class="reference internal" href="api/nexusLIMS.html#nexuslims-user"><span class="std std-ref">documentation</span></a> for more
+details.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nv">nexusLIMS_user</span><span class="o">=</span><span class="s1">&#39;username&#39;</span>
+<span class="nv">nexusLIMS_pass</span><span class="o">=</span><span class="s1">&#39;password&#39;</span>
+<span class="nv">mmfnexus_path</span><span class="o">=</span><span class="s1">&#39;/path/to/mmfnexus/mount&#39;</span>
+<span class="nv">nexusLIMS_path</span><span class="o">=</span><span class="s1">&#39;/path/to/nexusLIMS/mount/mmfnexus&#39;</span>
+<span class="nv">nexusLIMS_db_path</span><span class="o">=</span><span class="s1">&#39;/path/to/nexusLIMS/nexuslims_db.sqlite&#39;</span>
+<span class="nv">NEMO_address_1</span><span class="o">=</span><span class="s1">&#39;https://path.to.nemo.com/api/&#39;</span>
+<span class="nv">NEMO_token_1</span><span class="o">=</span><span class="s1">&#39;authentication_token&#39;</span>
+<span class="nv">NEMO_strftime_fmt_1</span><span class="o">=</span><span class="s2">&quot;%Y-%m-%dT%H:%M:%S%z&quot;</span>
+<span class="nv">NEMO_strptime_fmt_1</span><span class="o">=</span><span class="s2">&quot;%Y-%m-%dT%H:%M:%S%z&quot;</span>
+<span class="nv">NEMO_tz_1</span><span class="o">=</span><span class="s2">&quot;America/New_York&quot;</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="getting-into-the-environment">
+<p>Rather than using the <code class="docutils literal notranslate"><span class="pre">.env</span></code> file, each of these variables could also be set
+in the environment some other way if you desire. For example, to use Gitlab
+CI/CD tools, you would set these variables in your project’s CI/CD settings
+(see <a class="reference external" href="https://docs.gitlab.com/ee/ci/variables/">their documentation</a>),
+since you would not want to commit a <code class="docutils literal notranslate"><span class="pre">.env</span></code> file into a remote repository
+that contains authorization secrets (the equivalent is available in Github,
+as well).</p>
+</section>
+<section id="getting-into-the-environment">
 <h2>Getting into the environment<a class="headerlink" href="#getting-into-the-environment" title="Permalink to this headline">¶</a></h2>
-<p>Once the package is installed using <code class="docutils literal notranslate"><span class="pre">pipenv</span></code>, the code can be used
+<p>Once the package is installed using <code class="docutils literal notranslate"><span class="pre">poetry</span></code>, the code can be used
 like any other Python library within the resulting virtual environment.</p>
-<p><code class="docutils literal notranslate"><span class="pre">pipenv</span></code> allows you to run a single command inside that environment by
-using the <code class="docutils literal notranslate"><span class="pre">pipenv</span> <span class="pre">run</span></code> command from the repository:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pipenv run python
+<p><code class="docutils literal notranslate"><span class="pre">poetry</span></code> allows you to run a single command inside that environment by
+using the <code class="docutils literal notranslate"><span class="pre">poetry</span> <span class="pre">run</span></code> command from the repository:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ poetry run python
 </pre></div>
 </div>
 <p>To use other commands in the NexusLIMS environment, you can also “activate”
-the environment using the <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">pipenv</span> <span class="pre">shell</span></code> command from within the cloned
+the environment using the <code class="docutils literal notranslate"><span class="pre">$</span> <span class="pre">poetry</span> <span class="pre">shell</span></code> command from within the cloned
 repository. This will spawn a new shell that ensures all commands will have
 access to the installed packages and environment variables set appropriately.</p>
+</section>
+<section id="using-tox-for-testing">
+<h2>Using <code class="docutils literal notranslate"><span class="pre">tox</span></code> for testing<a class="headerlink" href="#using-tox-for-testing" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">tox</span></code> library is installed as a NexusLIMS dependency via <code class="docutils literal notranslate"><span class="pre">poetry</span></code>, and
+is used to coordinate running the code tests and building documentation.
+<code class="docutils literal notranslate"><span class="pre">tox</span></code> is configured in the <code class="docutils literal notranslate"><span class="pre">[tool.tox]</span></code> section of the <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>
+file. To run the complete test suite in isolated environments through
+<code class="docutils literal notranslate"><span class="pre">tox</span></code>, simply run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ poetry run tox
+</pre></div>
 </div>
-<div class="section" id="building-new-records">
+<p>One caveat is that (at the time of writing), <code class="docutils literal notranslate"><span class="pre">tox</span></code> is configured to run the
+tests in both a Python 3.7 and Python 3.8 environment, meaning both of these
+Python versions must be installed on your system. The recommended way to do
+this is to install <a class="reference external" href="https://github.com/pyenv/pyenv">pyenv</a>, which can manage
+multiple versions of Python on one system (without resorting to a heavier
+system such as Anaconda). If you have <code class="docutils literal notranslate"><span class="pre">pyenv</span></code> installed, the required
+versions of Python can be installed by running:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pyenv <span class="nb">local</span> <span class="p">|</span> xargs -L1 pyenv install -s
+</pre></div>
+</div>
+<p>This will read the versions specified in the <code class="docutils literal notranslate"><span class="pre">.python-version</span></code> file, and tell
+<code class="docutils literal notranslate"><span class="pre">pyenv</span></code> to install each one that is found (at the time of writing, this is
+3.7.12 and 3.8.12). This command only needs to be run once to do the initial
+Python installation. Assuming <code class="docutils literal notranslate"><span class="pre">pyenv</span></code> is installed correctly, <code class="docutils literal notranslate"><span class="pre">tox</span></code> will
+recognize the different Python versions and use them for its tests as defined
+in <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>.</p>
+<p>To build the documentation for the project, run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ poetry run tox -e docs
+</pre></div>
+</div>
+<p>The documentation should then be present in the <code class="docutils literal notranslate"><span class="pre">./_build/</span></code> directory.</p>
+<p>Finally, to generate the baseline test images (for the thumbnail generator
+code), run:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ poetry run tox -e gen_mpl_baseline
+</pre></div>
+</div>
+<p>Other commands can be added to the <code class="docutils literal notranslate"><span class="pre">tox</span></code> configuration in <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>
+following the example of the existing tasks. Consult the
+<a class="reference external" href="https://tox.wiki/en/latest/index.html">tox documentation</a> for more
+information.</p>
+</section>
+<section id="building-new-records">
 <h2>Building new records<a class="headerlink" href="#building-new-records" title="Permalink to this headline">¶</a></h2>
 <p>The most basic feature of the NexusLIMS back-end is to check the
 <a class="reference internal" href="database.html"><span class="doc">database</span></a> for any logs (inserted by the
 <a class="reference internal" href="session_logger_app.html"><span class="doc">Session Logger App</span></a>) with a status of
 <code class="docutils literal notranslate"><span class="pre">'TO_BE_BUILT'</span></code>. This can be accomplished simply by running the
 <a class="reference internal" href="api/nexusLIMS.builder.html#module-nexusLIMS.builder.record_builder" title="nexusLIMS.builder.record_builder"><code class="xref py py-mod docutils literal notranslate"><span class="pre">record_builder</span></code></a> module directly via:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ pipenv run python -m nexusLIMS.builder.record_builder
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ poetry run python -m nexusLIMS.builder.record_builder
 </pre></div>
 </div>
-<p>This command will find any records that need to be built, build the .xml file,
-and then upload it to the front-end CDCS instance.</p>
-</div>
-<div class="section" id="using-other-features-of-the-library">
+<p>This command will find any records that need to be built, build their .xml
+files, and then upload them to the front-end CDCS instance. Consult the
+record building <a class="reference internal" href="record_building.html"><span class="doc">documentation</span></a> for more details.</p>
+</section>
+<section id="using-other-features-of-the-library">
 <h2>Using other features of the library<a class="headerlink" href="#using-other-features-of-the-library" title="Permalink to this headline">¶</a></h2>
 <p>Once you are in a python interpreter (such as <code class="docutils literal notranslate"><span class="pre">python</span></code>, <code class="docutils literal notranslate"><span class="pre">ipython</span></code>,
-<code class="docutils literal notranslate"><span class="pre">jupyter</span></code>, etc.) from the <code class="docutils literal notranslate"><span class="pre">pipenv</span></code> environment, you can access the
+<code class="docutils literal notranslate"><span class="pre">jupyter</span></code>, etc.) from the <code class="docutils literal notranslate"><span class="pre">poetry</span></code> environment, you can access the
 code of this library through the <code class="docutils literal notranslate"><span class="pre">nexusLIMS</span></code> package if you want to do other
 tasks, such as extracting metadata or building previews images, etc.</p>
 <p>For example, to extract the metadata from a <code class="docutils literal notranslate"><span class="pre">.tif</span></code> file saved on the
@@ -263,82 +342,89 @@ FEI Quanta, run the following code using the
 </div>
 <p>The <code class="docutils literal notranslate"><span class="pre">meta</span></code> variable will then contain a dictionary with the extracted
 metadata from the file.</p>
-</div>
-<div class="section" id="contributing">
+</section>
+<section id="contributing">
 <h2>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h2>
-<p>To contribute, please
-<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/forks/new">fork</a>
-the repository, develop your addition on a
+<p>To contribute, please fork the repository, develop your addition on a
 <a class="reference external" href="https://www.atlassian.com/git/tutorials/comparing-workflows/feature-branch-workflow">feature branch</a>
-within your forked repo, and submit a
-<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/merge_requests">merge request</a>
-to the
-<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/tree/master">master</a>
+within your forked repo, and submit a pull request to the <code class="docutils literal notranslate"><span class="pre">master</span></code>
 branch to have it included in the project. Contributing to the package
 requires that every line of code is covered by a test case. This project uses
 testing through the <a class="reference external" href="https://docs.pytest.org/en/latest/">pytest</a> library,
 and features that do not pass the test cases or decrease coverage will not be
-accepted until suitable tests are included (see the <a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/tree/master/mdcs/nexusLIMS/nexusLIMS/tests"><code class="docutils literal notranslate"><span class="pre">tests</span></code></a> directory
-for examples) and that the coverage of any new features is 100%.
-To get this information, you can use an IDE that includes coverage tracking
+accepted until suitable tests are included (see the <code class="docutils literal notranslate"><span class="pre">tests</span></code> directory
+for examples) and that the coverage of any new features is 100%.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>In the public version of this repository, the included tests will not run
+due to the exclusion of test files and the expectation of certain files being
+present. If you are contributing, please make sure <cite>your changes</cite> are covered
+by tests, and the NexusLIMS developers will take care of integrating your
+PR fully in the code after it is accepted.</p>
+</div>
+<p>To get information about test coverage, you can use an IDE that includes coverage tracking
 (such as <a class="reference external" href="https://www.jetbrains.com/pycharm/">PyCharm</a>) or include the
 <code class="docutils literal notranslate"><span class="pre">--cov</span></code> flag when running the tests. To test the preview image generation,
 the <code class="docutils literal notranslate"><span class="pre">--mpl</span></code> option should also be provided, together with the path to
 the <cite>“reference”</cite> images that are tested against. For example:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>$ <span class="nb">cd</span> &lt;path_to_repo&gt;
-$ pipenv run pytest mdcs/nexusLIMS/nexusLIMS/tests --cov<span class="o">=</span>mdcs/nexusLIMS/nexusLIMS <span class="se">\</span>
-     --cov-report term --mpl --mpl-baseline-path<span class="o">=</span>mdcs/nexusLIMS/nexusLIMS/tests/files/figs
+$ poetry run pytest tests/ --cov<span class="o">=</span>nexusLIMS --cov<span class="o">=</span>tests --cov-config<span class="o">=</span>tests/.coveragerc <span class="se">\</span>
+     --cov-report term --mpl --mpl-baseline-path<span class="o">=</span>tests/files/figs
 
-<span class="c1"># ============================= test session starts ==============================</span>
-<span class="c1"># platform linux -- Python 3.7.5, pytest-5.3.5, py-1.8.1, pluggy-0.13.1</span>
-<span class="c1"># Matplotlib: 3.1.3</span>
+<span class="c1"># ================================= test session starts ==============================================================</span>
+<span class="c1"># platform linux -- Python 3.8.12, pytest-5.4.3, py-1.11.0, pluggy-0.13.1</span>
+<span class="c1"># cachedir: nexuslims/.tox/py38/.pytest_cache</span>
+<span class="c1"># Matplotlib: 3.4.3</span>
 <span class="c1"># Freetype: 2.6.1</span>
-<span class="c1"># rootdir: mdcs/nexusLIMS/nexusLIMS/tests, inifile: pytest.ini</span>
-<span class="c1"># plugins: mpl-0.11, cov-2.8.1, sugar-0.9.2</span>
-<span class="c1"># collected 104 items</span>
+<span class="c1"># rootdir: nexuslims/tests, inifile: pytest.ini</span>
+<span class="c1"># plugins: cov-3.0.0, mpl-0.13</span>
+<span class="c1"># collected 204 items</span>
 <span class="c1">#</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/tests/test_calendar_handling.py .............................. [ 28%]</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/tests/test_extractors.py ..................................... [ 64%]</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/tests/test_instruments.py .....                                [ 69%]</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/tests/test_records.py ......................                   [ 90%]</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/tests/test_utils.py .........                                  [ 99%]</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/tests/test_version.py .                                        [100%]</span>
+<span class="c1"># tests/test_extractors.py ...............................................................                      [ 30%]</span>
+<span class="c1"># tests/test_harvesters.py .................................................................................... [ 72%]</span>
+<span class="c1"># tests/test_instruments.py ..........                                                                          [ 76%]</span>
+<span class="c1"># tests/test_records.py .................................                                                       [ 93%]</span>
+<span class="c1"># tests/test_utils.py .............                                                                             [ 99%]</span>
+<span class="c1"># tests/test_version.py .                                                                                       [100%]</span>
 <span class="c1">#</span>
-<span class="c1"># ----------- coverage: platform linux, python 3.7.5-final-0 ---------------------</span>
-<span class="c1"># Name                                                         Stmts   Miss  Cover</span>
-<span class="c1"># --------------------------------------------------------------------------------</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/__init__.py                             8      0   100%</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/_urls.py                                3      0   100%</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/builder/__init__.py                     0      0   100%</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/builder/record_builder.py             149      0   100%</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/cdcs.py                                69      0   100%</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/db/__init__.py                         10      0   100%</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/db/session_handler.py                  72      0   100%</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/extractors/__init__.py                 65      0   100%</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/extractors/digital_micrograph.py      421      0   100%</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/extractors/fei_emi.py                   0      0   100%</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/extractors/quanta_tif.py              197      0   100%</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/extractors/thumbnail_generator.py     329      0   100%</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/harvester/__init__.py                   0      0   100%</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/harvester/sharepoint_calendar.py      108      0   100%</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/instruments.py                         44      0   100%</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/schemas/__init__.py                     0      0   100%</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/schemas/activity.py                   151      0   100%</span>
-<span class="c1"># test_calendar_handling.py                                      154      0   100%</span>
-<span class="c1"># test_extractors.py                                             379      0   100%</span>
-<span class="c1"># test_instruments.py                                             27      0   100%</span>
-<span class="c1"># test_records.py                                                181      0   100%</span>
-<span class="c1"># test_utils.py                                                   61      0   100%</span>
-<span class="c1"># test_version.py                                                  5      0   100%</span>
-<span class="c1"># utils.py                                                         7      0   100%</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/utils.py                              135      0   100%</span>
-<span class="c1"># mdcs/nexusLIMS/nexusLIMS/version.py                              2      0   100%</span>
-<span class="c1"># --------------------------------------------------------------------------------</span>
-<span class="c1"># TOTAL                                                         2577      0   100%</span>
+<span class="c1"># ---------- coverage: platform linux, python 3.8.12-final-0 -----------</span>
+<span class="c1"># Name                                          Stmts   Miss  Cover   Missing</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># nexusLIMS/__init__.py                             8      0   100%</span>
+<span class="c1"># nexusLIMS/_urls.py                                3      0   100%</span>
+<span class="c1"># nexusLIMS/builder/__init__.py                     0      0   100%</span>
+<span class="c1"># nexusLIMS/builder/record_builder.py             201      0   100%</span>
+<span class="c1"># nexusLIMS/cdcs.py                                70      0   100%</span>
+<span class="c1"># nexusLIMS/db/__init__.py                         10      0   100%</span>
+<span class="c1"># nexusLIMS/db/session_handler.py                  96      0   100%</span>
+<span class="c1"># nexusLIMS/extractors/__init__.py                 80      0   100%</span>
+<span class="c1"># nexusLIMS/extractors/digital_micrograph.py      415      0   100%</span>
+<span class="c1"># nexusLIMS/extractors/fei_emi.py                 198      0   100%</span>
+<span class="c1"># nexusLIMS/extractors/quanta_tif.py              203      0   100%</span>
+<span class="c1"># nexusLIMS/extractors/thumbnail_generator.py     328      0   100%</span>
+<span class="c1"># nexusLIMS/harvesters/__init__.py                107      0   100%</span>
+<span class="c1"># nexusLIMS/harvesters/nemo.py                    275      0   100%</span>
+<span class="c1"># nexusLIMS/harvesters/sharepoint_calendar.py     149      0   100%</span>
+<span class="c1"># nexusLIMS/instruments.py                         76      0   100%</span>
+<span class="c1"># nexusLIMS/schemas/__init__.py                     0      0   100%</span>
+<span class="c1"># nexusLIMS/schemas/activity.py                   166      0   100%</span>
+<span class="c1"># nexusLIMS/utils.py                              199      0   100%</span>
+<span class="c1"># nexusLIMS/version.py                              2      0   100%</span>
+<span class="c1"># tests/__init__.py                                 0      0   100%</span>
+<span class="c1"># tests/test_extractors.py                        747      0   100%</span>
+<span class="c1"># tests/test_harvesters.py                        477      0   100%</span>
+<span class="c1"># tests/test_instruments.py                        56      0   100%</span>
+<span class="c1"># tests/test_records.py                           254      0   100%</span>
+<span class="c1"># tests/test_utils.py                             101      0   100%</span>
+<span class="c1"># tests/test_version.py                             5      0   100%</span>
+<span class="c1"># tests/utils.py                                    9      0   100%</span>
+<span class="c1"># ---------------------------------------------------------------------------</span>
+<span class="c1"># TOTAL                                          4235      0   100%</span>
+<span class="c1"># Coverage HTML written to dir tests/coverage</span>
 </pre></div>
 </div>
-</div>
-</div>
+</section>
+</section>
 
 
     </div>
@@ -360,8 +446,8 @@ $ pipenv run pytest mdcs/nexusLIMS/nexusLIMS/tests --cov<span class="o">=</span>
       
     </p>
     <p>
-        &copy; Copyright 2020, NIST Office of Data and Informatics.<br/>
-      Last updated on Oct, 19, 2020.<br/>
+        &copy; Copyright 2022, NIST Office of Data and Informatics.<br/>
+      Last updated on Jul, 15, 2022.<br/>
     </p>
   </div>
 </footer>

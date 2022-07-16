@@ -5,12 +5,10 @@
 Record building workflow
 ========================
 
-    `Last updated: February 23, 2020`
+    `Last updated: November 26, 2021`
 
 This page describes the process used to build records based on the data saved by
-instruments in the
-`Electron Microscopy Nexus facility <https://mmlshare.nist.gov/Div/msed/MSED-MMF/default.aspx>`_
-using `NexusLIMS <https://nexuslims.nist.gov>`_.
+instruments in the Electron Microscopy Nexus facility using NexusLIMS.
 At the bottom is an `activity diagram <activity-diagram_>`_ that illustrates
 how the different modules work together to generate records from the centralized
 file storage and the NexusLIMS session database. Throughout this page, links
@@ -31,13 +29,15 @@ running ``python -m nexusLIMS.builder.record_builder``, which will run the
 function initiates one iteration of the record builder, which will query the
 NexusLIMS database for any sessions that are waiting to have their record built
 and then proceed to build them and upload them to the NexusLIMS CDCS instance.
+As of November 2021, it also queries the API for any enabled NEMO-based
+harvesters, and will fetch any recent "usage events" to determine if a record
+needs to be built.
 As part of this process (and explained in detail below), the centralized file
 system is searched for files matching the session logs in the database, which
 then have their metadata extracted and are parsed into `Acquisition Activities`.
 These activities are written to the .xml record, which is validated against the
-Nexus Microscopy Schema, and finally uploaded to the
-`NexusLIMS CDCS instance <https://nexuslims.nist.gov>`_ if everything goes
-according to plan. If not, an error is logged to the database for that session
+Nexus Microscopy Schema, and finally uploaded to the NexusLIMS CDCS instance if
+everything goes according to plan. If not, an error is logged to the database for that session
 and the operators of NexusLIMS are notified so the issue can be corrected.
 
 ..  admonition:: A note on authentication...
@@ -49,22 +49,32 @@ and the operators of NexusLIMS are notified so the issue can be corrected.
     context the code is run: :ref:`nexusLIMS_user <nexusLIMS-user>` and
     :ref:`nexusLIMS_pass <nexusLIMS-pass>`. The
     values provided in these variables will be used for authentication to all
-    network resources that require it. If running the code inside of a
-    `pipenv <https://pipenv.readthedocs.io/en/latest/>`_, the easiest way to do
+    network resources that require it. The easiest way to do
     this is by editing the ``.env.example`` file in the root of the NexusLIMS
     repository and renaming it to ``.env`` (make sure not to push this file to
-    any remote source, since it has a password in it!).
+    any remote source, since it has a password in it!). Furthermore, NEMO-based
+    session harvesting is enabled by specifying one or more sets of environment
+    variables named ``NEMO_address_X`` and ``NEMO_token_X``, where ``X`` is an
+    integer value (``1``, ``2``, ``3``, etc.). The address variable should be
+    a path to the API endpoint for a particular server (e.g.
+    ``https://www.nemo.com/api/``), while the token should be an API
+    authentication token created on the "Detailed administration" page of the
+    NEMO administration tools (ask your NEMO system administrator for more
+    direction if this is unclear).
 
 
 Finding New Sessions
 ++++++++++++++++++++
 
 The session finding is initiated by
-:py:func:`~nexusLIMS.builder.record_builder.process_new_records`, which
-immediately calls
+:py:func:`~nexusLIMS.builder.record_builder.process_new_records`. This method
+uses :py:func:`~nexusLIMS.harvesters.nemo.add_all_usage_events_to_db` to first
+query any enabled NEMO API Connectors, and adds rows to the NexusLIMS session
+log database for any newly created usage events (default is to look back seven
+days for usage events). The record builder then calls
 :py:func:`~nexusLIMS.builder.record_builder.build_new_session_records`, which in
 turn uses :py:func:`~nexusLIMS.db.session_handler.get_sessions_to_build` to
-query the NexusLIMS database for sessions awaiting processing (the database
+query the NexusLIMS database for any sessions awaiting processing (the database
 location can be referenced within the code using the environment variable
 :ref:`nexusLIMS_db_path <nexusLIMS-db-path>` (`e.g.`
 ``os.environ["nexusLIMS_db_path"]``. This method interrogates the database for
@@ -85,7 +95,9 @@ that are used when building a record:
 .. _session-contents:
 
     session_identifier : :py:class:`str`
-        The UUIDv4 identifier for an individual session on an instrument
+        An identifier for an individual session on an instrument. This is a UUIDv4
+        for any Sharepoint Calendar events, but will be a resolvable URL for any
+        NEMO-based events
     instrument : :py:class:`~nexusLIMS.instruments.Instrument`
         An object representing the instrument associated with this session
     dt_from : :py:class:`~datetime.datetime`
@@ -121,10 +133,14 @@ Overview
     Execute :py:func:`~nexusLIMS.builder.record_builder.build_record` for the
     :py:class:`~nexusLIMS.instruments.Instrument` and time range specified by
     the :py:class:`~nexusLIMS.db.session_handler.Session`
-2.  `(link) <querying-sharepoint_>`_
+
+.. TODO: clarify multiple harvesters here
+
+2.  `(link) <harvesting-calendar_>`_
     Fetch any associated calendar information for this
-    :py:class:`~nexusLIMS.db.session_handler.Session` using
-    :py:func:`~nexusLIMS.harvester.sharepoint_calendar.get_events`
+    :py:class:`~nexusLIMS.db.session_handler.Session` using one of the enabled
+    harvesters (currently :py:mod:`~nexusLIMS.harvesters.sharepoint_calendar`
+    or :py:mod:`~nexusLIMS.harvesters.nemo`).
 3.  `(link) <identifying-files_>`_
     Identify files that NexusLIMS knows how to parse within the time range using
     :py:func:`~nexusLIMS.utils.find_files_by_mtime`; if no files are found,
@@ -180,33 +196,35 @@ begins the record by writing basic XML header information before querying the
 reservation system for additional information about the experiment.
 `(go to top) <overview_>`_
 
-.. _querying-sharepoint:
+.. _harvesting-calendar:
 
-2. Querying the SharePoint Calendar
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+2. Querying the Reservation Calendars
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Since users must make reservations on the SharePoint calendar, this is an
-important source of metadata for the experimental records created by NexusLIMS.
-Information from these calendar "events" is included throughout the record,
+Since users must make reservations on either the SharePoint calendar or the
+NEMO facility management system, these are
+important sources of metadata for the experimental records created by NexusLIMS.
+Information from these reservation "events" is included throughout the record,
 although it primarily informs the information contained in the ``<summary>``
 element, including information such as who made the reservation, what the
 experiment's motivation was, what sample was examined, etc.
 
-To obtain this information, the
-:py:func:`~nexusLIMS.harvester.sharepoint_calendar.get_events` function from the
-:py:mod:`~nexusLIMS.harvester.sharepoint_calendar` harvester module is used.
-This function authenticates to and queries the SharePoint API, and receives
-an XML response representing any reservations found that match the timespan of
-the :py:class:`~nexusLIMS.db.session_handler.Session`. This XML is then
-translated using the XSLT file (path specified by
-:py:data:`~nexusLIMS.builder.record_builder.XSLT_PATH`) into a format that is
-compatible with the Nexus Microscopy Schema. This result is added to the XML
-representation of the current record.
-
-If no matching events are found, some basic details are added to the
-``<summary>`` section of the record using the information that can be accessed,
-such as the instrument the Experiment was performed on, as well as the date and
-time. `(go to top) <overview_>`_
+To obtain this information, the record builder uses whatever harvester module
+is listed in the ``harvester`` column of the NexusLIMS database for that
+instrument. (i.e. either :py:mod:`~nexusLIMS.harvesters.nemo` or
+:py:mod:`~nexusLIMS.harvesters.sharepoint_calendar` as of version
+1.1.0). Each of these modules implements a ``res_event_from_session`` method,
+used by the record builder to return a
+:py:class:`~nexusLIMS.harvesters.ReservationEvent` object representing the
+reservation that overlaps maximally with the unit of time (or a very simple
+generic one, if no matching reservation was found). These functions operate
+serve as an adaptor layer to allow NexusLIMS to generate structurally-uniform
+representations of a reservation from differing calendaring applications.
+From this point on, identical code is used regardless of the original source of
+the reservation information. Once the
+:py:class:`~nexusLIMS.harvesters.ReservationEvent` is obtained,
+it is serialized into XML format that is compatible with the Nexus Microscopy
+Schema. `(go to top) <overview_>`_
 
 .. _identifying-files:
 
@@ -232,20 +250,20 @@ location for authoritative data. Thus, if something changes about the
 instruments' configuration, the data needs to be updated in one location only.
 The following is an example of the information extracted from the database and
 available to the NexusLIMS back-end software for a given instrument (in this
-case the FEI Titan TEM in Building 223):
+case the FEI Titan TEM in Building 223, connected to the SharePoint harvester):
 
 .. code-block::
 
     Nexus Instrument: FEI-Titan-TEM-635816
-    API url:          https://mmlshare.nist.gov/Div/msed/MSED-MMF/_vti_bin/ListData.svc/FEITitanTEMEvents
+    API url:          https://sharepoint.url.com/_vti_bin/ListData.svc/FEITitanTEMEvents
     Calendar name:    FEI Titan TEM
-    Calendar url:     https://mmlshare.nist.gov/Div/msed/MSED-MMF/Lists/FEI%20Titan%20Events/calendar.aspx
+    Calendar url:     https://sharepoint.url.com/Lists/FEI%20Titan%20Events/calendar.aspx
     Schema name:      FEI Titan TEM
     Location:         223/B115
     Property tag:     635816
     Filestore path:   ./Titan
-    Computer IP:      129.6.173.37
-    Computer name:    TITAN52331880
+    Computer IP:      192.168.1.5
+    Computer name:    TITAN12345678
     Computer mount:   M:/
 
 Using the `Filestore path` information, NexusLIMS searches for files
@@ -256,7 +274,7 @@ the Unix |find|_ by spawning a sub-process. This only works on Linux, and may
 fail, so a slower pure-Python implementation (implemented in
 :py:meth:`~nexusLIMS.utils.find_files_by_mtime`) is used as a fallback if so.
 All files within the :py:class:`~nexusLIMS.instruments.Instrument`'s root-level
-folder are searched and only files with modificaiton times with the timespan
+folder are searched and only files with modification times with the timespan
 of interest are returned. Currently, this process takes on the order of tens of
 seconds for typical records (depending on how many files are in the instrument's
 folder) when using the :py:meth:`~nexusLIMS.utils.gnu_find_files_by_mtime`.

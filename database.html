@@ -2,35 +2,32 @@
 <!DOCTYPE html>
 
 <html>
-  <head><link rel="stylesheet" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css">
-    <script src="https://pages.nist.gov/nist-header-footer/js/jquery-1.9.0.min.js" type="text/javascript" defer="defer"></script>
-    <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js" type="text/javascript" defer="defer"></script>
-    
+  <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NexusLIMS database &#8212; NexusLIMS 0.0.9 documentation</title>
-    <link rel="stylesheet" href="_static/bootstrap-sphinx.css" type="text/css" />
-    <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+    <title>NexusLIMS database &#8212; NexusLIMS 1.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="_static/custom-styles.css" />
-    <script id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+    <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
     <script src="_static/jquery.js"></script>
     <script src="_static/underscore.js"></script>
     <script src="_static/doctools.js"></script>
-    <script src="_static/language_data.js"></script>
     <script src="_static/custom.js"></script>
     <link rel="shortcut icon" href="_static/nexusLIMS_bare_logo.ico"/>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Session logging" href="session_logger_app.html" />
-    <link rel="prev" title="Data security in NexusLIMS" href="data_security.html" />
+    <link rel="next" title="Record building workflow" href="record_building.html" />
+    <link rel="prev" title="Welcome to NexusLIMS!" href="index.html" />
 <meta charset='utf-8'>
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="_static/js/jquery-1.11.0.min.js "></script>
-<script type="text/javascript" src="_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
-<script type="text/javascript" src="_static/bootstrap-sphinx.js "></script>
+<script type="text/javascript" src="_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="_static/bootstrap-sphinx.js"></script>
 
   </head><body>
 
@@ -52,7 +49,7 @@
           <ul class="nav navbar-nav">
             
                 <li><a href="api.html">API Docs</a></li>
-                <li><a href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS">Repository</a></li>
+                <li><a href="https://github.com/usnistgov/NexusLIMS">Repository</a></li>
                 <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
             
             
@@ -66,20 +63,19 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Package introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_security.html">Data security in NexusLIMS</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">NexusLIMS database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="session_logger_app.html">Session logging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Developer documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="taxonomy.html">NexusLIMS taxonomy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schema_documentation.html">Schema documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session_logger_app.html">Session logging (deprecated)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/nexusLIMS.html">nexusLIMS package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.harvester.html">nexusLIMS.harvester package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
 </ul>
 </li>
@@ -94,11 +90,11 @@
               
                 
   <li>
-    <a href="data_security.html" title="Previous Chapter: Data security in NexusLIMS"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Previous</span>
+    <a href="index.html" title="Previous Chapter: Welcome to NexusLIMS!"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Previous</span>
     </a>
   </li>
   <li>
-    <a href="session_logger_app.html" title="Next Chapter: Session logging"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Next &raquo;</span>
+    <a href="record_building.html" title="Next Chapter: Record building workflow"><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Next &raquo;</span>
     </a>
   </li>
               
@@ -131,14 +127,13 @@
 <ul class="globaltoc">
     <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Package introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="data_security.html">Data security in NexusLIMS</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">NexusLIMS database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="session_logger_app.html">Session logging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Developer documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="taxonomy.html">NexusLIMS taxonomy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="schema_documentation.html">Schema documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="session_logger_app.html">Session logging (deprecated)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">API documentation</a></li>
 </ul>
 
@@ -169,50 +164,51 @@
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <div class="section" id="nexuslims-database">
+  <section id="nexuslims-database">
 <h1>NexusLIMS database<a class="headerlink" href="#nexuslims-database" title="Permalink to this headline">¶</a></h1>
 <blockquote>
-<div><p><cite>Last updated: February 26, 2020</cite></p>
+<div><p><cite>Last updated: June 13, 2022</cite></p>
 </div></blockquote>
 <p>In order to accurately know an Experimental session has occurred (and a record
 needs to be built) NexusLIMS relies on an external database that is stored
-as a file on the same centralized storage as where the instruments store their
-data (although the location is configurable, and does not explicitly have to be
-stored alongside the files – it just needs to be accessible from the
-instruments). Due to its simple design and requirements, the database is
-implemented using a single <a class="reference external" href="https://sqlite.org/index.html">SQLite</a> file
-stored in a location specified by the
+as a file accessible to the back-end. Due to its simple design and requirements,
+the database is implemented using a single <a class="reference external" href="https://sqlite.org/index.html">SQLite</a>
+file stored in a location specified by the
 <a class="reference internal" href="api/nexusLIMS.html#nexuslims-db-path"><span class="std std-ref">nexusLIMS_db_path</span></a> environment variable. This database
-is created using a custom <a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/blob/master/mdcs/nexusLIMS/nexusLIMS/db/NexusLIMS_db_creation_script.sql">SQL Schema Definition</a> (documented below) and can be
+is created using a custom <a class="reference external" href="https://github.com/usnistgov/NexusLIMS/blob/public/nexusLIMS/db/dev/NexusLIMS_db_creation_script.sql">SQL Schema Definition</a> (documented below) and can be
 easily backed up by simply copying the database file to a new location.
 The contents and structure of the database can be inspected using a number
 of open source tools, including the cross-platform software
 <a class="reference external" href="https://sqlitebrowser.org/">DB Browser for SQLite</a>.</p>
 <p>This database fulfills two primary purposes (in its current implementation).
-First, it serves as a location for the
-<a class="reference internal" href="session_logger_app.html"><span class="doc">Session Logger App</span></a> to make entries related to when
+First, it serves as a location entries related to when
 a user has started and finished an Experiment on an instrument, as well as
 when the back-end has attempted (and completed) building a record based on that
-Experiment. The second purpose is to contain authoritative information about
-the instruments in the Nexus Microscopy Facility, such as the instruments’
-names, their calendar URLs, where a given instrument stores its data, etc.
+Experiment (these entries are made by either the deprecated Session Logger app, or
+one of the more modern harvester modules, such as py:mod:<cite>~nexusLIMS.harvesters.nemo</cite>.
+The second purpose is to contain authoritative information about
+the instruments in the facility, such as the instruments’
+names, their reservation URLs, where a given instrument stores its data, etc.
 Having this information centrally located facilitates maintenance in the event
 the configuration changes in the future. These two sources of data are
 represented as two <cite>tables</cite> within the database named <cite>session_log</cite> and
 <cite>instruments</cite>, respectively. Specific documentation of each table and their
 data columns are provided below.</p>
-<div class="section" id="the-session-log-table">
+<section id="the-session-log-table">
 <h2>The <code class="docutils literal notranslate"><span class="pre">session_log</span></code> table<a class="headerlink" href="#the-session-log-table" title="Permalink to this headline">¶</a></h2>
 <p>As described above, the <code class="docutils literal notranslate"><span class="pre">session_log</span></code> table is where the instruments (and the
 NexusLIMS back-end) store information that is used to determine what records
 need to be built and which files should be included in a given record (see the
 <a class="reference internal" href="record_building.html"><span class="doc">record building</span></a> documentation for more details).
 Each row of this table represents a single timestamped log of a certain type of
-event. Users (perhaps without realizing it) write to this table when they start
-the <a class="reference internal" href="session_logger_app.html"><span class="doc">Session Logger App</span></a> on an instrument at the
-beginning of their session, and again when they click the <cite>“End Session”</cite>
-button or close the application at the end of their experiment. Together, these
-<cite>“START”</cite> and <cite>“END”</cite> logs (linked by a <code class="docutils literal notranslate"><span class="pre">session_identifier</span></code>) represent a unit
+event. If the deprecated <a class="reference internal" href="session_logger_app.html"><span class="doc">Session Logger App</span></a> is in use,
+users (perhaps without realizing it) write to this table when they start the on an
+instrument at the beginning of their session, and again when they click the <cite>“End Session”</cite>
+button or close the application at the end of their experiment. Otherwise, the reservation
+and usage event harvester code (such as <a class="reference internal" href="session_logger_app.html"><span class="doc">Session Logger App</span></a>) parses
+the API response from the reservation system and adds rows to the <code class="docutils literal notranslate"><span class="pre">session_log</span></code> table
+as required to represent an experiment on a particular instrument.</p>
+<p>Together, these <cite>“START”</cite> and <cite>“END”</cite> logs (linked by a <code class="docutils literal notranslate"><span class="pre">session_identifier</span></code>) represent a unit
 of time on a given instrument, and indicate to the NexusLIMS back-end
 that a record needs to be built for that instrument, containing files created
 between the starting and ending timestamps. The back-end periodically polls
@@ -248,8 +244,8 @@ generic number).</p>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">session_identifier</span></code></p></td>
 <td><p>VARCHAR(36)</p></td>
-<td><p>A UUID4 (36-character string) that
-is consistent among a single
+<td><p>A unique string (could be a UUID)
+that is consistent among a single
 record’s <cite>“START”</cite>, <cite>“END”</cite>, and
 <cite>“RECORD_GENERATION”</cite> events.</p>
 <p><cite>Checks:</cite> must not be <cite>NULL</cite></p>
@@ -311,8 +307,7 @@ matched time span)</p>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">user</span></code></p></td>
 <td><p>VARCHAR(50)</p></td>
-<td><p>The NIST “short style”
-username associated with this
+<td><p>A username associated with this
 session (if known) – this value
 is not currently used by the
 back-end since it is not reliable
@@ -320,8 +315,8 @@ across different instruments.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section" id="the-instruments-table">
+</section>
+<section id="the-instruments-table">
 <span id="instr-table"></span><h2>The <code class="docutils literal notranslate"><span class="pre">instruments</span></code> table<a class="headerlink" href="#the-instruments-table" title="Permalink to this headline">¶</a></h2>
 <p>This table serves as the authoritative data source for the NexusLIMS back-end
 regarding information about the instruments in the Nexus Facility. By locating
@@ -331,10 +326,16 @@ location, simplifying maintenance of the system. For example, when the
 SharePoint calendar system version was transitioned from 2010 to 2016, the
 calendar URLs changed, but after a simple update to the entries in this table,
 the existing back-end code continued working with no other changes needed.</p>
+<p>Likewise, when the Nexus facility migrated from the SharePoint-based reservation
+system to the NEMO-based one, reconfiguring the instruments was as simple as
+adding a duplicate row for each instrument with a different <code class="docutils literal notranslate"><span class="pre">harvester</span></code> value
+and the new API endpoint location for that instrument.</p>
 <p><strong>Back-end implementation details</strong></p>
 <p>When the <a class="reference internal" href="api/nexusLIMS.html#module-nexusLIMS" title="nexusLIMS"><code class="xref py py-mod docutils literal notranslate"><span class="pre">nexusLIMS</span></code></a> module is imported, one of the “setup” tasks
-performed is to load the <code class="docutils literal notranslate"><span class="pre">instruments</span></code> table from the database into a
-dictionary attribute named <a class="reference internal" href="api/nexusLIMS.html#nexusLIMS.instruments.instrument_db" title="nexusLIMS.instruments.instrument_db"><code class="xref py py-data docutils literal notranslate"><span class="pre">nexusLIMS.instruments.instrument_db</span></code></a>.
+performed is to perform a basic object-relational mapping between rows of
+the <code class="docutils literal notranslate"><span class="pre">instruments</span></code> table from the database into
+<a class="reference internal" href="api/nexusLIMS.html#nexusLIMS.instruments.Instrument" title="nexusLIMS.instruments.Instrument"><code class="xref py py-class docutils literal notranslate"><span class="pre">Instrument</span></code></a> objects. These objects are
+stored in a dictionary attribute named <a class="reference internal" href="api/nexusLIMS.html#nexusLIMS.instruments.instrument_db" title="nexusLIMS.instruments.instrument_db"><code class="xref py py-data docutils literal notranslate"><span class="pre">nexusLIMS.instruments.instrument_db</span></code></a>.
 This is done by querying the database specified in the environment variable
 <a class="reference internal" href="api/nexusLIMS.html#nexuslims-db-path"><span class="std std-ref">nexusLIMS_db_path</span></a> and creating a dictionary of
 <a class="reference internal" href="api/nexusLIMS.html#nexusLIMS.instruments.Instrument" title="nexusLIMS.instruments.Instrument"><code class="xref py py-class docutils literal notranslate"><span class="pre">Instrument</span></code></a> objects that contain information
@@ -357,9 +358,10 @@ import, rather than every time information is needed.</p>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">instrument_pid</span></code></p></td>
 <td><p>VARCHAR(100)</p></td>
 <td><p>The unique identifier for an instrument
-in the Nexus Microscopy facility, built
+in the facility, currently (but not
+required to be) built
 from the make, model, and type of
-instrument, plus the property tag
+instrument, plus a unique numeric code
 (e.g. <code class="docutils literal notranslate"><span class="pre">FEI-Titan-TEM-635816</span></code> )</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">api_url</span></code></p></td>
@@ -371,14 +373,14 @@ instrument’s scheduler</p></td>
 <td><p>TEXT</p></td>
 <td><p>The “user-friendly” name of the
 calendar for this instrument as
-displayed on the SharePoint
+displayed on the reservation system
 resource (e.g. “FEI Titan TEM”)</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">calendar_url</span></code></p></td>
 <td><p>TEXT</p></td>
 <td><p>The URL to this instrument’s
 web-accessible calendar on the
-SharePoint resource</p></td>
+SharePoint resource (if using)</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">location</span></code></p></td>
 <td><p>VARCHAR(100)</p></td>
@@ -393,14 +395,16 @@ schema and displayed in the records</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">property_tag</span></code></p></td>
 <td><p>VARCHAR(20)</p></td>
-<td><p>The NIST property tag for this
-instrument</p></td>
+<td><p>A unique numeric identifier for this
+instrument (not used by NexusLIMS, but
+for reference and potential future use)</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">filestore_path</span></code></p></td>
 <td><p>TEXT</p></td>
-<td><p>The path (relative to the Nexus
-facility root) on the central file
-storage where this instrument stores
+<td><p>The path (relative to central storage
+location specified in
+<a class="reference internal" href="api/nexusLIMS.html#mmfnexus-path"><span class="std std-ref">mmfnexus_path</span></a>)
+where this instrument stores
 its data (e.g. <code class="docutils literal notranslate"><span class="pre">./Titan</span></code>)</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">computer_name</span></code></p></td>
@@ -411,11 +415,12 @@ the <cite>Session Logger App</cite>. If this is
 incorrect (or not included), the
 logger application will fail when
 attempting  to start a session from
-the microscope.</p></td>
+the microscope (only relevant if using
+the <cite>Session Logger App</cite>)</p></td>
 </tr>
 <tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">computer_ip</span></code></p></td>
 <td><p>VARCHAR(15)</p></td>
-<td><p>The REN IP address of the <cite>support PC</cite>
+<td><p>The IP address of the <cite>support PC</cite>
 connected to this instrument (not
 currently utilized)</p></td>
 </tr>
@@ -424,12 +429,34 @@ currently utilized)</p></td>
 <td><p>The full path where the central file
 storage is mounted and files are
 saved on the ‘support PC’ for
-the instrument (e.g. ‘M:/’)</p></td>
+the instrument (e.g. ‘M:/’; only
+relevant if using the <cite>Session Logger
+App</cite>)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">harvester</span></code></p></td>
+<td><p>TEXT</p></td>
+<td><p>The specific submodule within
+<a class="reference internal" href="api/nexusLIMS.harvesters.html#module-nexusLIMS.harvesters" title="nexusLIMS.harvesters"><code class="xref py py-mod docutils literal notranslate"><span class="pre">nexusLIMS.harvesters</span></code></a> that
+should be used to harvest reservation
+information for this instrument. At the
+time of writing, the only possible
+values are <code class="docutils literal notranslate"><span class="pre">nemo</span></code> or
+<code class="docutils literal notranslate"><span class="pre">sharepoint_calendar</span></code>.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">timezone</span></code></p></td>
+<td><p>TEXT</p></td>
+<td><p>The timezone in which this instrument
+is located, in the format of the IANA
+timezone database (e.g.
+<code class="docutils literal notranslate"><span class="pre">America/New_York</span></code>). This is used
+to properly localize dates and times
+when communicating with the harvester
+APIs.</p></td>
 </tr>
 </tbody>
 </table>
-</div>
-</div>
+</section>
+</section>
 
 
     </div>
@@ -451,8 +478,8 @@ the instrument (e.g. ‘M:/’)</p></td>
       
     </p>
     <p>
-        &copy; Copyright 2020, NIST Office of Data and Informatics.<br/>
-      Last updated on Oct, 19, 2020.<br/>
+        &copy; Copyright 2022, NIST Office of Data and Informatics.<br/>
+      Last updated on Jul, 15, 2022.<br/>
     </p>
   </div>
 </footer>

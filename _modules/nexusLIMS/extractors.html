@@ -4,16 +4,15 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>nexusLIMS.extractors &#8212; NexusLIMS 0.0.9 documentation</title>
-    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>nexusLIMS.extractors &#8212; NexusLIMS 1.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom-styles.css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     <script src="../../_static/custom.js"></script>
     <link rel="shortcut icon" href="../../_static/nexusLIMS_bare_logo.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -22,10 +21,10 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
-<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
-<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
 
   </head><body>
 
@@ -47,7 +46,7 @@
           <ul class="nav navbar-nav">
             
                 <li><a href="../../api.html">API Docs</a></li>
-                <li><a href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS">Repository</a></li>
+                <li><a href="https://github.com/usnistgov/NexusLIMS">Repository</a></li>
                 <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
             
             
@@ -61,20 +60,19 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="../../index.html">Package introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../data_security.html">Data security in NexusLIMS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../database.html">NexusLIMS database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../session_logger_app.html">Session logging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../development.html">Developer documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../taxonomy.html">NexusLIMS taxonomy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../schema_documentation.html">Schema documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../session_logger_app.html">Session logging (deprecated)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../api/nexusLIMS.html">nexusLIMS package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.harvester.html">nexusLIMS.harvester package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
 </ul>
 </li>
@@ -126,14 +124,13 @@
 <ul class="globaltoc">
     <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../index.html">Package introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../data_security.html">Data security in NexusLIMS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../database.html">NexusLIMS database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../session_logger_app.html">Session logging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../development.html">Developer documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../taxonomy.html">NexusLIMS taxonomy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../schema_documentation.html">Schema documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../session_logger_app.html">Session logging (deprecated)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API documentation</a></li>
 </ul>
 
@@ -185,7 +182,7 @@
 <span class="kn">from</span> <span class="nn">nexusLIMS.instruments</span> <span class="kn">import</span> <span class="n">get_instr_from_filepath</span> <span class="k">as</span> <span class="n">_get_instr</span>
 <span class="kn">import</span> <span class="nn">hyperspy.api_nogui</span> <span class="k">as</span> <span class="nn">_hs</span>
 <span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
-<span class="kn">import</span> <span class="nn">collections</span> <span class="k">as</span> <span class="nn">_collections</span>
+<span class="kn">import</span> <span class="nn">collections.abc</span> <span class="k">as</span> <span class="nn">_abc</span>
 
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">_logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">PLACEHOLDER_PREVIEW</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span>
@@ -272,7 +269,7 @@
         <span class="k">if</span> <span class="n">extension</span> <span class="o">==</span> <span class="s1">&#39;tif&#39;</span><span class="p">:</span>
             <span class="n">instr</span> <span class="o">=</span> <span class="n">_get_instr</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
             <span class="n">instr_name</span> <span class="o">=</span> <span class="n">instr</span><span class="o">.</span><span class="n">name</span> <span class="k">if</span> <span class="n">instr</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="kc">None</span>
-            <span class="k">if</span> <span class="n">instr_name</span> <span class="o">==</span> <span class="s1">&#39;FEI-Quanta200-ESEM-633137&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">instr_name</span> <span class="o">==</span> <span class="s1">&#39;FEI-Quanta200-ESEM-633137_n&#39;</span><span class="p">:</span>
                 <span class="c1"># we know the output size we want for the Quanta</span>
                 <span class="n">output_size</span> <span class="o">=</span> <span class="p">(</span><span class="mi">512</span><span class="p">,</span> <span class="mi">471</span><span class="p">)</span>
                 <span class="n">_down_sample</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span>
@@ -322,7 +319,7 @@
                 <span class="n">_pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">preview_fname</span><span class="p">))</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span>
                     <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="c1"># Generate the thumbnail</span>
-                <span class="n">s</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">progressbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">compute</span><span class="p">(</span><span class="n">show_progressbar</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
                 <span class="n">_s2thumb</span><span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">out_path</span><span class="o">=</span><span class="n">preview_fname</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Preview already exists: </span><span class="si">{</span><span class="n">preview_fname</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
@@ -357,7 +354,7 @@
     <span class="n">items</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">d</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
         <span class="n">new_key</span> <span class="o">=</span> <span class="n">parent_key</span> <span class="o">+</span> <span class="n">separator</span> <span class="o">+</span> <span class="n">k</span> <span class="k">if</span> <span class="n">parent_key</span> <span class="k">else</span> <span class="n">k</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">_collections</span><span class="o">.</span><span class="n">MutableMapping</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">_abc</span><span class="o">.</span><span class="n">MutableMapping</span><span class="p">):</span>
             <span class="n">items</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">flatten_dict</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">new_key</span><span class="p">,</span> <span class="n">separator</span><span class="o">=</span><span class="n">separator</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">items</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">new_key</span><span class="p">,</span> <span class="n">v</span><span class="p">))</span>
@@ -401,8 +398,8 @@
       
     </p>
     <p>
-        &copy; Copyright 2020, NIST Office of Data and Informatics.<br/>
-      Last updated on Oct, 19, 2020.<br/>
+        &copy; Copyright 2022, NIST Office of Data and Informatics.<br/>
+      Last updated on Jul, 15, 2022.<br/>
     </p>
   </div>
 </footer>

@@ -40,4 +40,3 @@ nexusLIMS.extractors.thumbnail\_generator module
    :members:
    :undoc-members:
    :show-inheritance:
-

@@ -4,16 +4,15 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>nexusLIMS.cdcs &#8212; NexusLIMS 0.0.9 documentation</title>
-    <link rel="stylesheet" href="../../_static/bootstrap-sphinx.css" type="text/css" />
-    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>nexusLIMS.cdcs &#8212; NexusLIMS 1.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom-styles.css" />
-    <script id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
     <script src="../../_static/jquery.js"></script>
     <script src="../../_static/underscore.js"></script>
     <script src="../../_static/doctools.js"></script>
-    <script src="../../_static/language_data.js"></script>
     <script src="../../_static/custom.js"></script>
     <link rel="shortcut icon" href="../../_static/nexusLIMS_bare_logo.ico"/>
     <link rel="index" title="Index" href="../../genindex.html" />
@@ -22,10 +21,10 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../../_static/js/jquery-1.11.0.min.js "></script>
-<script type="text/javascript" src="../../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
-<script type="text/javascript" src="../../_static/bootstrap-sphinx.js "></script>
+<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
 
   </head><body>
 
@@ -47,7 +46,7 @@
           <ul class="nav navbar-nav">
             
                 <li><a href="../../api.html">API Docs</a></li>
-                <li><a href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS">Repository</a></li>
+                <li><a href="https://github.com/usnistgov/NexusLIMS">Repository</a></li>
                 <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
             
             
@@ -61,20 +60,19 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="../../index.html">Package introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../data_security.html">Data security in NexusLIMS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../database.html">NexusLIMS database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../session_logger_app.html">Session logging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../development.html">Developer documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../taxonomy.html">NexusLIMS taxonomy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../schema_documentation.html">Schema documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../session_logger_app.html">Session logging (deprecated)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../api/nexusLIMS.html">nexusLIMS package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.harvester.html">nexusLIMS.harvester package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
 </ul>
 </li>
@@ -126,14 +124,13 @@
 <ul class="globaltoc">
     <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../index.html">Package introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../data_security.html">Data security in NexusLIMS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../database.html">NexusLIMS database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../session_logger_app.html">Session logging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../development.html">Developer documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../taxonomy.html">NexusLIMS taxonomy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../schema_documentation.html">Schema documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../session_logger_app.html">Session logging (deprecated)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../api.html">API documentation</a></li>
 </ul>
 
@@ -180,24 +177,42 @@
 <span class="c1">#  OR NOT INJURY WAS SUSTAINED BY PERSONS OR PROPERTY OR OTHERWISE, AND</span>
 <span class="c1">#  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,</span>
 <span class="c1">#  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.</span>
-
-
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
 <span class="kn">import</span> <span class="nn">requests</span> <span class="k">as</span> <span class="nn">_requests</span>
 <span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span> <span class="k">as</span> <span class="n">_glob</span>
 <span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urljoin</span> <span class="k">as</span> <span class="n">_urljoin</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">from</span> <span class="nn">nexusLIMS._urls</span> <span class="kn">import</span> <span class="n">cdcs_url</span> <span class="k">as</span> <span class="n">_cdcs_url</span>
-<span class="kn">from</span> <span class="nn">nexusLIMS.harvester.sharepoint_calendar</span> <span class="kn">import</span> <span class="n">AuthenticationError</span> <span class="k">as</span> \
-    <span class="n">_authError</span>
-<span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="n">nexus_req</span> <span class="k">as</span> <span class="n">_nx_req</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="n">nexus_req</span> <span class="k">as</span> <span class="n">_nx_req</span><span class="p">,</span> \
+    <span class="n">AuthenticationError</span> <span class="k">as</span> <span class="n">_authError</span>
 <span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span> <span class="k">as</span> <span class="n">_tqdm</span>
 <span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
 
 <span class="n">_logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">()</span>
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">_logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">_logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_cdcs_url</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the url to the NexusLIMS CDCS instance by fetching it from the environment</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    url : str</span>
+<span class="sd">        The URL of the NexusLIMS CDCS instance to use</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If the ``cdcs_url`` environment variable is not defined, raise a ``ValueError``</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;cdcs_url&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;cdcs_url&#39; environment variable is not defined&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">url</span>
 
 
 <div class="viewcode-block" id="get_workspace_id"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.cdcs.get_workspace_id">[docs]</a><span class="k">def</span> <span class="nf">get_workspace_id</span><span class="p">():</span>
@@ -212,7 +227,7 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># assuming there&#39;s only one workspace for this user (that is the public</span>
     <span class="c1"># workspace)</span>
-    <span class="n">_endpoint</span> <span class="o">=</span> <span class="n">_urljoin</span><span class="p">(</span><span class="n">_cdcs_url</span><span class="p">,</span> <span class="s1">&#39;rest/workspace/read_access&#39;</span><span class="p">)</span>
+    <span class="n">_endpoint</span> <span class="o">=</span> <span class="n">_urljoin</span><span class="p">(</span><span class="n">_cdcs_url</span><span class="p">(),</span> <span class="s1">&#39;rest/workspace/read_access&#39;</span><span class="p">)</span>
     <span class="n">_r</span> <span class="o">=</span> <span class="n">_nx_req</span><span class="p">(</span><span class="n">_endpoint</span><span class="p">,</span> <span class="n">_requests</span><span class="o">.</span><span class="n">get</span><span class="p">,</span> <span class="n">basic_auth</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">_r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">401</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">_authError</span><span class="p">(</span><span class="s1">&#39;Could not authenticate to CDCS. Are the &#39;</span>
@@ -232,7 +247,7 @@
 <span class="sd">        The template ID</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># get the current template (XSD) id value:</span>
-    <span class="n">_endpoint</span> <span class="o">=</span> <span class="n">_urljoin</span><span class="p">(</span><span class="n">_cdcs_url</span><span class="p">,</span> <span class="s1">&#39;rest/template-version-manager/global&#39;</span><span class="p">)</span>
+    <span class="n">_endpoint</span> <span class="o">=</span> <span class="n">_urljoin</span><span class="p">(</span><span class="n">_cdcs_url</span><span class="p">(),</span> <span class="s1">&#39;rest/template-version-manager/global&#39;</span><span class="p">)</span>
     <span class="n">_r</span> <span class="o">=</span> <span class="n">_nx_req</span><span class="p">(</span><span class="n">_endpoint</span><span class="p">,</span> <span class="n">_requests</span><span class="o">.</span><span class="n">get</span><span class="p">,</span> <span class="n">basic_auth</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">_r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">401</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">_authError</span><span class="p">(</span><span class="s1">&#39;Could not authenticate to CDCS. Are the &#39;</span>
@@ -261,7 +276,7 @@
 <span class="sd">    record_id : str</span>
 <span class="sd">        The id (on the server) of the record that was uploaded</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">endpoint</span> <span class="o">=</span> <span class="n">_urljoin</span><span class="p">(</span><span class="n">_cdcs_url</span><span class="p">,</span> <span class="s1">&#39;rest/data/&#39;</span><span class="p">)</span>
+    <span class="n">endpoint</span> <span class="o">=</span> <span class="n">_urljoin</span><span class="p">(</span><span class="n">_cdcs_url</span><span class="p">(),</span> <span class="s1">&#39;rest/data/&#39;</span><span class="p">)</span>
 
     <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
         <span class="s1">&#39;template&#39;</span><span class="p">:</span> <span class="n">get_template_id</span><span class="p">(),</span>
@@ -279,9 +294,9 @@
 
     <span class="c1"># assign this record to the public workspace</span>
     <span class="n">record_id</span> <span class="o">=</span> <span class="n">post_r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
-    <span class="n">record_url</span> <span class="o">=</span> <span class="n">_urljoin</span><span class="p">(</span><span class="n">_cdcs_url</span><span class="p">,</span>
+    <span class="n">record_url</span> <span class="o">=</span> <span class="n">_urljoin</span><span class="p">(</span><span class="n">_cdcs_url</span><span class="p">(),</span>
                           <span class="sa">f</span><span class="s1">&#39;data?id=</span><span class="si">{</span><span class="n">record_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="n">wrk_endpoint</span> <span class="o">=</span> <span class="n">_urljoin</span><span class="p">(</span><span class="n">_cdcs_url</span><span class="p">,</span>
+    <span class="n">wrk_endpoint</span> <span class="o">=</span> <span class="n">_urljoin</span><span class="p">(</span><span class="n">_cdcs_url</span><span class="p">(),</span>
                             <span class="sa">f</span><span class="s1">&#39;rest/data/</span><span class="si">{</span><span class="n">record_id</span><span class="si">}</span><span class="s1">/assign/&#39;</span>
                             <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">get_workspace_id</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
 
@@ -306,7 +321,7 @@
 <span class="sd">        The REST response returned from the CDCS instance after attempting</span>
 <span class="sd">        the delete</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">endpoint</span> <span class="o">=</span> <span class="n">_urljoin</span><span class="p">(</span><span class="n">_cdcs_url</span><span class="p">,</span> <span class="sa">f</span><span class="s1">&#39;rest/data/</span><span class="si">{</span><span class="n">record_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">endpoint</span> <span class="o">=</span> <span class="n">_urljoin</span><span class="p">(</span><span class="n">_cdcs_url</span><span class="p">(),</span> <span class="sa">f</span><span class="s1">&#39;rest/data/</span><span class="si">{</span><span class="n">record_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
     <span class="n">r</span> <span class="o">=</span> <span class="n">_nx_req</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">_requests</span><span class="o">.</span><span class="n">delete</span><span class="p">,</span> <span class="n">basic_auth</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">204</span><span class="p">:</span>
         <span class="c1"># anything other than 204 status means something went wrong</span>
@@ -330,9 +345,9 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    files_uploaded : list of str</span>
+<span class="sd">    files_uploaded : :obj:`list` of :obj:`str`</span>
 <span class="sd">        A list of the files that were successfully uploaded</span>
-<span class="sd">    record_ids : list of str</span>
+<span class="sd">    record_ids : :obj:`list` of :obj:`str`</span>
 <span class="sd">        A list of the record id values (onthe server) that were uploaded</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">files_to_upload</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -415,8 +430,8 @@
       
     </p>
     <p>
-        &copy; Copyright 2020, NIST Office of Data and Informatics.<br/>
-      Last updated on Oct, 19, 2020.<br/>
+        &copy; Copyright 2022, NIST Office of Data and Informatics.<br/>
+      Last updated on Jul, 15, 2022.<br/>
     </p>
   </div>
 </footer>

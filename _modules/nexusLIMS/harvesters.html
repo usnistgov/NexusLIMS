@@ -1,0 +1,465 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>nexusLIMS.harvesters &#8212; NexusLIMS 1.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../../_static/custom-styles.css" />
+    <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+    <script src="../../_static/jquery.js"></script>
+    <script src="../../_static/underscore.js"></script>
+    <script src="../../_static/doctools.js"></script>
+    <script src="../../_static/custom.js"></script>
+    <link rel="shortcut icon" href="../../_static/nexusLIMS_bare_logo.ico"/>
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+<meta charset='utf-8'>
+<meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
+<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<script type="text/javascript" src="../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../_static/bootstrap-sphinx.js"></script>
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../index.html"><span><img src="../../_static/logo_horizontal.png"></span>
+           </a>
+        <span class="navbar-text navbar-version pull-left"><b></b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../api.html">API Docs</a></li>
+                <li><a href="https://github.com/usnistgov/NexusLIMS">Repository</a></li>
+                <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../index.html">Site Map <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../session_logger_app.html">Session logging (deprecated)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../api/nexusLIMS.html">nexusLIMS package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li class="dummy-sidebarrel">
+    <a><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Previous</span>
+    </a>
+  </li>
+  <li class="dummy-sidebarrel">
+    <a><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Next &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><img src="../../_static/nexusLIMS_bare_logo.png">
+<h4><a href="../../index.html" title="Return to documentation home">
+    NexusLIMS Documentation</a></h4>
+<ul class="globaltoc">
+    <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../session_logger_app.html">Session logging (deprecated)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../api.html">API documentation</a></li>
+</ul>
+
+</ul><h4>
+    <a class="no-hover">Page content</a>
+</h4>
+
+
+<form action="../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <h1>Source code for nexusLIMS.harvesters</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module contains a top-level class to represent calendar reservations and</span>
+<span class="sd">associated metadata harvest metadata from various calendar sources.</span>
+<span class="sd">The expectation is that submodules of this module will have a method named</span>
+<span class="sd">``res_event_from_session`` implemented to handle fetching a ReservationEvent</span>
+<span class="sd">object from a :py:class:`nexusLIMS.db.session_handler.Session` object.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.instruments</span> <span class="kn">import</span> <span class="n">Instrument</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>
+<span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
+
+<span class="n">CA_BUNDLE_PATH</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;NexusLIMS_cert_bundle_file&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+<span class="n">CA_BUNDLE_CONTENT</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;NexusLIMS_cert_bundle&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">CA_BUNDLE_CONTENT</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="c1"># no way to test this in CI/CD pipeline</span>
+    <span class="k">if</span> <span class="n">CA_BUNDLE_PATH</span><span class="p">:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">CA_BUNDLE_PATH</span><span class="p">,</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">our_cert</span><span class="p">:</span>
+            <span class="n">CA_BUNDLE_CONTENT</span> <span class="o">=</span> <span class="n">our_cert</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="c1"># split content into a list of bytes on \n characters</span>
+    <span class="n">CA_BUNDLE_CONTENT</span> <span class="o">=</span> <span class="p">[(</span><span class="n">i</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">encode</span><span class="p">()</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">CA_BUNDLE_CONTENT</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;\n&#39;</span><span class="p">)]</span>
+
+
+<div class="viewcode-block" id="ReservationEvent"><a class="viewcode-back" href="../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent">[docs]</a><span class="k">class</span> <span class="nc">ReservationEvent</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A representation of a single calendar reservation, independent of the type</span>
+<span class="sd">    of calendar the reservation was made with. ``ReservationEvent``</span>
+<span class="sd">    is a common interface that is used by the record building code.</span>
+<span class="sd">    Any attribute can be None to indicate it was not present or no value was</span>
+<span class="sd">    provided. The :py:meth:`as_xml` method is used to serialize the information</span>
+<span class="sd">    contained within a ``ReservationEvent`` into an XML representation that is</span>
+<span class="sd">    compatible with the Nexus Facility ``Experiment`` schema.</span>
+
+<span class="sd">    Attributes</span>
+<span class="sd">    ----------</span>
+<span class="sd">    experiment_title</span>
+<span class="sd">        The title of the event</span>
+<span class="sd">    instrument</span>
+<span class="sd">        The instrument associated with this reservation</span>
+<span class="sd">    last_updated : datetime.datetime</span>
+<span class="sd">        The time this event was last updated</span>
+<span class="sd">    username</span>
+<span class="sd">        The username of the user indicated in this event</span>
+<span class="sd">    user_full_name</span>
+<span class="sd">        The full name of the user for this event</span>
+<span class="sd">    created_by</span>
+<span class="sd">        The username of the user that created this event</span>
+<span class="sd">    created_by_full_name</span>
+<span class="sd">        The full name of the user that created this event</span>
+<span class="sd">    start_time</span>
+<span class="sd">        The time this event was scheduled to start</span>
+<span class="sd">    end_time</span>
+<span class="sd">        The time this event was scheduled to end</span>
+<span class="sd">    reservation_type</span>
+<span class="sd">        The &quot;type&quot; or category of this event (such as User session, service,</span>
+<span class="sd">        etc.))</span>
+<span class="sd">    experiment_purpose</span>
+<span class="sd">        The user-entered purpose of this experiment</span>
+<span class="sd">    sample_details</span>
+<span class="sd">        A list of the user-entered sample details for this experiment. The</span>
+<span class="sd">        length of the list must match that given in ``sample_pid`` and</span>
+<span class="sd">        ``sample_name``.</span>
+<span class="sd">    sample_pid</span>
+<span class="sd">        A list of sample PIDs provided by the user. The</span>
+<span class="sd">        length of the list must match that given in ``sample_details`` and</span>
+<span class="sd">        ``sample_name``.</span>
+<span class="sd">    sample_name</span>
+<span class="sd">        A list of user-friendly sample names (not a PID). The</span>
+<span class="sd">        length of the list must match that given in ``sample_details`` and</span>
+<span class="sd">        ``sample_pid``.</span>
+<span class="sd">    project_name</span>
+<span class="sd">        A list of the user-entered project names for this experiment. The</span>
+<span class="sd">        length of the list must match that given in ``project_id`` and</span>
+<span class="sd">        ``project_ref``.</span>
+<span class="sd">    project_id</span>
+<span class="sd">        A list of the specific project IDs within a research group/division. The</span>
+<span class="sd">        length of the list must match that given in ``project_name`` and</span>
+<span class="sd">        ``project_ref``.</span>
+<span class="sd">    project_ref</span>
+<span class="sd">        A list of (optional) links to this project in another database. The</span>
+<span class="sd">        length of the list must match that given in ``project_name`` and</span>
+<span class="sd">        ``project_id``.</span>
+<span class="sd">    internal_id</span>
+<span class="sd">        The identifier assigned to this event (if any) by the calendaring system</span>
+<span class="sd">    division</span>
+<span class="sd">        An identifier of the division this experiment was performed for (i.e.</span>
+<span class="sd">        the user&#39;s division)</span>
+<span class="sd">    group</span>
+<span class="sd">        An identifier of the group this experiment was performed for (i.e.</span>
+<span class="sd">        the user&#39;s group)</span>
+<span class="sd">    url</span>
+<span class="sd">        A web-accessible link to a summary of this reservation</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
+                 <span class="n">experiment_title</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">instrument</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Instrument</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">last_updated</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">datetime</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">username</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">user_full_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">created_by</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">created_by_full_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">start_time</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">datetime</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">end_time</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">datetime</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> 
+                 <span class="n">reservation_type</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">experiment_purpose</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">sample_details</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">sample_pid</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">sample_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">project_name</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">project_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">project_ref</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]],</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">internal_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">division</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">group</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+                 <span class="n">url</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">experiment_title</span> <span class="o">=</span> <span class="n">experiment_title</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span> <span class="o">=</span> <span class="n">instrument</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">last_updated</span> <span class="o">=</span> <span class="n">last_updated</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="o">=</span> <span class="n">username</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user_full_name</span> <span class="o">=</span> <span class="n">user_full_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">created_by</span> <span class="o">=</span> <span class="n">created_by</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">created_by_full_name</span> <span class="o">=</span> <span class="n">created_by_full_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span> <span class="o">=</span> <span class="n">start_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span> <span class="o">=</span> <span class="n">end_time</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reservation_type</span> <span class="o">=</span> <span class="n">reservation_type</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">experiment_purpose</span> <span class="o">=</span> <span class="n">experiment_purpose</span>
+
+        <span class="c1"># coerce sample arguments into lists</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_details</span> <span class="o">=</span> \
+            <span class="n">sample_details</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sample_details</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> \
+            <span class="p">[</span><span class="n">sample_details</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_pid</span> <span class="o">=</span> \
+            <span class="n">sample_pid</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sample_pid</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">sample_pid</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sample_name</span> <span class="o">=</span> \
+            <span class="n">sample_name</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">sample_name</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span>  <span class="p">[</span><span class="n">sample_name</span><span class="p">]</span>
+
+        <span class="c1"># coerce project arguments into lists</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">project_name</span> <span class="o">=</span> \
+            <span class="n">project_name</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">project_name</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">project_name</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">project_id</span> <span class="o">=</span> \
+            <span class="n">project_id</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">project_id</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">project_id</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">project_ref</span> <span class="o">=</span> \
+            <span class="n">project_ref</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">project_ref</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">project_ref</span><span class="p">]</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">internal_id</span> <span class="o">=</span> <span class="n">internal_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">division</span> <span class="o">=</span> <span class="n">division</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="o">=</span> <span class="n">group</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
+
+        <span class="c1"># raise error if all sample values are not none and have different</span>
+        <span class="c1"># lengths (this shouldn&#39;t happen):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_arg_lists</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_check_arg_lists</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">check_name</span><span class="p">,</span> <span class="n">arg_names</span><span class="p">,</span> <span class="n">lists</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="p">[</span><span class="s1">&#39;sample&#39;</span><span class="p">,</span> <span class="s1">&#39;project&#39;</span><span class="p">],</span>
+                <span class="p">[</span><span class="s1">&#39;[sample_details, sample_pid, sample_name]&#39;</span><span class="p">,</span>
+                 <span class="s1">&#39;[project_name, project_id, project_ref]&#39;</span><span class="p">],</span>
+                <span class="p">[[</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_details</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_pid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_name</span><span class="p">],</span>
+                 <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_ref</span><span class="p">]]):</span>
+            <span class="k">if</span> <span class="nb">all</span><span class="p">(</span><span class="n">x</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">lists</span><span class="p">):</span>
+                <span class="n">length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">lists</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">all</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">lst</span><span class="p">)</span> <span class="o">==</span> <span class="n">length</span> <span class="k">for</span> <span class="n">lst</span> <span class="ow">in</span> <span class="n">lists</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Length of </span><span class="si">{</span><span class="n">check_name</span><span class="si">}</span><span class="s2"> arguments must &quot;</span>
+                                     <span class="sa">f</span><span class="s2">&quot;be the same. The lengths of the &quot;</span>
+                                     <span class="sa">f</span><span class="s2">&quot;following arguments were &quot;</span>
+                                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">arg_names</span><span class="si">}</span><span class="s2"> : &quot;</span>
+                                     <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">l</span><span class="p">)</span> <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="n">lists</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">username</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;Event for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="si">}</span><span class="s1"> on </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> &#39;</span> \
+                   <span class="sa">f</span><span class="s1">&#39;from &#39;</span> \
+                   <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">localize_datetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s1"> &#39;</span> \
+                   <span class="sa">f</span><span class="s1">&#39;to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">localize_datetime</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">end_time</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;No matching calendar event&#39;</span> <span class="o">+</span> \
+                   <span class="p">(</span><span class="sa">f</span><span class="s1">&#39; for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="ReservationEvent.as_xml"><a class="viewcode-back" href="../../api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.as_xml">[docs]</a>    <span class="k">def</span> <span class="nf">as_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Get an XML representation of this ReservationEvent</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        root : lxml.etree.Element</span>
+<span class="sd">            The reservation event serialized as XML that matches the</span>
+<span class="sd">            Nexus Experiment schema</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;root&quot;</span><span class="p">)</span>
+
+        <span class="c1"># top-level nodes</span>
+        <span class="n">title_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;title&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_title</span><span class="p">:</span>
+            <span class="n">title_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_title</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">title_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Experiment on the &quot;</span> \
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">schema_name</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="p">:</span>
+                <span class="n">title_el</span><span class="o">.</span><span class="n">text</span> <span class="o">+=</span> \
+                    <span class="sa">f</span><span class="s2">&quot; on </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;%A %b. </span><span class="si">%d</span><span class="s1">, %Y&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">internal_id</span><span class="p">:</span>
+            <span class="n">id_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;id&quot;</span><span class="p">)</span>
+            <span class="n">id_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">internal_id</span>
+
+        <span class="c1"># summary node</span>
+        <span class="n">summary_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;summary&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_full_name</span><span class="p">:</span>
+            <span class="n">experimenter_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">summary_el</span><span class="p">,</span> <span class="s2">&quot;experimenter&quot;</span><span class="p">)</span>
+            <span class="n">experimenter_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">user_full_name</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">username</span><span class="p">:</span>
+            <span class="n">experimenter_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">summary_el</span><span class="p">,</span> <span class="s2">&quot;experimenter&quot;</span><span class="p">)</span>
+            <span class="n">experimenter_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">username</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="p">:</span>
+            <span class="n">instr_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">summary_el</span><span class="p">,</span> <span class="s2">&quot;instrument&quot;</span><span class="p">)</span>
+            <span class="n">instr_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">schema_name</span>
+            <span class="c1"># temporary workaround for duplicate harvesters for some instruments</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">harvester</span> <span class="o">==</span> <span class="s1">&#39;nemo&#39;</span> <span class="ow">and</span> \
+                    <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;_n&#39;</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+                <span class="n">pid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;_n&#39;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">pid</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">name</span>
+            <span class="n">instr_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;pid&#39;</span><span class="p">,</span> <span class="n">pid</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="p">:</span>
+            <span class="n">start_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">summary_el</span><span class="p">,</span> <span class="s2">&quot;reservationStart&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">start_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">localize_datetime</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">start_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span><span class="p">:</span>
+            <span class="n">end_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">summary_el</span><span class="p">,</span> <span class="s2">&quot;reservationEnd&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">end_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">localize_datetime</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span><span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">end_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">end_time</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_purpose</span><span class="p">:</span>
+            <span class="n">motivation_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">summary_el</span><span class="p">,</span> <span class="s2">&quot;motivation&quot;</span><span class="p">)</span>
+            <span class="n">motivation_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">experiment_purpose</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">:</span>
+            <span class="n">summary_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;ref&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">)</span>
+
+        <span class="c1"># sample nodes</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_pid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># if any of the sample arguments are not none, they should be</span>
+            <span class="c1"># lists, so we should create a sample element for each one</span>
+            <span class="k">for</span> <span class="n">pid</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span> <span class="n">details</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sample_pid</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">sample_name</span><span class="p">,</span>
+                                          <span class="bp">self</span><span class="o">.</span><span class="n">sample_details</span><span class="p">):</span>
+                <span class="c1"># create one sample subelement for each sample in our lists</span>
+                <span class="n">sample_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;sample&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">pid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">sample_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;ref&quot;</span><span class="p">,</span> <span class="n">pid</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">sample_name_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">sample_el</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span>
+                    <span class="n">sample_name_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">name</span>
+                <span class="k">if</span> <span class="n">details</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">sample_detail_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">sample_el</span><span class="p">,</span>
+                                                        <span class="s2">&quot;description&quot;</span><span class="p">)</span>
+                    <span class="n">sample_detail_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">details</span>
+
+        <span class="c1"># project nodes</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">pid</span><span class="p">,</span> <span class="n">ref</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">project_name</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">project_id</span><span class="p">,</span>
+                                     <span class="bp">self</span><span class="o">.</span><span class="n">project_ref</span><span class="p">):</span>
+                <span class="n">project_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">root</span><span class="p">,</span> <span class="s2">&quot;project&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">name</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">project_name_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">project_el</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span>
+                    <span class="n">project_name_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">name</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">division</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">division_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">project_el</span><span class="p">,</span> <span class="s2">&quot;division&quot;</span><span class="p">)</span>
+                    <span class="n">division_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">division</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">group_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">project_el</span><span class="p">,</span> <span class="s2">&quot;group&quot;</span><span class="p">)</span>
+                    <span class="n">group_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">group</span>
+                <span class="k">if</span> <span class="n">pid</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">proj_id_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">project_el</span><span class="p">,</span> <span class="s2">&quot;project_id&quot;</span><span class="p">)</span>
+                    <span class="n">proj_id_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">pid</span>
+                <span class="k">if</span> <span class="n">ref</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="n">proj_ref_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">project_el</span><span class="p">,</span> <span class="s2">&quot;ref&quot;</span><span class="p">)</span>
+                    <span class="n">proj_ref_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">ref</span>
+
+        <span class="k">return</span> <span class="n">root</span></div></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+  
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2022, NIST Office of Data and Informatics.<br/>
+      Last updated on Jul, 15, 2022.<br/>
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

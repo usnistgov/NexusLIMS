@@ -4,16 +4,15 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>nexusLIMS.db.session_handler &#8212; NexusLIMS 0.0.9 documentation</title>
-    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>nexusLIMS.db.session_handler &#8212; NexusLIMS 1.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom-styles.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <script src="../../../_static/custom.js"></script>
     <link rel="shortcut icon" href="../../../_static/nexusLIMS_bare_logo.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -22,10 +21,10 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js "></script>
-<script type="text/javascript" src="../../../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
-<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js "></script>
+<script type="text/javascript" src="../../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
 
   </head><body>
 
@@ -47,7 +46,7 @@
           <ul class="nav navbar-nav">
             
                 <li><a href="../../../api.html">API Docs</a></li>
-                <li><a href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS">Repository</a></li>
+                <li><a href="https://github.com/usnistgov/NexusLIMS">Repository</a></li>
                 <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
             
             
@@ -61,20 +60,19 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Package introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_security.html">Data security in NexusLIMS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../database.html">NexusLIMS database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../session_logger_app.html">Session logging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development.html">Developer documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../taxonomy.html">NexusLIMS taxonomy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../schema_documentation.html">Schema documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../session_logger_app.html">Session logging (deprecated)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/nexusLIMS.html">nexusLIMS package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.harvester.html">nexusLIMS.harvester package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
 </ul>
 </li>
@@ -126,14 +124,13 @@
 <ul class="globaltoc">
     <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Package introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_security.html">Data security in NexusLIMS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../database.html">NexusLIMS database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../session_logger_app.html">Session logging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development.html">Developer documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../taxonomy.html">NexusLIMS taxonomy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../schema_documentation.html">Schema documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../session_logger_app.html">Session logging (deprecated)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API documentation</a></li>
 </ul>
 
@@ -182,7 +179,8 @@
 <span class="c1">#  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.</span>
 <span class="c1">#</span>
 
-<span class="kn">from</span> <span class="nn">nexusLIMS.instruments</span> <span class="kn">import</span> <span class="n">instrument_db</span> <span class="k">as</span> <span class="n">_instr_db</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Union</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.instruments</span> <span class="kn">import</span> <span class="n">instrument_db</span> <span class="k">as</span> <span class="n">_instr_db</span><span class="p">,</span> <span class="n">Instrument</span>
 <span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span> <span class="k">as</span> <span class="n">_dt</span>
 <span class="kn">import</span> <span class="nn">sqlite3</span> <span class="k">as</span> <span class="nn">_sql3</span>
@@ -192,6 +190,19 @@
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">_logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
+<div class="viewcode-block" id="db_query"><a class="viewcode-back" href="../../../api/nexusLIMS.db.html#nexusLIMS.db.session_handler.db_query">[docs]</a><span class="k">def</span> <span class="nf">db_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">args</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">args</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">()</span>
+    <span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
+    <span class="k">with</span> <span class="n">_contextlib</span><span class="o">.</span><span class="n">closing</span><span class="p">(</span><span class="n">_sql3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
+            <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;nexusLIMS_db_path&#39;</span><span class="p">]))</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">conn</span><span class="p">:</span>  <span class="c1"># auto-commits</span>
+            <span class="k">with</span> <span class="n">_contextlib</span><span class="o">.</span><span class="n">closing</span><span class="p">(</span><span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">())</span> <span class="k">as</span> <span class="n">cursor</span><span class="p">:</span>
+                <span class="n">results</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span><span class="o">.</span><span class="n">fetchall</span><span class="p">()</span>
+                <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
+    <span class="k">return</span> <span class="n">success</span><span class="p">,</span> <span class="n">results</span></div>
+
+
 <div class="viewcode-block" id="SessionLog"><a class="viewcode-back" href="../../../api/nexusLIMS.db.html#nexusLIMS.db.session_handler.SessionLog">[docs]</a><span class="k">class</span> <span class="nc">SessionLog</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    A simple mapping of one row in the ``session_log`` table of the NexusLIMS</span>
@@ -199,28 +210,77 @@
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    session_identifier : str</span>
-<span class="sd">         A UUID4 (36-character string) that is consistent among a single</span>
-<span class="sd">         record&#39;s `&quot;START&quot;`, `&quot;END&quot;`, and `&quot;RECORD_GENERATION&quot;` events</span>
-<span class="sd">    instrument : str</span>
+<span class="sd">    session_identifier</span>
+<span class="sd">         A unique string that is consistent among a single</span>
+<span class="sd">         record&#39;s `&quot;START&quot;`, `&quot;END&quot;`, and `&quot;RECORD_GENERATION&quot;` events (often a</span>
+<span class="sd">         UUID, but is not required to be so)</span>
+<span class="sd">    instrument</span>
 <span class="sd">        The instrument associated with this session (foreign key reference to</span>
 <span class="sd">        the ``instruments`` table)</span>
-<span class="sd">    timestamp : str</span>
+<span class="sd">    timestamp</span>
 <span class="sd">        The ISO format timestamp representing the date and time of the logged</span>
 <span class="sd">        event</span>
-<span class="sd">    event_type : str</span>
+<span class="sd">    event_type</span>
 <span class="sd">        The type of log for this session (either `&quot;START&quot;`, `&quot;END&quot;`,</span>
 <span class="sd">        or `&quot;RECORD_GENERATION&quot;`)</span>
-<span class="sd">    user : str</span>
-<span class="sd">        The NIST &quot;short style&quot; username associated with this session (if known)</span>
+<span class="sd">    user</span>
+<span class="sd">        The username associated with this session (if known)</span>
+<span class="sd">    record_status</span>
+<span class="sd">        The status to use for this record (defaults to ``&#39;TO_BE_BUILT&#39;``</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_identifier</span><span class="p">,</span> <span class="n">instrument</span><span class="p">,</span>
-                 <span class="n">timestamp</span><span class="p">,</span> <span class="n">event_type</span><span class="p">,</span> <span class="n">user</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">session_identifier</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">instrument</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">timestamp</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">event_type</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">user</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+                 <span class="n">record_status</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="kc">None</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">session_identifier</span> <span class="o">=</span> <span class="n">session_identifier</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span> <span class="o">=</span> <span class="n">instrument</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span> <span class="o">=</span> <span class="n">timestamp</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">event_type</span> <span class="o">=</span> <span class="n">event_type</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">user</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">user</span> <span class="o">=</span> <span class="n">user</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">record_status</span> <span class="o">=</span> <span class="n">record_status</span> <span class="k">if</span> <span class="n">record_status</span> <span class="k">else</span> <span class="s1">&#39;TO_BE_BUILT&#39;</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;SessionLog (id=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">session_identifier</span><span class="si">}</span><span class="s2">, &quot;</span> \
+               <span class="sa">f</span><span class="s2">&quot;instrument=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="si">}</span><span class="s2">, &quot;</span> \
+               <span class="sa">f</span><span class="s2">&quot;timestamp=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">, &quot;</span> \
+               <span class="sa">f</span><span class="s2">&quot;event_type=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">event_type</span><span class="si">}</span><span class="s2">, &quot;</span> \
+               <span class="sa">f</span><span class="s2">&quot;user=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="si">}</span><span class="s2">, &quot;</span> \
+               <span class="sa">f</span><span class="s2">&quot;record_status=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">record_status</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+<div class="viewcode-block" id="SessionLog.insert_log"><a class="viewcode-back" href="../../../api/nexusLIMS.db.html#nexusLIMS.db.session_handler.SessionLog.insert_log">[docs]</a>    <span class="k">def</span> <span class="nf">insert_log</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Inserts a log into the database with the information contained within</span>
+<span class="sd">        this SessionLog&#39;s attributes (used primarily for NEMO ``usage_event``</span>
+<span class="sd">        integration). It will check for the presence of a matching record first</span>
+<span class="sd">        and warn without inserting anything if it finds one.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        success : bool</span>
+<span class="sd">            Whether or not the session log row was inserted successfully</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;SELECT * FROM session_log &quot;</span> \
+                <span class="s2">&quot;WHERE session_identifier=? AND &quot;</span> \
+                <span class="s2">&quot;instrument=? AND &quot;</span> \
+                <span class="s2">&quot;timestamp=? AND &quot;</span> \
+                <span class="s2">&quot;event_type=? AND &quot;</span> \
+                <span class="s2">&quot;record_status=? AND &quot;</span> \
+                <span class="s2">&quot;user=?&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">session_identifier</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">timestamp</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">event_type</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">record_status</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">user</span><span class="p">)</span>
+
+        <span class="n">success</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">db_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">results</span><span class="p">:</span>
+            <span class="c1"># There was a matching record in the DB, so warn and return success</span>
+            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;SessionLog already existed in DB, so no &quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;row was added: </span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">success</span>
+
+        <span class="n">query</span> <span class="o">=</span> <span class="s2">&quot;INSERT INTO session_log(session_identifier, instrument, &quot;</span> \
+                <span class="s2">&quot;timestamp, event_type, record_status, user) VALUES &quot;</span> \
+                <span class="s2">&quot;(?, ?, ?, ?, ?, ?)&quot;</span>
+        <span class="n">success</span><span class="p">,</span> <span class="n">results</span> <span class="o">=</span> <span class="n">db_query</span><span class="p">(</span><span class="n">query</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">success</span></div></div>
 
 
 <div class="viewcode-block" id="Session"><a class="viewcode-back" href="../../../api/nexusLIMS.db.html#nexusLIMS.db.session_handler.Session">[docs]</a><span class="k">class</span> <span class="nc">Session</span><span class="p">:</span>
@@ -233,13 +293,13 @@
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    session_identifier : str</span>
-<span class="sd">        The UUIDv4 identifier for an individual session on an instrument</span>
-<span class="sd">    instrument : ~nexusLIMS.instruments.Instrument</span>
+<span class="sd">        The unique identifier for an individual session on an instrument</span>
+<span class="sd">    instrument : Instrument</span>
 <span class="sd">        An object representing the instrument associated with this session</span>
-<span class="sd">    dt_from : :py:class:`~datetime.datetime`</span>
+<span class="sd">    dt_from : datetime.datetime</span>
 <span class="sd">        A :py:class:`~datetime.datetime` object representing the start of this</span>
 <span class="sd">        session</span>
-<span class="sd">    dt_to : :py:class:`~datetime.datetime`</span>
+<span class="sd">    dt_to : datetime.datetime</span>
 <span class="sd">        A :py:class:`~datetime.datetime` object representing the end of this</span>
 <span class="sd">        session</span>
 <span class="sd">    user : str</span>
@@ -264,14 +324,15 @@
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        status : str</span>
-<span class="sd">            One of `&quot;COMPLETED&quot;`, `&quot;WAITING_FOR_END&quot;`, `&quot;TO_BE_BUILT&quot;`,</span>
-<span class="sd">            `&quot;ERROR&quot;`, `&quot;NO_FILES_FOUND&quot;` (the allowed values in the</span>
-<span class="sd">            NexusLIMS database). Status value will be validated by the database</span>
+<span class="sd">            One of ``&quot;COMPLETED&quot;``, ``&quot;WAITING_FOR_END&quot;``, ``&quot;TO_BE_BUILT&quot;``,</span>
+<span class="sd">            ``&quot;ERROR&quot;``, ``&quot;NO_FILES_FOUND&quot;``, ``&quot;NO_CONSENT&quot;``, or ``&quot;NO_RESERVATION&quot;``</span>
+<span class="sd">            (the allowed values in the NexusLIMS database). Status value will be</span>
+<span class="sd">            validated by a check constraint in the database</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        success : bool</span>
-<span class="sd">            Whether or not the update operation was successful</span>
+<span class="sd">            Whether the update operation was successful</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">update_query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;UPDATE session_log SET record_status = &#39;</span><span class="si">{</span><span class="n">status</span><span class="si">}</span><span class="s2">&#39; &quot;</span> \
                        <span class="sa">f</span><span class="s2">&quot;WHERE session_identifier = &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">session_identifier</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
@@ -288,23 +349,26 @@
 
         <span class="k">return</span> <span class="n">success</span></div>
 
-<div class="viewcode-block" id="Session.insert_record_generation_event"><a class="viewcode-back" href="../../../api/nexusLIMS.db.html#nexusLIMS.db.session_handler.Session.insert_record_generation_event">[docs]</a>    <span class="k">def</span> <span class="nf">insert_record_generation_event</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<div class="viewcode-block" id="Session.insert_record_generation_event"><a class="viewcode-back" href="../../../api/nexusLIMS.db.html#nexusLIMS.db.session_handler.Session.insert_record_generation_event">[docs]</a>    <span class="k">def</span> <span class="nf">insert_record_generation_event</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Insert a log for this sesssion into the session database with</span>
-<span class="sd">        ``event_type`` `&quot;RECORD_GENERATION&quot;`</span>
+<span class="sd">        Insert a log for this session into the session database with</span>
+<span class="sd">        ``event_type`` `&quot;RECORD_GENERATION&quot;` and the current time (with local</span>
+<span class="sd">        system timezone) as the timestamp.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        success : bool</span>
-<span class="sd">            Whether or not the update operation was successful</span>
+<span class="sd">        res : dict</span>
+<span class="sd">            A dictionary containing the results from the query to check that</span>
+<span class="sd">            a RECORD_GENERATION event was added</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Logging RECORD_GENERATION for &#39;</span>
                       <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">session_identifier</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="n">insert_query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;INSERT INTO session_log &quot;</span> \
-                       <span class="sa">f</span><span class="s2">&quot;(instrument, event_type, session_identifier, user) &quot;</span> \
-                       <span class="sa">f</span><span class="s2">&quot;VALUES (&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;, &quot;</span> \
-                       <span class="sa">f</span><span class="s2">&quot;&#39;RECORD_GENERATION&#39;, &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">session_identifier</span><span class="si">}</span><span class="s2">&#39;, &quot;</span> \
-                       <span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;nexusLIMS_user&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39;);&quot;</span>
+        <span class="n">insert_query</span> <span class="o">=</span> <span class="s2">&quot;INSERT INTO session_log &quot;</span> \
+                       <span class="s2">&quot;(instrument, event_type, session_identifier, &quot;</span> \
+                       <span class="s2">&quot;user, timestamp) VALUES (?, ?, ?, ?, ?)&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;RECORD_GENERATION&#39;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">session_identifier</span><span class="p">,</span> <span class="n">_os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;nexusLIMS_user&#39;</span><span class="p">),</span>
+                <span class="n">_dt</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">astimezone</span><span class="p">())</span>
         <span class="n">success</span> <span class="o">=</span> <span class="kc">False</span>
 
         <span class="c1"># use contextlib to auto-close the connection and database cursors</span>
@@ -313,33 +377,36 @@
             <span class="k">with</span> <span class="n">conn</span><span class="p">:</span>  <span class="c1"># auto-commits</span>
                 <span class="k">with</span> <span class="n">_contextlib</span><span class="o">.</span><span class="n">closing</span><span class="p">(</span>
                         <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">())</span> <span class="k">as</span> <span class="n">cursor</span><span class="p">:</span>  <span class="c1"># auto-closes</span>
-                    <span class="n">results</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">insert_query</span><span class="p">)</span>
+                    <span class="n">results</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">insert_query</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
 
-        <span class="n">check_query</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;SELECT event_type, session_identifier, &quot;</span> \
-                      <span class="sa">f</span><span class="s2">&quot;id_session_log, &quot;</span> \
-                      <span class="sa">f</span><span class="s2">&quot;timestamp FROM session_log &quot;</span> \
-                      <span class="sa">f</span><span class="s2">&quot;WHERE instrument = &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; &quot;</span> \
-                      <span class="sa">f</span><span class="s2">&quot;AND event_type = &#39;RECORD_GENERATION&#39;&quot;</span> \
-                      <span class="sa">f</span><span class="s2">&quot;ORDER BY timestamp DESC LIMIT 1;&quot;</span>
+        <span class="n">check_query</span> <span class="o">=</span> <span class="s2">&quot;SELECT id_session_log, event_type, &quot;</span> \
+                      <span class="s2">&quot;session_identifier, timestamp FROM session_log &quot;</span> \
+                      <span class="s2">&quot;WHERE instrument = ?&quot;</span> \
+                      <span class="s2">&quot;AND event_type = ?&quot;</span> \
+                      <span class="s2">&quot;ORDER BY timestamp DESC LIMIT 1&quot;</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s1">&#39;RECORD_GENERATION&#39;</span><span class="p">)</span>
 
         <span class="c1"># use contextlib to auto-close the connection and database cursors</span>
         <span class="k">with</span> <span class="n">_contextlib</span><span class="o">.</span><span class="n">closing</span><span class="p">(</span><span class="n">_sql3</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span>
                 <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;nexusLIMS_db_path&#39;</span><span class="p">]))</span> <span class="k">as</span> <span class="n">conn</span><span class="p">:</span>
+            <span class="n">conn</span><span class="o">.</span><span class="n">row_factory</span> <span class="o">=</span> <span class="n">_sql3</span><span class="o">.</span><span class="n">Row</span>
             <span class="k">with</span> <span class="n">conn</span><span class="p">:</span>  <span class="c1"># auto-commits</span>
                 <span class="k">with</span> <span class="n">_contextlib</span><span class="o">.</span><span class="n">closing</span><span class="p">(</span>
                         <span class="n">conn</span><span class="o">.</span><span class="n">cursor</span><span class="p">())</span> <span class="k">as</span> <span class="n">cursor</span><span class="p">:</span>  <span class="c1"># auto-closes</span>
-                    <span class="n">results</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">check_query</span><span class="p">)</span>
+                    <span class="n">results</span> <span class="o">=</span> <span class="n">cursor</span><span class="o">.</span><span class="n">execute</span><span class="p">(</span><span class="n">check_query</span><span class="p">,</span> <span class="n">args</span><span class="p">)</span>
                     <span class="n">res</span> <span class="o">=</span> <span class="n">results</span><span class="o">.</span><span class="n">fetchone</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="n">res</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">]</span> <span class="o">==</span> <span class="p">(</span><span class="s1">&#39;RECORD_GENERATION&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_identifier</span><span class="p">):</span>
+        <span class="n">event_match</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;event_type&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;RECORD_GENERATION&#39;</span>
+        <span class="n">id_match</span> <span class="o">=</span> <span class="n">res</span><span class="p">[</span><span class="s1">&#39;session_identifier&#39;</span><span class="p">]</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">session_identifier</span>
+        <span class="k">if</span> <span class="n">event_match</span> <span class="ow">and</span> <span class="n">id_match</span><span class="p">:</span>
             <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Confirmed RECORD_GENERATION insertion for&#39;</span>
                           <span class="sa">f</span><span class="s1">&#39; </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">session_identifier</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
             <span class="n">success</span> <span class="o">=</span> <span class="kc">True</span>
 
-        <span class="k">return</span> <span class="n">success</span></div></div>
+        <span class="k">return</span> <span class="nb">dict</span><span class="p">(</span><span class="n">res</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="get_sessions_to_build"><a class="viewcode-back" href="../../../api/nexusLIMS.db.html#nexusLIMS.db.session_handler.get_sessions_to_build">[docs]</a><span class="k">def</span> <span class="nf">get_sessions_to_build</span><span class="p">():</span>
+<div class="viewcode-block" id="get_sessions_to_build"><a class="viewcode-back" href="../../../api/nexusLIMS.db.html#nexusLIMS.db.session_handler.get_sessions_to_build">[docs]</a><span class="k">def</span> <span class="nf">get_sessions_to_build</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Session</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Query the NexusLIMS database for pairs of logs with status</span>
 <span class="sd">    ``&#39;TO_BE_BUILT&#39;`` and return the information needed to build a record for</span>
@@ -347,7 +414,7 @@
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    sessions : list of :py:class:`~nexusLIMS.db.session_handler.Session`</span>
+<span class="sd">    sessions : List[Session]</span>
 <span class="sd">        A list of :py:class:`~nexusLIMS.db.session_handler.Session` objects</span>
 <span class="sd">        containing the sessions that the need their record built. Will be an</span>
 <span class="sd">        empty list if there&#39;s nothing to do.</span>
@@ -377,9 +444,9 @@
         <span class="n">el_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">el</span> <span class="k">for</span> <span class="n">el</span> <span class="ow">in</span> <span class="n">end_logs</span> <span class="k">if</span> <span class="n">el</span><span class="o">.</span><span class="n">session_identifier</span> <span class="o">==</span>
                    <span class="n">sl</span><span class="o">.</span><span class="n">session_identifier</span><span class="p">]</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">el_list</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="c1"># TODO: we should do something more intelligent here than just</span>
-            <span class="c1">#  raising an error</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">()</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;There was not exactly one &#39;END&#39; log for this &quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;&#39;START&#39; log; len(el_list) was </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">el_list</span><span class="p">)</span><span class="si">}</span><span class="s2">;&quot;</span>
+                             <span class="sa">f</span><span class="s2">&quot;sl was </span><span class="si">{</span><span class="n">sl</span><span class="si">}</span><span class="s2">; el_list was </span><span class="si">{</span><span class="n">el_list</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="n">el</span> <span class="o">=</span> <span class="n">el_list</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="n">dt_from</span> <span class="o">=</span> <span class="n">_dt</span><span class="o">.</span><span class="n">fromisoformat</span><span class="p">(</span><span class="n">sl</span><span class="o">.</span><span class="n">timestamp</span><span class="p">)</span>
@@ -408,8 +475,8 @@
       
     </p>
     <p>
-        &copy; Copyright 2020, NIST Office of Data and Informatics.<br/>
-      Last updated on Oct, 19, 2020.<br/>
+        &copy; Copyright 2022, NIST Office of Data and Informatics.<br/>
+      Last updated on Jul, 15, 2022.<br/>
     </p>
   </div>
 </footer>

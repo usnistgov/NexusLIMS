@@ -7,7 +7,7 @@ used by the NexusLIMS development team and what is meant by them:
 
 - **Harvester:**
 
-  - The harvesters (implemented in the :py:mod:`nexusLIMS.harvester` package)
+  - The harvesters (implemented in the :py:mod:`nexusLIMS.harvesters` package)
     are the portions of the code that connect to external data sources, such
     as the SharePoint calendar. Currently, the calendar harvester is the only
     one implemented, but eventually there will likely be at least an electronic
@@ -37,7 +37,7 @@ used by the NexusLIMS development team and what is meant by them:
 
 - **Session Logger:**
 
-  - The session logger is the portable Windows application that runs on the
+  - The session logger (deprecated) was the portable Windows application that runs on the
     individual microscope PCs, which logs simple information to the NexusLIMS
     database about when an Experiment has occurred. See the associated
     :doc:`documentation <session_logger_app>` page for more details.

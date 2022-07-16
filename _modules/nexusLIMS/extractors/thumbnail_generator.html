@@ -4,16 +4,15 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>nexusLIMS.extractors.thumbnail_generator &#8212; NexusLIMS 0.0.9 documentation</title>
-    <link rel="stylesheet" href="../../../_static/bootstrap-sphinx.css" type="text/css" />
-    <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>nexusLIMS.extractors.thumbnail_generator &#8212; NexusLIMS 1.1.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom-styles.css" />
-    <script id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
     <script src="../../../_static/jquery.js"></script>
     <script src="../../../_static/underscore.js"></script>
     <script src="../../../_static/doctools.js"></script>
-    <script src="../../../_static/language_data.js"></script>
     <script src="../../../_static/custom.js"></script>
     <link rel="shortcut icon" href="../../../_static/nexusLIMS_bare_logo.ico"/>
     <link rel="index" title="Index" href="../../../genindex.html" />
@@ -22,10 +21,10 @@
 <meta http-equiv='X-UA-Compatible' content='IE=edge,chrome=1'>
 <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1'>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<script type="text/javascript" src="../../../_static/js/jquery-1.11.0.min.js "></script>
-<script type="text/javascript" src="../../../_static/js/jquery-fix.js "></script>
-<script type="text/javascript" src="../../../_static/bootstrap-3.3.7/js/bootstrap.min.js "></script>
-<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js "></script>
+<script type="text/javascript" src="../../../_static/js/jquery-1.12.4.min.js"></script>
+<script type="text/javascript" src="../../../_static/js/jquery-fix.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-3.4.1/js/bootstrap.min.js"></script>
+<script type="text/javascript" src="../../../_static/bootstrap-sphinx.js"></script>
 
   </head><body>
 
@@ -47,7 +46,7 @@
           <ul class="nav navbar-nav">
             
                 <li><a href="../../../api.html">API Docs</a></li>
-                <li><a href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS">Repository</a></li>
+                <li><a href="https://github.com/usnistgov/NexusLIMS">Repository</a></li>
                 <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
             
             
@@ -61,20 +60,19 @@
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Package introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_security.html">Data security in NexusLIMS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../database.html">NexusLIMS database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../session_logger_app.html">Session logging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development.html">Developer documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../taxonomy.html">NexusLIMS taxonomy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../schema_documentation.html">Schema documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../session_logger_app.html">Session logging (deprecated)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/nexusLIMS.html">nexusLIMS package</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.harvester.html">nexusLIMS.harvester package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
 </ul>
 </li>
@@ -126,14 +124,13 @@
 <ul class="globaltoc">
     <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Package introduction</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../data_security.html">Data security in NexusLIMS</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../database.html">NexusLIMS database</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../session_logger_app.html">Session logging</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development.html">Developer documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../taxonomy.html">NexusLIMS taxonomy</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../schema_documentation.html">Schema documentation</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../session_logger_app.html">Session logging (deprecated)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api.html">API documentation</a></li>
 </ul>
 
@@ -197,8 +194,9 @@
 <span class="kn">from</span> <span class="nn">matplotlib.offsetbox</span> <span class="kn">import</span> <span class="n">OffsetImage</span> <span class="k">as</span> <span class="n">_OIm</span>
 <span class="kn">from</span> <span class="nn">matplotlib.transforms</span> <span class="kn">import</span> <span class="n">Bbox</span> <span class="k">as</span> <span class="n">_Bbox</span>
 <span class="kn">from</span> <span class="nn">PIL</span> <span class="kn">import</span> <span class="n">Image</span> <span class="k">as</span> <span class="n">_PILImage</span>
-<span class="kn">from</span> <span class="nn">PIL.Image</span> <span class="kn">import</span> <span class="n">LANCZOS</span> <span class="k">as</span> <span class="n">_LANCZOS</span>
 <span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
+
+<span class="n">_LANCZOS</span> <span class="o">=</span> <span class="n">_PILImage</span><span class="o">.</span><span class="n">Resampling</span><span class="o">.</span><span class="n">LANCZOS</span>
 
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">_logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">_logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
@@ -359,7 +357,7 @@
     <span class="n">old_size</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">size</span>    <span class="c1"># old_size[0] is in (width, height) format</span>
     <span class="n">ratio</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">new_width</span><span class="p">)</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">old_size</span><span class="p">)</span>
     <span class="n">new_size</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">([</span><span class="nb">int</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">ratio</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">old_size</span><span class="p">])</span>
-    <span class="n">im</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">new_size</span><span class="p">,</span> <span class="n">_PILImage</span><span class="o">.</span><span class="n">ANTIALIAS</span><span class="p">)</span>
+    <span class="n">im</span> <span class="o">=</span> <span class="n">im</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">new_size</span><span class="p">,</span> <span class="n">_LANCZOS</span><span class="p">)</span>
 
     <span class="n">new_im</span> <span class="o">=</span> <span class="n">_PILImage</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;RGBA&quot;</span><span class="p">,</span> <span class="p">(</span><span class="n">new_width</span><span class="p">,</span> <span class="n">new_width</span><span class="p">))</span>
     <span class="n">new_im</span><span class="o">.</span><span class="n">paste</span><span class="p">(</span><span class="n">im</span><span class="p">,</span> <span class="p">((</span><span class="n">new_width</span> <span class="o">-</span> <span class="n">new_size</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">//</span> <span class="mi">2</span><span class="p">,</span>
@@ -648,10 +646,17 @@
         <span class="c1"># signal is 1D linescan</span>
         <span class="k">elif</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">navigation_dimension</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">s</span><span class="o">.</span><span class="n">plot</span><span class="p">()</span>
-            <span class="n">s</span><span class="o">.</span><span class="n">_plot</span><span class="o">.</span><span class="n">pointer</span><span class="o">.</span><span class="n">set_on</span><span class="p">(</span><span class="kc">False</span><span class="p">)</span>       <span class="c1"># remove pointer</span>
+            <span class="c1"># this is not working due to https://github.com/hyperspy/hyperspy/issues/2965</span>
+            <span class="c1"># s._plot.pointer.set_on(False)       # remove pointer</span>
+
             <span class="n">f</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">_plot</span><span class="o">.</span><span class="n">navigator_plot</span><span class="o">.</span><span class="n">figure</span>
             <span class="n">f</span><span class="o">.</span><span class="n">get_axes</span><span class="p">()[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>            <span class="c1"># remove colorbar scale</span>
             <span class="n">ax</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">get_axes</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span>
+
+            <span class="c1"># workaround for above issue to remove pointer</span>
+            <span class="k">for</span> <span class="n">l</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">lines</span><span class="p">):</span>
+                <span class="n">l</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+
             <span class="n">_set_extent_and_save</span><span class="p">()</span>
             <span class="k">return</span> <span class="n">f</span>
         <span class="k">elif</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">navigation_dimension</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
@@ -690,7 +695,7 @@
                             <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;wrap&#39;</span><span class="p">,</span> <span class="n">anti_aliasing</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
             <span class="c1"># Create matplotlib annotation with image in center</span>
-            <span class="n">imagebox</span> <span class="o">=</span> <span class="n">_OIm</span><span class="p">(</span><span class="n">stamp</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=.</span><span class="mi">15</span><span class="p">)</span>
+            <span class="n">imagebox</span> <span class="o">=</span> <span class="n">_OIm</span><span class="p">(</span><span class="n">stamp</span><span class="p">,</span> <span class="n">zoom</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">.15</span><span class="p">)</span>
             <span class="n">imagebox</span><span class="o">.</span><span class="n">image</span><span class="o">.</span><span class="n">axes</span> <span class="o">=</span> <span class="n">ax</span>
             <span class="n">ao</span> <span class="o">=</span> <span class="n">_AOb</span><span class="p">(</span><span class="s1">&#39;center&#39;</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">borderpad</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">child</span><span class="o">=</span><span class="n">imagebox</span><span class="p">)</span>
             <span class="n">ao</span><span class="o">.</span><span class="n">patch</span><span class="o">.</span><span class="n">set_alpha</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
@@ -732,7 +737,7 @@
             <span class="n">_plt</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">_project_image_stack</span><span class="p">(</span>
                 <span class="n">s</span><span class="p">,</span> <span class="n">num</span><span class="o">=</span><span class="nb">min</span><span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">axes_manager</span><span class="o">.</span><span class="n">navigation_size</span><span class="p">),</span> <span class="n">dpi</span><span class="o">=</span><span class="n">dpi</span><span class="p">))</span>
             <span class="n">ax</span> <span class="o">=</span> <span class="n">_plt</span><span class="o">.</span><span class="n">gca</span><span class="p">()</span>
-            <span class="n">ax</span><span class="o">.</span><span class="n">set_position</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="o">.</span><span class="mi">8</span><span class="p">])</span>
+            <span class="n">ax</span><span class="o">.</span><span class="n">set_position</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mf">.8</span><span class="p">])</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">set_axis_off</span><span class="p">()</span>
             <span class="n">_set_title</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">General</span><span class="o">.</span><span class="n">title</span><span class="p">)</span>
             <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_title</span><span class="p">()</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span>
@@ -820,13 +825,13 @@
         <span class="n">ax_m</span> <span class="o">=</span> <span class="n">ax_m</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
         <span class="n">ax_m</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">ax_m</span><span class="p">)</span>
 
-        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.03</span><span class="p">,</span> <span class="o">.</span><span class="mi">9</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">General</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.03</span><span class="p">,</span> <span class="mf">.9</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">General</span><span class="o">.</span><span class="n">title</span><span class="p">,</span>
                 <span class="n">fontweight</span><span class="o">=</span><span class="s1">&#39;bold&#39;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.85</span><span class="p">,</span> <span class="s1">&#39;Could not generate preview image&#39;</span><span class="p">,</span>
                 <span class="n">va</span><span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">&#39;r&#39;</span><span class="p">)</span>
         <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.03</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">,</span> <span class="s1">&#39;Axes information:&#39;</span><span class="p">,</span>
                 <span class="n">va</span><span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">,</span> <span class="n">fontstyle</span><span class="o">=</span><span class="s1">&#39;italic&#39;</span><span class="p">)</span>
-        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.03</span><span class="p">,</span> <span class="o">.</span><span class="mi">75</span><span class="p">,</span> <span class="n">ax_m</span><span class="p">,</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.03</span><span class="p">,</span> <span class="mf">.75</span><span class="p">,</span> <span class="n">ax_m</span><span class="p">,</span>
                 <span class="n">fontfamily</span><span class="o">=</span><span class="s1">&#39;monospace&#39;</span><span class="p">,</span> <span class="n">va</span><span class="o">=</span><span class="s1">&#39;top&#39;</span><span class="p">)</span>
 
         <span class="n">extent</span> <span class="o">=</span> <span class="n">_full_extent</span><span class="p">(</span><span class="n">ax</span><span class="p">,</span> <span class="n">ax</span><span class="o">.</span><span class="n">texts</span><span class="p">,</span> <span class="n">pad</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span><span class="o">.</span><span class="n">transformed</span><span class="p">(</span>
@@ -904,8 +909,8 @@
       
     </p>
     <p>
-        &copy; Copyright 2020, NIST Office of Data and Informatics.<br/>
-      Last updated on Oct, 19, 2020.<br/>
+        &copy; Copyright 2022, NIST Office of Data and Informatics.<br/>
+      Last updated on Jul, 15, 2022.<br/>
     </p>
   </div>
 </footer>
