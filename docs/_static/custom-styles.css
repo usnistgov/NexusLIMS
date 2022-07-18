@@ -37,6 +37,11 @@ dt:target, span.highlighted {
     background-color: #fff9d3;
 }
 
+/* make indentation in sidebar smaller */
+#sidebar > ul.globaltoc ul {
+    padding-inline-start: 10px;
+}
+
 /* Style custom "dummy-sidebarrel" class to make the
 deactivated links look deactivated */
 .navbar-nav>li.dummy-sidebarrel>a,

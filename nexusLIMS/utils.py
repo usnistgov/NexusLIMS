@@ -352,9 +352,8 @@ def find_dirs_by_mtime(path: str,
 
     Returns
     -------
-    dirs
-        A list of the directories that have modification times within the
-        time range provided
+    dirs : list
+        A list of the directories that have modification times within the time range provided
     """
     dirs = []
 

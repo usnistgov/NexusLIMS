@@ -217,7 +217,8 @@ including:
 
 - [Joshua Taillon](https://www.nist.gov/people/joshua-taillon) - Office of Data and Informatics
 - [June Lau](https://www.nist.gov/people/june-w-lau) - Office of Data and Informatics
-- [Ryan White](https://www.nist.gov/people/ryan-white) - Applied Chemicals and Materials Division / Office of Data and Informatics
+- [Ryan White](https://www.nist.gov/people/ryan-white) - Applied Chemicals and Materials Division / Office of Data and Informatics (detail)
+- [Michael Katz](https://www.nist.gov/people/michael-katz) - Materials Science and Engineering Division / Office of Data and Informatics (detail)
 - [Marcus Newrock](https://www.nist.gov/people/marcus-william-newrock) - Office of Data and Informatics
 - [Ray Plante](https://www.nist.gov/people/raymond-plante) - Office of Data and Informatics
 - [Gretchen Greene](https://www.nist.gov/people/gretchen-greene) - Office of Data and Informatics
