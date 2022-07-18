@@ -44,6 +44,9 @@ pages:
     - mkdir -p public/doc && rsync -avr _build/ public/doc/
   retry: 2
   extends: .env_setup
+  except:
+    - public
+    - nist-pages
   after_script:
     - tar -xzf coverage.tar.gz -C public/ || true
   artifacts:
