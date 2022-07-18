@@ -22,6 +22,9 @@ nexusLIMS_tests:
       - poetry run tox
     retry: 2
     extends: .env_setup
+    except:
+        - public
+        - nist-pages
     after_script:
       # cache the coverage results so they can be published, always returning true
       - mv tests/coverage .
