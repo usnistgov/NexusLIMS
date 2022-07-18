@@ -235,7 +235,7 @@ class NemoConnector:
                 return [self.tools[tool_id]]
             p = {"id": tool_id}
 
-        tools = self._api_caller(requests.get, 'tools/', p)
+        tools = self._api_caller('GET', 'tools/', p)
 
         for t in tools:
             # cache the tool results
@@ -369,7 +369,7 @@ class NemoConnector:
                 return [self.projects[proj_id]]
             p = {"id": proj_id}
 
-        projects = self._api_caller(requests.get, 'projects/', p)
+        projects = self._api_caller('GET', 'projects/', p)
 
         for p in projects:
             # expand the only_allow_tools node
@@ -433,7 +433,7 @@ class NemoConnector:
             else:
                 p.update({"tool_id": str(tool_id)})
 
-        reservations = self._api_caller(requests.get, 'reservations/', p)
+        reservations = self._api_caller('GET', 'reservations/', p)
 
         for r in reservations:
             # expand various fields within the reservation data
@@ -545,7 +545,7 @@ class NemoConnector:
         else:
             p.update({"tool_id__in": ','.join([str(i) for i in tool_id])})
             
-        usage_events = self._api_caller(requests.get, 'usage_events/', p)
+        usage_events = self._api_caller('GET', 'usage_events/', p)
 
         for event in usage_events:
             # expand various fields within the usage event data
@@ -729,7 +729,7 @@ class NemoConnector:
             A list (could be empty) of users that match the ids and/or
             usernames given
         """
-        users = self._api_caller(requests.get, 'users/', p)
+        users = self._api_caller('GET', 'users/', p)
         for u in users:
             # cache the users response by ID and username
             self.users[u["id"]] = u
@@ -738,7 +738,7 @@ class NemoConnector:
         return users
 
     def _api_caller(self,
-                    fn: Callable,
+                    fn: str,
                     endpoint: str,
                     p: Dict[str, str]) -> List[Dict[str, Any]]:
         """
@@ -750,8 +750,8 @@ class NemoConnector:
         Parameters
         ----------
         fn
-            The ``requests`` function (POST, GET, PATCH, etc.) to use for the
-            API request
+            The ``requests`` function (``'POST'``, ``'GET'``, 
+            ``'PATCH'``, etc.) to use for the API request
         endpoint
             The API endpoint to use. Should be formatted with a trailing
             slash and no leading slash. i.e. the endpoint for Projects data

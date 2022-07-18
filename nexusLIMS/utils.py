@@ -39,6 +39,9 @@ import logging as _logging
 import sys as _sys
 
 from requests_ntlm import HttpNtlmAuth as _HttpNtlmAuth
+from requests import Session as _Session
+from requests.adapters import HTTPAdapter as _HTTPAdapter
+from requests.adapters import Retry as _Retry
 
 _logger = _logging.getLogger(__name__)
 _logger.setLevel(_logging.INFO)
@@ -67,14 +70,15 @@ def setup_loggers(log_level):
 
 
 def nexus_req(url: str,
-              fn: Callable,
+              fn: str,
               basic_auth: bool = False,
               token_auth: Optional[str] = None,
               **kwargs: Optional[dict]):
     """
     A helper method that wraps a function from :py:mod:`requests`, but adds a
-    local certificate authority chain to validate the SharePoint server's
-    certificates and authenticates using NTLM.
+    local certificate authority chain to validate any custom certificates and 
+    allow authenticatation using NTLM. Will automatically retry on 500 errors
+    using a strategy suggested here: https://stackoverflow.com/a/35636367
 
     Parameters
     ----------
@@ -82,8 +86,7 @@ def nexus_req(url: str,
         The URL to fetch
     fn
         The function from the ``requests`` library to use (e.g.
-        :py:func:`~requests.get`, :py:func:`~requests.put`,
-        :py:func:`~requests.post`, etc.)
+        ``'GET'``, ``'POST'``, ``'PATCH'``, etc.)
     basic_auth
         If True, use only username and password for authentication rather than
         NTLM
@@ -118,6 +121,14 @@ def nexus_req(url: str,
         else:
             kwargs['headers'] = {'Authorization': f"Token {token_auth}"}
 
+    # set up a session to retry requests as needed
+    s = _Session()
+    retries = _Retry(total=5, 
+                     backoff_factor=1, 
+                     status_forcelist=[502, 503, 504])
+    s.mount('https://', _HTTPAdapter(max_retries=retries))                 
+    s.mount('http://', _HTTPAdapter(max_retries=retries))                 
+
     verify_arg = True
     with _tempfile.NamedTemporaryFile() as tmp:
         if CA_BUNDLE_CONTENT:
@@ -129,9 +140,11 @@ def nexus_req(url: str,
             verify_arg = tmp.name
 
         if token_auth:
-            r = fn(url, verify=verify_arg, **kwargs)
+            r = s.request(fn, url, 
+                          verify=verify_arg, **kwargs)
         else:
-            r = fn(url, auth=get_auth(basic=basic_auth), verify=verify_arg, **kwargs)
+            r = s.request(fn, url, auth=get_auth(basic=basic_auth), 
+                          verify=verify_arg, **kwargs)
 
     return r
 

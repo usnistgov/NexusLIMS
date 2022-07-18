@@ -289,7 +289,7 @@ def fetch_xml(instrument, dt_from=None, dt_to=None):
                      f"StartTime lt DateTime'{to_str}'"
 
     _logger.info("Fetching Nexus calendar events from {}".format(instr_url))
-    r = _nexus_req(instr_url, _requests.get)
+    r = _nexus_req(instr_url, 'GET')
     _logger.info("  {} -- {} -- response: {}".format(instrument.name,
                                                      instr_url,
                                                      r.status_code))
@@ -483,7 +483,7 @@ def _get_sharepoint_tz():
         The timezone in tz database format
     """
     r = _nexus_req(_sharepoint_url() + '/_api/web/RegionalSettings/TimeZone',
-                   _requests.get)
+                   'GET')
     et = _etree.fromstring(r.text.encode())
     tz_description = et.find('.//d:Description', namespaces=et.nsmap)
     if tz_description is not None:

@@ -32,7 +32,6 @@ from nexusLIMS.utils import _zero_bytes
 from nexusLIMS.extractors import extension_reader_map as _ext
 from nexusLIMS.extractors import quanta_tif
 from datetime import datetime
-from requests import get
 import os
 import sys
 import pytest
@@ -194,11 +193,14 @@ class TestUtils:
     def test_bad_auth_options(self):
         with pytest.raises(ValueError):
             # giving
-            nexus_req("http://example.com", get, basic_auth=True,
+            nexus_req("http://example.com", 
+                      'GET', 
+                      basic_auth=True,
                       token_auth='test')
 
     def test_header_addition_nexus_req(self):
-        r = nexus_req(os.environ['NEMO_address_1'], get,
+        r = nexus_req(os.environ['NEMO_address_1'], 
+                      'GET',
                       token_auth=os.environ['NEMO_token_1'],
                       headers={'test_header': 'test_header_val'})
         assert 'test_header' in r.request.headers
@@ -234,3 +236,11 @@ class TestUtils:
             cred_file = os.path.join('bogus_credentials.ini')
             with pytest.raises(AuthenticationError):
                 _ = get_auth(cred_file)
+
+    def test_request_retry(self):
+        from nexusLIMS.utils import nexus_req
+        from requests.exceptions import RetryError
+        with pytest.raises(RetryError) as e:
+            r = nexus_req("https://httpstat.us/503", 'GET')
+        assert 'Max retries exceeded with url' in str(e)
+        

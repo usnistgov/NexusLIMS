@@ -380,10 +380,9 @@ class TestNemoIntegration:
     def test_getting_nemo_data(self):
         from nexusLIMS.utils import nexus_req
         from urllib.parse import urljoin
-        from requests import get as _get
         r = nexus_req(url=urljoin(os.environ['NEMO_address_1'],
                                   'api/reservations'),
-                      fn=_get, token_auth=os.environ['NEMO_token_1'])
+                      fn='GET', token_auth=os.environ['NEMO_token_1'])
 
     @pytest.mark.parametrize("test_user_id_input,"
                              "expected_usernames",

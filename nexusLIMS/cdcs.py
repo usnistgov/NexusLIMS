@@ -26,7 +26,6 @@
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 import os
 import os as _os
-import requests as _requests
 from glob import glob as _glob
 from urllib.parse import urljoin as _urljoin
 import sys
@@ -75,7 +74,7 @@ def get_workspace_id():
     # assuming there's only one workspace for this user (that is the public
     # workspace)
     _endpoint = _urljoin(_cdcs_url(), 'rest/workspace/read_access')
-    _r = _nx_req(_endpoint, _requests.get, basic_auth=True)
+    _r = _nx_req(_endpoint, 'GET', basic_auth=True)
     if _r.status_code == 401:
         raise _authError('Could not authenticate to CDCS. Are the '
                          'nexusLIMS_user and nexusLIMS_pass environment '
@@ -95,7 +94,7 @@ def get_template_id():
     """
     # get the current template (XSD) id value:
     _endpoint = _urljoin(_cdcs_url(), 'rest/template-version-manager/global')
-    _r = _nx_req(_endpoint, _requests.get, basic_auth=True)
+    _r = _nx_req(_endpoint, 'GET', basic_auth=True)
     if _r.status_code == 401:
         raise _authError('Could not authenticate to CDCS. Are the '
                          'nexusLIMS_user and nexusLIMS_pass environment '
@@ -131,7 +130,7 @@ def upload_record_content(xml_content, title):
         'xml_content': xml_content
     }
 
-    post_r = _nx_req(endpoint, _requests.post, json=payload, basic_auth=True)
+    post_r = _nx_req(endpoint, 'POST', json=payload, basic_auth=True)
 
     if post_r.status_code != 201:
         # anything other than 201 status means something went wrong
@@ -147,7 +146,7 @@ def upload_record_content(xml_content, title):
                             f'rest/data/{record_id}/assign/'
                             f'{get_workspace_id()}')
 
-    r = _nx_req(wrk_endpoint, _requests.patch, basic_auth=True)
+    r = _nx_req(wrk_endpoint, 'PATCH', basic_auth=True)
 
     _logger.info(f'Record "{title}" available at {record_url}')
     return post_r, record_id
@@ -169,7 +168,7 @@ def delete_record(record_id):
         the delete
     """
     endpoint = _urljoin(_cdcs_url(), f'rest/data/{record_id}')
-    r = _nx_req(endpoint, _requests.delete, basic_auth=True)
+    r = _nx_req(endpoint, 'DELETE', basic_auth=True)
     if r.status_code != 204:
         # anything other than 204 status means something went wrong
         _logger.error(f'Got error while deleting {record_id}:\n'
