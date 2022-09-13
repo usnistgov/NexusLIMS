@@ -9,7 +9,8 @@ cache:
     - if ! command -v pyenv; then rm -rf ${PYENV_DIR} || true; git clone https://github.com/pyenv/pyenv.git ${PYENV_DIR}; else eval "$(pyenv init --path)";  fi
     - pyenv local | xargs -L1 pyenv install -s
     - which python
-    - curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python -
+#   install poetry
+    - curl -sSL https://install.python-poetry.org | python -
     - source $HOME/.poetry/env
     - poetry config virtualenvs.in-project true; poetry config cache-dir ${PYENV_DIR}/.poetry-cache;
     - poetry config --list
