@@ -68,57 +68,65 @@ function script_trap_err() {
 # ARGS: None
 # OUTS: None
 function script_trap_exit() {
-    # delete lock file
-    if [ -f "${LOCKFILE}" ] && [ "$WE_CREATED_LOCKFILE" = true ] ; then
-        echo "Deleting lock file at ${LOCKFILE}" | tee -a "${LOGPATH}"
-        rm "${LOCKFILE}"
-    elif [ -f "${LOCKFILE}" ]; then
-        echo "We didn't create lock file at ${LOCKFILE}; so leaving in place" | tee -a "${LOGPATH}"
-    fi
+    # test to see if we have any files/directories at all in nexusLIMS_path;
+    # if we don't (i.e. the "find | wc -l" equals zero) then the mount point
+    # is probably not set up correctly and we should bail and send an email warning
+    if [[ $(find ${nexusLIMS_path} -maxdepth 0  | wc -l) -eq 0 ]]; then 
+        echo "no files at all found"; 
+        send_email 'no_log'
+    else
+        # delete lock file
+        if [ -f "${LOCKFILE}" ] && [ "$WE_CREATED_LOCKFILE" = true ] ; then
+            echo "Deleting lock file at ${LOCKFILE}" | tee -a "${LOGPATH}"
+            rm "${LOCKFILE}"
+        elif [ -f "${LOCKFILE}" ]; then
+            echo "We didn't create lock file at ${LOCKFILE}; so leaving in place" | tee -a "${LOGPATH}"
+        fi
 
-    # parse logfile for any erorr and send email (regardless of what happened
-    # in the script, since this happens in the exit trap)
-    #if grep -q -i -E 'critical|error|exception|fatal|no_files_found' "${LOGPATH}"; then
-    if grep -q -i -E 'critical|error|fatal' "${LOGPATH}"; then
-      stringArr=()
-      # do some more detailed checks to allow us to specify which text was
-      # found in the output:
-      if grep -q -i -E 'critical' "${LOGPATH}"; then
-        stringArr+=("critical")
-      elif grep -q -i -E 'error' "${LOGPATH}"; then
-        stringArr+=("error")
-      elif grep -q -i -E 'fatal' "${LOGPATH}"; then
-        stringArr+=("fatal")
-      elif grep -q -i -E 'no_files_found' "${LOGPATH}"; then
-        stringArr+=("no_files_found")
-      fi
-      found_strings=$(IFS=, ; echo "${stringArr[*]}")
-      # ignore (somewhat) common DNS issues and don't alert
-      if grep -q -i -E "Temporary failure in name resolution" "${LOGPATH}"; then
+        # parse logfile for any erorr and send email (regardless of what happened
+        # in the script, since this happens in the exit trap)
+        #if grep -q -i -E 'critical|error|exception|fatal|no_files_found' "${LOGPATH}"; then
+        if grep -q -i -E 'critical|error|fatal' "${LOGPATH}"; then
+        stringArr=()
+        # do some more detailed checks to allow us to specify which text was
+        # found in the output:
+        if grep -q -i -E 'critical' "${LOGPATH}"; then
+            stringArr+=("critical")
+        elif grep -q -i -E 'error' "${LOGPATH}"; then
+            stringArr+=("error")
+        elif grep -q -i -E 'fatal' "${LOGPATH}"; then
+            stringArr+=("fatal")
+        elif grep -q -i -E 'no_files_found' "${LOGPATH}"; then
+            stringArr+=("no_files_found")
+        fi
+        found_strings=$(IFS=, ; echo "${stringArr[*]}")
+        # ignore (somewhat) common DNS issues and don't alert
+        if grep -q -i -E "Temporary failure in name resolution" "${LOGPATH}"; then
+            # do nothing
+            :
+        else
+            send_email 'dummy_param'
+        fi
+        else
         # do nothing
         :
-      else
-        send_email
-      fi
-    else
-      # do nothing
-      :
+        fi
+
+        cd "$orig_cwd"
+
+        # Remove Cron mode script log
+        if [[ -n ${cron-} && -f ${script_output-} ]]; then
+            rm "$script_output"
+        fi
+
+        # Remove script execution lock
+        if [[ -d ${script_lock-} ]]; then
+            rmdir "$script_lock"
+        fi
+
+        # Restore terminal colours
+        printf '%b' "$ta_none"
     fi
-
-    cd "$orig_cwd"
-
-    # Remove Cron mode script log
-    if [[ -n ${cron-} && -f ${script_output-} ]]; then
-        rm "$script_output"
-    fi
-
-    # Remove script execution lock
-    if [[ -d ${script_lock-} ]]; then
-        rmdir "$script_lock"
-    fi
-
-    # Restore terminal colours
-    printf '%b' "$ta_none"
 }
 
 # DESC: Exit script with the given message
@@ -335,6 +343,16 @@ function get_abs_filename() {
 }
 
 function send_email() {
+    if [ "$1" = "no_log" ]; then
+sendmail "${email_recipients}" << EOF
+To: ${email_recipients}
+From: ${email_sender}
+Subject: ERROR in NexusLIMS record builder
+
+No log file was produced. Most likely the NexusLIMS file storage location
+was not properly mounted. Please check the record builder status.
+EOF
+    else
 sendmail "${email_recipients}" << EOF
 To: ${email_recipients}
 From: ${email_sender}
@@ -348,6 +366,7 @@ ${found_strings}
 
 $(cat "${LOGPATH}")
 EOF
+fi
 }
 
 # DESC: Main control flow
@@ -370,8 +389,8 @@ function main() {
     # shellcheck disable=SC2154
     LOGPATH_rel="${nexusLIMS_path}/../logs/${year}/${month}/${day}/$(date +%Y%m%d-%H%M).log"
     # make sure path to log file directory exists
-    mkdir -p "$(dirname "${LOGPATH_rel}")"
     # echo "LOGPATH_rel is ${LOGPATH_rel}"
+    mkdir -p "$(dirname "${LOGPATH_rel}")"
     LOGPATH=$(get_abs_filename "${LOGPATH_rel}")
     # echo "LOGPATH is ${LOGPATH}"
 
