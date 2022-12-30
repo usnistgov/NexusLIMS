@@ -823,7 +823,7 @@ class TestNemoIntegration:
                         '3': {
                             'sample_name': 'sample name 2',
                             'sample_or_pid': 'Sample Name',
-                            'sample_details': ''}
+                            'sample_details': None}
                     }}},
             'creation_time': '2021-11-29T10:38:00-07:00',
             'start': '2021-11-29T10:00:00-07:00',

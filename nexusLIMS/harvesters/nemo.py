@@ -1162,7 +1162,9 @@ def _process_res_question_samples(res_dict: Dict) -> \
             else:
                 sample_name.append(None)
                 sample_pid.append(None)
-            if len(v['sample_details']) > 0:
+            # as of NEMO 4.3.2, an empty textarea returns None rather than "",
+            # so check for None first, then test string length
+            if v['sample_details'] is not None and len(v['sample_details']) > 0:
                 sample_details.append(v['sample_details'])
             else:
                 sample_details.append(None)

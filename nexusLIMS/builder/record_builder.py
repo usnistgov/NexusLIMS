@@ -459,7 +459,7 @@ def build_new_session_records() -> List[str]:
                              f'"NO_RESERVATION"')
                 s.update_session_status('NO_RESERVATION')
             else:
-                _logger.error(f'Could not generate record text: {e}')
+                _logger.error(f'Could not generate record text: {e.__repr__()}')
                 _logger.error(f'Marking {s.session_identifier} as "ERROR"')
                 s.update_session_status('ERROR')
         else:
