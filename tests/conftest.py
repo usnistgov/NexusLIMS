@@ -71,6 +71,16 @@ def pytest_sessionstart(session):
         with tarfile.open(tarf, 'r:gz') as tar:
             tar.extractall(path=os.path.dirname(tarf))
 
+    # update API URLs for marlin.nist.gov if we're using marlin-test.nist.gov:
+    if '***REMOVED***' in os.environ.get('NEMO_address_1', ''):
+        from nexusLIMS.db import make_db_query
+        make_db_query(
+            "UPDATE instruments "
+            "SET api_url = REPLACE(api_url, '***REMOVED***', '***REMOVED***');")
+        make_db_query(
+            "UPDATE session_log "
+            "SET session_identifier = REPLACE(session_identifier, '***REMOVED***', '***REMOVED***');")
+
 
 def pytest_sessionfinish(session, exitstatus):
     """
@@ -137,6 +147,9 @@ def cleanup_session_log():
     yield None
     from nexusLIMS.db.session_handler import db_query
     to_remove = ('https://***REMOVED***/api/usage_events/?id=29',
+                 'https://***REMOVED***/api/usage_events/?id=30',
+                 'https://***REMOVED***/api/usage_events/?id=31',
+                 'https://***REMOVED***/api/usage_events/?id=29',
                  'https://***REMOVED***/api/usage_events/?id=30',
                  'https://***REMOVED***/api/usage_events/?id=31',
                  'https://***REMOVED***/api/usage_events/?id=385031',

@@ -6,12 +6,14 @@ cache:
   before_script:
     - if [[ -z "${PYENV_DIR}" ]]; then export PYENV_DIR=${HOME}/.pyenv; fi 
     - export PYENV_ROOT="${PYENV_DIR}" && export PATH="$PYENV_ROOT/bin:$PATH" && export TMPDIR="$PYENV_ROOT/.pip-tmp"
-    - if ! command -v pyenv; then rm -rf ${PYENV_DIR} || true; git clone https://github.com/pyenv/pyenv.git ${PYENV_DIR}; else eval "$(pyenv init --path)";  fi
+    - if ! command -v pyenv; then rm -rf ${PYENV_DIR} || true; git clone https://github.com/pyenv/pyenv.git ${PYENV_DIR}; else cd ${PYENV_DIR}; git pull; cd -; eval "$(pyenv init --path)";  fi
     - pyenv local | xargs -L1 pyenv install -s
     - which python
 #   install poetry
     - curl -sSL https://install.python-poetry.org | python -
-    - source $HOME/.poetry/env
+#    - source $HOME/.poetry/env
+    - export PATH="$HOME/.local/bin:${PATH}"
+    - poetry self update
     - poetry config virtualenvs.in-project true; poetry config cache-dir ${PYENV_DIR}/.poetry-cache;
     - poetry config --list
     - poetry run pip install tox

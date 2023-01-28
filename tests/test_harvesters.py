@@ -549,6 +549,10 @@ class TestNemoIntegration:
         # not sure best way to test this, but defaults should return at least
         # as many dictionaries as were present on the day these tests were
         # written (Sept. 20, 2021)
+
+        # Need to override api_url values for tools in the test DB if we're using ***REMOVED***.
+        # without changing the code for the nemo_connector, we do this at test setup in conftest.py
+
         defaults = nemo_connector.get_usage_events()
         assert len(defaults) >= 2
         assert all([key in defaults[0] for key in ['id', 'start', 'end',
@@ -728,8 +732,7 @@ class TestNemoIntegration:
         assert res_event.project_id[0] is None
         assert res_event.username == '***REMOVED***'
         assert res_event.internal_id == '187'
-        assert res_event.url == \
-               'https://***REMOVED***/event_details/reservation/187/'
+        assert res_event.url == f'{os.environ.get("NEMO_address_1").replace("api/", "")}event_details/reservation/187/'
 
     def test_res_event_from_session_no_matching_sessions(self):
         from nexusLIMS.db.session_handler import Session

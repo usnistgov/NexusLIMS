@@ -15,23 +15,23 @@ packages = [
 ]
 
 [tool.poetry.dependencies]
-python = ">=3.7,<3.9"
-lxml = "^4.6.4"
-requests = "^2.26.0"
+python = ">=3.8,<3.11"
+lxml = "^4.9.2"
+requests = "^2.28.1"
 requests_ntlm = "^1.1.0"
-pytz = "^2021.3"
-hyperspy = "1.7.1"
-scikit-learn = "^1.0.1"
-python-dotenv = "^0.19.2"
+pytz = "^2022.7"
+hyperspy = "1.7.3"
+scikit-learn = "^1.2.0"
+python-dotenv = "^0.21.0"
 
 [tool.poetry.dev-dependencies]
-pytest = "^5.2"
-coverage = "^6.2"
-pytest-mpl = "^0.13"
-pytest-cov = "^3.0.0"
+pytest = "^7.2"
+coverage = "^7.0.0"
+pytest-mpl = "^0.16.1"
+pytest-cov = "^4.0.0"
 Sphinx = "^4.3.1"
 sphinx-bootstrap-theme = "^0.8.0"
-tox = "^3.24.4"
+tox = "^4.0"
 
 [tool.poetry.scripts]
 
@@ -44,7 +44,7 @@ build-backend = "poetry.core.masonry.api"
 legacy_tox_ini = """
 [tox]
 isolated_build = true
-envlist = py{37, 38}
+envlist = py{38, 39, 310}
 
 [testenv]
 passenv = *

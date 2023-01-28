@@ -43,7 +43,10 @@ from matplotlib.transforms import Bbox as _Bbox
 from PIL import Image as _PILImage
 import logging as _logging
 
-_LANCZOS = _PILImage.Resampling.LANCZOS
+try:
+    _LANCZOS = _PILImage.Resampling.LANCZOS
+except AttributeError:          # pragma: no cover
+    _LANCZOS = _PILImage.LANCZOS
 
 _logger = _logging.getLogger(__name__)
 _logger.setLevel(_logging.INFO)

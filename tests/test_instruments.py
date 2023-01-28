@@ -59,7 +59,7 @@ class TestInstruments:
         assert \
             repr(instrument_db['FEI-Titan-TEM-635816_n']) == \
             f'Nexus Instrument: FEI-Titan-TEM-635816_n\n' + \
-            f'API url:          https://***REMOVED***/api/tools/?id=3\n' + \
+            f'API url:          {os.environ.get("NEMO_address_1")}tools/?id=3\n' + \
             f'Calendar name:    FEI Titan TEM\n' + \
             f'Calendar url:     https://***REMOVED***/calendar/\n' + \
             f'Schema name:      FEI Titan TEM\n' \
@@ -131,7 +131,7 @@ class TestInstruments:
                '2021-11-26 12:00:00 EST'
 
     def test_instrument_from_api_url(self):
-        returned_item = get_instr_from_api_url('https://***REMOVED***/api/'
+        returned_item = get_instr_from_api_url(os.environ.get('NEMO_address_1') +
                                                'tools/?id=10')
         assert returned_item == instrument_db['testsurface-CPU_P1111111']
 

@@ -438,7 +438,13 @@ def find_files_by_mtime(path, dt_from, dt_to):
     return files
 
 
-def gnu_find_files_by_mtime(path, dt_from, dt_to, extensions, followlinks=True):
+def gnu_find_files_by_mtime(
+        path: str,
+        dt_from: datetime,
+        dt_to: datetime,
+        extensions: Optional[List[str]] = None,
+        followlinks: bool = True
+) -> List[str]:
     """
     Given two timestamps, find files under a path that were
     last modified between the two. Uses the system-provided GNU ``find``
@@ -448,16 +454,16 @@ def gnu_find_files_by_mtime(path, dt_from, dt_to, extensions, followlinks=True):
 
     Parameters
     ----------
-    path : str
+    path
         The root path from which to start the search, relative to
         the :ref:`mmfnexus_path <mmfnexus-path>` environment setting.
-    dt_from : datetime.datetime
+    dt_from
         The "starting" point of the search timeframe
-    dt_to : datetime.datetime
+    dt_to
         The "ending" point of the search timeframe
-    extensions : :obj:`list` of :obj:`str`
+    extensions
         A list of strings representing the extensions to find
-    followlinks : bool
+    followlinks
         Whether to follow symlinks using the ``find`` command via 
         the ``-H`` command line flag. This is useful when the 
         :ref:`mmfnexus_path <mmfnexus-path>` is actually a directory
@@ -469,7 +475,7 @@ def gnu_find_files_by_mtime(path, dt_from, dt_to, extensions, followlinks=True):
 
     Returns
     -------
-    files : :obj:`list` of :obj:`str`
+    files
         A list of the files that have modification times within the
         time range provided (sorted by modification time)
 
