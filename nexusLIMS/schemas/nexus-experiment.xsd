@@ -282,6 +282,13 @@
                </xs:documentation>
         </xs:annotation>
       </xs:element>
+      
+      <xs:element name="elements" type="nx:PeriodicTableElementType" minOccurs="0" maxOccurs="1">
+        <xs:annotation>
+          <xs:documentation> A list of one or more elements that are present or expected to be
+            present in this sample </xs:documentation>
+        </xs:annotation>
+      </xs:element>
 
     </xs:sequence>
     <xs:attribute name="id" type="xs:string">
@@ -1060,5 +1067,605 @@
       </xs:enumeration>
     </xs:restriction>
   </xs:simpleType>
+
+  <xs:complexType name="PeriodicTableElementType">
+    <xs:annotation>
+      <xs:documentation> Allowed periodic table element values. Includes abbreviations from the
+        periodic table up to element number 118. This list was adapted from the Chemical Markup
+        Language schema (http://www.xml-cml.org/schema/schema3/) </xs:documentation>
+    </xs:annotation>
+    <xs:all>
+      <xs:element minOccurs="0" name="H">
+        <xs:annotation>
+          <xs:documentation>Hydrogen; Atomic number 1</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="He">
+        <xs:annotation>
+          <xs:documentation>Helium; Atomic number 2</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Li">
+        <xs:annotation>
+          <xs:documentation>Lithium; Atomic number 3</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Be">
+        <xs:annotation>
+          <xs:documentation>Beryllium; Atomic number 4</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="B">
+        <xs:annotation>
+          <xs:documentation>Boron; Atomic number 5</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="C">
+        <xs:annotation>
+          <xs:documentation>Carbon; Atomic number 6</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="N">
+        <xs:annotation>
+          <xs:documentation>Nitrogen; Atomic number 7</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="O">
+        <xs:annotation>
+          <xs:documentation>Oxygen; Atomic number 8</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="F">
+        <xs:annotation>
+          <xs:documentation>Fluorine; Atomic number 9</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Ne">
+        <xs:annotation>
+          <xs:documentation>Neon; Atomic number 10</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Na">
+        <xs:annotation>
+          <xs:documentation>Sodium; Atomic number 11</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Mg">
+        <xs:annotation>
+          <xs:documentation>Magnesium; Atomic number 12</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Al">
+        <xs:annotation>
+          <xs:documentation>Aluminum; Atomic number 13</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Si">
+        <xs:annotation>
+          <xs:documentation>Silicon; Atomic number 14</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="P">
+        <xs:annotation>
+          <xs:documentation>Phosphorus; Atomic number 15</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="S">
+        <xs:annotation>
+          <xs:documentation>Sulfur; Atomic number 16</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Cl">
+        <xs:annotation>
+          <xs:documentation>Chlorine; Atomic number 17</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Ar">
+        <xs:annotation>
+          <xs:documentation>Argon; Atomic number 18</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="K">
+        <xs:annotation>
+          <xs:documentation>Potassium; Atomic number 19</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Ca">
+        <xs:annotation>
+          <xs:documentation>Calcium; Atomic number 20</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Sc">
+        <xs:annotation>
+          <xs:documentation>Scandium; Atomic number 21</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Ti">
+        <xs:annotation>
+          <xs:documentation>Titanium; Atomic number 22</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="V">
+        <xs:annotation>
+          <xs:documentation>Vanadium; Atomic number 23</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Cr">
+        <xs:annotation>
+          <xs:documentation>Chromium; Atomic number 24</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Mn">
+        <xs:annotation>
+          <xs:documentation>Manganese; Atomic number 25</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Fe">
+        <xs:annotation>
+          <xs:documentation>Iron; Atomic number 26</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Co">
+        <xs:annotation>
+          <xs:documentation>Cobalt; Atomic number 27</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Ni">
+        <xs:annotation>
+          <xs:documentation>Nickel; Atomic number 28</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Cu">
+        <xs:annotation>
+          <xs:documentation>Copper; Atomic number 29</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Zn">
+        <xs:annotation>
+          <xs:documentation>Zinc; Atomic number 30</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Ga">
+        <xs:annotation>
+          <xs:documentation>Gallium; Atomic number 31</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Ge">
+        <xs:annotation>
+          <xs:documentation>Germanium; Atomic number 32</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="As">
+        <xs:annotation>
+          <xs:documentation>Arsenic; Atomic number 33</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Se">
+        <xs:annotation>
+          <xs:documentation>Selenium; Atomic number 34</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Br">
+        <xs:annotation>
+          <xs:documentation>Bromine; Atomic number 35</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Kr">
+        <xs:annotation>
+          <xs:documentation>Krypton; Atomic number 36</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Rb">
+        <xs:annotation>
+          <xs:documentation>Rubidium; Atomic number 37</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Sr">
+        <xs:annotation>
+          <xs:documentation>Strontium; Atomic number 38</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Y">
+        <xs:annotation>
+          <xs:documentation>Yttrium; Atomic number 39</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Zr">
+        <xs:annotation>
+          <xs:documentation>Zirconium; Atomic number 40</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Nb">
+        <xs:annotation>
+          <xs:documentation>Niobium; Atomic number 41</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Mo">
+        <xs:annotation>
+          <xs:documentation>Molybdenum; Atomic number 42</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Tc">
+        <xs:annotation>
+          <xs:documentation>Technetium; Atomic number 43</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Ru">
+        <xs:annotation>
+          <xs:documentation>Ruthenium; Atomic number 44</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Rh">
+        <xs:annotation>
+          <xs:documentation>Rhodium; Atomic number 45</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Pd">
+        <xs:annotation>
+          <xs:documentation>Palladium; Atomic number 46</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Ag">
+        <xs:annotation>
+          <xs:documentation>Silver; Atomic number 47</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Cd">
+        <xs:annotation>
+          <xs:documentation>Cadmium; Atomic number 48</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="In">
+        <xs:annotation>
+          <xs:documentation>Indium; Atomic number 49</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Sn">
+        <xs:annotation>
+          <xs:documentation>Tin; Atomic number 50</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Sb">
+        <xs:annotation>
+          <xs:documentation>Antimony; Atomic number 51</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Te">
+        <xs:annotation>
+          <xs:documentation>Tellurium; Atomic number 52</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="I">
+        <xs:annotation>
+          <xs:documentation>Iodine; Atomic number 53</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Xe">
+        <xs:annotation>
+          <xs:documentation>Xenon; Atomic number 54</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Cs">
+        <xs:annotation>
+          <xs:documentation>Cesium; Atomic number 55</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Ba">
+        <xs:annotation>
+          <xs:documentation>Barium; Atomic number 56</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="La">
+        <xs:annotation>
+          <xs:documentation>Lanthanum; Atomic number 57</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Ce">
+        <xs:annotation>
+          <xs:documentation>Cerium; Atomic number 58</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Pr">
+        <xs:annotation>
+          <xs:documentation>Praseodymium; Atomic number 59</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Nd">
+        <xs:annotation>
+          <xs:documentation>Neodymium; Atomic number 60</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Pm">
+        <xs:annotation>
+          <xs:documentation>Promethium; Atomic number 61</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Sm">
+        <xs:annotation>
+          <xs:documentation>Samarium; Atomic number 62</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Eu">
+        <xs:annotation>
+          <xs:documentation>Europium; Atomic number 63</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Gd">
+        <xs:annotation>
+          <xs:documentation>Gadolinium; Atomic number 64</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Tb">
+        <xs:annotation>
+          <xs:documentation>Terbium; Atomic number 65</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Dy">
+        <xs:annotation>
+          <xs:documentation>Dysprosium; Atomic number 66</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Ho">
+        <xs:annotation>
+          <xs:documentation>Holmium; Atomic number 67</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Er">
+        <xs:annotation>
+          <xs:documentation>Erbium; Atomic number 68</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Tm">
+        <xs:annotation>
+          <xs:documentation>Thulium; Atomic number 69</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Yb">
+        <xs:annotation>
+          <xs:documentation>Ytterbium; Atomic number 70</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Lu">
+        <xs:annotation>
+          <xs:documentation>Lutetium; Atomic number 71</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Hf">
+        <xs:annotation>
+          <xs:documentation>Hafnium; Atomic number 72</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Ta">
+        <xs:annotation>
+          <xs:documentation>Tantalum; Atomic number 73</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="W">
+        <xs:annotation>
+          <xs:documentation>Tungsten; Atomic number 74</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Re">
+        <xs:annotation>
+          <xs:documentation>Rhenium; Atomic number 75</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Os">
+        <xs:annotation>
+          <xs:documentation>Osmium; Atomic number 76</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Ir">
+        <xs:annotation>
+          <xs:documentation>Iridium; Atomic number 77</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Pt">
+        <xs:annotation>
+          <xs:documentation>Platinum; Atomic number 78</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Au">
+        <xs:annotation>
+          <xs:documentation>Gold; Atomic number 79</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Hg">
+        <xs:annotation>
+          <xs:documentation>Mercury; Atomic number 80</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Tl">
+        <xs:annotation>
+          <xs:documentation>Thallium; Atomic number 81</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Pb">
+        <xs:annotation>
+          <xs:documentation>Lead; Atomic number 82</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Bi">
+        <xs:annotation>
+          <xs:documentation>Bismuth; Atomic number 83</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Po">
+        <xs:annotation>
+          <xs:documentation>Polonium; Atomic number 84</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="At">
+        <xs:annotation>
+          <xs:documentation>Astatine; Atomic number 85</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Rn">
+        <xs:annotation>
+          <xs:documentation>Radon; Atomic number 86</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Fr">
+        <xs:annotation>
+          <xs:documentation>Francium; Atomic number 87</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Ra">
+        <xs:annotation>
+          <xs:documentation>Radium; Atomic number 88</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Ac">
+        <xs:annotation>
+          <xs:documentation>Actinium; Atomic number 89</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Th">
+        <xs:annotation>
+          <xs:documentation>Thorium; Atomic number 90</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Pa">
+        <xs:annotation>
+          <xs:documentation>Protactinium; Atomic number 91</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="U">
+        <xs:annotation>
+          <xs:documentation>Uranium; Atomic number 92</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Np">
+        <xs:annotation>
+          <xs:documentation>Neptunium; Atomic number 93</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Pu">
+        <xs:annotation>
+          <xs:documentation>Plutonium; Atomic number 94</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Am">
+        <xs:annotation>
+          <xs:documentation>Americium; Atomic number 95</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Cm">
+        <xs:annotation>
+          <xs:documentation>Curium; Atomic number 96</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Bk">
+        <xs:annotation>
+          <xs:documentation>Berkelium; Atomic number 97</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Cf">
+        <xs:annotation>
+          <xs:documentation>Californium; Atomic number 98</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Es">
+        <xs:annotation>
+          <xs:documentation>Einsteinium; Atomic number 99</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Fm">
+        <xs:annotation>
+          <xs:documentation>Fermium; Atomic number 100</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Md">
+        <xs:annotation>
+          <xs:documentation>Mendelevium; Atomic number 101</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="No">
+        <xs:annotation>
+          <xs:documentation>Nobelium; Atomic number 102</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Lr">
+        <xs:annotation>
+          <xs:documentation>Lawrencium; Atomic number 103</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Rf">
+        <xs:annotation>
+          <xs:documentation>Rutherfordium; Atomic number 104</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Db">
+        <xs:annotation>
+          <xs:documentation>Dubnium; Atomic number 105</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Sg">
+        <xs:annotation>
+          <xs:documentation>Seaborgium; Atomic number 106</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Bh">
+        <xs:annotation>
+          <xs:documentation>Bohrium; Atomic number 107</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Hs">
+        <xs:annotation>
+          <xs:documentation>Hassium; Atomic number 108</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Mt">
+        <xs:annotation>
+          <xs:documentation>Meitnerium; Atomic number 109</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Ds">
+        <xs:annotation>
+          <xs:documentation>Darmstadtium; Atomic number 110</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Rg">
+        <xs:annotation>
+          <xs:documentation>Roentgenium; Atomic number 111</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Cn">
+        <xs:annotation>
+          <xs:documentation>Copernicium; Atomic number 112</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Nh">
+        <xs:annotation>
+          <xs:documentation>Nihonium; Atomic number 113</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Fl">
+        <xs:annotation>
+          <xs:documentation>Flerovium; Atomic number 114</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Mc">
+        <xs:annotation>
+          <xs:documentation>Moscovium; Atomic number 115</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Lv">
+        <xs:annotation>
+          <xs:documentation>Livermorium; Atomic number 116</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Ts">
+        <xs:annotation>
+          <xs:documentation>Tennessine; Atomic number 117</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element minOccurs="0" name="Og">
+        <xs:annotation>
+          <xs:documentation>Oganesson; Atomic number 118</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:all>
+  </xs:complexType>
 
 </xs:schema>

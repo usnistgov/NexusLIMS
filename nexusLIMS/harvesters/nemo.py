@@ -1074,7 +1074,7 @@ def res_event_from_session(session: Session) -> ReservationEvent:
         # DONE: check for presence of sample_group in the reservation metadata
         #  and change the harvester to process the sample group metadata by
         #  providing lists to the ReservationEvent constructor
-        sample_details, sample_pid, sample_name = \
+        sample_details, sample_pid, sample_name, sample_elements = \
             _process_res_question_samples(res)
 
         # DONE: respect user choice not to harvest data (data_consent)
@@ -1114,7 +1114,7 @@ def res_event_from_session(session: Session) -> ReservationEvent:
             experiment_purpose=_get_res_question_value('experiment_purpose',
                                                        res),
             sample_details=sample_details, sample_pid=sample_pid,
-            sample_name=sample_name,
+            sample_name=sample_name, sample_elements=sample_elements,
             project_name=[None],
             project_id=[_get_res_question_value('project_id', res)],
             project_ref=[None],
@@ -1129,8 +1129,9 @@ def res_event_from_session(session: Session) -> ReservationEvent:
 def _process_res_question_samples(res_dict: Dict) -> \
     Tuple[Union[List[Union[str, None]], None],
           Union[List[Union[str, None]], None],
+          Union[List[Union[str, None]], None],
           Union[List[Union[str, None]], None]]:
-    sample_details, sample_pid, sample_name = [], [], []
+    sample_details, sample_pid, sample_name, periodic_tables = [], [], [], []
     sample_group = _get_res_question_value('sample_group', res_dict)
     if sample_group is not None:
         # multiple samples form will have
@@ -1145,13 +1146,16 @@ def _process_res_question_samples(res_dict: Dict) -> \
         #   "1": {
         #     "sample_name": "sample name 1",
         #     "sample_or_pid": "Sample Name",
-        #     "sample_details": "A sample with name and some additional detail"
+        #     "sample_details": "A sample with name and some additional detail",
+        #     "periodic_table": ["H", "Ti", "Cu", "Sb", "Re"]
         #   },
         #   ...
         # }
         # each key "0", "1", "2", etc. represents a single sample the user
         # added via the "Add" button. There should always be at least one,
         # since sample information is required
+        # the "periodic_table" key is optional, and won't be present if the user did not select anything in that
+        # section of the questions
         for k, v in sample_group.items():
             if v['sample_or_pid'].lower() == "pid":
                 sample_pid.append(v['sample_name'])
@@ -1168,6 +1172,10 @@ def _process_res_question_samples(res_dict: Dict) -> \
                 sample_details.append(v['sample_details'])
             else:
                 sample_details.append(None)
+            if 'periodic_table' in v:
+                periodic_tables.append(v['periodic_table'])
+            else:
+                periodic_tables.append(None)
     else:  # pragma: no cover
         # non-multiple samples (old-style form) (this is deprecated,
         # so doesn't need coverage since we don't have reservations in this
@@ -1175,7 +1183,7 @@ def _process_res_question_samples(res_dict: Dict) -> \
         sample_details = [_get_res_question_value('sample_details', res_dict)]
         sample_pid = [None]
         sample_name = [_get_res_question_value('sample_name', res_dict)]
-    return sample_details, sample_pid, sample_name
+    return sample_details, sample_pid, sample_name, periodic_tables
 
 
 def _get_res_question_value(value: str, res_dict: Dict) -> Union[str, Dict,

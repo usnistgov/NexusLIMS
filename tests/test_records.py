@@ -518,6 +518,63 @@ class TestRecordBuilder:
         # remove record
         os.remove(f)
 
+    def test_build_record_with_sample_elements(
+            self, remove_nemo_gov_harvester, monkeypatch):
+        # test session that only has one file present
+        def mock_get_sessions():
+            return [session_handler.Session(
+                session_identifier='https://***REMOVED***/api/usage_events'
+                                   '/?id=-1',
+                instrument=instrument_db['testsurface-CPU_P1111111'],
+                dt_from=_dt.fromisoformat('2023-02-13T13:00:00.000-07:00'),
+                dt_to=_dt.fromisoformat('2023-02-13T14:00:00.000-07:00'),
+                user='None')]
+
+        NX = "https://data.nist.gov/od/dm/nexus/experiment/v1.0"
+
+        monkeypatch.setattr(_rb, '_get_sessions', mock_get_sessions)
+
+        # make record uploader just pretend by returning all files provided (
+        # as if they were actually uploaded)
+        monkeypatch.setattr(_rb, "_upload_record_files", lambda x: (x, x))
+
+        # override preview generation to save time
+        from nexusLIMS.builder.record_builder import build_record
+        monkeypatch.setattr(_rb, 'build_record',
+                            partial(build_record, generate_previews=False))
+
+        xml_files = _rb.build_new_session_records()
+        assert len(xml_files) == 1
+        f = xml_files[0]
+        root = et.parse(f)
+
+        assert root.find(f'/{{{NX}}}title').text == \
+               'Test reservation for multiple samples, some with elements, some not'
+        assert len(root.findall(f'//{{{NX}}}acquisitionActivity')) == 1
+        assert len(root.findall(f'//{{{NX}}}dataset')) == 4
+        assert root.find(f'/{{{NX}}}summary/{{{NX}}}motivation').text == \
+               'testing'
+        assert root.find(f'/{{{NX}}}summary/{{{NX}}}instrument').get('pid') == \
+               'testsurface-CPU_P1111111'
+        assert len(root.findall(f'//{{{NX}}}sample')) == 3
+
+        # test sample element tags
+        expected = [
+            None,
+            [f'{{{NX}}}S', f'{{{NX}}}Rb', f'{{{NX}}}Sb', f'{{{NX}}}Re', f'{{{NX}}}Cm'],
+            [f'{{{NX}}}Ir']
+        ]
+        sample_elements = root.findall(f'//{{{NX}}}sample')
+        for exp, e in zip(expected, sample_elements):
+            el = e.find(f'{{{NX}}}elements')
+            if exp is None:
+                assert exp == el
+            else:
+                assert [i.tag for i in el] == exp
+
+        # remove record
+        os.remove(f)
+
     def test_not_implemented_harvester(self):
         # need to create a session with an instrument with a bogus harvester
         from nexusLIMS.instruments import Instrument

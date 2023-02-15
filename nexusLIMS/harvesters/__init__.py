@@ -110,6 +110,7 @@ class ReservationEvent:
                  sample_details: Union[List[Union[str, None]], None] = None,
                  sample_pid: Union[List[Union[str, None]], None] = None,
                  sample_name: Union[List[Union[str, None]], None] = None,
+                 sample_elements: Union[List[Union[List[str], None]], None] = None,
                  project_name: Union[List[Union[str, None]], None] = None,
                  project_id: Union[List[Union[str, None]], None] = None,
                  project_ref: Union[List[Union[str, None]], None] = None,
@@ -131,12 +132,16 @@ class ReservationEvent:
 
         # coerce sample arguments into lists
         self.sample_details = \
-            sample_details if isinstance(sample_details, list) else \
-            [sample_details]
+            sample_details if isinstance(sample_details, list) else [sample_details]
         self.sample_pid = \
             sample_pid if isinstance(sample_pid, list) else [sample_pid]
         self.sample_name = \
-            sample_name if isinstance(sample_name, list) else  [sample_name]
+            sample_name if isinstance(sample_name, list) else [sample_name]
+        # sample elements should be a list of List[str] or None; we shouldn't really be doing the above
+        # coercion anyway, so we'll assume the caller knows what they're doing and used the right argument type
+        self.sample_elements = sample_elements
+        if self.sample_elements is None:
+            self.sample_elements = [None]
 
         # coerce project arguments into lists
         self.project_name = \
@@ -249,8 +254,9 @@ class ReservationEvent:
         if self.sample_pid is not None:
             # if any of the sample arguments are not none, they should be
             # lists, so we should create a sample element for each one
-            for pid, name, details in zip(self.sample_pid, self.sample_name,
-                                          self.sample_details):
+            for pid, name, details, elements in \
+                zip(self.sample_pid, self.sample_name,
+                    self.sample_details, self.sample_elements):
                 # create one sample subelement for each sample in our lists
                 sample_el = etree.SubElement(root, "sample")
                 if pid is not None:
@@ -262,11 +268,15 @@ class ReservationEvent:
                     sample_detail_el = etree.SubElement(sample_el,
                                                         "description")
                     sample_detail_el.text = details
+                if elements is not None:
+                    sample_elements_el = etree.SubElement(sample_el, "elements")
+                    for e in elements:
+                        etree.SubElement(sample_elements_el, e)
 
         # project nodes
         if self.project_name is not None:
             for name, pid, ref in zip(self.project_name, self.project_id,
-                                     self.project_ref):
+                                      self.project_ref):
                 project_el = etree.SubElement(root, "project")
                 if name is not None:
                     project_name_el = etree.SubElement(project_el, "name")

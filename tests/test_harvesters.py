@@ -734,6 +734,28 @@ class TestNemoIntegration:
         assert res_event.internal_id == '187'
         assert res_event.url == f'{os.environ.get("NEMO_address_1").replace("api/", "")}event_details/reservation/187/'
 
+    def test_res_event_from_session_with_elements(self):
+        from nexusLIMS.db.session_handler import Session
+        from nexusLIMS.harvesters import nemo
+        s = Session('test_matching_reservation',
+                    instrument_db['testsurface-CPU_P1111111'],
+                    dt.fromisoformat('2023-02-13T13:00:00-07:00'),
+                    dt.fromisoformat('2023-02-13T14:00:00-07:00'),
+                    user='***REMOVED***')
+        res_event = nemo.res_event_from_session(s)
+        assert res_event.instrument == instrument_db['testsurface-CPU_P1111111']
+        assert res_event.experiment_title == 'Test reservation for multiple samples, some with elements, some not'
+        assert res_event.experiment_purpose == 'testing'
+        assert res_event.sample_name[0] == "sample 1.1"
+        assert res_event.project_id[0] is None
+        assert res_event.sample_elements[0] is None
+        assert set(res_event.sample_elements[1]) == {'S', 'Rb', 'Sb', 'Re', 'Cm'}
+        assert set(res_event.sample_elements[2]) == {'Ir'}
+        assert res_event.username == '***REMOVED***'
+        # this will be different depending on which server we're using, so don't test id
+        # assert res_event.internal_id == '***REMOVED***'
+        assert f'{os.environ.get("NEMO_address_1").replace("api/", "")}event_details/reservation/' in res_event.url
+
     def test_res_event_from_session_no_matching_sessions(self):
         from nexusLIMS.db.session_handler import Session
         from nexusLIMS.harvesters import nemo
@@ -833,7 +855,7 @@ class TestNemoIntegration:
             'end': '2021-11-29T12:00:00-07:00',
             'title': ''
         }
-        details, pid, name = _process_res_question_samples(r)
+        details, pid, name, elements = _process_res_question_samples(r)
         assert details == ['A sample with a PID and some more details',
                            'A sample with a name and some additional detail',
                            None, None]
@@ -846,12 +868,79 @@ class TestNemoIntegration:
             r['question_data']['sample_group'][
                 'user_input'][str(i)]['sample_or_pid'] = 'bogus'
 
-        details, pid, name = _process_res_question_samples(r)
+        details, pid, name, elements = _process_res_question_samples(r)
         assert details == ['A sample with a PID and some more details',
                            'A sample with a name and some additional detail',
                            None, None]
         assert pid == [None, None, None, None]
         assert name == [None, None, None, None]
+
+    def test_res_questions_periodic_table_elements(self, nemo_connector):
+        """
+        This method is similar to above, but actually gets some test reservations
+        with and without the "periodic table" input defined
+        """
+        from nexusLIMS.harvesters.nemo import _process_res_question_samples
+
+        # sample with no elements
+        dt_from = dt.fromisoformat('2023-02-13T10:00:00-07:00')
+        dt_to = dt.fromisoformat('2023-02-13T11:00:00-07:00')
+        res = nemo_connector.get_reservations(tool_id=10, dt_from=dt_from, dt_to=dt_to)
+        if not res:
+            pytest.xfail('Did not find expected test reservation on server')  # pragma: no cover
+
+        details, pids, names, elements = _process_res_question_samples(res[0])
+        assert details == [None]
+        assert pids == ['sample 1']
+        assert names == [None]
+        assert elements == [None]
+
+        # sample with some elements
+        dt_from = dt.fromisoformat('2023-02-13T11:00:00-07:00')
+        dt_to = dt.fromisoformat('2023-02-13T12:00:00-07:00')
+        res = nemo_connector.get_reservations(tool_id=10, dt_from=dt_from, dt_to=dt_to)
+        if not res:
+            pytest.xfail('Did not find expected test reservation on server')  # pragma: no cover
+
+        details, pids, names, elements = _process_res_question_samples(res[0])
+        assert details == [None]
+        assert pids == ['sample 2']
+        assert names == [None]
+        assert [set(e) for e in elements] == [{'H', 'Ti', 'Cu', 'Sb', 'Re'}]
+
+        # sample with all elements
+        dt_from = dt.fromisoformat('2023-02-13T12:00:00-07:00')
+        dt_to = dt.fromisoformat('2023-02-13T13:00:00-07:00')
+        res = nemo_connector.get_reservations(tool_id=10, dt_from=dt_from, dt_to=dt_to)
+        if not res:
+            pytest.xfail('Did not find expected test reservation on server')  # pragma: no cover
+
+        details, pids, names, elements = _process_res_question_samples(res[0])
+        assert details == ['testing']
+        assert pids == [None]
+        assert names == ['sample 3']
+        assert [set(e) for e in elements] == [
+            {"H", "He", "Li", "Be", "B", "C", "N", "O", "F", "Ne", "Na", "Mg", "Al", "Si", "P", "S", "Cl", "Ar", "K",
+             "Ca", "Sc", "Ti", "V", "Cr", "Mn", "Fe", "Co", "Ni", "Cu", "Zn", "Ga", "Ge", "As", "Se", "Br", "Kr", "Rb",
+             "Sr", "Y", "Zr", "Nb", "Mo", "Tc", "Ru", "Rh", "Pd", "Ag", "Cd", "In", "Sn", "Sb", "Te", "I", "Xe", "Cs",
+             "Ba", "Lu", "Hf", "Ta", "W", "Re", "Os", "Ir", "Pt", "Au", "Hg", "Tl", "Pb", "Bi", "Po", "At", "Rn", "Fr",
+             "Ra", "Lr", "Rf", "Db", "Sg", "Bh", "Hs", "Mt", "Ds", "Rg", "Cn", "Nh", "Fl", "Mc", "Lv", "Ts", "Og", "La",
+             "Ce", "Pr", "Nd", "Pm", "Sm", "Eu", "Gd", "Tb", "Dy", "Ho", "Er", "Tm", "Yb", "Ac", "Th", "Pa", "U", "Np",
+             "Pu", "Am", "Cm", "Bk", "Cf", "Es", "Fm", "Md", "No"}]
+
+        # multiple samples in group, some with elements, some not
+        dt_from = dt.fromisoformat('2023-02-13T13:00:00-07:00')
+        dt_to = dt.fromisoformat('2023-02-13T14:00:00-07:00')
+        res = nemo_connector.get_reservations(tool_id=10, dt_from=dt_from, dt_to=dt_to)
+        if not res:
+            pytest.xfail('Did not find expected test reservation on server')  # pragma: no cover
+
+        details, pids, names, elements = _process_res_question_samples(res[0])
+        assert details == ['no elements', 'some elements', 'one element']
+        assert pids == [None, None, None]
+        assert names == ['sample 1.1', 'sample 1.2', 'sample 1.3']
+        assert [set(e) if e else None for e in elements] == [None, {'S', 'Rb', 'Sb', 'Re', 'Cm'}, {'Ir'}]
+
 
     def test_get_tool_ids(self, nemo_connector):
         tool_ids = nemo_connector.get_known_tool_ids()
@@ -1058,6 +1147,7 @@ class TestReservationEvent:
                             "testing"],
             sample_pid=["***REMOVED***.5"],
             sample_name=["The test sample"],
+            sample_elements=[["Te", "S", "Ts"]],
             project_name=["NexusLIMS"], project_id=["***REMOVED***.1.5"],
             project_ref=["https://www.example.org"], internal_id="42308",
             division="641", group="00"
@@ -1089,6 +1179,7 @@ class TestReservationEvent:
         assert xml.find('sample/name').text == "The test sample"
         assert xml.find('sample/description').text == \
                "A sample that was loaded into a microscope for testing"
+        assert [el.tag for el in xml.find('sample/elements')] == ['Te', 'S', 'Ts']
         assert xml.find('project/name').text == "NexusLIMS"
         assert xml.find('project/division').text == "641"
         assert xml.find('project/group').text == "00"

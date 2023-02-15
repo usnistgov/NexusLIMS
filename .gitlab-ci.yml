@@ -32,6 +32,7 @@ nexusLIMS_tests:
       # cache the coverage results so they can be published, always returning true
       - mv tests/coverage .
       - tar -czf coverage.tar.gz coverage || true
+    coverage: /(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/
     artifacts:
       paths:
         - coverage

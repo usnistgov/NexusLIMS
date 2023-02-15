@@ -383,7 +383,7 @@ def validate_record(xml_filename):
     Returns
     -------
     validates : bool
-        Whether or not the record validates against the Nexus schema
+        Whether the record validates against the Nexus schema
     """
     xsd_doc = _etree.parse(XSD_PATH)
     xml_schema = _etree.XMLSchema(xsd_doc)
