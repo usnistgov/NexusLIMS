@@ -25,8 +25,9 @@
 #  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
+# pylint: disable=duplicate-code
 """
-**Attributes**
+Methods and representations for instruments in a NexusLIMS system.
 
 Attributes
 ----------
@@ -36,25 +37,28 @@ instrument_db : dict
     Each object in this dictionary represents an instrument detected in the
     NexusLIMS remote database.
 """
+import contextlib
 import datetime
-from typing import Union
+import logging
+import os
+import sqlite3
+from pathlib import Path
+from typing import Optional
 
-from nexusLIMS.utils import is_subpath as _is_subpath
-import sqlite3 as _sql3
-import contextlib as _contextlib
-import os as _os
-import logging as _logging
-import pytz as _pytz
+import pytz
 
-_logging.basicConfig()
-_logger = _logging.getLogger(__name__)
-_logger.setLevel(_logging.INFO)
+from nexusLIMS.utils import is_subpath
+
+logging.basicConfig()
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
 def _get_instrument_db():
     """
-    Connect to the NexusLIMS database and get a list of all the instruments
-    contained within
+    Get dictionary of instruments from the NexusLIMS database.
+
+    Sort of like a very very basic ORM, but much worse.
 
     Returns
     -------
@@ -64,56 +68,69 @@ def _get_instrument_db():
         NexusLIMS database
     """
     query = "SELECT * from instruments"
-    # use contextlib to auto-close the connection and database cursors
-    with _contextlib.closing(_sql3.connect(
-            _os.environ['nexusLIMS_db_path'])) as conn:
+
+    with contextlib.closing(  # noqa: SIM117
+        sqlite3.connect(os.environ["nexusLIMS_db_path"]),
+    ) as conn:
         with conn:  # auto-commits
-            with _contextlib.closing(conn.cursor()) as cursor:  # auto-closes
+            with contextlib.closing(conn.cursor()) as cursor:
                 results = cursor.execute(query).fetchall()
-                col_names = list(map(lambda x: x[0], cursor.description))
+                col_names = [x[0] for x in cursor.description]
 
     instr_db = {}
-    for l in results:
+    for line in results:
         this_dict = {}
-        for key, val in zip(col_names, l):
+        for key, val in zip(col_names, line):
             this_dict[key] = val
 
-        key = this_dict.pop('instrument_pid')
-        this_dict['name'] = key
+        key = this_dict.pop("instrument_pid")
+        this_dict["name"] = key
         # remove keys from this_dict that we don't know about yet so we don't
         # crash and burn if a new column is added
-        known_cols = \
-            ['api_url', 'calendar_name', 'calendar_url', 'location',
-             'name', 'schema_name', 'property_tag', 'filestore_path',
-             'computer_ip', 'computer_name', 'computer_mount', 'harvester',
-             'timezone']
+        known_cols = [
+            "api_url",
+            "calendar_name",
+            "calendar_url",
+            "location",
+            "name",
+            "schema_name",
+            "property_tag",
+            "filestore_path",
+            "computer_ip",
+            "computer_name",
+            "computer_mount",
+            "harvester",
+            "timezone",
+        ]
         this_dict = {k: this_dict[k] for k in known_cols}
         instr_db[key] = Instrument(**this_dict)
 
     return instr_db
 
 
-class Instrument:
+class Instrument:  # pylint: disable=too-many-instance-attributes
     """
+    Representation of a NexusLIMS instrument.
+
     A simple object to hold information about an instrument in the Microscopy
-    Nexus facility, fetched from the external NexusLIMS database
+    Nexus facility, fetched from the external NexusLIMS database.
 
     Parameters
     ----------
     api_url : str or None
-        The calendar API endpoint url for this instrument’s scheduler
+        The calendar API endpoint url for this instrument's scheduler
     calendar_name : str or None
         The “user-friendly” name of the calendar for this instrument as displayed on the
         reservation system resource (e.g. “FEI Titan TEM”)
     calendar_url : str or None
-        The URL to this instrument’s web-accessible calendar on the SharePoint
+        The URL to this instrument's web-accessible calendar on the SharePoint
         resource (if using)
     location : str or None
         The physical location of this instrument (building and room number)
     name : str or None
-        The unique identifier for an instrument in the facility, currently (but not required to be)
-        built from the make, model, and type of instrument, plus a unique numeric code
-        (e.g. ``FEI-Titan-TEM-635816``)
+        The unique identifier for an instrument in the facility, currently
+        (but not required to be) built from the make, model, and type of instrument,
+        plus a unique numeric code (e.g. ``FEI-Titan-TEM-635816``)
     schema_name : str or None
         The human-readable name of instrument as defined in the Nexus Microscopy
         schema and displayed in the records
@@ -145,23 +162,24 @@ class Instrument:
         timezone database (e.g. ``America/New_York``). This is used to properly localize
         dates and times when communicating with the harvester APIs.
     """
-    def __init__(self,
-                 api_url=None,
-                 calendar_name=None,
-                 calendar_url=None,
-                 location=None,
-                 name=None,
-                 schema_name=None,
-                 property_tag=None,
-                 filestore_path=None,
-                 computer_ip=None,
-                 computer_name=None,
-                 computer_mount=None,
-                 harvester=None,
-                 timezone=None):
-        """
-        Create a new Instrument
-        """
+
+    def __init__(  # pylint: disable=too-many-arguments # noqa: PLR0913
+        self,
+        api_url=None,
+        calendar_name=None,
+        calendar_url=None,
+        location=None,
+        name=None,
+        schema_name=None,
+        property_tag=None,
+        filestore_path=None,
+        computer_ip=None,
+        computer_name=None,
+        computer_mount=None,
+        harvester=None,
+        timezone=None,
+    ):
+        """Create a new Instrument."""
         self.api_url = api_url
         self.calendar_name = calendar_name
         self.calendar_url = calendar_url
@@ -175,30 +193,36 @@ class Instrument:
         self.computer_mount = computer_mount
         self.harvester = harvester
         if isinstance(timezone, str):
-            self.timezone = _pytz.timezone(timezone)
+            self.timezone = pytz.timezone(timezone)
         else:
             self.timezone = timezone
 
     def __repr__(self):
-        return f'Nexus Instrument: {self.name}\n' \
-               f'API url:          {self.api_url}\n' \
-               f'Calendar name:    {self.calendar_name}\n' \
-               f'Calendar url:     {self.calendar_url}\n' \
-               f'Schema name:      {self.schema_name}\n' \
-               f'Location:         {self.location}\n' \
-               f'Property tag:     {self.property_tag}\n' \
-               f'Filestore path:   {self.filestore_path}\n' \
-               f'Computer IP:      {self.computer_ip}\n' \
-               f'Computer name:    {self.computer_name}\n' \
-               f'Computer mount:   {self.computer_mount}\n' \
-               f'Harvester:        {self.harvester}\n' \
-               f'Timezone:         {self.timezone}'
+        """Return custom representation of an Instrument."""
+        return (
+            f"Nexus Instrument: {self.name}\n"
+            f"API url:          {self.api_url}\n"
+            f"Calendar name:    {self.calendar_name}\n"
+            f"Calendar url:     {self.calendar_url}\n"
+            f"Schema name:      {self.schema_name}\n"
+            f"Location:         {self.location}\n"
+            f"Property tag:     {self.property_tag}\n"
+            f"Filestore path:   {self.filestore_path}\n"
+            f"Computer IP:      {self.computer_ip}\n"
+            f"Computer name:    {self.computer_name}\n"
+            f"Computer mount:   {self.computer_mount}\n"
+            f"Harvester:        {self.harvester}\n"
+            f"Timezone:         {self.timezone}"
+        )
 
     def __str__(self):
-        return f'{self.name}' + f' in {self.location}' if self.location else ''
+        """Return custom string representation of an Instrument."""
+        return f"{self.name} in {self.location}" if self.location else ""
 
-    def localize_datetime(self, dt: datetime.datetime) -> datetime.datetime:
+    def localize_datetime(self, _dt: datetime.datetime) -> datetime.datetime:
         """
+        Localize a datetime to an Instrument's timezone.
+
         Convert a date and time to the timezone of this instrument. If the
         supplied datetime is naive (i.e. does not have a timezone), it will be
         assumed to already be in the timezone of the instrument, and the
@@ -208,7 +232,7 @@ class Instrument:
 
         Parameters
         ----------
-        dt
+        _dt
             The datetime object to localize
 
         Returns
@@ -217,27 +241,34 @@ class Instrument:
             A datetime object with the same timezone as the instrument
         """
         if self.timezone is None:
-            _logger.warning(f"Tried to localize a datetime with instrument "
-                            f"that does not have timezone information ("
-                            f"{self.name})")
-            return dt
-        if dt.tzinfo is None:
+            logger.warning(
+                "Tried to localize a datetime with instrument that does not have "
+                "timezone information (%s)",
+                self.name,
+            )
+            return _dt
+        if _dt.tzinfo is None:
             # dt is timezone naive
-            return self.timezone.localize(dt)
-        else:
-            # dt has timezone info
-            return dt.astimezone(self.timezone)
+            return self.timezone.localize(_dt)
 
-    def localize_datetime_str(self, dt: datetime.datetime,
-                              fmt: str = '%Y-%m-%d %H:%M:%S %Z') -> str:
+        # dt has timezone info
+        return _dt.astimezone(self.timezone)
+
+    def localize_datetime_str(
+        self,
+        _dt: datetime.datetime,
+        fmt: str = "%Y-%m-%d %H:%M:%S %Z",
+    ) -> str:
         """
+        Localize a datetime to an Instrument's timezone and return as string.
+
         Convert a date and time to the timezone of this instrument, returning
         a textual representation of the object, rather than the datetime
         itself. Uses :py:meth:`localize_datetime` for the actual conversion.
 
         Parameters
         ----------
-        dt
+        _dt
             The datetime object ot localize
         fmt
             The strftime format string to use to format the output
@@ -247,26 +278,26 @@ class Instrument:
         str
             The formatted textual representation of the localized datetime
         """
-        return self.localize_datetime(dt).strftime(fmt)
+        return self.localize_datetime(_dt).strftime(fmt)
 
 
 instrument_db = _get_instrument_db()
 
 
-def get_instr_from_filepath(path):
+def get_instr_from_filepath(path: Path):
     """
-    Using the NexusLIMS database, get an instrument object by a given path.
+    Get an instrument object by a given path Using the NexusLIMS database.
 
     Parameters
     ----------
-    path : str
+    path
         A path (relative or absolute) to a file saved in the central
         filestore that will be used to search for a matching instrument
 
     Returns
     -------
     instrument : Instrument or None
-        An `_Instrument` instance matching the path, or None if no match was
+        An `Instrument` instance matching the path, or None if no match was
         found
 
     Examples
@@ -275,9 +306,11 @@ def get_instr_from_filepath(path):
     >>> str(inst)
     'FEI-Titan-TEM-635816 in xxx/xxxx'
     """
-    for k, v in instrument_db.items():
-        if _is_subpath(path, _os.path.join(_os.environ["mmfnexus_path"],
-                                           v.filestore_path)):
+    for _, v in instrument_db.items():
+        if is_subpath(
+            path,
+            Path(os.environ["mmfnexus_path"]) / v.filestore_path,
+        ):
             return v
 
     return None
@@ -285,7 +318,7 @@ def get_instr_from_filepath(path):
 
 def get_instr_from_calendar_name(cal_name):
     """
-    Using the NexusLIMS database, get an instrument object by a given path.
+    Get an instrument object from the NexusLIMS database by its calendar name.
 
     Parameters
     ----------
@@ -296,7 +329,7 @@ def get_instr_from_calendar_name(cal_name):
     Returns
     -------
     instrument : Instrument or None
-        An `_Instrument` instance matching the path, or None if no match was
+        An `Instrument` instance matching the path, or None if no match was
         found
 
     Examples
@@ -305,16 +338,16 @@ def get_instr_from_calendar_name(cal_name):
     >>> str(inst)
     'FEI-Titan-TEM-635816 in ***REMOVED***'
     """
-    for k, v in instrument_db.items():
+    for _, v in instrument_db.items():
         if cal_name in v.api_url:
             return v
 
     return None
 
 
-def get_instr_from_api_url(api_url: str) -> Union[None, Instrument]:
+def get_instr_from_api_url(api_url: str) -> Optional[Instrument]:
     """
-    Using the NexusLIMS database, get an instrument object by a given api_url.
+    Get an instrument object from the NexusLIMS database by its ``api_url``.
 
     Parameters
     ----------
@@ -334,7 +367,7 @@ def get_instr_from_api_url(api_url: str) -> Union[None, Instrument]:
     >>> str(inst)
     'FEI-Titan-STEM-630901_n in xxx/xxxx'
     """
-    for k, v in instrument_db.items():
+    for _, v in instrument_db.items():
         if api_url == v.api_url:
             return v
 

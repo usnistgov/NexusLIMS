@@ -25,7 +25,7 @@
 #  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
-"""
-This module is only used for keeping track of the current software version.
-"""
-__version__ = '1.1.0'
+"""Keeps track of the current software version."""
+import importlib.metadata
+
+__version__ = importlib.metadata.version("nexusLIMS")

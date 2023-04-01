@@ -1,4 +1,4 @@
-#  NIST Public License - 2020
+#  NIST Public License - 2023
 #
 #  This software was developed by employees of the National Institute of
 #  Standards and Technology (NIST), an agency of the Federal Government
@@ -25,40 +25,45 @@
 #  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
-"""
-A module to handle communication with the NexusLIMS database.
+"""Handle basic metadata extraction from files that do not have an extractor defined."""
 
-Also performs basic database ORM tasks. The top-level module has a helper function to
-make a database query (:py:meth:`make_db_query`), while the
-:py:mod:`~nexusLIMS.db.session_handler` submodule is primarily concerned with mapping
-session log information from the database into python objects for use in other parts of
-the NexusLIMS backend.
-"""
-
-import contextlib
+import logging
 import os
-import sqlite3
+from datetime import datetime as dt
+
+from nexusLIMS.instruments import get_instr_from_filepath
+
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
 
-def make_db_query(query):
+def get_basic_metadata(filename):
     """
-    Execute a query on the NexusLIMS database and return the results as a list.
+    Get basic metadata from a file.
+
+    Returns basic metadata from a file that's not currently interpretable by NexusLIMS.
 
     Parameters
     ----------
-    query : str
-        The SQL query to execute
+    filename : str
+        path to a file saved in the harvested directory of the instrument
 
     Returns
     -------
-    res_list : :obj:`list` of :obj:`tuple`
-        The results of the SQL query
+    mdict : dict
+        A description of the file in lieu of any metadata extracted from it.
     """
-    # use contextlib to auto-close the connection and database cursors
-    with contextlib.closing(  # noqa: SIM117
-        sqlite3.connect(os.environ["nexusLIMS_db_path"]),
-    ) as connection:
-        with connection:
-            with contextlib.closing(connection.cursor()) as cursor:
-                results = cursor.execute(query)
-                return results.fetchall()
+    mdict = {"nx_meta": {}}
+    mdict["nx_meta"]["DatasetType"] = "Unknown"
+    mdict["nx_meta"]["Data Type"] = "Unknown"
+
+    # get the modification time (as ISO format):
+    mtime = os.path.getmtime(filename)
+    instr = get_instr_from_filepath(filename)
+    mtime_iso = dt.fromtimestamp(
+        mtime,
+        tz=instr.timezone if instr else None,
+    ).isoformat()
+    mdict["nx_meta"]["Creation Time"] = mtime_iso
+
+    return mdict

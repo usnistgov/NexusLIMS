@@ -25,12 +25,17 @@
 #  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
+"""Module to test the version of NexusLIMS."""
+
+from packaging import version
 
 from nexusLIMS.version import __version__
-from distutils.version import StrictVersion
 
 
 class TestVersion:
-    def test_version_number(self):
-        # if distutils can parse the version number, we'll assume it's valid
-        StrictVersion(__version__)
+    """Test the version."""
+
+    # pylint: disable=too-few-public-methods
+    def test_version_parsing(self):
+        """Assume if packaging.version can parse the version, it is valid."""
+        version.parse(__version__)

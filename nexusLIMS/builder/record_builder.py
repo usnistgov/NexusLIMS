@@ -26,7 +26,7 @@
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
 """
-**Attributes**
+Builds NexusLIMS records.
 
 Attributes
 ----------
@@ -34,53 +34,56 @@ XSD_PATH
     A string containing the path to the Nexus Experiment schema file,
     which is used to validate XML records built by this module
 """
-from typing import List, Union
-
-import os as _os
-import logging as _logging
-import pathlib as _pathlib
-import shutil as _shutil
-import sys as _sys
-import argparse as _ap
-from uuid import uuid4 as _uuid4
-from lxml import etree as _etree
-from datetime import datetime as _datetime
-from datetime import timedelta as _timedelta
-from io import BytesIO as _bytesIO
-import nexusLIMS.schemas.activity as _activity
-from nexusLIMS.schemas.activity import AcquisitionActivity as _AcqAc
-from nexusLIMS.schemas.activity import cluster_filelist_mtimes
-from nexusLIMS.instruments import Instrument
-from nexusLIMS.harvesters import ReservationEvent as _ResEvent
-from nexusLIMS.harvesters import sharepoint_calendar as _sp_cal
-from nexusLIMS.harvesters import nemo as _nemo
-from nexusLIMS.harvesters.nemo import NoDataConsentException, NoMatchingReservationException
-from nexusLIMS.utils import find_files_by_mtime as _find_files
-from nexusLIMS.utils import gnu_find_files_by_mtime as _gnu_find_files
-from nexusLIMS.utils import has_delay_passed as _has_delay_passed
-from nexusLIMS.extractors import extension_reader_map as _ext
-from nexusLIMS.db.session_handler import db_query as _dbq
-from nexusLIMS.db.session_handler import get_sessions_to_build as _get_sessions
-from nexusLIMS.db.session_handler import Session
-from nexusLIMS.cdcs import upload_record_files as _upload_record_files
-from nexusLIMS import version as _version
-from timeit import default_timer as _timer
+import argparse
+import logging
+import os
+import shutil
+import sys
+import time
+from datetime import datetime as dt
+from datetime import timedelta as td
 from importlib import import_module, util
+from io import BytesIO
+from pathlib import Path
+from timeit import default_timer
+from typing import List, Optional
+from uuid import uuid4
 
-_logger = _logging.getLogger(__name__)
-XSD_PATH: str = _os.path.join(_os.path.dirname(_activity.__file__),
-                              "nexus-experiment.xsd")
+from lxml import etree
+
+from nexusLIMS import version
+from nexusLIMS.cdcs import upload_record_files
+from nexusLIMS.db.session_handler import Session, db_query, get_sessions_to_build
+from nexusLIMS.extractors import extension_reader_map as ext_map
+from nexusLIMS.harvesters import nemo, sharepoint_calendar
+from nexusLIMS.harvesters.nemo import utils as nemo_utils
+from nexusLIMS.harvesters.reservation_event import ReservationEvent
+from nexusLIMS.schemas import activity
+from nexusLIMS.schemas.activity import AcquisitionActivity, cluster_filelist_mtimes
+from nexusLIMS.utils import (
+    find_files_by_mtime,
+    gnu_find_files_by_mtime,
+    has_delay_passed,
+)
+
+logger = logging.getLogger(__name__)
+XSD_PATH: str = Path(activity.__file__).parent / "nexus-experiment.xsd"
 
 
-def build_record(session: Session,
-                 sample_id: Union[None, str] = None,
-                 generate_previews: bool = True) -> str:
+def build_record(
+    session: Session,
+    sample_id: Optional[str] = None,
+    *,
+    generate_previews: bool = True,
+) -> str:
     """
+    Build a NexusLIMS XML record of an Experiment.
+
     Construct an XML document conforming to the NexusLIMS schema from a
     directory containing microscopy data files. Accepts either a
     :py:class:`~nexusLIMS.db.session_handler.Session` object or an Instrument
     and date range (for backwards compatibility). For calendar parsing,
-    currently no logic is implemented for a query that returns multiple records
+    currently no logic is implemented for a query that returns multiple records.
 
     Parameters
     ----------
@@ -93,7 +96,7 @@ def build_record(session: Session,
         A unique identifier pointing to a sample identifier for data
         collected in this record. If None, a UUIDv4 will be generated
     generate_previews
-        Whether or not to create the preview thumbnail images
+        Whether to create the preview thumbnail images
 
     Returns
     -------
@@ -101,25 +104,24 @@ def build_record(session: Session,
         A formatted string containing a well-formed and valid XML document
         for the data contained in the provided path
     """
-
     if sample_id is None:
-        sample_id = str(_uuid4())
-
-    # use instrument, dt_from, dt_to, and user from session:
-    instrument = session.instrument
-    dt_from = session.dt_from
-    dt_to = session.dt_to
-    user = session.user
+        sample_id = str(uuid4())
 
     # setup XML namespaces
-    NX = "https://data.nist.gov/od/dm/nexus/experiment/v1.0"
-    XSI = "http://www.w3.org/2001/XMLSchema-instance"
-    NSMAP = {None: NX, "xsi": XSI, "nx": NX}
-    xml = _etree.Element(f"Experiment", nsmap=NSMAP)
+    nx_namespace = "https://data.nist.gov/od/dm/nexus/experiment/v1.0"
+    xsi_namespace = "http://www.w3.org/2001/XMLSchema-instance"
+    ns_map = {None: nx_namespace, "xsi": xsi_namespace, "nx": nx_namespace}
+    xml = etree.Element("Experiment", nsmap=ns_map)
 
-    _logger.info(f"Getting calendar events with instrument: {instrument.name}, "
-                 f"from {dt_from.isoformat()} to {dt_to.isoformat()}, "
-                 f"user: {user}; using harvester: {instrument.harvester}")
+    logger.info(
+        "Getting calendar events with instrument: %s, from %s to %s, "
+        "user: %s; using harvester: %s",
+        session.instrument.name,
+        session.dt_from.isoformat(),
+        session.dt_to.isoformat(),
+        session.user,
+        session.instrument.harvester,
+    )
     # this now returns a nexusLIMS.harvesters.ReservationEvent, not a string
     # DONE: Make this general to handle a session regardless of harvester,
     #  not just sharepoint (as it is now)
@@ -127,7 +129,7 @@ def build_record(session: Session,
     # implemented that takes a session and returns a matching
     # ReservationEvent (if any)
     res_event = get_reservation_event(session)
-    # res_event = _sp_cal.get_events(instrument=instrument, dt_from=dt_from,
+    # res_event = sharepoint_calendar.get_events(instrument=instrument, dt_from=dt_from,
     #                                dt_to=dt_to, user=user)
 
     output = res_event.as_xml()
@@ -135,21 +137,33 @@ def build_record(session: Session,
     for child in output:
         xml.append(child)
 
-    _logger.info(f"Building acquisition activities for timespan from "
-                 f"{dt_from.isoformat()} to {dt_to.isoformat()}")
-    activities = build_acq_activities(instrument,
-                                      dt_from, dt_to,
-                                      generate_previews)
-    for i, a in enumerate(activities):
-        a_xml = a.as_xml(i, sample_id, print_xml=False)
+    logger.info(
+        "Building acquisition activities for timespan from %s to %s",
+        session.dt_from.isoformat(),
+        session.dt_to.isoformat(),
+    )
+    activities = build_acq_activities(
+        session.instrument,
+        session.dt_from,
+        session.dt_to,
+        generate_previews,
+    )
+    for i, this_activity in enumerate(activities):
+        a_xml = this_activity.as_xml(i, sample_id)
         xml.append(a_xml)
 
-    return _etree.tostring(xml, xml_declaration=True, encoding='UTF-8',
-                           pretty_print=True).decode()
+    return etree.tostring(
+        xml,
+        xml_declaration=True,
+        encoding="UTF-8",
+        pretty_print=True,
+    ).decode()
 
 
-def get_reservation_event(session: Session) -> _ResEvent:
+def get_reservation_event(session: Session) -> ReservationEvent:
     """
+    Get a ReservationEvent representation of a Session.
+
     Handles the abstraction of choosing the right "version" of the
     ``res_event_from_session`` method from the harvester specified in the
     instrument database. This allows for one consistent function name to call
@@ -171,31 +185,40 @@ def get_reservation_event(session: Session) -> _ResEvent:
         ``session``.
     """
     # try to find module and raise error if not found:
-    if util.find_spec(f".{session.instrument.harvester}",
-                      "nexusLIMS.harvesters") is None:
-        raise NotImplementedError(f"Harvester {session.instrument.harvester} "
-                                  f"not found in nexusLIMS.harvesters")
+    if (
+        util.find_spec(f".{session.instrument.harvester}", "nexusLIMS.harvesters")
+        is None
+    ):
+        msg = (
+            f"Harvester {session.instrument.harvester} not found in "
+            "nexusLIMS.harvesters"
+        )
+        raise NotImplementedError(msg)
 
     # use import_module to choose the correct harvester based on the instrument
-    harvester = \
-        import_module(f".{session.instrument.harvester}",
-                      "nexusLIMS.harvesters")
+    harvester = import_module(
+        f".{session.instrument.harvester}",
+        "nexusLIMS.harvesters",
+    )
     # for PyCharm typing, explicitly specify what modules may be in `harvester`
-    harvester: Union[_nemo, _sp_cal]
+    # harvester: Union[nemo, sharepoint_calendar]  # noqa: ERA001
     # DONE: check if that method exists for the given harvester and raise
     #  NotImplementedError if not
-    if not hasattr(harvester, 'res_event_from_session'):
-        raise NotImplementedError(f"res_event_from_session has not been "
-                                  f"implemented for {harvester}, which is "
-                                  f"required to use this method.")
-    res_event = harvester.res_event_from_session(session)
-    return res_event
+    if not hasattr(harvester, "res_event_from_session"):
+        msg = (
+            f"res_event_from_session has not been implemented for {harvester}, which "
+            f"is required to use this method."
+        )
+        raise NotImplementedError(msg)
+
+    return harvester.res_event_from_session(session)
 
 
 def build_acq_activities(instrument, dt_from, dt_to, generate_previews):
     """
-    Build an XML string representation of each AcquisitionActivity for a
-    single microscopy session. This includes setup parameters and metadata
+    Build an XML string representation of each AcquisitionActivity for a session.
+
+    This includes setup parameters and metadata
     associated with each dataset obtained during a microscopy session. Unique
     AcquisitionActivities are delimited via clustering of file collection
     time to detect "long" breaks during a session.
@@ -222,41 +245,41 @@ def build_acq_activities(instrument, dt_from, dt_to, generate_previews):
         The list of :py:class:`~nexusLIMS.schemas.activity.AcquisitionActivity`
         objects generated for the record
     """
-    _logging.getLogger('hyperspy.io_plugins.digital_micrograph').setLevel(
-        _logging.WARNING)
+    logging.getLogger("hyperspy.io_plugins.digital_micrograph").setLevel(
+        logging.WARNING,
+    )
 
-    start_timer = _timer()
-    path = _os.path.abspath(_os.path.join(_os.environ['mmfnexus_path'],
-                                          instrument.filestore_path))
-    # find the files to be included
+    start_timer = default_timer()
+    path = Path(os.environ["mmfnexus_path"]) / instrument.filestore_path
+
+    # find the files to be included (list of Paths)
     files = get_files(path, dt_from, dt_to)
 
-    # remove all files but those supported by nexusLIMS.extractors
-    files = [f for f in files if _os.path.splitext(f)[1].strip('.') in
-             _ext.keys()]
+    logger.info(
+        "Found %i files in %.2f seconds",
+        len(files),
+        default_timer() - start_timer,
+    )
 
-    end_timer = _timer()
-    _logger.info(f'Found {len(files)} files in'
-                 f' {end_timer - start_timer:.2f} seconds')
-
-    # return a string indicating no files found if none were found
+    # raise error if no file found were found
     if len(files) == 0:
-        raise FileNotFoundError('No files found in this time range')
+        msg = "No files found in this time range"
+        raise FileNotFoundError(msg)
 
     # get the timestamp boundaries of acquisition activities
     aa_bounds = cluster_filelist_mtimes(files)
 
     # add the last file's modification time to the boundaries list to make
     # the loop below easier to process
-    aa_bounds.append(_os.path.getmtime(files[-1]))
+    aa_bounds.append(files[-1].stat().st_mtime)
 
-    activities: List[Union[None, _AcqAc]] = [None] * len(aa_bounds)
+    activities: List[Optional[AcquisitionActivity]] = [None] * len(aa_bounds)
 
     i = 0
     aa_idx = 0
     while i < len(files):
         f = files[i]
-        mtime = _os.path.getmtime(f)
+        mtime = f.stat().st_mtime
 
         # check this file's mtime, if it is less than this iteration's value
         # in the AA bounds, then it belongs to this iteration's AA
@@ -264,19 +287,23 @@ def build_acq_activities(instrument, dt_from, dt_to, generate_previews):
         if mtime <= aa_bounds[aa_idx]:
             # if current activity index is None, we need to start a new AA:
             if activities[aa_idx] is None:
-                start_time = _datetime.fromtimestamp(mtime)
-                activities[aa_idx] = _AcqAc(start=start_time)
+                activities[aa_idx] = AcquisitionActivity(
+                    start=dt.fromtimestamp(mtime, tz=instrument.timezone),
+                )
 
             # add this file to the AA
-            _logger.info(
-                f'Adding file {i}/{len(files)} '
-                f'{f.replace(_os.environ["mmfnexus_path"], "").strip("/")} '
-                f'to activity {aa_idx}')
-            activities[aa_idx].add_file(f, generate_previews)
+            logger.info(
+                "Adding file %i/%i %s to activity %i",
+                i,
+                len(files),
+                str(f).replace(os.environ["mmfnexus_path"], "").strip("/"),
+                aa_idx,
+            )
+            activities[aa_idx].add_file(fname=f, generate_preview=generate_previews)
             # assume this file is the last one in the activity (this will be
             # true on the last iteration where mtime is <= to the
             # aa_bounds value)
-            activities[aa_idx].end = _datetime.fromtimestamp(mtime)
+            activities[aa_idx].end = dt.fromtimestamp(mtime, tz=instrument.timezone)
             i += 1
         else:
             # this file's mtime is after the boundary and is thus part of the
@@ -285,28 +312,25 @@ def build_acq_activities(instrument, dt_from, dt_to, generate_previews):
             aa_idx += 1
 
     # Remove any "None" activities from list
-    activities: List[_AcqAc] = [a for a in activities if a is not None]
+    activities: List[AcquisitionActivity] = [a for a in activities if a is not None]
 
-    _logger.info('Finished detecting activities')
-    for i, a in enumerate(activities):
-        # aa_logger = _logging.getLogger('nexusLIMS.schemas.activity')
-        # aa_logger.setLevel(_logging.ERROR)
-        _logger.info(f'Activity {i}: storing setup parameters')
-        a.store_setup_params()
-        _logger.info(f'Activity {i}: storing unique metadata values')
-        a.store_unique_metadata()
+    logger.info("Finished detecting activities")
+    for i, this_activity in enumerate(activities):
+        logger.info("Activity %i: storing setup parameters", i)
+        this_activity.store_setup_params()
+        logger.info("Activity %i: storing unique metadata values", i)
+        this_activity.store_unique_metadata()
 
     return activities
 
 
-def get_files(path, dt_from, dt_to):
+def get_files(path: Path, dt_from, dt_to) -> List[Path]:
     """
-    Get list of files under a path that were last modified between the two
-    given timestamps.
+    Get files under a path that were last modified between the two given timestamps.
 
     Parameters
     ----------
-    path : str
+    path
         The file path in which to search for files
     dt_from : datetime.datetime
         The starting timestamp that will be used to determine which files go
@@ -317,24 +341,47 @@ def get_files(path, dt_from, dt_to):
 
     Returns
     -------
-    files : List[str]
+    files : List[Path]
         A list of the files that have modification times within the
         time range provided (sorted by modification time)
     """
-    _logger.info(f'Starting new file-finding in {path}')
+    logger.info("Starting new file-finding in %s", path)
+
+    # read file finding strategy from environment and set to default of exclusive
+    strategy = os.environ.get("NexusLIMS_file_strategy", default="exclusive").lower()
+    if strategy not in ["inclusive", "exclusive"]:
+        logger.warning(
+            'File finding strategy (env variable "NexusLIMS_file_strategy") had '
+            'an unexpected value: "%s". Setting value to "exclusive".',
+            strategy,
+        )
+        strategy = "exclusive"
+
+    extension_arg = None if strategy == "inclusive" else ext_map.keys()
+
     try:
-        files = _gnu_find_files(path, dt_from, dt_to, _ext.keys())
-    except (NotImplementedError, RuntimeError) as e:
-        _logger.warning(f'GNU find returned error: {e}\nFalling back to pure '
-                        f'Python implementation')
-        files = _find_files(path, dt_from, dt_to)
+        files = gnu_find_files_by_mtime(path, dt_from, dt_to, extensions=extension_arg)
+
+    # exclude following from coverage because find_files_by_mtime is deprecated as of
+    # 1.2.0 and does not support extensions at all (like the above method)
+    except (NotImplementedError, RuntimeError) as exception:  # pragma: no cover
+        logger.warning(
+            "GNU find returned error: %s\nFalling back to pure Python implementation",
+            exception,
+        )
+        files = find_files_by_mtime(path, dt_from, dt_to)
     return files
 
 
-def dump_record(session: Session,
-                filename: Union[None, str] = None,
-                generate_previews: bool = True):
+def dump_record(
+    session: Session,
+    filename: Optional[Path] = None,
+    *,
+    generate_previews: bool = True,
+) -> Path:
     """
+    Dump a record to an XML file.
+
     Writes an XML record for a :py:class:`~nexusLIMS.db.session_handler.Session`
     composed of information pulled from the appropriate reservation system
     as well as metadata extracted from the microscope data (e.g. dm3 or
@@ -345,7 +392,7 @@ def dump_record(session: Session,
     session
         A :py:class:`~nexusLIMS.db.session_handler.Session` object
         representing a unit of time on one of the instruments known to NexusLIMS
-    filename : None or str
+    filename : None or Path
         The filename of the dumped xml file to write. If None, a default name
         will be generated from the other parameters
     generate_previews : bool
@@ -353,26 +400,27 @@ def dump_record(session: Session,
 
     Returns
     -------
-    filename : str
+    filename : Path
         The name of the created record that was returned
     """
     if filename is None:
-        filename = 'compiled_record' + \
-                   (f'_{session.instrument.name}' if session.instrument
-                    else '') + \
-                   session.dt_from.strftime('_%Y-%m-%d') + \
-                   (f'_{session.user}' if session.user else '') + '.xml'
-    _pathlib.Path(_os.path.dirname(filename)).mkdir(parents=True, exist_ok=True)
-    with open(filename, 'w') as f:
-        text = build_record(session=session,
-                            generate_previews=generate_previews)
+        filename = Path(
+            "compiled_record"
+            + (f"_{session.instrument.name}" if session.instrument else "")
+            + session.dt_from.strftime("_%Y-%m-%d")
+            + (f"_{session.user}" if session.user else "")
+            + ".xml",
+        )
+    filename.parent.mkdir(parents=True, exist_ok=True)
+    with filename.open(mode="w", encoding="utf-8") as f:
+        text = build_record(session=session, generate_previews=generate_previews)
         f.write(text)
     return filename
 
 
 def validate_record(xml_filename):
     """
-    Validate an .xml record against the Nexus schema
+    Validate an .xml record against the Nexus schema.
 
     Parameters
     ----------
@@ -385,24 +433,24 @@ def validate_record(xml_filename):
     validates : bool
         Whether the record validates against the Nexus schema
     """
-    xsd_doc = _etree.parse(XSD_PATH)
-    xml_schema = _etree.XMLSchema(xsd_doc)
-    xml_doc = _etree.parse(xml_filename)
-    validates = xml_schema.validate(xml_doc)
-    return validates
+    xsd_doc = etree.parse(XSD_PATH)  # noqa: S320
+    xml_schema = etree.XMLSchema(xsd_doc)
+    xml_doc = etree.parse(xml_filename)  # noqa: S320
+
+    return xml_schema.validate(xml_doc)
 
 
-def build_new_session_records() -> List[str]:
+def build_new_session_records() -> List[Path]:
     """
-    Fetches new records that need to be built from the database (using
-    :py:func:`~nexusLIMS.db.session_handler.get_sessions_to_build`), builds
-    those records using
-    :py:func:`build_record` (saving to the NexusLIMS folder), and returns a
-    list of resulting .xml files to be uploaded to CDCS.
+    Build records for new sessions from the database.
+
+    Uses :py:func:`~nexusLIMS.db.session_handler.get_sessions_to_build`) and builds
+    those records using :py:func:`build_record` (saving to the NexusLIMS folder), and
+    returns a list of resulting .xml files to be uploaded to CDCS.
 
     Returns
     -------
-    xml_files : List[str]
+    xml_files : List[Path]
         A list of record files that were successfully built and saved to
         centralized storage
     """
@@ -410,99 +458,119 @@ def build_new_session_records() -> List[str]:
     # usage events from any NEMO instances;
     # nexusLIMS.harvesters.nemo.add_all_usage_events_to_db() must be used
     # first to do so
-    sessions = _get_sessions()
+    sessions = get_sessions_to_build()
     if not sessions:
-        _sys.exit("No 'TO_BE_BUILT' sessions were found. Exiting.")
+        sys.exit("No 'TO_BE_BUILT' sessions were found. Exiting.")
     xml_files = []
     # loop through the sessions
     for s in sessions:
         try:
             db_row = s.insert_record_generation_event()
             record_text = build_record(session=s)
-        except (FileNotFoundError, Exception) as e:
-            if isinstance(e, FileNotFoundError):
+        except (  # pylint: disable=broad-exception-caught
+            FileNotFoundError,
+            Exception,
+        ) as exception:
+            if isinstance(exception, FileNotFoundError):
                 # if no files were found for this session log, mark it as so in
                 # the database
-                path = _os.path.join(_os.environ['mmfnexus_path'],
-                                     s.instrument.filestore_path)
-                _logger.warning(f'No files found in '
-                                f'{_os.path.abspath(path)} between '
-                                f'{s.dt_from.isoformat()} and '
-                                f'{s.dt_to.isoformat()}')
+                path = Path(os.environ["mmfnexus_path"]) / s.instrument.filestore_path
+                logger.warning(
+                    "No files found in %s between %s and %s",
+                    path,
+                    s.dt_from.isoformat(),
+                    s.dt_to.isoformat(),
+                )
 
-                if _has_delay_passed(s.dt_to):
-                    _logger.warning(f'Marking {s.session_identifier} as '
-                                    f'"NO_FILES_FOUND"')
-                    s.update_session_status('NO_FILES_FOUND')
+                if has_delay_passed(s.dt_to):
+                    logger.warning(
+                        'Marking %s as "NO_FILES_FOUND"',
+                        s.session_identifier,
+                    )
+                    s.update_session_status("NO_FILES_FOUND")
                 else:
-                    # if the delay hasn't passed, log and delete the record generation event
-                    # we inserted previously
-                    _logger.warning(f'Configured record building delay has '
-                                    f'not passed; Removing previously inserted '
-                                    f'RECORD_GENERATION '
-                                    f'row for {s.session_identifier}')
-                    _dbq("DELETE FROM session_log "
-                         "WHERE id_session_log = ?",
-                         (db_row['id_session_log'], ))
-            elif isinstance(e, NoDataConsentException):
-                _logger.warning(f"User requested this session not be "
-                                f"harvested, so no record was built. "
-                                f"{e}")
-                _logger.info(f'Marking {s.session_identifier} as '
-                             f'"NO_CONSENT"')
-                s.update_session_status('NO_CONSENT')
-            elif isinstance(e, NoMatchingReservationException):
-                _logger.warning(f"No matching reservation found for this "
-                                f"session, so assuming no consent was given. "
-                                f"{e}")
-                _logger.info(f'Marking {s.session_identifier} as '
-                             f'"NO_RESERVATION"')
-                s.update_session_status('NO_RESERVATION')
+                    # if the delay hasn't passed, log and delete the record
+                    # generation event we inserted previously
+                    logger.warning(
+                        "Configured record building delay has not passed; "
+                        "Removing previously inserted RECORD_GENERATION row for %s",
+                        s.session_identifier,
+                    )
+                    db_query(
+                        "DELETE FROM session_log WHERE id_session_log = ?",
+                        (  # pylint: disable=used-before-assignment
+                            db_row["id_session_log"],
+                        ),
+                    )
+            elif isinstance(exception, nemo.exceptions.NoDataConsentError):
+                logger.warning(
+                    "User requested this session not be harvested, "
+                    "so no record was built. %s",
+                    exception,
+                )
+                logger.info('Marking %s as "NO_CONSENT"', s.session_identifier)
+                s.update_session_status("NO_CONSENT")
+            elif isinstance(exception, nemo.exceptions.NoMatchingReservationError):
+                logger.warning(
+                    "No matching reservation found for this session, "
+                    "so assuming no consent was given. %s",
+                    exception,
+                )
+                logger.info('Marking %s as "NO_RESERVATION"', s.session_identifier)
+                s.update_session_status("NO_RESERVATION")
             else:
-                _logger.error(f'Could not generate record text: {e.__repr__()}')
-                _logger.error(f'Marking {s.session_identifier} as "ERROR"')
-                s.update_session_status('ERROR')
+                logger.exception("Could not generate record text")
+                logger.exception('Marking %s as "ERROR"', s.session_identifier)
+                s.update_session_status("ERROR")
         else:
-            if validate_record(_bytesIO(bytes(record_text, 'UTF-8'))):
-                _logger.info(f'Validated newly generated record')
-                # generate filename for saved record and make sure path exists
-                # DONE: fix this for NEMO records since session_identifier is
-                #  a URL and it doesn't work right
-                if s.instrument.harvester == 'nemo':
-                    # for NEMO session_identifier is a URL of usage_event
-                    unique_suffix = f'{_nemo.id_from_url(s.session_identifier)}'
-                else:  # pragma: no cover
-                    # assume session_identifier is a UUID
-                    unique_suffix = f'{s.session_identifier.split("-")[0]}'
-                basename = f'{s.dt_from.strftime("%Y-%m-%d")}_' \
-                           f'{s.instrument.name}_' \
-                           f'{unique_suffix}.xml'
-                filename = _os.path.join(_os.environ['nexusLIMS_path'], '..',
-                                         'records', basename)
-                filename = _os.path.abspath(filename)
-                _pathlib.Path(_os.path.dirname(filename)).mkdir(parents=True,
-                                                                exist_ok=True)
-                # write the record to disk and append to list of files generated
-                with open(filename, 'w') as f:
-                    f.write(record_text)
-                _logger.info(f'Wrote record to {filename}')
-                xml_files.append(filename)
-                # Mark this session as completed in the database
-                _logger.info(f'Marking {s.session_identifier} as "COMPLETED"')
-                s.update_session_status('COMPLETED')
-            else:
-                _logger.error(f'Marking {s.session_identifier} as "ERROR"')
-                _logger.error(f'Could not validate record, did not write to '
-                              f'disk')
-                s.update_session_status('ERROR')
+            xml_files = _record_validation_flow(record_text, s, xml_files)
 
     return xml_files
 
 
-def process_new_records(dry_run: bool = False,
-                        dt_from: Union[None, _datetime] = None,
-                        dt_to: Union[None, _datetime] = None):
+def _record_validation_flow(record_text, s, xml_files) -> List[Path]:
+    if validate_record(BytesIO(bytes(record_text, "UTF-8"))):
+        logger.info("Validated newly generated record")
+        # generate filename for saved record and make sure path exists
+        # DONE: fix this for NEMO records since session_identifier is
+        #  a URL and it doesn't work right
+        if s.instrument.harvester == "nemo":
+            # for NEMO session_identifier is a URL of usage_event
+            unique_suffix = f"{nemo_utils.id_from_url(s.session_identifier)}"
+        else:  # pragma: no cover
+            # assume session_identifier is a UUID
+            unique_suffix = f'{s.session_identifier.split("-")[0]}'
+        basename = (
+            f'{s.dt_from.strftime("%Y-%m-%d")}_'
+            f"{s.instrument.name}_"
+            f"{unique_suffix}.xml"
+        )
+        filename = Path(os.environ["nexusLIMS_path"]).parent / "records" / basename
+        filename.parent.mkdir(parents=True, exist_ok=True)
+        # write the record to disk and append to list of files generated
+        with filename.open(mode="w", encoding="utf-8") as f:
+            f.write(record_text)
+        logger.info("Wrote record to %s", filename)
+        xml_files.append(Path(filename))
+        # Mark this session as completed in the database
+        logger.info('Marking %s as "COMPLETED"', s.session_identifier)
+        s.update_session_status("COMPLETED")
+    else:
+        logger.error('Marking %s as "ERROR"', s.session_identifier)
+        logger.error("Could not validate record, did not write to disk")
+        s.update_session_status("ERROR")
+    return xml_files
+
+
+def process_new_records(
+    *,
+    dry_run: bool = False,
+    dt_from: Optional[dt] = None,
+    dt_to: Optional[dt] = None,
+):
     """
+    Process new records (this is the main entrypoint to the record builder).
+
     Using :py:meth:`build_new_session_records()`, process new records,
     save them to disk, and upload them to the NexusLIMS CDCS instance.
 
@@ -525,20 +593,22 @@ def process_new_records(dry_run: bool = False,
         be fetched.
     """
     if dry_run:
-        _logger.info("!!DRY RUN!! Only finding files, not building records")
+        logger.info("!!DRY RUN!! Only finding files, not building records")
         # get 'TO_BE_BUILT' sessions from the database
-        sessions = _get_sessions()
+        sessions = get_sessions_to_build()
         # get Session objects for NEMO usage events without adding to DB
         # DONE: NEMO usage events fetched should take a time range;
-        sessions += _nemo.get_usage_events_as_sessions(dt_from=dt_from,
-                                                       dt_to=dt_to)
+        sessions += nemo_utils.get_usage_events_as_sessions(
+            dt_from=dt_from,
+            dt_to=dt_to,
+        )
         if not sessions:
-            _logger.warning("No 'TO_BE_BUILT' sessions were found. Exiting.")
-            return None
+            logger.warning("No 'TO_BE_BUILT' sessions were found. Exiting.")
+            return
         for s in sessions:
             # at this point, sessions can be from any type of harvester
-            _logger.info('')
-            _logger.info('')
+            logger.info("")
+            logger.info("")
             # DONE: generalize this from just sharepoint to any harvester
             #       (prob. new function that takes session and determines
             #       where it came from and then gets the matching reservation
@@ -548,33 +618,35 @@ def process_new_records(dry_run: bool = False,
     else:
         # DONE: NEMO usage events fetcher should take a time range; we also
         #  need a consistent response for testing
-        _nemo.add_all_usage_events_to_db(dt_from=dt_from,
-                                         dt_to=dt_to)
+        nemo_utils.add_all_usage_events_to_db(dt_from=dt_from, dt_to=dt_to)
         xml_files = build_new_session_records()
         if len(xml_files) == 0:
-            _logger.warning("No XML files built, so no files uploaded")
+            logger.warning("No XML files built, so no files uploaded")
         else:
-            files_uploaded, record_ids = _upload_record_files(xml_files)
+            files_uploaded, _ = upload_record_files(xml_files)
             for f in files_uploaded:
-                uploaded_dir = _os.path.abspath(_os.path.join(
-                    _os.path.dirname(f), 'uploaded'))
-                _pathlib.Path(uploaded_dir).mkdir(parents=True, exist_ok=True)
+                uploaded_dir = Path(f).parent / "uploaded"
+                Path(uploaded_dir).mkdir(parents=True, exist_ok=True)
 
-                _shutil.copy2(f, uploaded_dir)
-                _os.remove(f)
-            files_not_uploaded = [f for f in xml_files
-                                  if f not in files_uploaded]
+                shutil.copy2(f, uploaded_dir)
+                Path(f).unlink()
+            files_not_uploaded = [f for f in xml_files if f not in files_uploaded]
 
             if len(files_not_uploaded) > 0:
-                _logger.error(f'Some record files were not uploaded: '
-                              f'{files_not_uploaded}')
+                logger.error(
+                    "Some record files were not uploaded: %s",
+                    files_not_uploaded,
+                )
+    return
 
 
 def dry_run_get_sharepoint_reservation_event(
-        s: Session) -> _ResEvent:  # pragma: no cover
+    s: Session,
+) -> ReservationEvent:  # pragma: no cover
     """
-    Get the calendar event that would be used to create a record based off
-    the supplied session
+    Get the calendar event that *would* be used based off the supplied session.
+
+    Only implemented for the Sharepoint harvester.
 
     Parameters
     ----------
@@ -587,16 +659,15 @@ def dry_run_get_sharepoint_reservation_event(
         A list of strings containing the files that would be included for the
         record of this session (if it were not a dry run)
     """
-    xml = _sp_cal.fetch_xml(s.instrument, s.dt_from, s.dt_to)
-    res_event = _sp_cal.res_event_from_xml(xml)
-    _logger.info(res_event)
+    xml = sharepoint_calendar.fetch_xml(s.instrument, s.dt_from, s.dt_to)
+    res_event = sharepoint_calendar.res_event_from_xml(xml)
+    logger.info(res_event)
     return res_event
 
 
-def dry_run_file_find(s: Session) -> List[str]:
+def dry_run_file_find(s: Session) -> List[Path]:
     """
-    Get the files that would be included for any records to be created based
-    off the supplied session
+    Get the files that *would* be included for a record built for the supplied session.
 
     Parameters
     ----------
@@ -605,43 +676,48 @@ def dry_run_file_find(s: Session) -> List[str]:
 
     Returns
     -------
-    files : List[str]
-        A list of strings containing the files that would be included for the
+    files : List[Path]
+        A list of Paths containing the files that would be included for the
         record of this session (if it were not a dry run)
     """
-    path = _os.path.abspath(_os.path.join(_os.environ['mmfnexus_path'],
-                                          s.instrument.filestore_path))
-    _logger.info(f'Searching for files for {s.instrument.name} in '
-                 f'{_os.path.abspath(path)} between '
-                 f'{s.dt_from.isoformat()} and '
-                 f'{s.dt_to.isoformat()}')
+    path = Path(os.environ["mmfnexus_path"]) / s.instrument.filestore_path
+    logger.info(
+        "Searching for files for %s in %s between %s and %s",
+        s.instrument.name,
+        path,
+        s.dt_from.isoformat(),
+        s.dt_to.isoformat(),
+    )
     files = get_files(path, s.dt_from, s.dt_to)
 
-    _logger.info(f'Results for {s.session_identifier} on {s.instrument}:')
+    logger.info("Results for %s on %s:", s.session_identifier, s.instrument)
     if len(files) == 0:
-        _logger.warning('No files found for this session')
+        logger.warning("No files found for this session")
     else:
-        _logger.info(f'Found {len(files)} files for this session')
+        logger.info("Found %i files for this session", len(files))
     for f in files:
-        mtime = _datetime.fromtimestamp(
-            _os.path.getmtime(f)).isoformat()
-        _logger.info(f'*mtime* {mtime} - {f}')
+        mtime = dt.fromtimestamp(
+            f.stat().st_mtime,
+            tz=s.instrument.timezone,
+        ).isoformat()
+        logger.info("*mtime* %s - %s", mtime, f)
     return files
 
 
-if __name__ == '__main__':  # pragma: no cover
-    """
-    If running as a module, process new records (with some control flags)
-    """
+if __name__ == "__main__":  # pragma: no cover
+    # If running as a module, process new records (with some control flags)
     from nexusLIMS.utils import setup_loggers
 
-    parser = _ap.ArgumentParser()
+    parser = argparse.ArgumentParser()
 
     # Optional argument flag which defaults to False
-    parser.add_argument("-n", "--dry-run",
-                        action="store_true",
-                        dest='dry_run',
-                        default=False)
+    parser.add_argument(
+        "-n",
+        "--dry-run",
+        action="store_true",
+        dest="dry_run",
+        default=False,
+    )
 
     # Optional verbosity counter (eg. -v, -vv, -vvv, etc.)
     parser.add_argument(
@@ -650,34 +726,34 @@ if __name__ == '__main__':  # pragma: no cover
         action="count",
         default=0,
         help="Verbosity (-v, -vv); corresponds to python logging level. "
-             "0 is WARN, 1 (-v) is INFO, 2 (-vv) is DEBUG. ERROR and "
-             "CRITICAL are always shown.")
+        "0 is WARN, 1 (-v) is INFO, 2 (-vv) is DEBUG. ERROR and "
+        "CRITICAL are always shown.",
+    )
 
     # Specify output of "--version"
     parser.add_argument(
         "--version",
         action="version",
-        version=f"%(prog)s (version {_version})")
+        version=f"%(prog)s (version {version})",
+    )
 
     args = parser.parse_args()
 
     # set up logging
-    logging_levels = {0: _logging.WARNING,
-                      1: _logging.INFO,
-                      2: _logging.DEBUG}
+    logging_levels = {0: logging.WARNING, 1: logging.INFO, 2: logging.DEBUG}
 
-    if args.dry_run:
-        if args.verbose <= 0:
-            _logger.warning('Increasing verbosity so output of "dry-run" '
-                            'will be shown')
-            args.verbose = 1
+    if args.dry_run and args.verbose <= 0:
+        logger.warning('Increasing verbosity so output of "dry-run" will be shown')
+        args.verbose = 1
 
     setup_loggers(logging_levels[args.verbose])
     # when running as script, __name__ is "__main__", so we need to set level
     # explicitly since the setup_loggers function won't find it
-    _logger.setLevel(logging_levels[args.verbose])
+    logger.setLevel(logging_levels[args.verbose])
 
     # by default only fetch the last week's worth of data from the NEMO
     # harvesters to speed things up
-    process_new_records(args.dry_run,
-                        dt_from=_datetime.now() - _timedelta(weeks=1))
+    process_new_records(
+        dry_run=args.dry_run,
+        dt_from=dt.now(tz=time.tzname) - td(weeks=1),
+    )

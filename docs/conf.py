@@ -1,3 +1,5 @@
+# pylint: skip-file
+
 # Configuration file for the Sphinx documentation builder.
 #
 # This file only contains a selection of the most common options. For a full
@@ -11,18 +13,20 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
+
 # import sys
 import shutil
-# sys.path.insert(0, os.path.abspath('../../'))
-import nexusLIMS.version
 from datetime import datetime
 from glob import glob
 
+# sys.path.insert(0, os.path.abspath('../../'))
+import nexusLIMS.version
+
 # -- Project information -----------------------------------------------------
 
-project = 'NexusLIMS'
-copyright = f'{datetime.now().year}, NIST Office of Data and Informatics'
-author = 'NIST Office of Data and Informatics'
+project = "NexusLIMS"
+copyright = f"{datetime.now().year}, NIST Office of Data and Informatics"
+author = "NIST Office of Data and Informatics"
 numfig = True
 
 # The full version, including alpha/beta/rc tags
@@ -35,27 +39,28 @@ release = nexusLIMS.version.__version__
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
 extensions = [
-    'sphinx.ext.autodoc',
-    'sphinx.ext.napoleon',
-    'sphinx.ext.intersphinx',
-    'sphinx.ext.coverage',
-    'sphinx.ext.viewcode'
+    "sphinx.ext.autodoc",
+    "sphinx.ext.napoleon",
+    "sphinx.ext.intersphinx",
+    "sphinx.ext.coverage",
+    "sphinx.ext.viewcode",
 ]
 
 try:
     import sphinxcontrib.spelling
-    extensions.append('sphinxcontrib.spelling')
+
+    extensions.append("sphinxcontrib.spelling")
 except BaseException:
     pass
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # The suffix of source filenames.
-source_suffix = '.rst'
-highlight_language = 'python'
+source_suffix = ".rst"
+highlight_language = "python"
 today = ""
-pygments_style = 'sphinx'
+pygments_style = "sphinx"
 add_function_parentheses = True
 # master_doc = 'index'
 
@@ -77,27 +82,22 @@ add_function_parentheses = True
 #     soi.writebytes('**REMOVED**/NexusMicroscopyLIMS/mdcs/nexusLIMS/'
 #                    'doc/source/objects_lxml.inv', ztext)
 
-intersphinx_mapping = {'python': ('https://docs.python.org/3.7/', None),
-                       'hyperspy': (
-                           'http://hyperspy.org/hyperspy-doc/current/', None),
-                       'numpy': (
-                           'https://numpy.org/doc/stable/', None),
-                       'matplotlib': ('https://matplotlib.org/', None),
-                       'requests': (
-                           'https://requests.readthedocs.io/en/latest/',
-                           None),
-                       'PIL': (
-                           'https://pillow.readthedocs.io/en/stable/',
-                           None),
-                       'pytz': ('http://pytz.sourceforge.net/',
-                                'pytz_objects.inv'),
-                       # use the custom objects.inv file above for LXML:
-                       'lxml': ('https://lxml.de/', 'objects_lxml.inv'),
-                       }
+intersphinx_mapping = {
+    "python": ("https://docs.python.org/3.10/", None),
+    "hyperspy": ("http://hyperspy.org/hyperspy-doc/current/", None),
+    "numpy": ("https://numpy.org/doc/stable/", None),
+    "matplotlib": ("https://matplotlib.org/stable/", None),
+    "requests": ("https://requests.readthedocs.io/en/latest/", None),
+    "PIL": ("https://pillow.readthedocs.io/en/stable/", None),
+    "pytz": ("http://pytz.sourceforge.net/", "pytz_objects.inv"),
+    # use the custom objects.inv file above for LXML:
+    "lxml": ("https://lxml.de/", "objects_lxml.inv"),
+}
 
 import sphinx_bootstrap_theme
+
 # Activate the theme.
-html_theme = 'bootstrap'
+html_theme = "bootstrap"
 html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 
 
@@ -105,15 +105,15 @@ html_theme_path = sphinx_bootstrap_theme.get_html_theme_path()
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
 exclude_patterns = [
-    '.git',
-    '_build',
-    'Thumbs.db',
-    '.DS_Store',
-    'build',
-#    'api/nexusLIMS.rst',
-    'api/nexusLIMS.version.rst',
-    'README.rst',
-    'dev_scripts'
+    ".git",
+    "_build",
+    "Thumbs.db",
+    ".DS_Store",
+    "build",
+    #    'api/nexusLIMS.rst',
+    "api/nexusLIMS.version.rst",
+    "README.rst",
+    "dev_scripts",
 ]
 
 # Keep warnings as “system message” paragraphs in the built documents.
@@ -130,42 +130,39 @@ keep_warnings = True
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+html_static_path = ["_static"]
 
 html_css_files = [
-    'custom-styles.css',
+    "custom-styles.css",
 ]
 
 html_js_files = [
-    'custom.js',
+    "custom.js",
 ]
 
 # html_title = "NexusLIMS documentation"
 html_short_title = "NexusLIMS"
 html_logo = "_static/logo_horizontal.png"
 html_favicon = "_static/nexusLIMS_bare_logo.ico"
-html_last_updated_fmt = '%b, %d, %Y'
+html_last_updated_fmt = "%b, %d, %Y"
 html_use_smartypants = True
 html_show_sourcelink = True
 html_show_sphinx = False
 html_show_copyright = True
 
-html_extra_path = ['schema_doc']
+html_extra_path = ["schema_doc"]
 
 # html_sidebars = {'**': ['localtoc.html', 'sourcelink.html', 'searchbox.html']}
-html_sidebars = {'**': ['custom-sidebar.html',
-                        'localtoc.html',
-                        'searchbox.html',
-                        'sourcelink.html']}
+html_sidebars = {
+    "**": ["custom-sidebar.html", "localtoc.html", "searchbox.html", "sourcelink.html"]
+}
 
 
 html_theme_options = {
     # Navigation bar title. (Default: ``project`` value)
-    'navbar_title': " ",
-
+    "navbar_title": " ",
     # Tab name for entire site. (Default: "Site")
-    'navbar_site_name': "Site Map",
-
+    "navbar_site_name": "Site Map",
     # A list of tuples containing pages or urls to link to.
     # Valid tuples should be in the following forms:
     #    (name, page)                 # a link to a page
@@ -173,26 +170,20 @@ html_theme_options = {
     #    (name, "http://example.com", True) # arbitrary absolute url
     # Note the "1" or "True" value above as the third argument to indicate
     # an arbitrary url.
-    'navbar_links': [
-        ("API Docs", 'api'),
-        ("Repository",
-         "https://github.com/usnistgov/NexusLIMS", True),
+    "navbar_links": [
+        ("API Docs", "api"),
+        ("Repository", "https://github.com/usnistgov/NexusLIMS", True),
         ("NIST ODI", "https://www.nist.gov/mml/odi", True),
     ],
-
     # Render the next and previous page links in navbar. (Default: true)
-    'navbar_sidebarrel': True,
-
+    "navbar_sidebarrel": True,
     # Render the current pages TOC in the navbar. (Default: true)
-    'navbar_pagenav': False,
-
+    "navbar_pagenav": False,
     # Tab name for the current pages TOC. (Default: "Page")
-    'navbar_pagenav_name': "Page",
-
+    "navbar_pagenav_name": "Page",
     # Global TOC depth for "site" navbar tab. (Default: 1)
     # Switching to -1 shows all levels.
-    'globaltoc_depth': -1,
-
+    "globaltoc_depth": -1,
     # Include hidden TOCs in Site navbar?
     #
     # Note: If this is "false", you cannot have mixed ``:hidden:`` and
@@ -200,21 +191,17 @@ html_theme_options = {
     # will break.
     #
     # Values: "true" (default) or "false"
-    'globaltoc_includehidden': "true",
-
+    "globaltoc_includehidden": "true",
     # HTML navbar class (Default: "navbar") to attach to <div> element.
     # For black navbar, do "navbar navbar-inverse"
     # 'navbar_class': "navbar navbar-inverse",
-    'navbar_class': "navbar",
-
+    "navbar_class": "navbar",
     # Fix navigation bar to top of page?
     # Values: "true" (default) or "false"
-    'navbar_fixed_top': "false",
-
+    "navbar_fixed_top": "false",
     # Location of link to source.
     # Options are "nav" (default), "footer" or anything else to exclude.
-    'source_link_position': "footer",
-
+    "source_link_position": "footer",
     # Bootswatch (http://bootswatch.com/) theme.
     #
     # Options are nothing (default) or the name of a valid theme
@@ -226,11 +213,10 @@ html_theme_options = {
     # Currently, the supported themes are:
     # - Bootstrap 2: https://bootswatch.com/2
     # - Bootstrap 3: https://bootswatch.com/3
-    'bootswatch_theme': "lumen",
-
+    "bootswatch_theme": "lumen",
     # Choose Bootstrap version.
     # Values: "3" (default) or "2" (in quotes)
-    'bootstrap_version': "3",
+    "bootstrap_version": "3",
 }
 
 rst_epilog = """
@@ -247,11 +233,12 @@ def run_apidoc(_):
     from sphinx.ext.apidoc import main
 
     cur_dir = os.path.normpath(os.path.dirname(__file__))
-    output_path = os.path.join(cur_dir, 'api')
+    output_path = os.path.join(cur_dir, "api")
     shutil.rmtree(output_path, ignore_errors=True)
     modules = os.path.normpath(os.path.join(cur_dir, "../nexusLIMS"))
-    to_exclude = list(glob(os.path.join(modules, 'dev_scripts') + '/**/*',
-                           recursive=True))
+    to_exclude = list(
+        glob(os.path.join(modules, "dev_scripts") + "/**/*", recursive=True)
+    )
     # exclude db_logger_gui files from autodoc
     # to_exclude += list(glob(os.path.join(modules, 'db', 'db_logger_gui', '*')))
     # to_exclude += list(glob(os.path.join(modules, 'db', 'migrate_db.py')))
@@ -259,10 +246,10 @@ def run_apidoc(_):
 
     # load environment if present
     from dotenv import load_dotenv
-    load_dotenv('../.env')
 
-    main(['-f', '-M', '-T', '-d', '-1', '-o', output_path, modules] +
-         to_exclude)
+    load_dotenv("../.env")
+
+    main(["-f", "-M", "-T", "-d", "-1", "-o", output_path, modules] + to_exclude)
 
 
 # def build_plantuml(_):
@@ -281,9 +268,11 @@ def run_apidoc(_):
 
 # lines from intersphinx to ignore during api-doc autogeneration (so we don't
 # get useless warning messages while the docs are being built
-nitpick_ignore = [('py:class', 'function'),
-                  ('py:class', 'optional'),
-                  ('py:class', 'json.encoder.JSONEncoder')]
+nitpick_ignore = [
+    ("py:class", "function"),
+    ("py:class", "optional"),
+    ("py:class", "json.encoder.JSONEncoder"),
+]
 
 
 def skip(app, what, name, obj, would_skip, options):
@@ -294,8 +283,10 @@ def skip(app, what, name, obj, would_skip, options):
 
 def setup(app):
     # app.connect("autodoc-skip-member", skip)
-    app.connect('builder-inited', run_apidoc)
+    app.connect("builder-inited", run_apidoc)
     # app.connect('builder-inited', build_plantuml)
-    print('If you need to update the PlantUML diagrams, run\n'
-          'build_plantuml.sh in this directory')
+    print(
+        "If you need to update the PlantUML diagrams, run\n"
+        "build_plantuml.sh in this directory"
+    )
     # app.add_stylesheet("custom-styles.css")

@@ -386,8 +386,9 @@ methodology-specific ontology/schema, were one to exist.
     A few keys within the ``'nx_meta'`` :py:class:`dict` are reserved for
     internal use (again, not validated by a schema), and are parsed in a special
     way if they exist. These include (at present): ``'DatasetType'``,
-    ``'Data Type'``, ``'Creation Time'``, and ``'warnings'``. ``'DatasetType'``
-    is mapped to the ``@type`` attribute of ``<dataset>`` elements in the
+    ``'Data Type'``, ``'Creation Time'``, ``'Extraction Details'``, and 
+    ``'warnings'``. ``'DatasetType'`` is mapped to the ``@type`` attribute of
+    ``<dataset>`` elements in the
     NexusLIMS schema, and has a controlled vocabulary (see the schema
     documentation for details). ``'Data Type'`` is non-controlled, and should
     contain a human-readable value that describes the data (with spaces

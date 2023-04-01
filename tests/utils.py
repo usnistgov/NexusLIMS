@@ -25,49 +25,74 @@
 #  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,
 #  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.
 #
-import os
+"""Provides some utilities to use during the testing of NexusLIMS."""
 import tarfile
+from pathlib import Path
 
-tars = \
-    {'CORRUPTED': 'test_corrupted.dm3.tar.gz',
-     'LIST_SIGNAL': 'list_signal_dataZeroed.dm3.tar.gz',
-     '643_EFTEM_DIFF': '643_EFTEM_DIFFRACTION_dataZeroed.dm3.tar.gz',
-     '643_EELS_SI': '643_Titan_EELS_SI_dataZeroed.dm3.tar.gz',
-     '643_EELS_PROC_THICK':
-         '643_Titan_EELS_proc_thickness_dataZeroed.dm3.tar.gz',
-     '643_EELS_PROC_INT_BG':
-         '643_Titan_EELS_proc_integrate_and_bg_dataZeroed.dm3.tar.gz',
-     '643_EELS_SI_DRIFT':
-         '643_Titan_EELS_SI_driftcorr_dataZeroed.dm3.tar.gz',
-     '643_EDS_SI': '643_Titan_EDS_SI_dataZeroed.dm4.tar.gz',
-     '643_STEM_STACK': '643_Titan_STEM_stack_dataZeroed.dm3.tar.gz',
-     '643_SURVEY': '643_Titan_survey_image_dataZeroed.dm3.tar.gz',
-     '642_STEM_DIFF': '642_Titan_STEM_DIFFRACTION_dataZeroed.dm3.tar.gz',
-     '642_OPMODE_DIFF':
-         '642_Titan_opmode_diffraction_dataZeroed.dm3.tar.gz',
-     '642_EELS_SI_DRIFT':
-         '642_Titan_EELS_SI_driftcorr_dataZeroed.dm3.tar.gz',
-     '642_EELS_PROC_1': '642_Titan_EELS_proc_1_dataZeroed.dm3.tar.gz',
-     '642_ANNOTATIONS':
-         '642_Titan_opmode_diffraction_dataZeroed_annotations.dm3.tar.gz',
-     '642_TECNAI_MAG': '642_Titan_Tecnai_mag_dataZeroed.dm3.tar.gz',
-     'JEOL3010_DIFF': 'JEOL3010_diffraction_dataZeroed.dm3.tar.gz',
-     'FFT': 'FFT.dm3.tar.gz',
-     'QUANTA_TIF': 'quad1image_001.tif.tar.gz',
-     'QUANTA_32BIT': 'quad1image_001_32bit.tif.tar.gz',
-     '4D_STEM': '4d_stem.hdf5.tar.gz',
-     'PARSE_META_642_TITAN': '01 - 13k - 30um obj.dm3.tar.gz',
-     'FEI_SER': 'fei_emi_ser_test_files.tar.gz',
-     'DB': 'test_db.sqlite.tar.gz',
-     'RECORD': '2018-11-13_FEI-Titan-TEM-635816_7de34313.xml.tar.gz'
-     }
+tars = {
+    "CORRUPTED": "test_corrupted.dm3.tar.gz",
+    "LIST_SIGNAL": "list_signal_dataZeroed.dm3.tar.gz",
+    "643_EFTEM_DIFF": "643_EFTEM_DIFFRACTION_dataZeroed.dm3.tar.gz",
+    "643_EELS_SI": "643_Titan_EELS_SI_dataZeroed.dm3.tar.gz",
+    "643_EELS_PROC_THICK": "643_Titan_EELS_proc_thickness_dataZeroed.dm3.tar.gz",
+    "643_EELS_PROC_INT_BG": "643_Titan_EELS_proc_intgrate_and_bg_dataZeroed.dm3.tar.gz",
+    "643_EELS_SI_DRIFT": "643_Titan_EELS_SI_driftcorr_dataZeroed.dm3.tar.gz",
+    "643_EDS_SI": "643_Titan_EDS_SI_dataZeroed.dm4.tar.gz",
+    "643_STEM_STACK": "643_Titan_STEM_stack_dataZeroed.dm3.tar.gz",
+    "643_SURVEY": "643_Titan_survey_image_dataZeroed.dm3.tar.gz",
+    "642_STEM_DIFF": "642_Titan_STEM_DIFFRACTION_dataZeroed.dm3.tar.gz",
+    "642_OPMODE_DIFF": "642_Titan_opmode_diffraction_dataZeroed.dm3.tar.gz",
+    "642_EELS_SI_DRIFT": "642_Titan_EELS_SI_driftcorr_dataZeroed.dm3.tar.gz",
+    "642_EELS_PROC_1": "642_Titan_EELS_proc_1_dataZeroed.dm3.tar.gz",
+    "642_ANNOTATIONS": "642_Titan_opmode_diffraction_dataZeroed_annotations.dm3.tar.gz",
+    "642_TECNAI_MAG": "642_Titan_Tecnai_mag_dataZeroed.dm3.tar.gz",
+    "JEOL3010_DIFF": "JEOL3010_diffraction_dataZeroed.dm3.tar.gz",
+    "FFT": "FFT.dm3.tar.gz",
+    "QUANTA_TIF": "quad1image_001.tif.tar.gz",
+    "QUANTA_32BIT": "quad1image_001_32bit.tif.tar.gz",
+    "QUANTA_NO_BEAM": "quad1image_001_no_beam_scan_or_system_meta.tar.gz",
+    "4D_STEM": "4d_stem.hdf5.tar.gz",
+    "PARSE_META_642_TITAN": "01 - 13k - 30um obj.dm3.tar.gz",
+    "FEI_SER": "fei_emi_ser_test_files.tar.gz",
+    "DB": "test_db.sqlite.tar.gz",
+    "RECORD": "2018-11-13_FEI-Titan-TEM-635816_7de34313.xml.tar.gz",
+}
 
 
 for name, f in tars.items():
-    tars[name] = os.path.join(os.path.dirname(__file__), 'files', f)
+    tars[name] = Path(__file__).parent / "files" / f
 
-files = {}
-for k, v in tars.items():
-    with tarfile.open(v, 'r:gz') as tar:
-        files[k] = [os.path.join(os.path.dirname(__file__), 'files', i) for i
-                    in tar.getnames()]
+
+def extract_files(tar_key):
+    """
+    Extract files from a tar archive.
+
+    Will extract files from a tar specified by ``tar_key``; returns a list
+    of files that were present in the tar archive
+    """
+    with tarfile.open(tars[tar_key], "r:gz") as tar:
+        tar.extractall(path=Path(tars[tar_key]).parent)
+        return [Path(__file__).parent / "files" / i for i in tar.getnames()]
+
+
+def delete_files(tar_key):
+    """
+    Delete files previously extracted from a tar.
+
+    Will delete any files that have been extracted from one of the above tars,
+    specified by ``tar_key``
+    """
+    with tarfile.open(tars[tar_key], "r:gz") as tar:
+        files = [Path(__file__).parent / "files" / i for i in tar.getnames()]
+    for _f in files:
+        Path(_f).unlink(missing_ok=True)
+
+
+def get_full_file_path(filename, fei_ser_files):
+    """
+    Get full file path for a file.
+
+    Get the full file path on disk for a file that is part of the ``fei_ser_files``
+    fixture/dictionary
+    """
+    return [i for i in fei_ser_files if filename in str(i)][0]

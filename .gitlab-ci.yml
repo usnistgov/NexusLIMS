@@ -1,9 +1,15 @@
+stages:
+  - linting
+  - test
+  - deploy
+
 cache:
   paths:
     - coverage.tar.gz
 
 .env_setup:
   before_script:
+# install pyenv and python versions
     - if [[ -z "${PYENV_DIR}" ]]; then export PYENV_DIR=${HOME}/.pyenv; fi 
     - export PYENV_ROOT="${PYENV_DIR}" && export PATH="$PYENV_ROOT/bin:$PATH" && export TMPDIR="$PYENV_ROOT/.pip-tmp"
     - if ! command -v pyenv; then rm -rf ${PYENV_DIR} || true; git clone https://github.com/pyenv/pyenv.git ${PYENV_DIR}; else cd ${PYENV_DIR}; git pull; cd -; eval "$(pyenv init --path)";  fi
@@ -11,18 +17,27 @@ cache:
     - which python
 #   install poetry
     - curl -sSL https://install.python-poetry.org | python -
-#    - source $HOME/.poetry/env
+#   add poetry install path to PATH
     - export PATH="$HOME/.local/bin:${PATH}"
+# update poetry, configure, and install tox
     - poetry self update
     - poetry config virtualenvs.in-project true; poetry config cache-dir ${PYENV_DIR}/.poetry-cache;
     - poetry config --list
     - poetry run pip install tox
 
+linting:
+    stage: linting
+    extends: .env_setup
+    script:
+      - poetry install
+      - poetry run tox -e lint
+    needs: []
+
 nexusLIMS_tests:
     stage: test
     script:
       # run tests with coverage and output coverage report to html
-      - poetry run tox
+      - TOX_SKIP_ENV=lint poetry run tox
     retry: 2
     extends: .env_setup
     except:
@@ -39,7 +54,7 @@ nexusLIMS_tests:
       reports:
         junit: tests/test_report.xml
       expire_in: 30 days
-    needs: []
+    needs: ['linting']
 
 pages:
   stage: deploy

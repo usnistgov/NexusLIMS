@@ -49,6 +49,24 @@ Refer to :ref:`record-building` for more details.
 
 The following variables should be defined as environment variables in your
 session, or in the ``.env`` file in the root of this package's repository.
+See the ``.env.example`` file for more documentation and examples.
+
+.. _NexusLIMS-file-strategy:
+
+`NexusLIMS_file_strategy`
+    Defines the strategy used to find files associated with experimental records.
+    A value of ``exclusive`` will `only` add files for which NexusLIMS knows how
+    to generate preview images and extract metadata.  A value of ``inclusive``
+    will include all files found, even if preview generation/detailed metadata
+    extraction is not possible.
+
+.. _NexusLIMS-ignore-patterns:
+
+`NexusLIMS_ignore_patterns`
+    The patterns defined in this variable (which should be provided as a
+    JSON-formatted string) will be ignored when finding files. A default value
+    is provided in the ``.env.example`` file that should work for most users,
+    but this setting allows for further customization of the file-finding routine.
 
 .. _nexusLIMS-user:
 
@@ -89,18 +107,18 @@ session, or in the ``.env`` file in the root of this package's repository.
 `NEMO_address_X`
     The path to a NEMO instance's API endpoint. Should be something like
     ``https://www.nemo.com/api/`` (make sure to include the trailing slash).
-    The value ``_X`` can be replaced with any value (such as 
-    ``NEMO_address_1``). NexusLIMS supports having multiple NEMO reservation 
-    systems enabled at once (useful if your instruments are split over a few 
-    different management systems). To enable this behavior, create multiple 
+    The value ``_X`` can be replaced with any value (such as
+    ``NEMO_address_1``). NexusLIMS supports having multiple NEMO reservation
+    systems enabled at once (useful if your instruments are split over a few
+    different management systems). To enable this behavior, create multiple
     pairs of environment variables for each instance, where the suffix ``_X``
     changes for each pair (`e.g.` you could have ``NEMO_address_1`` paired with
-    ``NEMO_token_1``, ``NEMO_address_2`` paired with ``NEMO_token_2``, etc.). 
+    ``NEMO_token_1``, ``NEMO_address_2`` paired with ``NEMO_token_2``, etc.).
 
 .. _nemo-token:
 
 `NEMO_token_X`
-    An API authentication token from the corresponding NEMO installation 
+    An API authentication token from the corresponding NEMO installation
     (specified in ``NEMO_address_X``) that
     will be used to authorize requests to the NEMO API. This token can be
     obtained by visiting the "Detailed Administration" page in the NEMO
@@ -136,8 +154,9 @@ session, or in the ``.env`` file in the root of this package's repository.
     times without any timezone information. Providing it helps properly map
     file creation times to usage event times.
 """
+# pylint: disable=invalid-name
 
-import logging as _logging
+import logging
 
 from dotenv import load_dotenv
 
@@ -146,21 +165,25 @@ load_dotenv()
 
 
 def _filter_hyperspy_messages(record):  # pragma: no cover
-    """Filter to be used with logging class to hide HyperSpy API import
-    warnings within the NexusLIMS codebase"""
+    """Filter HyperSpy API import warnings within the NexusLIMS codebase."""
     # this only triggers if the hs.preferences.GUIs.warn_if_guis_are_missing
     # preference is set to True
-    if record.msg.startswith('The ipywidgets GUI') or \
-            record.msg.startswith('The traitsui GUI'):  
-        return False   
-    else:
-        # unless we come across another HyperSpy error, this line won't be
-        # reached, so exclude from coverage
-        return True    
+    if record.msg.startswith("The ipywidgets GUI") or record.msg.startswith(
+        "The traitsui GUI",
+    ):
+        return False
+    # unless we come across another HyperSpy error, this line won't be
+    # reached, so exclude from coverage
+    return True
 
 
 # connect the filter function to the HyperSpy logger
-_logging.getLogger('hyperspy.api').addFilter(_filter_hyperspy_messages)
+logging.getLogger("hyperspy.api").addFilter(_filter_hyperspy_messages)
+
+# tweak some logger levels
+logging.getLogger("matplotlib.font_manager").disabled = True
+logging.getLogger("matplotlib").setLevel(logging.WARNING)
+logging.getLogger("PIL.PngImagePlugin").setLevel(logging.WARNING)
 
 # set log message format
-_logging.basicConfig(format='%(asctime)s %(name)s %(levelname)s: %(message)s')
+logging.basicConfig(format="%(asctime)s %(name)s %(levelname)s: %(message)s")

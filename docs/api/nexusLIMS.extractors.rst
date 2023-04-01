@@ -9,6 +9,14 @@ nexusLIMS.extractors package
 Submodules
 ----------
 
+nexusLIMS.extractors.basic\_metadata module
+-------------------------------------------
+
+.. automodule:: nexusLIMS.extractors.basic_metadata
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 nexusLIMS.extractors.digital\_micrograph module
 -----------------------------------------------
 
