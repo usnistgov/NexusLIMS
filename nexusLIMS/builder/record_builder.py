@@ -39,7 +39,6 @@ import logging
 import os
 import shutil
 import sys
-import time
 from datetime import datetime as dt
 from datetime import timedelta as td
 from importlib import import_module, util
@@ -61,6 +60,7 @@ from nexusLIMS.harvesters.reservation_event import ReservationEvent
 from nexusLIMS.schemas import activity
 from nexusLIMS.schemas.activity import AcquisitionActivity, cluster_filelist_mtimes
 from nexusLIMS.utils import (
+    current_system_tz,
     find_files_by_mtime,
     gnu_find_files_by_mtime,
     has_delay_passed,
@@ -755,5 +755,5 @@ if __name__ == "__main__":  # pragma: no cover
     # harvesters to speed things up
     process_new_records(
         dry_run=args.dry_run,
-        dt_from=dt.now(tz=time.tzname) - td(weeks=1),
+        dt_from=dt.now(tz=current_system_tz()) - td(weeks=1),
     )
