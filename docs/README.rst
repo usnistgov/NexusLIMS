@@ -30,6 +30,8 @@ records without any need for user input. These pages serve mostly as reference
 for those with more interest in the nuts and bolts of how it all works together,
 and how the system may be able to be changed in the future.
 
+.. _logo:
+
 About the logo
 --------------
 

@@ -28,6 +28,7 @@ cache:
 linting:
     stage: linting
     extends: .env_setup
+    retry: 2
     script:
       - poetry install
       - poetry run tox -e lint

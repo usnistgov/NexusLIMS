@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "nexusLIMS"
-version = "1.2.0"
+version = "1.3.0"
 description = "The NIST Electron Microscopy Nexus LIMS project"
 authors = ["Joshua Taillon <joshua.taillon@nist.gov>"]
 maintainers = ["Joshua Taillon <joshua.taillon@nist.gov>"]
@@ -42,6 +42,7 @@ black = "^23.1.0"
 isort = "^5.12.0"
 pylint = "^2.16.4"
 ruff = "^0.0.259"
+sphinxcontrib-towncrier = "^0.3.2a0"
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]
@@ -55,7 +56,6 @@ src_paths = ["nexusLIMS", "tests"]
 max-line-length = "88"
 good-names = ["f", "i", "j", "k", "v", "s"]
 ignore-long-lines = "^\\s*(# |\\.\\. _.*: |``/feed)(<?https?://\\S+>|\\S+)?$"
-
 
 [tool.pylint.Main]
 extension-pkg-allow-list = ["lxml"]
@@ -82,6 +82,44 @@ ignore = ["N999", "UP006", "UP007", "UP035", "B905", "RUF007"]
 [tool.ruff.pydocstyle]
 convention = "numpy"
 
+[tool.towncrier]
+directory = "docs/changes"
+package = "nexusLIMS"
+package_dir = "nexusLIMS"
+title_format = "v{version} ({project_date})"
+filename = "docs/development_log.rst"
+issue_format = "`#{issue} <https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/{issue}>`_"
+
+[[tool.towncrier.type]]
+directory = "feature"
+name = "New features"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "bugfix"
+name = "Bug fixes"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "enhancement"
+name = "Enhancements"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "doc"
+name = "Documentation improvements"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "misc"
+name = "Miscellaneous/Development changes"
+showcontent = true
+
+[[tool.towncrier.type]]
+directory = "removal"
+name = "Deprecations and/or Removals"
+showcontent = true
+
 [tool.tox]
 legacy_tox_ini = """
 [tox]
@@ -92,7 +130,7 @@ envlist =
 
 [testenv]
 passenv = *
-whitelist_externals = poetry
+allowlist_externals = poetry
 commands = 
     poetry install
     poetry run pytest tests/ --cov=nexusLIMS --cov=tests \

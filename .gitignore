@@ -4,6 +4,7 @@
 *~
 *.bak
 backups
+.~lock*
 
 # Other files
 .access_token

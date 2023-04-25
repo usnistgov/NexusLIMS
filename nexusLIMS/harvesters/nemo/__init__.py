@@ -54,8 +54,9 @@ def res_event_from_session(session: Session) -> ReservationEvent:
     """
     Create reservation event from session.
 
-    Create an internal :py:class:`~nexusLIMS.harvesters.ReservationEvent`
-    representation of a session by finding a matching reservation in the NEMO
+    Create an internal
+    :py:class:`~nexusLIMS.harvesters.reservation_event.ReservationEvent` representation
+    of a session by finding a matching reservation in the NEMO
     system and parsing the data contained within into a ``ReservationEvent``.
 
     This method assumes a certain format for the "reservation questions"
@@ -126,7 +127,7 @@ def res_event_from_session(session: Session) -> ReservationEvent:
 
     Returns
     -------
-    res_event : ~nexusLIMS.harvesters.ReservationEvent
+    res_event : ~nexusLIMS.harvesters.reservation_event.ReservationEvent
         The matching reservation event
     """
     # a session has instrument, dt_from, dt_to, and user

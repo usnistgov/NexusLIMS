@@ -129,7 +129,7 @@ def get_connector_for_session(session: Session) -> NemoConnector:
     Get the appropriate NEMO connector for a given Session.
 
     Given a :py:class:`~nexusLIMS.db.session_handler.Session`, find the matching
-    :py:class:`~nexusLIMS.harvesters.nemo.NemoConnector` from the enabled
+    :py:class:`~nexusLIMS.harvesters.nemo.connector.NemoConnector` from the enabled
     list of NEMO harvesters.
 
     Parameters
@@ -139,7 +139,7 @@ def get_connector_for_session(session: Session) -> NemoConnector:
 
     Returns
     -------
-    n : ~nexusLIMS.harvesters.nemo.NemoConnector
+    n : ~nexusLIMS.harvesters.nemo.connector.NemoConnector
         The connector object that allows for querying the NEMO API for the
         instrument contained in ``session``
 
@@ -174,7 +174,7 @@ def get_connector_by_base_url(base_url: str) -> NemoConnector:
 
     Returns
     -------
-    n : ~nexusLIMS.harvesters.nemo.NemoConnector
+    n : ~nexusLIMS.harvesters.nemo.connector.NemoConnector
         The enabled NemoConnector instance
 
     Raises

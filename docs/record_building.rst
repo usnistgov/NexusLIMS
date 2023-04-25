@@ -68,7 +68,7 @@ Finding New Sessions
 
 The session finding is initiated by
 :py:func:`~nexusLIMS.builder.record_builder.process_new_records`. This method
-uses :py:func:`~nexusLIMS.harvesters.nemo.add_all_usage_events_to_db` to first
+uses :py:func:`~nexusLIMS.harvesters.nemo.utils.add_all_usage_events_to_db` to first
 query any enabled NEMO API Connectors, and adds rows to the NexusLIMS session
 log database for any newly created usage events (default is to look back seven
 days for usage events). The record builder then calls
@@ -215,14 +215,14 @@ instrument. (i.e. either :py:mod:`~nexusLIMS.harvesters.nemo` or
 :py:mod:`~nexusLIMS.harvesters.sharepoint_calendar` as of version
 1.1.0). Each of these modules implements a ``res_event_from_session`` method,
 used by the record builder to return a
-:py:class:`~nexusLIMS.harvesters.ReservationEvent` object representing the
-reservation that overlaps maximally with the unit of time (or a very simple
+:py:class:`~nexusLIMS.harvesters.reservation_event.ReservationEvent` object representing
+the reservation that overlaps maximally with the unit of time (or a very simple
 generic one, if no matching reservation was found). These functions operate
 serve as an adaptor layer to allow NexusLIMS to generate structurally-uniform
 representations of a reservation from differing calendaring applications.
 From this point on, identical code is used regardless of the original source of
 the reservation information. Once the
-:py:class:`~nexusLIMS.harvesters.ReservationEvent` is obtained,
+:py:class:`~nexusLIMS.harvesters.reservation_event.ReservationEvent` is obtained,
 it is serialized into XML format that is compatible with the Nexus Microscopy
 Schema. `(go to top) <overview_>`_
 

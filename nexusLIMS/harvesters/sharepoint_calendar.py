@@ -28,9 +28,13 @@
 """
 Communicate with a SharePoint calendar system used for instrument reservations.
 
+.. deprecated:: 1.1.1
+   NexusLIMS works best with a NEMO instance for scheduling (see
+   :py:doc:`nexusLIMS.harvesters.nemo`).
+
 Note, due to changes in NIST's instrument configurations, the SharePoint
 harvester has been deprecated as of March 2022. It _should_ continue to
-work with versions of SharePoint up to 2019. It _does not_ work with
+work with versions of SharePoint up to 2019. It **does not** work with
 "SharePoint in Microsoft 365" due to that platform's lack of support for
 NTLM authentication. This file is left in place for backwards compatibility,
 but is no longer actively developed nor tested (since it requires a working
@@ -97,9 +101,10 @@ def res_event_from_xml(xml, date=None):
     """
     Create a reservation event from Sharepoint XML.
 
-    Creates a ReservationEvent from an xml response from
-    :py:func:`~.fetch_xml` rather than providing values directly. If there are
-    multiple events in the XML, it will only process the first one.
+    Creates a :py:class:`~nexusLIMS.harvesters.reservation_event.ReservationEvent`
+    from an xml response from :py:func:`~.fetch_xml` rather than providing values
+    directly. If there are multiple events in the XML, it will only process the first
+    one.
 
     Parameters
     ----------
@@ -146,7 +151,7 @@ def res_event_from_xml(xml, date=None):
 
     Returns
     -------
-    res_event : ~nexusLIMS.harvesters.ReservationEvent
+    res_event : ~nexusLIMS.harvesters.reservation_event.ReservationEvent
         An object representing an entry on the SharePoint calendar. Could
         be empty if no ``entry`` nodes are present in XML response
     """
@@ -406,7 +411,7 @@ def get_events(instrument=None, dt_from=None, dt_to=None):
 
     Returns
     -------
-    res_event : ~nexusLIMS.harvesters.ReservationEvent
+    res_event : ~nexusLIMS.harvesters.reservation_event.ReservationEvent
         A ``ReservationEvent``, containing information about a
         single reservation, including title, instrument, user information,
         reservation purpose, sample details, description, and date/time

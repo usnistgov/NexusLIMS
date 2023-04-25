@@ -25,6 +25,14 @@ nexusLIMS.extractors.digital\_micrograph module
    :undoc-members:
    :show-inheritance:
 
+nexusLIMS.extractors.edax module
+--------------------------------
+
+.. automodule:: nexusLIMS.extractors.edax
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 nexusLIMS.extractors.fei\_emi module
 ------------------------------------
 
@@ -45,6 +53,14 @@ nexusLIMS.extractors.thumbnail\_generator module
 ------------------------------------------------
 
 .. automodule:: nexusLIMS.extractors.thumbnail_generator
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+nexusLIMS.extractors.utils module
+---------------------------------
+
+.. automodule:: nexusLIMS.extractors.utils
    :members:
    :undoc-members:
    :show-inheritance:

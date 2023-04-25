@@ -15,6 +15,7 @@ expected (although not enforced):
   separated by commas as a string- e.g. '(12, 1024, 1024)'
 * ``'Instrument ID'`` - instrument PID pulled from the instrument database
 """
+import base64
 import inspect
 import json
 import logging
@@ -33,6 +34,7 @@ from nexusLIMS.version import __version__
 
 from .basic_metadata import get_basic_metadata
 from .digital_micrograph import get_dm3_metadata
+from .edax import get_msa_metadata, get_spc_metadata
 from .fei_emi import get_ser_metadata
 from .quanta_tif import get_quanta_metadata
 from .thumbnail_generator import down_sample_image, sig_to_thumbnail
@@ -45,6 +47,8 @@ extension_reader_map = {
     "dm4": get_dm3_metadata,
     "tif": get_quanta_metadata,
     "ser": get_ser_metadata,
+    "spc": get_spc_metadata,
+    "msa": get_msa_metadata,
 }
 
 
@@ -201,7 +205,7 @@ def create_preview(fname: Path, *, overwrite: bool) -> Path:
 
     Returns
     -------
-    Path
+    preview_fname : pathlib.Path
         The filename of the generated preview image
     """
     preview_fname = replace_mmf_path(fname, ".thumb.png")
@@ -324,5 +328,8 @@ class _CustomEncoder(json.JSONEncoder):
             return o.tolist()
         if isinstance(o, np.bytes_):
             return o.decode()
+        if isinstance(o, np.void):
+            # np.void array may contain arbitary binary, so base64 encode it
+            return base64.b64encode(o.tolist()).decode("utf-8")
 
         return super().default(o)

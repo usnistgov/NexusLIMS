@@ -1,4 +1,5 @@
 # pylint: skip-file
+# ruff: noqa
 
 # Configuration file for the Sphinx documentation builder.
 #
@@ -30,7 +31,8 @@ author = "NIST Office of Data and Informatics"
 numfig = True
 
 # The full version, including alpha/beta/rc tags
-release = nexusLIMS.version.__version__
+version = nexusLIMS.version.__version__
+release = version
 
 
 # -- General configuration ---------------------------------------------------
@@ -44,14 +46,17 @@ extensions = [
     "sphinx.ext.intersphinx",
     "sphinx.ext.coverage",
     "sphinx.ext.viewcode",
+    "sphinxcontrib.towncrier.ext",
 ]
 
-try:
-    import sphinxcontrib.spelling
+# use short form for type hint links
+autodoc_typehints_format = "short"
+python_use_unqualified_type_names = True
 
-    extensions.append("sphinxcontrib.spelling")
-except BaseException:
-    pass
+# -- Options for towncrier_draft extension -----------------------------------
+towncrier_draft_autoversion_mode = "draft"
+towncrier_draft_include_empty = False
+towncrier_draft_working_directory = "."
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ["_templates"]
@@ -112,6 +117,7 @@ exclude_patterns = [
     "build",
     #    'api/nexusLIMS.rst',
     "api/nexusLIMS.version.rst",
+    "changes/*.rst",
     "README.rst",
     "dev_scripts",
 ]

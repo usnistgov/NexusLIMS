@@ -3,7 +3,9 @@
 
 """Tests the extraction of metadata and generation of preview images from data files."""
 
+import base64
 import filecmp
+import json
 import logging
 import os
 from datetime import datetime as dt
@@ -24,6 +26,7 @@ from nexusLIMS.extractors import (
     thumbnail_generator,
 )
 from nexusLIMS.extractors.basic_metadata import get_basic_metadata
+from nexusLIMS.extractors.edax import get_msa_metadata, get_spc_metadata
 from nexusLIMS.extractors.quanta_tif import get_quanta_metadata
 from nexusLIMS.extractors.thumbnail_generator import down_sample_image, sig_to_thumbnail
 from nexusLIMS.extractors.utils import _try_decimal, _zero_data_in_dm3
@@ -278,7 +281,7 @@ class TestExtractorModule:
             return instruments.instrument_db["FEI-Quanta200-ESEM-633137_n"]
 
         monkeypatch.setattr(
-            nexusLIMS.extractors.quanta_tif,
+            nexusLIMS.extractors.utils,
             "get_instr_from_filepath",
             mock_instr,
         )
@@ -296,7 +299,7 @@ class TestExtractorModule:
             return None
 
         monkeypatch.setattr(
-            nexusLIMS.extractors.quanta_tif,
+            nexusLIMS.extractors.utils,
             "get_instr_from_filepath",
             mock_instr,
         )
@@ -307,6 +310,28 @@ class TestExtractorModule:
             == "nexusLIMS.extractors.quanta_tif"
         )
         assert meta["nx_meta"]["NexusLIMS Extraction"]["Version"] == __version__
+        self.remove_thumb_and_json(thumb_fname)
+
+    def test_parse_metadata_edax_spc(self):
+        test_file = Path(__file__).parent / "files" / "647_leo_edax_test.spc"
+        _, thumb_fname = parse_metadata(fname=test_file)
+
+        # test encoding of np.void metadata filler values
+        json_path = Path(str(thumb_fname).replace("thumb.png", "json"))
+        with json_path.open("r", encoding="utf-8") as _file:
+            json_meta = json.load(_file)
+
+        filler_val = json_meta["original_metadata"]["filler3"]
+        assert filler_val == "PQoOQgAAgD8="
+
+        expected_void = np.void(b"\x3D\x0A\x0E\x42\x00\x00\x80\x3F")
+        assert np.void(base64.b64decode(filler_val)) == expected_void
+
+        self.remove_thumb_and_json(thumb_fname)
+
+    def test_parse_metadata_edax_msa(self):
+        test_file = Path(__file__).parent / "files" / "647_leo_edax_test.msa"
+        _, thumb_fname = parse_metadata(fname=test_file)
         self.remove_thumb_and_json(thumb_fname)
 
     def test_parse_metadata_ser(self, fei_ser_files):
@@ -645,6 +670,69 @@ class TestDigitalMicrographExtractor:
             filename.unlink(missing_ok=True)
 
 
+class TestEDAXSPCExtractor:
+    """Tests nexusLIMS.extractors.edax."""
+
+    def test_647_leo_edax_spc(self):
+        test_file = Path(__file__).parent / "files" / "647_leo_edax_test.spc"
+        meta = get_spc_metadata(test_file)
+        assert meta["nx_meta"]["Azimuthal Angle (deg)"] == 0.0
+        assert meta["nx_meta"]["Live Time (s)"] == pytest.approx(30.000002)
+        assert meta["nx_meta"]["Detector Energy Resolution (eV)"] == pytest.approx(
+            125.16211,
+        )
+        assert meta["nx_meta"]["Elevation Angle (deg)"] == 35.0
+        assert meta["nx_meta"]["Channel Size (eV)"] == 5
+        assert meta["nx_meta"]["Number of Spectrum Channels"] == 4096
+        assert meta["nx_meta"]["Stage Tilt (deg)"] == -1.0
+        assert meta["nx_meta"]["Starting Energy (keV)"] == 0.0
+        assert meta["nx_meta"]["Ending Energy (keV)"] == pytest.approx(20.475)
+
+    def test_647_leo_edax_msa(self):
+        test_file = Path(__file__).parent / "files" / "647_leo_edax_test.msa"
+        meta = get_msa_metadata(test_file)
+        assert meta["nx_meta"]["Azimuthal Angle (deg)"] == 0.0
+        assert meta["nx_meta"]["Amplifier Time (μs)"] == "7.68"
+        assert meta["nx_meta"]["Analyzer Type"] == "DPP4"
+        assert meta["nx_meta"]["Beam Energy (keV)"] == 10.0
+        assert meta["nx_meta"]["Channel Offset"] == 0.0
+        assert (
+            meta["nx_meta"]["EDAX Comment"]
+            == "Converted by EDAX.TeamEDS V4.5.1-RC2.20170623.3 Friday, June 23, 2017"
+        )
+        assert meta["nx_meta"]["Data Format"] == "XY"
+        assert meta["nx_meta"]["EDAX Date"] == "29-Aug-2022"
+        assert meta["nx_meta"]["Elevation Angle (deg)"] == 35.0
+        assert meta["nx_meta"]["User-Selected Elements"] == "8,27,16"
+        assert (
+            meta["nx_meta"]["Originating File of MSA Export"]
+            == "20220829_CoO220711_withNscan.spc"
+        )
+        assert meta["nx_meta"]["File Format"] == "EMSA/MAS Spectral Data File"
+        assert meta["nx_meta"]["FPGA Version"] == "0"
+        assert meta["nx_meta"]["Live Time (s)"] == 30.0
+        assert meta["nx_meta"]["Number of Data Columns"] == 1.0
+        assert meta["nx_meta"]["Number of Data Points"] == 4096.0
+        assert meta["nx_meta"]["Offset"] == 0.0
+        assert meta["nx_meta"]["EDAX Owner"] == "EDAX TEAM EDS/block"
+        assert meta["nx_meta"]["Real Time (s)"] == 0.0
+        assert meta["nx_meta"]["Energy Resolution (eV)"] == "125.2"
+        assert meta["nx_meta"]["Signal Type"] == "EDS"
+        assert meta["nx_meta"]["Active Layer Thickness (cm)"] == "0.1"
+        assert meta["nx_meta"]["Be Window Thickness (cm)"] == 0.0
+        assert meta["nx_meta"]["Dead Layer Thickness (cm)"] == 0.03
+        assert meta["nx_meta"]["EDAX Time"] == "10:14"
+        assert meta["nx_meta"]["EDAX Title"] == ""  # noqa: PLC1901
+        assert meta["nx_meta"]["TakeOff Angle (deg)"] == "35.5"
+        assert meta["nx_meta"]["Stage Tilt (deg)"] == "-1.0"
+        assert meta["nx_meta"]["MSA Format Version"] == "1.0"
+        assert meta["nx_meta"]["X Column Label"] == "X-RAY Energy"
+        assert meta["nx_meta"]["X Units Per Channel"] == 5.0
+        assert meta["nx_meta"]["X Column Units"] == "Energy (EV)"
+        assert meta["nx_meta"]["Y Column Label"] == "X-RAY Intensity"
+        assert meta["nx_meta"]["Y Column Units"] == "Intensity"
+
+
 class TestQuantaExtractor:
     """Tests nexusLIMS.extractors.quanta_tif."""
 
@@ -716,7 +804,7 @@ class TestQuantaExtractor:
             return instruments.instrument_db["FEI-Quanta200-ESEM-633137_n"]
 
         monkeypatch.setattr(
-            nexusLIMS.extractors.quanta_tif,
+            nexusLIMS.extractors.utils,
             "get_instr_from_filepath",
             mock_instr,
         )

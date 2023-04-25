@@ -6,13 +6,21 @@ nexusLIMS.harvesters package
    :undoc-members:
    :show-inheritance:
 
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: -1
+
+   nexusLIMS.harvesters.nemo
+
 Submodules
 ----------
 
-nexusLIMS.harvesters.nemo module
---------------------------------
+nexusLIMS.harvesters.reservation\_event module
+----------------------------------------------
 
-.. automodule:: nexusLIMS.harvesters.nemo
+.. automodule:: nexusLIMS.harvesters.reservation_event
    :members:
    :undoc-members:
    :show-inheritance:

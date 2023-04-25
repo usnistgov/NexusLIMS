@@ -122,15 +122,8 @@ def build_record(
         session.user,
         session.instrument.harvester,
     )
-    # this now returns a nexusLIMS.harvesters.ReservationEvent, not a string
-    # DONE: Make this general to handle a session regardless of harvester,
-    #  not just sharepoint (as it is now)
-    # We need to make a consistent method that every harvester has
-    # implemented that takes a session and returns a matching
-    # ReservationEvent (if any)
+    # this returns a nexusLIMS.harvesters.reservation_event.ReservationEvent
     res_event = get_reservation_event(session)
-    # res_event = sharepoint_calendar.get_events(instrument=instrument, dt_from=dt_from,
-    #                                dt_to=dt_to, user=user)
 
     output = res_event.as_xml()
 
@@ -174,15 +167,16 @@ def get_reservation_event(session: Session) -> ReservationEvent:
     ----------
     session
         The :py:class:`~nexusLIMS.db.session_handler.Session` for which to
-        fetch a matching :py:class:`~nexusLIMS.harvesters.ReservationEvent` from
+        fetch a matching
+        :py:class:`~nexusLIMS.harvesters.reservation_event.ReservationEvent` from
         the relevant harvester
 
     Returns
     -------
-    res_event : ~nexusLIMS.harvesters.ReservationEvent
-        A :py:class:`~nexusLIMS.harvesters.ReservationEvent` representation of
-        a reservation that matches the instrument and timespan specified in
-        ``session``.
+    res_event : ~nexusLIMS.harvesters.reservation_event.ReservationEvent
+        A :py:class:`~nexusLIMS.harvesters.reservation_event.ReservationEvent`
+        representation of a reservation that matches the instrument and timespan
+        specified in ``session``.
     """
     # try to find module and raise error if not found:
     if (
@@ -324,7 +318,11 @@ def build_acq_activities(instrument, dt_from, dt_to, generate_previews):
     return activities
 
 
-def get_files(path: Path, dt_from, dt_to) -> List[Path]:
+def get_files(
+    path: Path,
+    dt_from: dt,
+    dt_to: dt,
+) -> List[Path]:
     """
     Get files under a path that were last modified between the two given timestamps.
 
@@ -341,7 +339,7 @@ def get_files(path: Path, dt_from, dt_to) -> List[Path]:
 
     Returns
     -------
-    files : List[Path]
+    files : List[pathlib.Path]
         A list of the files that have modification times within the
         time range provided (sorted by modification time)
     """
@@ -389,10 +387,10 @@ def dump_record(
 
     Parameters
     ----------
-    session
+    session : nexusLIMS.db.session_handler.Session
         A :py:class:`~nexusLIMS.db.session_handler.Session` object
         representing a unit of time on one of the instruments known to NexusLIMS
-    filename : None or Path
+    filename : typing.Optional[pathlib.Path]
         The filename of the dumped xml file to write. If None, a default name
         will be generated from the other parameters
     generate_previews : bool
@@ -400,7 +398,7 @@ def dump_record(
 
     Returns
     -------
-    filename : Path
+    filename : pathlib.Path
         The name of the created record that was returned
     """
     if filename is None:
@@ -450,7 +448,7 @@ def build_new_session_records() -> List[Path]:
 
     Returns
     -------
-    xml_files : List[Path]
+    xml_files : typing.List[pathlib.Path]
         A list of record files that were successfully built and saved to
         centralized storage
     """
@@ -655,7 +653,7 @@ def dry_run_get_sharepoint_reservation_event(
 
     Returns
     -------
-    res_event : ~nexusLIMS.harvesters.ReservationEvent
+    res_event : ~nexusLIMS.harvesters.reservation_event.ReservationEvent
         A list of strings containing the files that would be included for the
         record of this session (if it were not a dry run)
     """
@@ -671,12 +669,12 @@ def dry_run_file_find(s: Session) -> List[Path]:
 
     Parameters
     ----------
-    s
+    s : nexusLIMS.db.session_handler.Session
         A session read from the database
 
     Returns
     -------
-    files : List[Path]
+    files : typing.List[pathlib.Path]
         A list of Paths containing the files that would be included for the
         record of this session (if it were not a dry run)
     """

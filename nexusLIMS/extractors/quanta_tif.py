@@ -30,13 +30,11 @@ import configparser
 import contextlib
 import io
 import logging
-import os
-from datetime import datetime as dt
 from decimal import Decimal, InvalidOperation
 from math import degrees
 from pathlib import Path
 
-from nexusLIMS.instruments import get_instr_from_filepath
+from nexusLIMS.extractors.utils import _set_instr_name_and_time
 from nexusLIMS.utils import set_nested_dict_value, sort_dict, try_getting_dict_value
 
 logger = logging.getLogger(__name__)
@@ -70,19 +68,7 @@ def get_quanta_metadata(filename: Path):
     mdict["nx_meta"]["DatasetType"] = "Image"
     mdict["nx_meta"]["Data Type"] = "SEM_Imaging"
 
-    instr = get_instr_from_filepath(filename)
-    # if we found the instrument, then store the name as string, else None
-    instr_name = instr.name if instr is not None else None
-
-    # get the modification time (as ISO format):
-    mtime_iso = dt.fromtimestamp(
-        os.path.getmtime(filename),
-        tz=instr.timezone if instr else None,
-    ).isoformat()
-
-    mdict["nx_meta"]["Instrument ID"] = instr_name
-    mdict["nx_meta"]["Creation Time"] = mtime_iso
-    mdict["nx_meta"]["warnings"] = []
+    _set_instr_name_and_time(mdict, filename)
 
     # if the user_idx is -1, it means the [User] tag was not found in the
     # file, and so the metadata is missing (so we should just return 0)

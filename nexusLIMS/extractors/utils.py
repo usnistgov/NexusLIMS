@@ -28,15 +28,18 @@
 """Methods (primarily intended to be private) that are used by the other extractors."""
 
 import logging
+import os
 import re
 import shutil
 import tarfile
+from datetime import datetime
 from decimal import Decimal, InvalidOperation
 from pathlib import Path
 from typing import Dict, List, Optional
 
 from hyperspy.io_plugins.digital_micrograph import DigitalMicrographReader, ImageObject
 
+from nexusLIMS.instruments import Instrument, get_instr_from_filepath
 from nexusLIMS.utils import set_nested_dict_value, try_getting_dict_value
 
 logger = logging.getLogger(__name__)
@@ -46,6 +49,23 @@ def _coerce_to_list(meta_key):
     if isinstance(meta_key, str):
         return [meta_key]
     return meta_key
+
+
+def _get_mtime_iso(filename: Path, instrument: Optional[Instrument] = None):
+    return datetime.fromtimestamp(
+        os.path.getmtime(filename),
+        tz=instrument.timezone if instrument else None,
+    ).isoformat()
+
+
+def _set_instr_name_and_time(mdict: Dict, filename: Path):
+    instr = get_instr_from_filepath(filename)
+    # if we found the instrument, then store the name as string, else None
+    instr_name = instr.name if instr is not None else None
+
+    mdict["nx_meta"]["Instrument ID"] = instr_name
+    mdict["nx_meta"]["Creation Time"] = _get_mtime_iso(filename, instr)
+    mdict["nx_meta"]["warnings"] = []
 
 
 def _set_acquisition_device_name(mdict: Dict, pre_path: List[str]):

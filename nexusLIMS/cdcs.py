@@ -207,7 +207,7 @@ def upload_record_files(
 
     Parameters
     ----------
-    files_to_upload : Optional[List[Path]]
+    files_to_upload : typing.Optional[typing.List[pathlib.Path]]
         The list of .xml files to upload. If ``None``, all .xml files in the
         current directory will be used instead.
     progress : bool
@@ -215,9 +215,9 @@ def upload_record_files(
 
     Returns
     -------
-    files_uploaded : List[Path]
+    files_uploaded : list of pathlib.Path
         A list of the files that were successfully uploaded
-    record_ids : List[str]
+    record_ids : list of str
         A list of the record id values (on the server) that were uploaded
     """
     if files_to_upload is None:

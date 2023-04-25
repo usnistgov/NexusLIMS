@@ -1,9 +1,10 @@
 .. toctree::
    :titlesonly:
-   :maxdepth: 2
+   :maxdepth: 1
    :hidden:
 
    Package introduction <self>
+   changelog
    database
    record_building
    development

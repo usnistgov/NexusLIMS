@@ -919,7 +919,7 @@ def replace_mmf_path(path: Path, suffix: str) -> Path:
 
     Returns
     -------
-    Path
+    pathlib.Path
         A resolved pathlib.Path object pointing to the new path
     """
     mmf_path = Path(os.environ["mmfnexus_path"])

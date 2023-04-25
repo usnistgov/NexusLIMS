@@ -160,6 +160,8 @@ import logging
 
 from dotenv import load_dotenv
 
+from .version import __version__  # noqa: F401
+
 # load environment variables from a .env file if present
 load_dotenv()
 
