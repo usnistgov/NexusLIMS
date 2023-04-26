@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Index &#8212; NexusLIMS 1.1.0 documentation</title>
+    <title>Index &#8212; NexusLIMS 1.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="_static/custom-styles.css" />
@@ -59,7 +59,7 @@ $(document).ready(function(){
         </button>
         <a class="navbar-brand" href="index.html"><span><img src="_static/logo_horizontal.png"></span>
            </a>
-        <span class="navbar-text navbar-version pull-left"><b></b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.3.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -80,6 +80,7 @@ $(document).ready(function(){
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="database.html">NexusLIMS database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Developer documentation</a></li>
@@ -92,7 +93,10 @@ $(document).ready(function(){
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/nexusLIMS.harvesters.nemo.html">nexusLIMS.harvesters.nemo package</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
 </ul>
 </li>
@@ -144,6 +148,7 @@ $(document).ready(function(){
 <ul class="globaltoc">
     <ul>
 <li class="toctree-l1"><a class="reference internal" href="index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="database.html">NexusLIMS database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Developer documentation</a></li>
@@ -201,7 +206,7 @@ $(document).ready(function(){
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/nexusLIMS.schemas.html#nexusLIMS.schemas.activity.AcquisitionActivity">AcquisitionActivity (class in nexusLIMS.schemas.activity)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.add_all_usage_events_to_db">add_all_usage_events_to_db() (in module nexusLIMS.harvesters.nemo)</a>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.utils.add_all_usage_events_to_db">add_all_usage_events_to_db() (in module nexusLIMS.harvesters.nemo.utils)</a>
 </li>
       <li><a href="api/nexusLIMS.extractors.html#nexusLIMS.extractors.thumbnail_generator.add_annotation_markers">add_annotation_markers() (in module nexusLIMS.extractors.thumbnail_generator)</a>
 </li>
@@ -209,7 +214,7 @@ $(document).ready(function(){
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/nexusLIMS.schemas.html#nexusLIMS.schemas.activity.AcquisitionActivity.add_file">add_file() (nexusLIMS.schemas.activity.AcquisitionActivity method)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.as_xml">as_xml() (nexusLIMS.harvesters.ReservationEvent method)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent.as_xml">as_xml() (nexusLIMS.harvesters.reservation_event.ReservationEvent method)</a>
 
       <ul>
         <li><a href="api/nexusLIMS.schemas.html#nexusLIMS.schemas.activity.AcquisitionActivity.as_xml">(nexusLIMS.schemas.activity.AcquisitionActivity method)</a>
@@ -237,13 +242,19 @@ $(document).ready(function(){
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/nexusLIMS.html#nexusLIMS.cdcs.cdcs_url">cdcs_url() (in module nexusLIMS.cdcs)</a>
+</li>
       <li><a href="api/nexusLIMS.schemas.html#nexusLIMS.schemas.activity.cluster_filelist_mtimes">cluster_filelist_mtimes() (in module nexusLIMS.schemas.activity)</a>
+</li>
+      <li><a href="api/nexusLIMS.extractors.html#nexusLIMS.extractors.create_preview">create_preview() (in module nexusLIMS.extractors)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.created_by">created_by (nexusLIMS.harvesters.ReservationEvent attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent.created_by">created_by (nexusLIMS.harvesters.reservation_event.ReservationEvent attribute)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.created_by_full_name">created_by_full_name (nexusLIMS.harvesters.ReservationEvent attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent.created_by_full_name">created_by_full_name (nexusLIMS.harvesters.reservation_event.ReservationEvent attribute)</a>
+</li>
+      <li><a href="api/nexusLIMS.html#nexusLIMS.utils.current_system_tz">current_system_tz() (in module nexusLIMS.utils)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -255,7 +266,7 @@ $(document).ready(function(){
 </li>
       <li><a href="api/nexusLIMS.html#nexusLIMS.cdcs.delete_record">delete_record() (in module nexusLIMS.cdcs)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.division">division (nexusLIMS.harvesters.ReservationEvent attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent.division">division (nexusLIMS.harvesters.reservation_event.ReservationEvent attribute)</a>
 </li>
       <li><a href="api/nexusLIMS.extractors.html#nexusLIMS.extractors.thumbnail_generator.down_sample_image">down_sample_image() (in module nexusLIMS.extractors.thumbnail_generator)</a>
 </li>
@@ -275,13 +286,13 @@ $(document).ready(function(){
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.end_time">end_time (nexusLIMS.harvesters.ReservationEvent attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent.end_time">end_time (nexusLIMS.harvesters.reservation_event.ReservationEvent attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.experiment_purpose">experiment_purpose (nexusLIMS.harvesters.ReservationEvent attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent.experiment_purpose">experiment_purpose (nexusLIMS.harvesters.reservation_event.ReservationEvent attribute)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.experiment_title">experiment_title (nexusLIMS.harvesters.ReservationEvent attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent.experiment_title">experiment_title (nexusLIMS.harvesters.reservation_event.ReservationEvent attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -307,9 +318,11 @@ $(document).ready(function(){
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/nexusLIMS.html#nexusLIMS.utils.get_auth">get_auth() (in module nexusLIMS.utils)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.get_connector_by_base_url">get_connector_by_base_url() (in module nexusLIMS.harvesters.nemo)</a>
+      <li><a href="api/nexusLIMS.extractors.html#nexusLIMS.extractors.basic_metadata.get_basic_metadata">get_basic_metadata() (in module nexusLIMS.extractors.basic_metadata)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.get_connector_for_session">get_connector_for_session() (in module nexusLIMS.harvesters.nemo)</a>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.utils.get_connector_by_base_url">get_connector_by_base_url() (in module nexusLIMS.harvesters.nemo.utils)</a>
+</li>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.utils.get_connector_for_session">get_connector_for_session() (in module nexusLIMS.harvesters.nemo.utils)</a>
 </li>
       <li><a href="api/nexusLIMS.extractors.html#nexusLIMS.extractors.digital_micrograph.get_dm3_metadata">get_dm3_metadata() (in module nexusLIMS.extractors.digital_micrograph)</a>
 </li>
@@ -319,7 +332,7 @@ $(document).ready(function(){
 </li>
       <li><a href="api/nexusLIMS.builder.html#nexusLIMS.builder.record_builder.get_files">get_files() (in module nexusLIMS.builder.record_builder)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.get_harvesters_enabled">get_harvesters_enabled() (in module nexusLIMS.harvesters.nemo)</a>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.utils.get_harvesters_enabled">get_harvesters_enabled() (in module nexusLIMS.harvesters.nemo.utils)</a>
 </li>
       <li><a href="api/nexusLIMS.html#nexusLIMS.instruments.get_instr_from_api_url">get_instr_from_api_url() (in module nexusLIMS.instruments)</a>
 </li>
@@ -327,7 +340,9 @@ $(document).ready(function(){
 </li>
       <li><a href="api/nexusLIMS.html#nexusLIMS.instruments.get_instr_from_filepath">get_instr_from_filepath() (in module nexusLIMS.instruments)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.get_known_tool_ids">get_known_tool_ids() (nexusLIMS.harvesters.nemo.NemoConnector method)</a>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.connector.NemoConnector.get_known_tool_ids">get_known_tool_ids() (nexusLIMS.harvesters.nemo.connector.NemoConnector method)</a>
+</li>
+      <li><a href="api/nexusLIMS.extractors.html#nexusLIMS.extractors.edax.get_msa_metadata">get_msa_metadata() (in module nexusLIMS.extractors.edax)</a>
 </li>
       <li><a href="api/nexusLIMS.html#nexusLIMS.utils.get_nested_dict_key">get_nested_dict_key() (in module nexusLIMS.utils)</a>
 </li>
@@ -339,37 +354,41 @@ $(document).ready(function(){
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.get_projects">get_projects() (nexusLIMS.harvesters.nemo.NemoConnector method)</a>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.connector.NemoConnector.get_projects">get_projects() (nexusLIMS.harvesters.nemo.connector.NemoConnector method)</a>
 </li>
       <li><a href="api/nexusLIMS.extractors.html#nexusLIMS.extractors.quanta_tif.get_quanta_metadata">get_quanta_metadata() (in module nexusLIMS.extractors.quanta_tif)</a>
 </li>
       <li><a href="api/nexusLIMS.builder.html#nexusLIMS.builder.record_builder.get_reservation_event">get_reservation_event() (in module nexusLIMS.builder.record_builder)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.get_reservations">get_reservations() (nexusLIMS.harvesters.nemo.NemoConnector method)</a>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.connector.NemoConnector.get_reservations">get_reservations() (nexusLIMS.harvesters.nemo.connector.NemoConnector method)</a>
 </li>
       <li><a href="api/nexusLIMS.extractors.html#nexusLIMS.extractors.fei_emi.get_ser_metadata">get_ser_metadata() (in module nexusLIMS.extractors.fei_emi)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.get_session_from_usage_event">get_session_from_usage_event() (nexusLIMS.harvesters.nemo.NemoConnector method)</a>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.connector.NemoConnector.get_session_from_usage_event">get_session_from_usage_event() (nexusLIMS.harvesters.nemo.connector.NemoConnector method)</a>
 </li>
       <li><a href="api/nexusLIMS.db.html#nexusLIMS.db.session_handler.get_sessions_to_build">get_sessions_to_build() (in module nexusLIMS.db.session_handler)</a>
 </li>
+      <li><a href="api/nexusLIMS.extractors.html#nexusLIMS.extractors.edax.get_spc_metadata">get_spc_metadata() (in module nexusLIMS.extractors.edax)</a>
+</li>
       <li><a href="api/nexusLIMS.html#nexusLIMS.cdcs.get_template_id">get_template_id() (in module nexusLIMS.cdcs)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.get_tools">get_tools() (nexusLIMS.harvesters.nemo.NemoConnector method)</a>
+      <li><a href="api/nexusLIMS.html#nexusLIMS.utils.get_timespan_overlap">get_timespan_overlap() (in module nexusLIMS.utils)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.get_usage_events">get_usage_events() (nexusLIMS.harvesters.nemo.NemoConnector method)</a>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.connector.NemoConnector.get_tools">get_tools() (nexusLIMS.harvesters.nemo.connector.NemoConnector method)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.get_usage_events_as_sessions">get_usage_events_as_sessions() (in module nexusLIMS.harvesters.nemo)</a>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.connector.NemoConnector.get_usage_events">get_usage_events() (nexusLIMS.harvesters.nemo.connector.NemoConnector method)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.get_users">get_users() (nexusLIMS.harvesters.nemo.NemoConnector method)</a>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.utils.get_usage_events_as_sessions">get_usage_events_as_sessions() (in module nexusLIMS.harvesters.nemo.utils)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.get_users_by_username">get_users_by_username() (nexusLIMS.harvesters.nemo.NemoConnector method)</a>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.connector.NemoConnector.get_users">get_users() (nexusLIMS.harvesters.nemo.connector.NemoConnector method)</a>
+</li>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.connector.NemoConnector.get_users_by_username">get_users_by_username() (nexusLIMS.harvesters.nemo.connector.NemoConnector method)</a>
 </li>
       <li><a href="api/nexusLIMS.html#nexusLIMS.cdcs.get_workspace_id">get_workspace_id() (in module nexusLIMS.cdcs)</a>
 </li>
       <li><a href="api/nexusLIMS.html#nexusLIMS.utils.gnu_find_files_by_mtime">gnu_find_files_by_mtime() (in module nexusLIMS.utils)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.group">group (nexusLIMS.harvesters.ReservationEvent attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent.group">group (nexusLIMS.harvesters.reservation_event.ReservationEvent attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -385,7 +404,7 @@ $(document).ready(function(){
 <h2 id="I">I</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.id_from_url">id_from_url() (in module nexusLIMS.harvesters.nemo)</a>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.utils.id_from_url">id_from_url() (in module nexusLIMS.harvesters.nemo.utils)</a>
 </li>
       <li><a href="api/nexusLIMS.db.html#nexusLIMS.db.session_handler.SessionLog.insert_log">insert_log() (nexusLIMS.db.session_handler.SessionLog method)</a>
 </li>
@@ -395,11 +414,11 @@ $(document).ready(function(){
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.instrument">instrument (nexusLIMS.harvesters.ReservationEvent attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent.instrument">instrument (nexusLIMS.harvesters.reservation_event.ReservationEvent attribute)</a>
 </li>
       <li><a href="api/nexusLIMS.html#nexusLIMS.instruments.instrument_db">instrument_db (in module nexusLIMS.instruments)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.internal_id">internal_id (nexusLIMS.harvesters.ReservationEvent attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent.internal_id">internal_id (nexusLIMS.harvesters.reservation_event.ReservationEvent attribute)</a>
 </li>
       <li><a href="api/nexusLIMS.html#nexusLIMS.utils.is_subpath">is_subpath() (in module nexusLIMS.utils)</a>
 </li>
@@ -409,7 +428,7 @@ $(document).ready(function(){
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.last_updated">last_updated (nexusLIMS.harvesters.ReservationEvent attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent.last_updated">last_updated (nexusLIMS.harvesters.reservation_event.ReservationEvent attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -445,7 +464,11 @@ $(document).ready(function(){
 </li>
         <li><a href="api/nexusLIMS.extractors.html#module-nexusLIMS.extractors">nexusLIMS.extractors</a>
 </li>
+        <li><a href="api/nexusLIMS.extractors.html#module-nexusLIMS.extractors.basic_metadata">nexusLIMS.extractors.basic_metadata</a>
+</li>
         <li><a href="api/nexusLIMS.extractors.html#module-nexusLIMS.extractors.digital_micrograph">nexusLIMS.extractors.digital_micrograph</a>
+</li>
+        <li><a href="api/nexusLIMS.extractors.html#module-nexusLIMS.extractors.edax">nexusLIMS.extractors.edax</a>
 </li>
         <li><a href="api/nexusLIMS.extractors.html#module-nexusLIMS.extractors.fei_emi">nexusLIMS.extractors.fei_emi</a>
 </li>
@@ -453,9 +476,19 @@ $(document).ready(function(){
 </li>
         <li><a href="api/nexusLIMS.extractors.html#module-nexusLIMS.extractors.thumbnail_generator">nexusLIMS.extractors.thumbnail_generator</a>
 </li>
+        <li><a href="api/nexusLIMS.extractors.html#module-nexusLIMS.extractors.utils">nexusLIMS.extractors.utils</a>
+</li>
         <li><a href="api/nexusLIMS.harvesters.html#module-nexusLIMS.harvesters">nexusLIMS.harvesters</a>
 </li>
-        <li><a href="api/nexusLIMS.harvesters.html#module-nexusLIMS.harvesters.nemo">nexusLIMS.harvesters.nemo</a>
+        <li><a href="api/nexusLIMS.harvesters.nemo.html#module-nexusLIMS.harvesters.nemo">nexusLIMS.harvesters.nemo</a>
+</li>
+        <li><a href="api/nexusLIMS.harvesters.nemo.html#module-nexusLIMS.harvesters.nemo.connector">nexusLIMS.harvesters.nemo.connector</a>
+</li>
+        <li><a href="api/nexusLIMS.harvesters.nemo.html#module-nexusLIMS.harvesters.nemo.exceptions">nexusLIMS.harvesters.nemo.exceptions</a>
+</li>
+        <li><a href="api/nexusLIMS.harvesters.nemo.html#module-nexusLIMS.harvesters.nemo.utils">nexusLIMS.harvesters.nemo.utils</a>
+</li>
+        <li><a href="api/nexusLIMS.harvesters.html#module-nexusLIMS.harvesters.reservation_event">nexusLIMS.harvesters.reservation_event</a>
 </li>
         <li><a href="api/nexusLIMS.harvesters.html#module-nexusLIMS.harvesters.sharepoint_calendar">nexusLIMS.harvesters.sharepoint_calendar</a>
 </li>
@@ -476,7 +509,7 @@ $(document).ready(function(){
 <h2 id="N">N</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector">NemoConnector (class in nexusLIMS.harvesters.nemo)</a>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.connector.NemoConnector">NemoConnector (class in nexusLIMS.harvesters.nemo.connector)</a>
 </li>
       <li><a href="api/nexusLIMS.html#nexusLIMS.utils.nexus_req">nexus_req() (in module nexusLIMS.utils)</a>
 </li>
@@ -530,10 +563,24 @@ $(document).ready(function(){
 </li>
       </ul></li>
       <li>
+    nexusLIMS.extractors.basic_metadata
+
+      <ul>
+        <li><a href="api/nexusLIMS.extractors.html#module-nexusLIMS.extractors.basic_metadata">module</a>
+</li>
+      </ul></li>
+      <li>
     nexusLIMS.extractors.digital_micrograph
 
       <ul>
         <li><a href="api/nexusLIMS.extractors.html#module-nexusLIMS.extractors.digital_micrograph">module</a>
+</li>
+      </ul></li>
+      <li>
+    nexusLIMS.extractors.edax
+
+      <ul>
+        <li><a href="api/nexusLIMS.extractors.html#module-nexusLIMS.extractors.edax">module</a>
 </li>
       </ul></li>
       <li>
@@ -550,13 +597,20 @@ $(document).ready(function(){
         <li><a href="api/nexusLIMS.extractors.html#module-nexusLIMS.extractors.quanta_tif">module</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li>
     nexusLIMS.extractors.thumbnail_generator
 
       <ul>
         <li><a href="api/nexusLIMS.extractors.html#module-nexusLIMS.extractors.thumbnail_generator">module</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li>
+    nexusLIMS.extractors.utils
+
+      <ul>
+        <li><a href="api/nexusLIMS.extractors.html#module-nexusLIMS.extractors.utils">module</a>
 </li>
       </ul></li>
       <li>
@@ -570,7 +624,35 @@ $(document).ready(function(){
     nexusLIMS.harvesters.nemo
 
       <ul>
-        <li><a href="api/nexusLIMS.harvesters.html#module-nexusLIMS.harvesters.nemo">module</a>
+        <li><a href="api/nexusLIMS.harvesters.nemo.html#module-nexusLIMS.harvesters.nemo">module</a>
+</li>
+      </ul></li>
+      <li>
+    nexusLIMS.harvesters.nemo.connector
+
+      <ul>
+        <li><a href="api/nexusLIMS.harvesters.nemo.html#module-nexusLIMS.harvesters.nemo.connector">module</a>
+</li>
+      </ul></li>
+      <li>
+    nexusLIMS.harvesters.nemo.exceptions
+
+      <ul>
+        <li><a href="api/nexusLIMS.harvesters.nemo.html#module-nexusLIMS.harvesters.nemo.exceptions">module</a>
+</li>
+      </ul></li>
+      <li>
+    nexusLIMS.harvesters.nemo.utils
+
+      <ul>
+        <li><a href="api/nexusLIMS.harvesters.nemo.html#module-nexusLIMS.harvesters.nemo.utils">module</a>
+</li>
+      </ul></li>
+      <li>
+    nexusLIMS.harvesters.reservation_event
+
+      <ul>
+        <li><a href="api/nexusLIMS.harvesters.html#module-nexusLIMS.harvesters.reservation_event">module</a>
 </li>
       </ul></li>
       <li>
@@ -615,9 +697,9 @@ $(document).ready(function(){
         <li><a href="api/nexusLIMS.html#module-nexusLIMS.version">module</a>
 </li>
       </ul></li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NoDataConsentException">NoDataConsentException</a>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.exceptions.NoDataConsentError">NoDataConsentError</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NoMatchingReservationException">NoMatchingReservationException</a>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.exceptions.NoMatchingReservationError">NoMatchingReservationError</a>
 </li>
   </ul></td>
 </tr></table>
@@ -633,6 +715,8 @@ $(document).ready(function(){
 </li>
       <li><a href="api/nexusLIMS.extractors.html#nexusLIMS.extractors.fei_emi.parse_acquire_info">parse_acquire_info() (in module nexusLIMS.extractors.fei_emi)</a>
 </li>
+      <li><a href="api/nexusLIMS.extractors.html#nexusLIMS.extractors.fei_emi.parse_basic_info">parse_basic_info() (in module nexusLIMS.extractors.fei_emi)</a>
+</li>
       <li><a href="api/nexusLIMS.extractors.html#nexusLIMS.extractors.quanta_tif.parse_beam_info">parse_beam_info() (in module nexusLIMS.extractors.quanta_tif)</a>
 </li>
       <li><a href="api/nexusLIMS.extractors.html#nexusLIMS.extractors.fei_emi.parse_data_type">parse_data_type() (in module nexusLIMS.extractors.fei_emi)</a>
@@ -647,11 +731,13 @@ $(document).ready(function(){
 </li>
       <li><a href="api/nexusLIMS.extractors.html#nexusLIMS.extractors.digital_micrograph.parse_dm3_spectrum_image_info">parse_dm3_spectrum_image_info() (in module nexusLIMS.extractors.digital_micrograph)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/nexusLIMS.extractors.html#nexusLIMS.extractors.fei_emi.parse_experimental_conditions">parse_experimental_conditions() (in module nexusLIMS.extractors.fei_emi)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/nexusLIMS.extractors.html#nexusLIMS.extractors.fei_emi.parse_experimental_description">parse_experimental_description() (in module nexusLIMS.extractors.fei_emi)</a>
+</li>
+      <li><a href="api/nexusLIMS.extractors.html#nexusLIMS.extractors.quanta_tif.parse_image_info">parse_image_info() (in module nexusLIMS.extractors.quanta_tif)</a>
 </li>
       <li><a href="api/nexusLIMS.extractors.html#nexusLIMS.extractors.parse_metadata">parse_metadata() (in module nexusLIMS.extractors)</a>
 </li>
@@ -663,15 +749,17 @@ $(document).ready(function(){
 </li>
       <li><a href="api/nexusLIMS.builder.html#nexusLIMS.builder.record_builder.process_new_records">process_new_records() (in module nexusLIMS.builder.record_builder)</a>
 </li>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.utils.process_res_question_samples">process_res_question_samples() (in module nexusLIMS.harvesters.nemo.utils)</a>
+</li>
       <li><a href="api/nexusLIMS.extractors.html#nexusLIMS.extractors.digital_micrograph.process_tecnai_microscope_info">process_tecnai_microscope_info() (in module nexusLIMS.extractors.digital_micrograph)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.project_id">project_id (nexusLIMS.harvesters.ReservationEvent attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent.project_id">project_id (nexusLIMS.harvesters.reservation_event.ReservationEvent attribute)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.project_name">project_name (nexusLIMS.harvesters.ReservationEvent attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent.project_name">project_name (nexusLIMS.harvesters.reservation_event.ReservationEvent attribute)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.project_ref">project_ref (nexusLIMS.harvesters.ReservationEvent attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent.project_ref">project_ref (nexusLIMS.harvesters.reservation_event.ReservationEvent attribute)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.projects">projects (nexusLIMS.harvesters.nemo.NemoConnector attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.connector.NemoConnector.projects">projects (nexusLIMS.harvesters.nemo.connector.NemoConnector attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -679,7 +767,13 @@ $(document).ready(function(){
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.res_event_from_session">res_event_from_session() (in module nexusLIMS.harvesters.nemo)</a>
+      <li><a href="api/nexusLIMS.html#nexusLIMS.utils.remove_dict_nones">remove_dict_nones() (in module nexusLIMS.utils)</a>
+</li>
+      <li><a href="api/nexusLIMS.html#nexusLIMS.utils.remove_dtb_element">remove_dtb_element() (in module nexusLIMS.utils)</a>
+</li>
+      <li><a href="api/nexusLIMS.html#nexusLIMS.utils.replace_mmf_path">replace_mmf_path() (in module nexusLIMS.utils)</a>
+</li>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.res_event_from_session">res_event_from_session() (in module nexusLIMS.harvesters.nemo)</a>
 
       <ul>
         <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.sharepoint_calendar.res_event_from_session">(in module nexusLIMS.harvesters.sharepoint_calendar)</a>
@@ -689,9 +783,9 @@ $(document).ready(function(){
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.sharepoint_calendar.res_event_from_xml">res_event_from_xml() (in module nexusLIMS.harvesters.sharepoint_calendar)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.reservation_type">reservation_type (nexusLIMS.harvesters.ReservationEvent attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent.reservation_type">reservation_type (nexusLIMS.harvesters.reservation_event.ReservationEvent attribute)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent">ReservationEvent (class in nexusLIMS.harvesters)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent">ReservationEvent (class in nexusLIMS.harvesters.reservation_event)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -699,11 +793,11 @@ $(document).ready(function(){
 <h2 id="S">S</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.sample_details">sample_details (nexusLIMS.harvesters.ReservationEvent attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent.sample_details">sample_details (nexusLIMS.harvesters.reservation_event.ReservationEvent attribute)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.sample_name">sample_name (nexusLIMS.harvesters.ReservationEvent attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent.sample_name">sample_name (nexusLIMS.harvesters.reservation_event.ReservationEvent attribute)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.sample_pid">sample_pid (nexusLIMS.harvesters.ReservationEvent attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent.sample_pid">sample_pid (nexusLIMS.harvesters.reservation_event.ReservationEvent attribute)</a>
 </li>
       <li><a href="api/nexusLIMS.db.html#nexusLIMS.db.session_handler.Session">Session (class in nexusLIMS.db.session_handler)</a>
 </li>
@@ -713,13 +807,15 @@ $(document).ready(function(){
 </li>
       <li><a href="api/nexusLIMS.html#nexusLIMS.utils.setup_loggers">setup_loggers() (in module nexusLIMS.utils)</a>
 </li>
+      <li><a href="api/nexusLIMS.extractors.html#nexusLIMS.extractors.thumbnail_generator.sig_to_thumbnail">sig_to_thumbnail() (in module nexusLIMS.extractors.thumbnail_generator)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/nexusLIMS.extractors.html#nexusLIMS.extractors.thumbnail_generator.sig_to_thumbnail">sig_to_thumbnail() (in module nexusLIMS.extractors.thumbnail_generator)</a>
+      <li><a href="api/nexusLIMS.html#nexusLIMS.utils.sort_dict">sort_dict() (in module nexusLIMS.utils)</a>
 </li>
       <li><a href="api/nexusLIMS.extractors.html#nexusLIMS.extractors.fei_emi.split_fei_metadata_units">split_fei_metadata_units() (in module nexusLIMS.extractors.fei_emi)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.start_time">start_time (nexusLIMS.harvesters.ReservationEvent attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent.start_time">start_time (nexusLIMS.harvesters.reservation_event.ReservationEvent attribute)</a>
 </li>
       <li><a href="api/nexusLIMS.schemas.html#nexusLIMS.schemas.activity.AcquisitionActivity.store_setup_params">store_setup_params() (nexusLIMS.schemas.activity.AcquisitionActivity method)</a>
 </li>
@@ -727,9 +823,9 @@ $(document).ready(function(){
 </li>
       <li><a href="api/nexusLIMS.schemas.html#nexusLIMS.schemas.activity.AcquisitionActivity.store_unique_params">store_unique_params() (nexusLIMS.schemas.activity.AcquisitionActivity method)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.strftime">strftime() (nexusLIMS.harvesters.nemo.NemoConnector method)</a>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.connector.NemoConnector.strftime">strftime() (nexusLIMS.harvesters.nemo.connector.NemoConnector method)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.strptime">strptime() (nexusLIMS.harvesters.nemo.NemoConnector method)</a>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.connector.NemoConnector.strptime">strptime() (nexusLIMS.harvesters.nemo.connector.NemoConnector method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -737,7 +833,7 @@ $(document).ready(function(){
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.tools">tools (nexusLIMS.harvesters.nemo.NemoConnector attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.connector.NemoConnector.tools">tools (nexusLIMS.harvesters.nemo.connector.NemoConnector attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -755,17 +851,17 @@ $(document).ready(function(){
 </li>
       <li><a href="api/nexusLIMS.html#nexusLIMS.cdcs.upload_record_files">upload_record_files() (in module nexusLIMS.cdcs)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.url">url (nexusLIMS.harvesters.ReservationEvent attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent.url">url (nexusLIMS.harvesters.reservation_event.ReservationEvent attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.user_full_name">user_full_name (nexusLIMS.harvesters.ReservationEvent attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent.user_full_name">user_full_name (nexusLIMS.harvesters.reservation_event.ReservationEvent attribute)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent.username">username (nexusLIMS.harvesters.ReservationEvent attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent.username">username (nexusLIMS.harvesters.reservation_event.ReservationEvent attribute)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.users">users (nexusLIMS.harvesters.nemo.NemoConnector attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.connector.NemoConnector.users">users (nexusLIMS.harvesters.nemo.connector.NemoConnector attribute)</a>
 </li>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.users_by_username">users_by_username (nexusLIMS.harvesters.nemo.NemoConnector attribute)</a>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.connector.NemoConnector.users_by_username">users_by_username (nexusLIMS.harvesters.nemo.connector.NemoConnector attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -781,7 +877,7 @@ $(document).ready(function(){
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.nemo.NemoConnector.write_usage_event_to_session_log">write_usage_event_to_session_log() (nexusLIMS.harvesters.nemo.NemoConnector method)</a>
+      <li><a href="api/nexusLIMS.harvesters.nemo.html#nexusLIMS.harvesters.nemo.connector.NemoConnector.write_usage_event_to_session_log">write_usage_event_to_session_log() (nexusLIMS.harvesters.nemo.connector.NemoConnector method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -811,8 +907,8 @@ $(document).ready(function(){
       
     </p>
     <p>
-        &copy; Copyright 2022, NIST Office of Data and Informatics.<br/>
-      Last updated on Jul, 18, 2022.<br/>
+        &copy; Copyright 2023, NIST Office of Data and Informatics.<br/>
+      Last updated on Apr, 25, 2023.<br/>
     </p>
   </div>
 </footer>

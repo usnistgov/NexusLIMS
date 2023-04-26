@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>nexusLIMS.utils &#8212; NexusLIMS 1.1.0 documentation</title>
+    <title>nexusLIMS.utils &#8212; NexusLIMS 1.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom-styles.css" />
@@ -28,19 +28,20 @@ $(document).ready(function(){
   // Mark external (non-nist.gov) A tags with class "external"
   //If the adress start with https and ends with nist.gov
   var re_nist = new RegExp('^https?:\/\/((^\/)*\.)*nist\\.gov(\/|$)');
+  var re_nist_github = new RegExp('^https:\/\/github.com\/usnistgov(\/|$)');
   //Regex to find address that start with https
   var re_absolute_address = new RegExp('^((https?:)?\/\/)');
   $("a").each(function(){
     var url=$(this).attr('href');
-    if(re_nist.test(url) || !re_absolute_address.test(url)){
-      $(this).addClass('local');
+    if(re_nist.test(url) || !re_absolute_address.test(url) || re_nist_github.test(url)){
+      $(this).addClass('leave_notice_local');
     }else{
       //This a href appears to be external, so tag it
-      $(this).addClass('external');
+      $(this).addClass('leave_notice_external');
     }
   });
   // Add leaveNotice to external A elements
-  $('a.external').leaveNotice();
+  $('a.leave_notice_external').leaveNotice();
 });
 </script>
 <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
@@ -58,7 +59,7 @@ $(document).ready(function(){
         </button>
         <a class="navbar-brand" href="../../index.html"><span><img src="../../_static/logo_horizontal.png"></span>
            </a>
-        <span class="navbar-text navbar-version pull-left"><b></b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.3.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -79,6 +80,7 @@ $(document).ready(function(){
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../database.html">NexusLIMS database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../development.html">Developer documentation</a></li>
@@ -91,7 +93,10 @@ $(document).ready(function(){
 <li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/nexusLIMS.harvesters.nemo.html">nexusLIMS.harvesters.nemo package</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
 </ul>
 </li>
@@ -143,6 +148,7 @@ $(document).ready(function(){
 <ul class="globaltoc">
     <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../database.html">NexusLIMS database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../development.html">Developer documentation</a></li>
@@ -197,65 +203,81 @@ $(document).ready(function(){
 <span class="c1">#  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,</span>
 <span class="c1">#  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.</span>
 <span class="c1">#</span>
-<span class="kn">from</span> <span class="nn">configparser</span> <span class="kn">import</span> <span class="n">ConfigParser</span> <span class="k">as</span> <span class="n">_ConfigParser</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="sd">&quot;&quot;&quot;Utility functions used in potentially multiple places by NexusLIMS.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">configparser</span> <span class="kn">import</span> <span class="n">ConfigParser</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span><span class="p">,</span> <span class="n">timedelta</span><span class="p">,</span> <span class="n">timezone</span>
+<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">getmtime</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">copyfile</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">certifi</span> <span class="k">as</span> <span class="nn">_certifi</span>
-<span class="kn">import</span> <span class="nn">tempfile</span> <span class="k">as</span> <span class="nn">_tempfile</span>
-<span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
-<span class="kn">import</span> <span class="nn">subprocess</span> <span class="k">as</span> <span class="nn">_sp</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timedelta</span> <span class="k">as</span> <span class="n">_timedelta</span>
-<span class="kn">from</span> <span class="nn">os.path</span> <span class="kn">import</span> <span class="n">getmtime</span> <span class="k">as</span> <span class="n">_getmtime</span>
-<span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
-<span class="kn">import</span> <span class="nn">sys</span> <span class="k">as</span> <span class="nn">_sys</span>
+<span class="kn">import</span> <span class="nn">certifi</span>
+<span class="kn">from</span> <span class="nn">requests</span> <span class="kn">import</span> <span class="n">Session</span>
+<span class="kn">from</span> <span class="nn">requests.adapters</span> <span class="kn">import</span> <span class="n">HTTPAdapter</span><span class="p">,</span> <span class="n">Retry</span>
+<span class="kn">from</span> <span class="nn">requests_ntlm</span> <span class="kn">import</span> <span class="n">HttpNtlmAuth</span>
 
-<span class="kn">from</span> <span class="nn">requests_ntlm</span> <span class="kn">import</span> <span class="n">HttpNtlmAuth</span> <span class="k">as</span> <span class="n">_HttpNtlmAuth</span>
+<span class="kn">from</span> <span class="nn">.harvesters</span> <span class="kn">import</span> <span class="n">CA_BUNDLE_CONTENT</span>
 
-<span class="n">_logger</span> <span class="o">=</span> <span class="n">_logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-<span class="n">_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">_logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 
 <span class="c1"># hours to add to datetime objects (hack for poole testing -- should be -2 if</span>
 <span class="c1"># running tests from Mountain Time on files in Eastern Time)</span>
-<span class="n">tz_offset</span> <span class="o">=</span> <span class="n">_timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+<span class="n">tz_offset</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">hours</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="setup_loggers"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.setup_loggers">[docs]</a><span class="k">def</span> <span class="nf">setup_loggers</span><span class="p">(</span><span class="n">log_level</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Set logging level of all NexusLIMS loggers</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set logging level of all NexusLIMS loggers.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    log_level : int</span>
 <span class="sd">        The level of logging, such as ``logging.DEBUG``</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="nb">format</span><span class="o">=</span><span class="s1">&#39;</span><span class="si">%(asctime)s</span><span class="s1"> </span><span class="si">%(name)s</span><span class="s1"> </span><span class="si">%(levelname)s</span><span class="s1">: &#39;</span>
-                                <span class="s1">&#39;</span><span class="si">%(message)s</span><span class="s1">&#39;</span><span class="p">,</span>
-                         <span class="n">level</span><span class="o">=</span><span class="n">log_level</span><span class="p">)</span>
-    <span class="n">loggers</span> <span class="o">=</span> <span class="p">[</span><span class="n">_logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">name</span><span class="p">)</span> <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span>
-               <span class="n">_logging</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">loggerDict</span> <span class="k">if</span> <span class="s1">&#39;nexusLIMS&#39;</span> <span class="ow">in</span> <span class="n">name</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">logger</span> <span class="ow">in</span> <span class="n">loggers</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">log_level</span><span class="p">)</span></div>
+    <span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span>
+        <span class="nb">format</span><span class="o">=</span><span class="s2">&quot;</span><span class="si">%(asctime)s</span><span class="s2"> </span><span class="si">%(name)s</span><span class="s2"> </span><span class="si">%(levelname)s</span><span class="s2">: </span><span class="si">%(message)s</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">level</span><span class="o">=</span><span class="n">log_level</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">loggers</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">logging</span><span class="o">.</span><span class="n">root</span><span class="o">.</span><span class="n">manager</span><span class="o">.</span><span class="n">loggerDict</span>  <span class="c1"># pylint: disable=no-member</span>
+        <span class="k">if</span> <span class="s2">&quot;nexusLIMS&quot;</span> <span class="ow">in</span> <span class="n">name</span>
+    <span class="p">]</span>
+    <span class="k">for</span> <span class="n">_logger</span> <span class="ow">in</span> <span class="n">loggers</span><span class="p">:</span>
+        <span class="n">_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">log_level</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="nexus_req"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.nexus_req">[docs]</a><span class="k">def</span> <span class="nf">nexus_req</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-              <span class="n">fn</span><span class="p">:</span> <span class="n">Callable</span><span class="p">,</span>
-              <span class="n">basic_auth</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-              <span class="n">token_auth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-              <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">]):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="nexus_req"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.nexus_req">[docs]</a><span class="k">def</span> <span class="nf">nexus_req</span><span class="p">(</span>
+    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">function</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">basic_auth</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">token_auth</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">**</span><span class="n">kwargs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">dict</span><span class="p">],</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Make a request from NexusLIMS.</span>
+
 <span class="sd">    A helper method that wraps a function from :py:mod:`requests`, but adds a</span>
-<span class="sd">    local certificate authority chain to validate the SharePoint server&#39;s</span>
-<span class="sd">    certificates and authenticates using NTLM.</span>
+<span class="sd">    local certificate authority chain to validate any custom certificates and</span>
+<span class="sd">    allow authenticatation using NTLM. Will automatically retry on 500 errors</span>
+<span class="sd">    using a strategy suggested here: https://stackoverflow.com/a/35636367.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    url</span>
 <span class="sd">        The URL to fetch</span>
-<span class="sd">    fn</span>
+<span class="sd">    function</span>
 <span class="sd">        The function from the ``requests`` library to use (e.g.</span>
-<span class="sd">        :py:func:`~requests.get`, :py:func:`~requests.put`,</span>
-<span class="sd">        :py:func:`~requests.post`, etc.)</span>
+<span class="sd">        ``&#39;GET&#39;``, ``&#39;POST&#39;``, ``&#39;PATCH&#39;``, etc.)</span>
 <span class="sd">    basic_auth</span>
 <span class="sd">        If True, use only username and password for authentication rather than</span>
 <span class="sd">        NTLM</span>
@@ -277,23 +299,30 @@ $(document).ready(function(){
 <span class="sd">        If multiple methods of authentication are provided to the function</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">basic_auth</span> <span class="ow">and</span> <span class="n">token_auth</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s1">&#39;Both `basic_auth` and `token_auth` were provided. &#39;</span>
-                         <span class="s1">&#39;Only one can be used at a time&#39;</span><span class="p">)</span>
-
-    <span class="kn">from</span> <span class="nn">.harvesters</span> <span class="kn">import</span> <span class="n">CA_BUNDLE_CONTENT</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;Both `basic_auth` and `token_auth` were provided. &quot;</span>
+            <span class="s2">&quot;Only one can be used at a time&quot;</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
     <span class="c1"># if token_auth is desired, add it to any existing headers passed along</span>
     <span class="c1"># with the request</span>
     <span class="k">if</span> <span class="n">token_auth</span><span class="p">:</span>
-        <span class="k">if</span> <span class="s1">&#39;headers&#39;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;headers&#39;</span><span class="p">][</span><span class="s1">&#39;Authorization&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Token </span><span class="si">{</span><span class="n">token_auth</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">if</span> <span class="s2">&quot;headers&quot;</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="p">:</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;headers&quot;</span><span class="p">][</span><span class="s2">&quot;Authorization&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Token </span><span class="si">{</span><span class="n">token_auth</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">kwargs</span><span class="p">[</span><span class="s1">&#39;headers&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;Authorization&#39;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Token </span><span class="si">{</span><span class="n">token_auth</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+            <span class="n">kwargs</span><span class="p">[</span><span class="s2">&quot;headers&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;Authorization&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;Token </span><span class="si">{</span><span class="n">token_auth</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">}</span>
+
+    <span class="c1"># set up a session to retry requests as needed</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">Session</span><span class="p">()</span>
+    <span class="n">retries</span> <span class="o">=</span> <span class="n">Retry</span><span class="p">(</span><span class="n">total</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">backoff_factor</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">status_forcelist</span><span class="o">=</span><span class="p">[</span><span class="mi">502</span><span class="p">,</span> <span class="mi">503</span><span class="p">,</span> <span class="mi">504</span><span class="p">])</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span><span class="s2">&quot;https://&quot;</span><span class="p">,</span> <span class="n">HTTPAdapter</span><span class="p">(</span><span class="n">max_retries</span><span class="o">=</span><span class="n">retries</span><span class="p">))</span>
+    <span class="n">s</span><span class="o">.</span><span class="n">mount</span><span class="p">(</span><span class="s2">&quot;http://&quot;</span><span class="p">,</span> <span class="n">HTTPAdapter</span><span class="p">(</span><span class="n">max_retries</span><span class="o">=</span><span class="n">retries</span><span class="p">))</span>
 
     <span class="n">verify_arg</span> <span class="o">=</span> <span class="kc">True</span>
-    <span class="k">with</span> <span class="n">_tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">()</span> <span class="k">as</span> <span class="n">tmp</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">CA_BUNDLE_CONTENT</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">_certifi</span><span class="o">.</span><span class="n">where</span><span class="p">(),</span> <span class="s1">&#39;rb&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">sys_cert</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">Path</span><span class="p">(</span><span class="n">certifi</span><span class="o">.</span><span class="n">where</span><span class="p">())</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">sys_cert</span><span class="p">:</span>
                 <span class="n">lines</span> <span class="o">=</span> <span class="n">sys_cert</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
             <span class="n">tmp</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span>
             <span class="n">tmp</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="n">CA_BUNDLE_CONTENT</span><span class="p">)</span>
@@ -301,26 +330,34 @@ $(document).ready(function(){
             <span class="n">verify_arg</span> <span class="o">=</span> <span class="n">tmp</span><span class="o">.</span><span class="n">name</span>
 
         <span class="k">if</span> <span class="n">token_auth</span><span class="p">:</span>
-            <span class="n">r</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="n">verify_arg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">request</span><span class="p">(</span><span class="n">function</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">verify</span><span class="o">=</span><span class="n">verify_arg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">r</span> <span class="o">=</span> <span class="n">fn</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">auth</span><span class="o">=</span><span class="n">get_auth</span><span class="p">(</span><span class="n">basic</span><span class="o">=</span><span class="n">basic_auth</span><span class="p">),</span> <span class="n">verify</span><span class="o">=</span><span class="n">verify_arg</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">request</span><span class="p">(</span>
+                <span class="n">function</span><span class="p">,</span>
+                <span class="n">url</span><span class="p">,</span>
+                <span class="n">auth</span><span class="o">=</span><span class="n">get_auth</span><span class="p">(</span><span class="n">basic</span><span class="o">=</span><span class="n">basic_auth</span><span class="p">),</span>
+                <span class="n">verify</span><span class="o">=</span><span class="n">verify_arg</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">r</span></div>
+    <span class="k">return</span> <span class="n">response</span></div>
 
 
-<div class="viewcode-block" id="is_subpath"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.is_subpath">[docs]</a><span class="k">def</span> <span class="nf">is_subpath</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">of_paths</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="is_subpath"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.is_subpath">[docs]</a><span class="k">def</span> <span class="nf">is_subpath</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">of_paths</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return if this path is a subpath of other paths.</span>
+
 <span class="sd">    Helper function to determine if a given path is a &quot;subpath&quot; of a set of</span>
 <span class="sd">    paths. Useful to help determine which instrument a given file comes from,</span>
 <span class="sd">    given the instruments ``filestore_path`` and the path of the file to test.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    path : str</span>
+<span class="sd">    path</span>
 <span class="sd">        The path of the file (or directory) to test. This will usually be the</span>
 <span class="sd">        absolute path to a file on the local filesystem (to be compared using</span>
 <span class="sd">        the host-specific ``mmf_nexus_root_path``.</span>
-<span class="sd">    of_paths : str or list</span>
+<span class="sd">    of_paths</span>
 <span class="sd">        The &quot;higher-level&quot; path to test against (or list thereof). In typical</span>
 <span class="sd">        use, this will be a path joined of an instruments ``filestore_path``</span>
 <span class="sd">        with the root-level ``mmf_nexus_root_path``</span>
@@ -332,26 +369,24 @@ $(document).ready(function(){
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; is_subpath(&#39;/path/to/file.dm3&#39;,</span>
-<span class="sd">    ...            os.path.join(os.environ[&#39;mmfnexus_path&#39;],</span>
-<span class="sd">    ...                         titan.filestore_path))</span>
+<span class="sd">    &gt;&gt;&gt; is_subpath(Path(&#39;/path/to/file.dm3&#39;),</span>
+<span class="sd">    ...            Path(os.environ[&#39;mmfnexus_path&#39;] /</span>
+<span class="sd">    ...                 titan.filestore_path))</span>
 <span class="sd">    True</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">of_paths</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">of_paths</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
         <span class="n">of_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">of_paths</span><span class="p">]</span>
-    <span class="n">abs_of_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">of_path</span><span class="p">)</span> <span class="k">for</span> <span class="n">of_path</span> <span class="ow">in</span> <span class="n">of_paths</span><span class="p">]</span>
 
-    <span class="n">result</span> <span class="o">=</span> <span class="nb">any</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="n">subpath</span><span class="p">)</span>
-                 <span class="k">for</span> <span class="n">subpath</span> <span class="ow">in</span> <span class="n">abs_of_paths</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">result</span></div>
+    <span class="k">return</span> <span class="nb">any</span><span class="p">(</span><span class="n">subpath</span> <span class="ow">in</span> <span class="n">path</span><span class="o">.</span><span class="n">parents</span> <span class="k">for</span> <span class="n">subpath</span> <span class="ow">in</span> <span class="n">of_paths</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="get_nested_dict_value"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.get_nested_dict_value">[docs]</a><span class="k">def</span> <span class="nf">get_nested_dict_value</span><span class="p">(</span><span class="n">nested_dict</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">prepath</span><span class="o">=</span><span class="p">()):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a value from nested dictionaries.</span>
+
 <span class="sd">    Use a recursive method to find a value in a dictionary of dictionaries</span>
 <span class="sd">    (such as the metadata dictionaries we receive from the file parsers).</span>
-<span class="sd">    Cribbed from: https://stackoverflow.com/a/22171182/1435788</span>
+<span class="sd">    Cribbed from: https://stackoverflow.com/a/22171182/1435788.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -370,20 +405,23 @@ $(document).ready(function(){
 <span class="sd">        value was found. If None, the value was not found in the dictionary.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">nested_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">path</span> <span class="o">=</span> <span class="n">prepath</span> <span class="o">+</span> <span class="p">(</span><span class="n">k</span><span class="p">,)</span>
-        <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="n">value</span><span class="p">:</span>                                   <span class="c1"># found value</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">prepath</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="o">==</span> <span class="n">value</span><span class="p">:</span>  <span class="c1"># found value</span>
             <span class="k">return</span> <span class="n">path</span>
-        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">):</span>                        <span class="c1"># v is a dict</span>
-            <span class="n">p</span> <span class="o">=</span> <span class="n">get_nested_dict_value</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>    <span class="c1"># recursive call</span>
-            <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">p</span></div>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s2">&quot;items&quot;</span><span class="p">):</span>  <span class="c1"># v is a dict</span>
+            <span class="n">dict_val</span> <span class="o">=</span> <span class="n">get_nested_dict_value</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>  <span class="c1"># recursive call</span>
+            <span class="k">if</span> <span class="n">dict_val</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">dict_val</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="get_nested_dict_key"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.get_nested_dict_key">[docs]</a><span class="k">def</span> <span class="nf">get_nested_dict_key</span><span class="p">(</span><span class="n">nested_dict</span><span class="p">,</span> <span class="n">key_to_find</span><span class="p">,</span> <span class="n">prepath</span><span class="o">=</span><span class="p">()):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a key from nested dictionaries.</span>
+
 <span class="sd">    Use a recursive method to find a key in a dictionary of dictionaries</span>
 <span class="sd">    (such as the metadata dictionaries we receive from the file parsers).</span>
-<span class="sd">    Cribbed from: https://stackoverflow.com/a/22171182/1435788</span>
+<span class="sd">    Cribbed from: https://stackoverflow.com/a/22171182/1435788.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -402,19 +440,22 @@ $(document).ready(function(){
 <span class="sd">        value was found. If None, the value was not found in the dictionary.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">nested_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-        <span class="n">path</span> <span class="o">=</span> <span class="n">prepath</span> <span class="o">+</span> <span class="p">(</span><span class="n">k</span><span class="p">,)</span>
-        <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="n">key_to_find</span><span class="p">:</span>                                 <span class="c1"># found key</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="p">(</span><span class="o">*</span><span class="n">prepath</span><span class="p">,</span> <span class="n">k</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">k</span> <span class="o">==</span> <span class="n">key_to_find</span><span class="p">:</span>  <span class="c1"># found key</span>
             <span class="k">return</span> <span class="n">path</span>
-        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s1">&#39;items&#39;</span><span class="p">):</span>                            <span class="c1"># v is a dict</span>
-            <span class="n">p</span> <span class="o">=</span> <span class="n">get_nested_dict_key</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">key_to_find</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>    <span class="c1"># recursive call</span>
-            <span class="k">if</span> <span class="n">p</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="k">return</span> <span class="n">p</span></div>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="s2">&quot;items&quot;</span><span class="p">):</span>  <span class="c1"># v is a dict</span>
+            <span class="n">dict_key</span> <span class="o">=</span> <span class="n">get_nested_dict_key</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="n">key_to_find</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>  <span class="c1"># recursive call</span>
+            <span class="k">if</span> <span class="n">dict_key</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">dict_key</span>
+    <span class="k">return</span> <span class="kc">None</span></div>
 
 
 <div class="viewcode-block" id="get_nested_dict_value_by_path"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.get_nested_dict_value_by_path">[docs]</a><span class="k">def</span> <span class="nf">get_nested_dict_value_by_path</span><span class="p">(</span><span class="n">nest_dict</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a nested dictionary value by path.</span>
+
 <span class="sd">    Get the value from within a nested dictionary structure by traversing into</span>
-<span class="sd">    the dictionary as deep as that path found and returning that value</span>
+<span class="sd">    the dictionary as deep as that path found and returning that value.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -432,19 +473,18 @@ $(document).ready(function(){
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">sub_dict</span> <span class="o">=</span> <span class="n">nest_dict</span>
     <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">sub_dict</span><span class="p">:</span>
-            <span class="n">sub_dict</span> <span class="o">=</span> <span class="n">sub_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">sub_dict</span> <span class="o">=</span> <span class="s1">&#39;not found&#39;</span>
+        <span class="n">sub_dict</span> <span class="o">=</span> <span class="n">sub_dict</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">sub_dict</span> <span class="k">else</span> <span class="s2">&quot;not found&quot;</span>
 
     <span class="k">return</span> <span class="n">sub_dict</span></div>
 
 
 <div class="viewcode-block" id="set_nested_dict_value"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.set_nested_dict_value">[docs]</a><span class="k">def</span> <span class="nf">set_nested_dict_value</span><span class="p">(</span><span class="n">nest_dict</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set a nested dictionary value by path.</span>
+
 <span class="sd">    Set a value within a nested dictionary structure by traversing into</span>
 <span class="sd">    the dictionary as deep as that path found and changing it to `value`.</span>
-<span class="sd">    Cribbed from https://stackoverflow.com/a/13688108/1435788</span>
+<span class="sd">    Cribbed from https://stackoverflow.com/a/13688108/1435788.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -466,14 +506,16 @@ $(document).ready(function(){
     <span class="n">nest_dict</span><span class="p">[</span><span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]]</span> <span class="o">=</span> <span class="n">value</span></div>
 
 
-<div class="viewcode-block" id="try_getting_dict_value"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.try_getting_dict_value">[docs]</a><span class="k">def</span> <span class="nf">try_getting_dict_value</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="try_getting_dict_value"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.try_getting_dict_value">[docs]</a><span class="k">def</span> <span class="nf">try_getting_dict_value</span><span class="p">(</span><span class="n">dict_</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Try to get a nested dictionary value.</span>
+
 <span class="sd">    This method will try to get a value from a dictionary (potentially</span>
 <span class="sd">    nested) and fail silently if the value is not found, returning None.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    d : dict</span>
+<span class="sd">    dict_ : dict</span>
 <span class="sd">        The dictionary from which to get a value</span>
 <span class="sd">    key : str or tuple</span>
 <span class="sd">        The key to query, or if an iterable container type (tuple, list,</span>
@@ -488,20 +530,28 @@ $(document).ready(function(){
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">d</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
-        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">get_nested_dict_value_by_path</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
-    <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">return</span> <span class="s1">&#39;not found&#39;</span></div>
+            <span class="k">return</span> <span class="n">dict_</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="s2">&quot;__iter__&quot;</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">get_nested_dict_value_by_path</span><span class="p">(</span><span class="n">dict_</span><span class="p">,</span> <span class="n">key</span><span class="p">)</span>
+        <span class="c1"># we shouldn&#39;t reach this line, but always good to return a consistent</span>
+        <span class="c1"># value just in case</span>
+        <span class="k">return</span> <span class="s2">&quot;not found&quot;</span>  <span class="c1"># pragma: no cover # noqa: TRY300</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+        <span class="k">return</span> <span class="s2">&quot;not found&quot;</span></div>
 
 
-<div class="viewcode-block" id="find_dirs_by_mtime"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.find_dirs_by_mtime">[docs]</a><span class="k">def</span> <span class="nf">find_dirs_by_mtime</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> 
-                       <span class="n">dt_from</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
-                       <span class="n">dt_to</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
-                       <span class="n">followlinks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="find_dirs_by_mtime"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.find_dirs_by_mtime">[docs]</a><span class="k">def</span> <span class="nf">find_dirs_by_mtime</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">dt_from</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
+    <span class="n">dt_to</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">followlinks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find directories modified between two times.</span>
+
 <span class="sd">    Given two timestamps, find the directories under a path that were</span>
-<span class="sd">    last modified between the two</span>
+<span class="sd">    last modified between the two.</span>
 
 <span class="sd">    .. deprecated:: 0.0.9</span>
 <span class="sd">          `find_dirs_by_mtime` is not recommended for use to find files for</span>
@@ -525,35 +575,41 @@ $(document).ready(function(){
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    dirs : list</span>
-<span class="sd">        A list of the directories that have modification times within the time range provided</span>
+<span class="sd">        A list of the directories that have modification times within the</span>
+<span class="sd">        time range provided</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">dirs</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="c1"># adjust the datetime objects with the tz_offset (usually should be 0) if</span>
     <span class="c1"># they are naive</span>
     <span class="k">if</span> <span class="n">dt_from</span><span class="o">.</span><span class="n">tzinfo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">dt_from</span> <span class="o">+=</span> <span class="n">tz_offset</span>
+        <span class="n">dt_from</span> <span class="o">+=</span> <span class="n">tz_offset</span>  <span class="c1"># pragma: no cover</span>
     <span class="k">if</span> <span class="n">dt_to</span><span class="o">.</span><span class="n">tzinfo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">dt_to</span> <span class="o">+=</span> <span class="n">tz_offset</span>
+        <span class="n">dt_to</span> <span class="o">+=</span> <span class="n">tz_offset</span>  <span class="c1"># pragma: no cover</span>
 
     <span class="c1"># use os.walk and only inspect the directories for mtime (much fewer</span>
     <span class="c1"># comparisons than looking at every file):</span>
-    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Finding directories modified between </span><span class="si">{</span><span class="n">dt_from</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s1"> &#39;</span>
-                 <span class="sa">f</span><span class="s1">&#39;and </span><span class="si">{</span><span class="n">dt_to</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">dirpath</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">_os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">followlinks</span><span class="o">=</span><span class="n">followlinks</span><span class="p">):</span>
-        <span class="k">if</span> <span class="n">dt_from</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">_getmtime</span><span class="p">(</span><span class="n">dirpath</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">dt_to</span><span class="o">.</span><span class="n">timestamp</span><span class="p">():</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s2">&quot;Finding directories modified between </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">dt_from</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+        <span class="n">dt_to</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">dirpath</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">followlinks</span><span class="o">=</span><span class="n">followlinks</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">dt_from</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">getmtime</span><span class="p">(</span><span class="n">dirpath</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">dt_to</span><span class="o">.</span><span class="n">timestamp</span><span class="p">():</span>
             <span class="n">dirs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">dirpath</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">dirs</span></div>
 
 
-<div class="viewcode-block" id="find_files_by_mtime"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.find_files_by_mtime">[docs]</a><span class="k">def</span> <span class="nf">find_files_by_mtime</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">dt_from</span><span class="p">,</span> <span class="n">dt_to</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="find_files_by_mtime"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.find_files_by_mtime">[docs]</a><span class="k">def</span> <span class="nf">find_files_by_mtime</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">dt_from</span><span class="p">,</span> <span class="n">dt_to</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>  <span class="c1"># pragma: no cover</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find files motified between two times.</span>
+
 <span class="sd">    Given two timestamps, find files under a path that were</span>
 <span class="sd">    last modified between the two.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    path : str</span>
+<span class="sd">    path</span>
 <span class="sd">        The root path from which to start the search</span>
 <span class="sd">    dt_from : datetime.datetime</span>
 <span class="sd">        The &quot;starting&quot; point of the search timeframe</span>
@@ -566,10 +622,16 @@ $(document).ready(function(){
 <span class="sd">        A list of the files that have modification times within the</span>
 <span class="sd">        time range provided (sorted by modification time)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+        <span class="s2">&quot;find_files_by_mtime has been deprecated in v1.2.0 and is &quot;</span>
+        <span class="s2">&quot;no longer tested or supported. Please use &quot;</span>
+        <span class="s2">&quot;gnu_find_files_by_mtime() instead&quot;</span><span class="p">,</span>
+        <span class="ne">DeprecationWarning</span><span class="p">,</span>
+        <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="c1"># find only the directories that have been modified between these two</span>
     <span class="c1"># timestamps (should be much faster than inspecting all files)</span>
     <span class="c1"># Note: this doesn&#39;t work reliably, so just look in entire path...</span>
-    <span class="c1"># dirs = find_dirs_by_mtime(path, dt_from, dt_to)</span>
 
     <span class="n">dirs</span> <span class="o">=</span> <span class="p">[</span><span class="n">path</span><span class="p">]</span>
 
@@ -580,25 +642,34 @@ $(document).ready(function(){
     <span class="k">if</span> <span class="n">dt_to</span><span class="o">.</span><span class="n">tzinfo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">dt_to</span> <span class="o">+=</span> <span class="n">tz_offset</span>
 
-    <span class="n">files</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>    <span class="c1"># use a set here (faster and we won&#39;t have duplicates)</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>  <span class="c1"># use a set here (faster and we won&#39;t have duplicates)</span>
     <span class="c1"># for each of those directories, walk the file tree and inspect the</span>
     <span class="c1"># actual files:</span>
-    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">dirs</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">dirpath</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">filenames</span> <span class="ow">in</span> <span class="n">_os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">d</span><span class="p">,</span> <span class="n">followlinks</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">directory</span> <span class="ow">in</span> <span class="n">dirs</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">dirpath</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">filenames</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">followlinks</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
             <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">:</span>
-                <span class="n">fname</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirpath</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span>
-                <span class="k">if</span> <span class="n">dt_from</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">_getmtime</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">dt_to</span><span class="o">.</span><span class="n">timestamp</span><span class="p">():</span>
+                <span class="n">fname</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">dirpath</span><span class="p">)</span> <span class="o">/</span> <span class="n">f</span>
+                <span class="k">if</span> <span class="n">dt_from</span><span class="o">.</span><span class="n">timestamp</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">getmtime</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">dt_to</span><span class="o">.</span><span class="n">timestamp</span><span class="p">():</span>
                     <span class="n">files</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
 
     <span class="c1"># convert the set to a list and sort my mtime</span>
     <span class="n">files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
-    <span class="n">files</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">_getmtime</span><span class="p">)</span>
+    <span class="n">files</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">getmtime</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">files</span></div>
 
 
-<div class="viewcode-block" id="gnu_find_files_by_mtime"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.gnu_find_files_by_mtime">[docs]</a><span class="k">def</span> <span class="nf">gnu_find_files_by_mtime</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">dt_from</span><span class="p">,</span> <span class="n">dt_to</span><span class="p">,</span> <span class="n">extensions</span><span class="p">,</span> <span class="n">followlinks</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="gnu_find_files_by_mtime"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.gnu_find_files_by_mtime">[docs]</a><span class="k">def</span> <span class="nf">gnu_find_files_by_mtime</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">dt_from</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
+    <span class="n">dt_to</span><span class="p">:</span> <span class="n">datetime</span><span class="p">,</span>
+    <span class="n">extensions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">followlinks</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find files modified between two times.</span>
+
 <span class="sd">    Given two timestamps, find files under a path that were</span>
 <span class="sd">    last modified between the two. Uses the system-provided GNU ``find``</span>
 <span class="sd">    command. In basic testing, this method was found to be approximately 3 times</span>
@@ -607,20 +678,21 @@ $(document).ready(function(){
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    path : str</span>
+<span class="sd">    path</span>
 <span class="sd">        The root path from which to start the search, relative to</span>
 <span class="sd">        the :ref:`mmfnexus_path &lt;mmfnexus-path&gt;` environment setting.</span>
-<span class="sd">    dt_from : datetime.datetime</span>
+<span class="sd">    dt_from</span>
 <span class="sd">        The &quot;starting&quot; point of the search timeframe</span>
-<span class="sd">    dt_to : datetime.datetime</span>
+<span class="sd">    dt_to</span>
 <span class="sd">        The &quot;ending&quot; point of the search timeframe</span>
-<span class="sd">    extensions : :obj:`list` of :obj:`str`</span>
-<span class="sd">        A list of strings representing the extensions to find</span>
-<span class="sd">    followlinks : bool</span>
-<span class="sd">        Whether to follow symlinks using the ``find`` command via </span>
-<span class="sd">        the ``-H`` command line flag. This is useful when the </span>
+<span class="sd">    extensions</span>
+<span class="sd">        A list of strings representing the extensions to find. If None,</span>
+<span class="sd">        all files between are found between the two times.</span>
+<span class="sd">    followlinks</span>
+<span class="sd">        Whether to follow symlinks using the ``find`` command via</span>
+<span class="sd">        the ``-H`` command line flag. This is useful when the</span>
 <span class="sd">        :ref:`mmfnexus_path &lt;mmfnexus-path&gt;` is actually a directory</span>
-<span class="sd">        of symlinks. If this is the case and ``followlinks`` is </span>
+<span class="sd">        of symlinks. If this is the case and ``followlinks`` is</span>
 <span class="sd">        ``False``, no files will ever be found because the ``find``</span>
 <span class="sd">        command will not &quot;dereference&quot; the symbolic links it finds.</span>
 <span class="sd">        See comments in the code for more comments on implementation</span>
@@ -628,57 +700,43 @@ $(document).ready(function(){
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    files : :obj:`list` of :obj:`str`</span>
+<span class="sd">    List[str]</span>
 <span class="sd">        A list of the files that have modification times within the</span>
 <span class="sd">        time range provided (sorted by modification time)</span>
 
 <span class="sd">    Raises</span>
 <span class="sd">    ------</span>
-<span class="sd">    NotImplementedError</span>
-<span class="sd">        If the system running this code is not Linux-based</span>
 <span class="sd">    RuntimeError</span>
 <span class="sd">        If the find command cannot be found, or running it results in output</span>
 <span class="sd">        to `stderr`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Using GNU `find` to search for files&#39;</span><span class="p">)</span>
-    <span class="c1"># Verify we&#39;re running on Linux</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">_sys</span><span class="o">.</span><span class="n">platform</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;linux&#39;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s1">&#39;gnu_find_files_by_mtime only implemented &#39;</span>
-                                  <span class="s1">&#39;for Linux&#39;</span><span class="p">)</span>
-
-    <span class="k">if</span> <span class="n">path</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;/&#39;</span><span class="p">:</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Removing trailing slash from path: &quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
-        <span class="n">path</span> <span class="o">=</span> <span class="n">path</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using GNU `find` to search for files&quot;</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_which</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
         <span class="k">def</span> <span class="nf">_is_exec</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="ow">and</span> <span class="n">_os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">_os</span><span class="o">.</span><span class="n">X_OK</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span> <span class="ow">and</span> <span class="n">os</span><span class="o">.</span><span class="n">access</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">X_OK</span><span class="p">)</span>
 
         <span class="c1"># Check to see if find command is on PATH:</span>
-        <span class="n">exec_file</span> <span class="o">=</span> <span class="n">fname</span>
-
-        <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;PATH&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">pathsep</span><span class="p">):</span>
-            <span class="n">exe_file</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">p</span><span class="p">,</span> <span class="n">exec_file</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">exe</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;PATH&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">pathsep</span><span class="p">):</span>
+            <span class="n">exe_file</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">exe</span><span class="p">)</span> <span class="o">/</span> <span class="n">fname</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">_is_exec</span><span class="p">(</span><span class="n">exe_file</span><span class="p">):</span>
                 <span class="k">return</span> <span class="n">exe_file</span>
 
         <span class="k">return</span> <span class="kc">False</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">_which</span><span class="p">(</span><span class="s1">&#39;find&#39;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s1">&#39;find command was not found on the system PATH&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">_which</span><span class="p">(</span><span class="s2">&quot;find&quot;</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;find command was not found on the system PATH&quot;</span>
+        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
     <span class="c1"># adjust the datetime objects with the tz_offset (usually should be 0) if</span>
     <span class="c1"># they are naive</span>
-    <span class="k">if</span> <span class="n">dt_from</span><span class="o">.</span><span class="n">tzinfo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">dt_from</span> <span class="o">+=</span> <span class="n">tz_offset</span>
-    <span class="k">if</span> <span class="n">dt_to</span><span class="o">.</span><span class="n">tzinfo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">dt_to</span> <span class="o">+=</span> <span class="n">tz_offset</span>
+    <span class="n">dt_from</span> <span class="o">+=</span> <span class="n">tz_offset</span> <span class="k">if</span> <span class="n">dt_from</span><span class="o">.</span><span class="n">tzinfo</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+    <span class="n">dt_to</span> <span class="o">+=</span> <span class="n">tz_offset</span> <span class="k">if</span> <span class="n">dt_to</span><span class="o">.</span><span class="n">tzinfo</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
 
     <span class="c1"># join the given path with the root storage folder</span>
-    <span class="n">find_path</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;mmfnexus_path&quot;</span><span class="p">],</span> <span class="n">path</span><span class="p">)</span>
+    <span class="n">find_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;mmfnexus_path&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="n">path</span>
 
-    
-    <span class="c1"># if &quot;followlinks&quot; is provided, the &quot;find&quot; command is split into two parts; </span>
+    <span class="c1"># if &quot;followlinks&quot; is provided, the &quot;find&quot; command is split into two parts;</span>
     <span class="c1"># This code is to support when `mmfnexus_path` is a directory of symbolic links</span>
     <span class="c1"># to instrument storage locations, rather than actual directories</span>
 
@@ -691,73 +749,95 @@ $(document).ready(function(){
     <span class="c1"># First, we search from the root path for any symbolic links that point</span>
     <span class="c1"># to directories; If the root path is a (relatively) small directory consisting</span>
     <span class="c1"># of mostly symbolic links, this operation should be very fast.</span>
- 
+
     <span class="c1"># Based off the results of the first search, we then use &quot;find&quot; with the</span>
     <span class="c1"># &quot;-H&quot; flag to dereference only the paths provided as a command line option</span>
-    <span class="c1"># for &quot;find&quot;. We assume in this implementation there will not be symlinks </span>
+    <span class="c1"># for &quot;find&quot;. We assume in this implementation there will not be symlinks</span>
     <span class="c1"># in the instrument data folders themselves. This method further assumes that</span>
-    <span class="c1"># the folder specified by &quot;path&quot; is either a symlink itself, or a directory </span>
+    <span class="c1"># the folder specified by &quot;path&quot; is either a symlink itself, or a directory</span>
     <span class="c1"># containing one or more symlinks. It _should_ still work if this is not the</span>
     <span class="c1"># case, but may be slower, since it will run two &quot;find&quot; commands over the whole</span>
     <span class="c1"># directory tree in that case.</span>
     <span class="k">if</span> <span class="n">followlinks</span><span class="p">:</span>
-        <span class="n">find_path</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;mmfnexus_path&quot;</span><span class="p">],</span> <span class="n">path</span><span class="p">)</span>
-        <span class="n">cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;find </span><span class="si">{</span><span class="n">find_path</span><span class="si">}</span><span class="s1"> -type l -xtype d -print0&#39;</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Running followlinks find via subprocess: &quot;</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">_sp</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">stdin</span><span class="o">=</span><span class="n">_sp</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">_sp</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">_sp</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
-        <span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="p">)</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
-        <span class="n">paths</span> <span class="o">=</span> <span class="n">stdout</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
-        <span class="n">paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">paths</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Found the following symlinks: &quot;</span><span class="si">{</span><span class="n">paths</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
+        <span class="n">find_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;mmfnexus_path&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="n">path</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;find&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">find_path</span><span class="p">),</span> <span class="s2">&quot;-type&quot;</span><span class="p">,</span> <span class="s2">&quot;l&quot;</span><span class="p">,</span> <span class="s2">&quot;-xtype&quot;</span><span class="p">,</span> <span class="s2">&quot;d&quot;</span><span class="p">,</span> <span class="s2">&quot;-print0&quot;</span><span class="p">]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running followlinks find via subprocess.run: &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
+        <span class="n">out</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">out</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Found the following symlinks: &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span><span class="p">,</span> <span class="n">paths</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">paths</span><span class="p">:</span>
-            <span class="n">find_path</span> <span class="o">=</span> <span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="sa">f</span><span class="s1">&#39;&quot;</span><span class="si">{</span><span class="n">p</span><span class="si">}</span><span class="s1">&quot;&#39;</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">])</span>
-            <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;find_path is: &#39;</span><span class="si">{</span><span class="n">find_path</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+            <span class="n">find_path</span> <span class="o">=</span> <span class="n">paths</span>  <span class="c1"># make find_path a list of str here for later use</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;find_path is: &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">find_path</span><span class="p">)</span>
+
+    <span class="c1"># check if find_path is a Path and convert it to list if so:</span>
+    <span class="n">find_path</span> <span class="o">=</span> <span class="p">[</span><span class="n">find_path</span><span class="p">]</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">find_path</span><span class="p">,</span> <span class="n">Path</span><span class="p">)</span> <span class="k">else</span> <span class="n">find_path</span>
 
     <span class="c1"># Actually run find command (ignoring mib files if specified by</span>
     <span class="c1"># environment variable):</span>
-    <span class="n">filetype_regex</span> <span class="o">=</span> <span class="s1">&#39;|&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">extensions</span><span class="p">)</span>
 
-    <span class="n">cmd</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;find &#39;</span> <span class="o">+</span> \
-          <span class="p">(</span><span class="s1">&#39;-H &#39;</span> <span class="k">if</span> <span class="n">followlinks</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">+</span> \
-          <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">find_path</span><span class="si">}</span><span class="s1"> &#39;</span> <span class="o">+</span> \
-          <span class="sa">f</span><span class="s1">&#39;-type f &#39;</span> <span class="o">+</span> \
-          <span class="sa">f</span><span class="s1">&#39;-regextype posix-egrep &#39;</span> <span class="o">+</span> \
-          <span class="sa">f</span><span class="s1">&#39;-regex &quot;.*</span><span class="se">\\</span><span class="s1">.(</span><span class="si">{</span><span class="n">filetype_regex</span><span class="si">}</span><span class="s1">)$&quot; &#39;</span> <span class="o">+</span> \
-          <span class="sa">f</span><span class="s1">&#39;-newermt &quot;</span><span class="si">{</span><span class="n">dt_from</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s1">&quot; &#39;</span> <span class="o">+</span> \
-          <span class="sa">f</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">! -newermt &quot;</span><span class="si">{</span><span class="n">dt_to</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s1">&quot; &#39;</span> <span class="o">+</span> \
-          <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="se">\\</span><span class="s1">! -name &quot;*.mib&quot; &#39;</span> <span class="k">if</span> <span class="s1">&#39;ignore_mib&#39;</span> <span class="ow">in</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">+</span> \
-          <span class="sa">f</span><span class="s1">&#39;-print0&#39;</span>
+    <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;find&quot;</span><span class="p">,</span> <span class="s2">&quot;-H&quot;</span> <span class="k">if</span> <span class="n">followlinks</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">]</span>
+    <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">find_path</span><span class="p">]</span>
+    <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span>
+        <span class="s2">&quot;-type&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;f&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-newermt&quot;</span><span class="p">,</span>
+        <span class="n">dt_from</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+        <span class="s2">&quot;-not&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;-newermt&quot;</span><span class="p">,</span>
+        <span class="n">dt_to</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+    <span class="p">]</span>
 
-    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Running via subprocess: &quot;</span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="s1">&quot;&#39;</span><span class="p">)</span>
-    <span class="n">out</span> <span class="o">=</span> <span class="n">_sp</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                    <span class="n">stdin</span><span class="o">=</span><span class="n">_sp</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">_sp</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">_sp</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+    <span class="c1"># add extensions as -iname patterns to find arguments</span>
+    <span class="k">if</span> <span class="n">extensions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;(&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">ext</span> <span class="ow">in</span> <span class="n">extensions</span><span class="p">:</span>
+            <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;-iname&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;*.</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;-o&quot;</span><span class="p">]</span>
+        <span class="n">cmd</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+        <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;)&quot;</span><span class="p">]</span>
 
-    <span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="p">)</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+    <span class="c1"># if we need to ignore patterns, add them as an &quot;and (-not -iname ...)&quot;</span>
+    <span class="c1"># syntax as find arguments</span>
+    <span class="k">if</span> <span class="s2">&quot;NexusLIMS_ignore_patterns&quot;</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">:</span>
+        <span class="n">ignore_patterns</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;NexusLIMS_ignore_patterns&quot;</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">ignore_patterns</span><span class="p">:</span>
+            <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;-and&quot;</span><span class="p">,</span> <span class="s2">&quot;(&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">ignore_patterns</span><span class="p">:</span>
+                <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;-not&quot;</span><span class="p">,</span> <span class="s2">&quot;-iname&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="s2">&quot;-and&quot;</span><span class="p">]</span>
+            <span class="n">cmd</span><span class="o">.</span><span class="n">pop</span><span class="p">()</span>
+            <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;)&quot;</span><span class="p">]</span>
 
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">stderr</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="c1"># find command returned an error</span>
-        <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="n">stderr</span><span class="p">)</span>
+    <span class="c1"># add -print0 at the end since it will preempt our filename</span>
+    <span class="c1"># patterns if we add it at the beginning</span>
+    <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;-print0&quot;</span><span class="p">]</span>
 
-    <span class="n">files</span> <span class="o">=</span> <span class="n">stdout</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\x00</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running via subprocess.run: &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Running via subprocess.run (as string): &quot;</span><span class="si">%s</span><span class="s1">&quot;&#39;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd</span><span class="p">))</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">capture_output</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="n">out</span><span class="o">.</span><span class="n">stdout</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">decode</span><span class="p">())</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">]</span>
 
     <span class="c1"># convert to set and back to remove duplicates and sort my mtime</span>
     <span class="n">files</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">files</span><span class="p">))</span>
-    <span class="n">files</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">_getmtime</span><span class="p">)</span>
-    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span><span class="si">}</span><span class="s2"> files&quot;</span><span class="p">)</span>
+    <span class="n">files</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">getmtime</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Found </span><span class="si">%i</span><span class="s2"> files&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">))</span>
     <span class="k">return</span> <span class="n">files</span></div>
 
 
-<span class="k">def</span> <span class="nf">_sort_dict</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
-    <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">_sort_dict</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="n">v</span>
-            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">())}</span>
+<div class="viewcode-block" id="sort_dict"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.sort_dict">[docs]</a><span class="k">def</span> <span class="nf">sort_dict</span><span class="p">(</span><span class="n">item</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Recursively sort a dictionary by keys.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">{</span>
+        <span class="n">k</span><span class="p">:</span> <span class="n">sort_dict</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">v</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="n">v</span>
+        <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">item</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+    <span class="p">}</span></div>
 
 
-<span class="k">def</span> <span class="nf">_remove_dtb_element</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Helper method that uses exec to delete a specific leaf of a</span>
-<span class="sd">    DictionaryTreeBrowser using a string</span>
+<div class="viewcode-block" id="remove_dtb_element"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.remove_dtb_element">[docs]</a><span class="k">def</span> <span class="nf">remove_dtb_element</span><span class="p">(</span><span class="n">tree</span><span class="p">,</span> <span class="n">path</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Remove an element from a DictionaryTreeBrowser by setting it to None.</span>
+
+<span class="sd">    Helper method that sets a specific leaf of a DictionaryTreeBrowser to None.</span>
+<span class="sd">    Use with :py:meth:`remove_dict_nones` to fully remove the desired DTB element after</span>
+<span class="sd">    setting it to None (after converting DTB to dictionary).</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -770,25 +850,44 @@ $(document).ready(function(){
 <span class="sd">    -------</span>
 <span class="sd">    tree : :py:class:`~hyperspy.misc.utils.DictionaryTreeBrowser`</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">to_del</span> <span class="o">=</span> <span class="s1">&#39;tree.</span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-    <span class="k">try</span><span class="p">:</span>
+    <span class="n">tree</span><span class="o">.</span><span class="n">set_item</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
 
-        <span class="n">exec</span><span class="p">(</span><span class="s1">&#39;del </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">to_del</span><span class="p">))</span>
-    <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">_</span><span class="p">:</span>
-        <span class="c1"># Log the failure and continue</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s1">&#39;_remove_dtb_element: Could not find </span><span class="si">{}</span><span class="s1">&#39;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">to_del</span><span class="p">))</span>
-
-    <span class="k">return</span> <span class="n">tree</span>
+    <span class="k">return</span> <span class="n">tree</span></div>
 
 
-<span class="k">def</span> <span class="nf">_zero_bytes</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">bytes_from</span><span class="p">,</span> <span class="n">bytes_to</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A helper method to set certain byte locations within a file to zero,</span>
-<span class="sd">    which can help for creating highly-compressible test files</span>
+<div class="viewcode-block" id="remove_dict_nones"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.remove_dict_nones">[docs]</a><span class="k">def</span> <span class="nf">remove_dict_nones</span><span class="p">(</span><span class="n">dictionary</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="n">Any</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Delete keys with a value of ``None`` in a dictionary, recursively.</span>
+
+<span class="sd">    Taken from https://stackoverflow.com/a/4256027.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    fname : str</span>
+<span class="sd">    dictionary</span>
+<span class="sd">        The dictionary, with keys that have None values removed</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        The same dictionary, but with &quot;Nones&quot; removed</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">dictionary</span><span class="o">.</span><span class="n">items</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">dictionary</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+            <span class="n">remove_dict_nones</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">dictionary</span></div>
+
+
+<span class="k">def</span> <span class="nf">_zero_bytes</span><span class="p">(</span><span class="n">fname</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">bytes_from</span><span class="p">,</span> <span class="n">bytes_to</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Set certain byte locations within a file to zero.</span>
+
+<span class="sd">    This method helps creating highly-compressible test files.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    fname</span>
 <span class="sd">    bytes_from : int or :obj:`list` of str</span>
 <span class="sd">        The position of the file (in decimal) at which to start zeroing</span>
 <span class="sd">    bytes_to : int or :obj:`list` of str</span>
@@ -797,36 +896,38 @@ $(document).ready(function(){
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    new_fname : str</span>
+<span class="sd">    new_fname</span>
 <span class="sd">        The modified file that has it&#39;s bytes zeroed</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="kn">from</span> <span class="nn">shutil</span> <span class="kn">import</span> <span class="n">copyfile</span>
-    <span class="n">filename</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">fname</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s1">&#39;.ser&#39;</span><span class="p">):</span>
-        <span class="n">index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-        <span class="n">basename</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;_&#39;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
-        <span class="n">new_fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">basename</span><span class="si">}</span><span class="s1">_dataZeroed_</span><span class="si">{</span><span class="n">index</span><span class="si">}{</span><span class="n">ext</span><span class="si">}</span><span class="s1">&#39;</span>
+    <span class="n">filename</span><span class="p">,</span> <span class="n">ext</span> <span class="o">=</span> <span class="n">fname</span><span class="o">.</span><span class="n">stem</span><span class="p">,</span> <span class="n">fname</span><span class="o">.</span><span class="n">suffix</span>
+    <span class="k">if</span> <span class="n">ext</span> <span class="o">==</span> <span class="s2">&quot;.ser&quot;</span><span class="p">:</span>
+        <span class="n">index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">basename</span> <span class="o">=</span> <span class="s2">&quot;_&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">filename</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="p">)[:</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">new_fname</span> <span class="o">=</span> <span class="n">fname</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">basename</span><span class="si">}</span><span class="s2">_dataZeroed_</span><span class="si">{</span><span class="n">index</span><span class="si">}{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">new_fname</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">_dataZeroed</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="n">new_fname</span> <span class="o">=</span> <span class="n">fname</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2">_dataZeroed</span><span class="si">{</span><span class="n">ext</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="n">copyfile</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">new_fname</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">bytes_from</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
         <span class="n">bytes_from</span> <span class="o">=</span> <span class="p">[</span><span class="n">bytes_from</span><span class="p">]</span>
         <span class="n">bytes_to</span> <span class="o">=</span> <span class="p">[</span><span class="n">bytes_to</span><span class="p">]</span>
 
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">new_fname</span><span class="p">,</span> <span class="s1">&#39;r+b&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">bf</span><span class="p">,</span> <span class="n">bt</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bytes_from</span><span class="p">,</span> <span class="n">bytes_to</span><span class="p">):</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">bf</span><span class="p">)</span>
-            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s1">&#39;</span><span class="se">\0</span><span class="s1">&#39;</span> <span class="o">*</span> <span class="p">(</span><span class="n">bt</span> <span class="o">-</span> <span class="n">bf</span><span class="p">))</span>
+    <span class="k">with</span> <span class="n">Path</span><span class="p">(</span><span class="n">new_fname</span><span class="p">)</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r+b&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">from_byte</span><span class="p">,</span> <span class="n">to_byte</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">bytes_from</span><span class="p">,</span> <span class="n">bytes_to</span><span class="p">):</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">seek</span><span class="p">(</span><span class="n">from_byte</span><span class="p">)</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\0</span><span class="s2">&quot;</span> <span class="o">*</span> <span class="p">(</span><span class="n">to_byte</span> <span class="o">-</span> <span class="n">from_byte</span><span class="p">))</span>
 
     <span class="k">return</span> <span class="n">new_fname</span>
 
 
-<span class="k">def</span> <span class="nf">_get_timespan_overlap</span><span class="p">(</span><span class="n">range_1</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">datetime</span><span class="p">,</span> <span class="n">datetime</span><span class="p">],</span>
-                          <span class="n">range_2</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">datetime</span><span class="p">,</span> <span class="n">datetime</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">_timedelta</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Find the amount of overlap between two time spans. Adapted from</span>
-<span class="sd">    https://stackoverflow.com/a/9044111</span>
+<div class="viewcode-block" id="get_timespan_overlap"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.get_timespan_overlap">[docs]</a><span class="k">def</span> <span class="nf">get_timespan_overlap</span><span class="p">(</span>
+    <span class="n">range_1</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">datetime</span><span class="p">,</span> <span class="n">datetime</span><span class="p">],</span>
+    <span class="n">range_2</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">datetime</span><span class="p">,</span> <span class="n">datetime</span><span class="p">],</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">timedelta</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find the amount of overlap between two time spans.</span>
+
+<span class="sd">    Adapted from https://stackoverflow.com/a/9044111.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -839,19 +940,20 @@ $(document).ready(function(){
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    overlap</span>
+<span class="sd">    datetime.timedelta</span>
 <span class="sd">        The amount of overlap between the time ranges</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">latest_start</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">range_1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">range_2</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">earliest_end</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">range_1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">range_2</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
     <span class="n">delta</span> <span class="o">=</span> <span class="n">earliest_end</span> <span class="o">-</span> <span class="n">latest_start</span>
-    <span class="n">overlap</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">_timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">delta</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">overlap</span>
+    <span class="k">return</span> <span class="nb">max</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="mi">0</span><span class="p">),</span> <span class="n">delta</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="get_auth"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.get_auth">[docs]</a><span class="k">def</span> <span class="nf">get_auth</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="s2">&quot;credentials.ini&quot;</span><span class="p">,</span> <span class="n">basic</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="get_auth"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.get_auth">[docs]</a><span class="k">def</span> <span class="nf">get_auth</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">basic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get an authentication scheme for NexusLIMS requests.</span>
+
 <span class="sd">    Set up NTLM authentication for the Microscopy Nexus using an account</span>
 <span class="sd">    as specified from a file that lives in the package root named</span>
 <span class="sd">    .credentials (or some other value provided as a parameter).</span>
@@ -881,27 +983,33 @@ $(document).ready(function(){
 <span class="sd">        ``password``. See the ``credentials.ini.example`` file included in</span>
 <span class="sd">        the repository as an example.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;credentials.ini&quot;</span><span class="p">)</span>
+
     <span class="c1"># DONE: this should be moved out of sharepoint calendar an into general</span>
     <span class="c1">#  utils since it&#39;s used for CDCS as well</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">username</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;nexusLIMS_user&#39;</span><span class="p">]</span>
-        <span class="n">passwd</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;nexusLIMS_pass&#39;</span><span class="p">]</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Authenticating using environment variables&quot;</span><span class="p">)</span>
-    <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+        <span class="n">username</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;nexusLIMS_user&quot;</span><span class="p">]</span>
+        <span class="n">passwd</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;nexusLIMS_pass&quot;</span><span class="p">]</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Authenticating using environment variables&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">exception</span><span class="p">:</span>
         <span class="c1"># if absolute path was provided, use that, otherwise find filename in</span>
         <span class="c1"># this directory</span>
-        <span class="k">if</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isabs</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">is_absolute</span><span class="p">():</span>
             <span class="k">pass</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">filename</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="n">filename</span><span class="p">)</span>
+            <span class="n">filename</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="n">filename</span>
 
         <span class="c1"># Raise error if the configuration file is not found</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">filename</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span><span class="s2">&quot;No credentials were specified with &quot;</span>
-                                      <span class="s2">&quot;environment variables, and credential &quot;</span>
-                                      <span class="s2">&quot;file </span><span class="si">{}</span><span class="s2"> was not found&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">filename</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;No credentials were specified with &quot;</span>
+                <span class="s2">&quot;environment variables, and credential &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;file </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s2"> was not found&quot;</span>
+            <span class="p">)</span>
+            <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">exception</span>
 
-        <span class="n">config</span> <span class="o">=</span> <span class="n">_ConfigParser</span><span class="p">()</span>
+        <span class="n">config</span> <span class="o">=</span> <span class="n">ConfigParser</span><span class="p">()</span>
         <span class="n">config</span><span class="o">.</span><span class="n">read</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
 
         <span class="n">username</span> <span class="o">=</span> <span class="n">config</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;nexus_credentials&quot;</span><span class="p">,</span> <span class="s2">&quot;username&quot;</span><span class="p">)</span>
@@ -911,20 +1019,20 @@ $(document).ready(function(){
         <span class="c1"># return just username and password (for BasicAuthentication)</span>
         <span class="k">return</span> <span class="n">username</span><span class="p">,</span> <span class="n">passwd</span>
 
-    <span class="n">domain</span> <span class="o">=</span> <span class="s1">&#39;nist&#39;</span>
-    <span class="n">path</span> <span class="o">=</span> <span class="n">domain</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\\</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">username</span>
+    <span class="n">domain</span> <span class="o">=</span> <span class="s2">&quot;nist&quot;</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">domain</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\\</span><span class="s2">&quot;</span> <span class="o">+</span> <span class="n">username</span>
 
-    <span class="n">auth</span> <span class="o">=</span> <span class="n">_HttpNtlmAuth</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">passwd</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">auth</span></div>
+    <span class="k">return</span> <span class="n">HttpNtlmAuth</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">passwd</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="has_delay_passed"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.has_delay_passed">[docs]</a><span class="k">def</span> <span class="nf">has_delay_passed</span><span class="p">(</span><span class="n">date</span><span class="p">:</span> <span class="n">datetime</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Helper method to check if the current time is greater than the configured</span>
-<span class="sd">    (or default) record building delay configured in the</span>
-<span class="sd">    ``nexusLIMS_file_delay_days`` environment variable. If the date given is</span>
-<span class="sd">    timezone-aware, the current time in that timezone will be compared.</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if the current time is greater than the configured delay.</span>
+
+<span class="sd">    Check if the current time is greater than the configured (or default) record</span>
+<span class="sd">    building delay configured in the ``nexusLIMS_file_delay_days`` environment variable.</span>
+<span class="sd">    If the date given is timezone-aware, the current time in that timezone will be</span>
+<span class="sd">    compared.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -939,34 +1047,70 @@ $(document).ready(function(){
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="c1"># get record builder delay from environment settings</span>
-        <span class="n">delay</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s1">&#39;nexusLIMS_file_delay_days&#39;</span><span class="p">,</span> <span class="mi">2</span><span class="p">))</span>
+        <span class="n">delay</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;nexusLIMS_file_delay_days&quot;</span><span class="p">,</span> <span class="s2">&quot;2&quot;</span><span class="p">))</span>
     <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
         <span class="c1"># if it cannot be coerced to a number, warn and set to the</span>
         <span class="c1"># default of 2 days</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s1">&#39;The environment variable value of &#39;</span>
-            <span class="sa">f</span><span class="s1">&#39;nexusLIMS_file_delay_days &#39;</span>
-            <span class="sa">f</span><span class="s1">&#39;(</span><span class="si">{</span><span class="n">_os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;nexusLIMS_file_delay_days&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">) could &#39;</span>
-            <span class="sa">f</span><span class="s1">&#39;not be understood as a number, so using the default &#39;</span>
-            <span class="sa">f</span><span class="s1">&#39;of 2 days.&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;The environment variable value of nexusLIMS_file_delay_days (</span><span class="si">%s</span><span class="s2">) could &quot;</span>
+            <span class="s2">&quot;not be understood as a number, so using the default of 2 days.&quot;</span><span class="p">,</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">getenv</span><span class="p">(</span><span class="s2">&quot;nexusLIMS_file_delay_days&quot;</span><span class="p">),</span>
+        <span class="p">)</span>
         <span class="n">delay</span> <span class="o">=</span> <span class="mi">2</span>
 
-    <span class="n">delay</span> <span class="o">=</span> <span class="n">_timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">delay</span><span class="p">)</span>
+    <span class="n">delay</span> <span class="o">=</span> <span class="n">timedelta</span><span class="p">(</span><span class="n">days</span><span class="o">=</span><span class="n">delay</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">date</span><span class="o">.</span><span class="n">tzinfo</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="c1"># compare naive datetime</span>
-        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="c1"># compare timezone-aware datetime using current time in that timezone</span>
-        <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">date</span><span class="o">.</span><span class="n">tzinfo</span><span class="p">)</span>
+    <span class="n">now</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>  <span class="c1"># noqa: DTZ005</span>
+        <span class="k">if</span> <span class="n">date</span><span class="o">.</span><span class="n">tzinfo</span> <span class="ow">is</span> <span class="kc">None</span>
+        <span class="k">else</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">date</span><span class="o">.</span><span class="n">tzinfo</span><span class="p">)</span>
+    <span class="p">)</span>
 
     <span class="n">delta</span> <span class="o">=</span> <span class="n">now</span> <span class="o">-</span> <span class="n">date</span>
 
     <span class="k">return</span> <span class="n">delta</span> <span class="o">&gt;</span> <span class="n">delay</span></div>
 
 
+<div class="viewcode-block" id="current_system_tz"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.current_system_tz">[docs]</a><span class="k">def</span> <span class="nf">current_system_tz</span><span class="p">():</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Get the current system timezone information.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="p">(</span>
+        <span class="n">timezone</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=-</span><span class="n">time</span><span class="o">.</span><span class="n">altzone</span><span class="p">),</span> <span class="n">time</span><span class="o">.</span><span class="n">tzname</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="k">if</span> <span class="n">time</span><span class="o">.</span><span class="n">daylight</span>
+        <span class="k">else</span> <span class="n">timezone</span><span class="p">(</span><span class="n">timedelta</span><span class="p">(</span><span class="n">seconds</span><span class="o">=-</span><span class="n">time</span><span class="o">.</span><span class="n">timezone</span><span class="p">),</span> <span class="n">time</span><span class="o">.</span><span class="n">tzname</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+    <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="replace_mmf_path"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.replace_mmf_path">[docs]</a><span class="k">def</span> <span class="nf">replace_mmf_path</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">suffix</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Given an input &quot;mmfnexus_path&quot; path, generate equivalent &quot;nexusLIMS_path&quot; path.</span>
+
+<span class="sd">    If the given path is not a subpath of &quot;mmfnexus_path&quot;, a warning will be logged</span>
+<span class="sd">    and the suffix will just be added at the end.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    path</span>
+<span class="sd">        The input path, which is expected to be a subpath of the mmfnexus_path directory</span>
+<span class="sd">    suffix</span>
+<span class="sd">        Any added suffix to add to the path (useful for appending with a new extension,</span>
+<span class="sd">        such as ``.json``)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    pathlib.Path</span>
+<span class="sd">        A resolved pathlib.Path object pointing to the new path</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mmf_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;mmfnexus_path&quot;</span><span class="p">])</span>
+    <span class="n">nexuslims_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;nexusLIMS_path&quot;</span><span class="p">])</span>
+
+    <span class="k">if</span> <span class="n">mmf_path</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">path</span><span class="o">.</span><span class="n">parents</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> is not a sub-path of </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">,</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;mmfnexus_path&quot;</span><span class="p">])</span>
+    <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">mmf_path</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">nexuslims_path</span><span class="p">))</span> <span class="o">+</span> <span class="n">suffix</span><span class="p">)</span></div>
+
+
 <div class="viewcode-block" id="AuthenticationError"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.utils.AuthenticationError">[docs]</a><span class="k">class</span> <span class="nc">AuthenticationError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Class for showing an exception having to do with authentication&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Class for showing an exception having to do with authentication.&quot;&quot;&quot;</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">message</span><span class="p">):</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">message</span> <span class="o">=</span> <span class="n">message</span></div>
 </pre></div>
@@ -986,8 +1130,8 @@ $(document).ready(function(){
       
     </p>
     <p>
-        &copy; Copyright 2022, NIST Office of Data and Informatics.<br/>
-      Last updated on Jul, 18, 2022.<br/>
+        &copy; Copyright 2023, NIST Office of Data and Informatics.<br/>
+      Last updated on Apr, 25, 2023.<br/>
     </p>
   </div>
 </footer>

@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>nexusLIMS.db package &#8212; NexusLIMS 1.1.0 documentation</title>
+    <title>nexusLIMS.db package &#8212; NexusLIMS 1.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../_static/custom-styles.css" />
@@ -62,7 +62,7 @@ $(document).ready(function(){
         </button>
         <a class="navbar-brand" href="../index.html"><span><img src="../_static/logo_horizontal.png"></span>
            </a>
-        <span class="navbar-text navbar-version pull-left"><b></b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.3.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -83,6 +83,7 @@ $(document).ready(function(){
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../database.html">NexusLIMS database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../development.html">Developer documentation</a></li>
@@ -95,7 +96,10 @@ $(document).ready(function(){
 <li class="toctree-l3"><a class="reference internal" href="nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">nexusLIMS.db package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nexusLIMS.harvesters.nemo.html">nexusLIMS.harvesters.nemo package</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
 </ul>
 </li>
@@ -147,6 +151,7 @@ $(document).ready(function(){
 <ul class="globaltoc">
     <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../database.html">NexusLIMS database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../development.html">Developer documentation</a></li>
@@ -196,20 +201,25 @@ $(document).ready(function(){
       
   <section id="module-nexusLIMS.db">
 <span id="nexuslims-db-package"></span><h1>nexusLIMS.db package<a class="headerlink" href="#module-nexusLIMS.db" title="Permalink to this headline">¶</a></h1>
+<p>A module to handle communication with the NexusLIMS database.</p>
+<p>Also performs basic database ORM tasks. The top-level module has a helper function to
+make a database query (<a class="reference internal" href="#nexusLIMS.db.make_db_query" title="nexusLIMS.db.make_db_query"><code class="xref py py-meth docutils literal notranslate"><span class="pre">make_db_query()</span></code></a>), while the
+<a class="reference internal" href="#module-nexusLIMS.db.session_handler" title="nexusLIMS.db.session_handler"><code class="xref py py-mod docutils literal notranslate"><span class="pre">session_handler</span></code></a> submodule is primarily concerned with mapping
+session log information from the database into python objects for use in other parts of
+the NexusLIMS backend.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="nexusLIMS.db.make_db_query">
 <span class="sig-prename descclassname"><span class="pre">nexusLIMS.db.</span></span><span class="sig-name descname"><span class="pre">make_db_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/db.html#make_db_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.db.make_db_query" title="Permalink to this definition">¶</a></dt>
-<dd><p>Execute an arbitrary query on the NexusLIMS database and return the results
-as a list</p>
+<dd><p>Execute a query on the NexusLIMS database and return the results as a list.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>query</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The SQL query to execute</p>
+<dd class="field-odd"><p><strong>query</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The SQL query to execute</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>res_list</strong> – The results of the SQL query</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#tuple" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of <a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#tuple" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">tuple</span></code></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -219,10 +229,12 @@ as a list</p>
 </section>
 <section id="module-nexusLIMS.db.session_handler">
 <span id="nexuslims-db-session-handler-module"></span><h2>nexusLIMS.db.session_handler module<a class="headerlink" href="#module-nexusLIMS.db.session_handler" title="Permalink to this headline">¶</a></h2>
+<p>Classes and methods to interact with sessions from the NexusLIMS database.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="nexusLIMS.db.session_handler.Session">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nexusLIMS.db.session_handler.</span></span><span class="sig-name descname"><span class="pre">Session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session_identifier</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_from</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_to</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/db/session_handler.html#Session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.db.session_handler.Session" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.7/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nexusLIMS.db.session_handler.</span></span><span class="sig-name descname"><span class="pre">Session</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session_identifier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="nexusLIMS.html#nexusLIMS.instruments.Instrument" title="nexusLIMS.instruments.Instrument"><span class="pre">Instrument</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_range</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.10/library/typing.html#typing.Tuple" title="(in Python v3.10)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.10/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><span class="pre">datetime</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.10/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><span class="pre">datetime</span></a><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/db/session_handler.html#Session"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.db.session_handler.Session" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.10/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A representation of a session in the NexusLIMS database.</p>
 <p>A record of an individual session as read from the Nexus Microscopy
 facility session database. Created by combining two
 <a class="reference internal" href="#nexusLIMS.db.session_handler.SessionLog" title="nexusLIMS.db.session_handler.SessionLog"><code class="xref py py-class docutils literal notranslate"><span class="pre">SessionLog</span></code></a> objects with status
@@ -230,20 +242,19 @@ facility session database. Created by combining two
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>session_identifier</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The unique identifier for an individual session on an instrument</p></li>
-<li><p><strong>instrument</strong> (<a class="reference internal" href="nexusLIMS.html#nexusLIMS.instruments.Instrument" title="nexusLIMS.instruments.Instrument"><em>Instrument</em></a>) – An object representing the instrument associated with this session</p></li>
-<li><p><strong>dt_from</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><em>datetime.datetime</em></a>) – A <a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> object representing the start of this
-session</p></li>
-<li><p><strong>dt_to</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><em>datetime.datetime</em></a>) – A <a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> object representing the end of this
-session</p></li>
-<li><p><strong>user</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The username associated with this session (may not be trustworthy)</p></li>
+<li><p><strong>session_identifier</strong> – The unique identifier for an individual session on an instrument</p></li>
+<li><p><strong>instrument</strong> – An object representing the instrument associated with this session</p></li>
+<li><p><strong>dt_range</strong> – A tuple of two <a class="reference external" href="https://docs.python.org/3.10/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">datetime</span></code></a> objects representing the start
+and end of this session )in that order</p></li>
+<li><p><strong>user</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The username associated with this session (may not be trustworthy)</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="nexusLIMS.db.session_handler.Session.insert_record_generation_event">
-<span class="sig-name descname"><span class="pre">insert_record_generation_event</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/nexusLIMS/db/session_handler.html#Session.insert_record_generation_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.db.session_handler.Session.insert_record_generation_event" title="Permalink to this definition">¶</a></dt>
-<dd><p>Insert a log for this session into the session database with
+<span class="sig-name descname"><span class="pre">insert_record_generation_event</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><span class="pre">dict</span></a></span></span><a class="reference internal" href="../_modules/nexusLIMS/db/session_handler.html#Session.insert_record_generation_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.db.session_handler.Session.insert_record_generation_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert record generation event to session log.</p>
+<p>Insert a log for this session into the session database with
 <code class="docutils literal notranslate"><span class="pre">event_type</span></code> <cite>“RECORD_GENERATION”</cite> and the current time (with local
 system timezone) as the timestamp.</p>
 <dl class="field-list simple">
@@ -252,7 +263,7 @@ system timezone) as the timestamp.</p>
 a RECORD_GENERATION event was added</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)">dict</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -260,11 +271,12 @@ a RECORD_GENERATION event was added</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="nexusLIMS.db.session_handler.Session.update_session_status">
 <span class="sig-name descname"><span class="pre">update_session_status</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">status</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/db/session_handler.html#Session.update_session_status"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.db.session_handler.Session.update_session_status" title="Permalink to this definition">¶</a></dt>
-<dd><p>Update the <code class="docutils literal notranslate"><span class="pre">record_status</span></code> in the session logs for this
-<a class="reference internal" href="#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a></p>
+<dd><p>Update the status of this Session in the NexusLIMS database.</p>
+<p>Specifically, update the <code class="docutils literal notranslate"><span class="pre">record_status</span></code> in any session logs for this
+<a class="reference internal" href="#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>status</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – One of <code class="docutils literal notranslate"><span class="pre">&quot;COMPLETED&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;WAITING_FOR_END&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;TO_BE_BUILT&quot;</span></code>,
+<dd class="field-odd"><p><strong>status</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – One of <code class="docutils literal notranslate"><span class="pre">&quot;COMPLETED&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;WAITING_FOR_END&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;TO_BE_BUILT&quot;</span></code>,
 <code class="docutils literal notranslate"><span class="pre">&quot;ERROR&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;NO_FILES_FOUND&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;NO_CONSENT&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;NO_RESERVATION&quot;</span></code>
 (the allowed values in the NexusLIMS database). Status value will be
 validated by a check constraint in the database</p>
@@ -273,7 +285,7 @@ validated by a check constraint in the database</p>
 <dd class="field-even"><p><strong>success</strong> – Whether the update operation was successful</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -282,10 +294,11 @@ validated by a check constraint in the database</p>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="nexusLIMS.db.session_handler.SessionLog">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nexusLIMS.db.session_handler.</span></span><span class="sig-name descname"><span class="pre">SessionLog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session_identifier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Optional" title="(in Python v3.7)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/db/session_handler.html#SessionLog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.db.session_handler.SessionLog" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.7/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nexusLIMS.db.session_handler.</span></span><span class="sig-name descname"><span class="pre">SessionLog</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session_identifier</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">instrument</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">timestamp</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">event_type</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">user</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">record_status</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.10/library/typing.html#typing.Optional" title="(in Python v3.10)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/db/session_handler.html#SessionLog"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.db.session_handler.SessionLog" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.10/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A log of the start or end of a Session.</p>
 <p>A simple mapping of one row in the <code class="docutils literal notranslate"><span class="pre">session_log</span></code> table of the NexusLIMS
-database (all values are strings)</p>
+database (all values are strings).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -299,14 +312,15 @@ event</p></li>
 <li><p><strong>event_type</strong> – The type of log for this session (either <cite>“START”</cite>, <cite>“END”</cite>,
 or <cite>“RECORD_GENERATION”</cite>)</p></li>
 <li><p><strong>user</strong> – The username associated with this session (if known)</p></li>
-<li><p><strong>record_status</strong> – The status to use for this record (defaults to <code class="docutils literal notranslate"><span class="pre">'TO_BE_BUILT'</span></code></p></li>
+<li><p><strong>record_status</strong> – The status to use for this record (defaults to <code class="docutils literal notranslate"><span class="pre">'TO_BE_BUILT'</span></code>)</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="nexusLIMS.db.session_handler.SessionLog.insert_log">
-<span class="sig-name descname"><span class="pre">insert_log</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../_modules/nexusLIMS/db/session_handler.html#SessionLog.insert_log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.db.session_handler.SessionLog.insert_log" title="Permalink to this definition">¶</a></dt>
-<dd><p>Inserts a log into the database with the information contained within
+<span class="sig-name descname"><span class="pre">insert_log</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span></span><a class="reference internal" href="../_modules/nexusLIMS/db/session_handler.html#SessionLog.insert_log"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.db.session_handler.SessionLog.insert_log" title="Permalink to this definition">¶</a></dt>
+<dd><p>Insert this log into the NexusLIMS database.</p>
+<p>Inserts a log into the database with the information contained within
 this SessionLog’s attributes (used primarily for NEMO <code class="docutils literal notranslate"><span class="pre">usage_event</span></code>
 integration). It will check for the presence of a matching record first
 and warn without inserting anything if it finds one.</p>
@@ -315,7 +329,7 @@ and warn without inserting anything if it finds one.</p>
 <dd class="field-odd"><p><strong>success</strong> – Whether or not the session log row was inserted successfully</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -325,14 +339,16 @@ and warn without inserting anything if it finds one.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="nexusLIMS.db.session_handler.db_query">
 <span class="sig-prename descclassname"><span class="pre">nexusLIMS.db.session_handler.</span></span><span class="sig-name descname"><span class="pre">db_query</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">query</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">args</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/db/session_handler.html#db_query"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.db.session_handler.db_query" title="Permalink to this definition">¶</a></dt>
-<dd></dd></dl>
+<dd><p>Make a query on the NexusLIMS database.</p>
+</dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="nexusLIMS.db.session_handler.get_sessions_to_build">
-<span class="sig-prename descclassname"><span class="pre">nexusLIMS.db.session_handler.</span></span><span class="sig-name descname"><span class="pre">get_sessions_to_build</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><span class="pre">nexusLIMS.db.session_handler.Session</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/nexusLIMS/db/session_handler.html#get_sessions_to_build"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.db.session_handler.get_sessions_to_build" title="Permalink to this definition">¶</a></dt>
-<dd><p>Query the NexusLIMS database for pairs of logs with status
+<span class="sig-prename descclassname"><span class="pre">nexusLIMS.db.session_handler.</span></span><span class="sig-name descname"><span class="pre">get_sessions_to_build</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.10/library/typing.html#typing.List" title="(in Python v3.10)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><span class="pre">Session</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/nexusLIMS/db/session_handler.html#get_sessions_to_build"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.db.session_handler.get_sessions_to_build" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get list of sessions that need to be built from the NexusLIMS database.</p>
+<p>Query the NexusLIMS database for pairs of logs with status
 <code class="docutils literal notranslate"><span class="pre">'TO_BE_BUILT'</span></code> and return the information needed to build a record for
-that session</p>
+that session.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><strong>sessions</strong> – A list of <a class="reference internal" href="#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> objects
@@ -340,7 +356,7 @@ containing the sessions that the need their record built. Will be an
 empty list if there’s nothing to do.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>List[<a class="reference internal" href="#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session">Session</a>]</p>
+<dd class="field-even"><p><em>List</em>[<a class="reference internal" href="#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><em>Session</em></a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -368,8 +384,8 @@ empty list if there’s nothing to do.</p>
       
     </p>
     <p>
-        &copy; Copyright 2022, NIST Office of Data and Informatics.<br/>
-      Last updated on Jul, 18, 2022.<br/>
+        &copy; Copyright 2023, NIST Office of Data and Informatics.<br/>
+      Last updated on Apr, 25, 2023.<br/>
     </p>
   </div>
 </footer>

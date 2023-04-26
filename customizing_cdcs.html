@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Tips for customizing CDCS &#8212; NexusLIMS 1.1.0 documentation</title>
+    <title>Tips for customizing CDCS &#8212; NexusLIMS 1.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="_static/custom-styles.css" />
@@ -62,7 +62,7 @@ $(document).ready(function(){
         </button>
         <a class="navbar-brand" href="index.html"><span><img src="_static/logo_horizontal.png"></span>
            </a>
-        <span class="navbar-text navbar-version pull-left"><b></b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.3.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -83,6 +83,7 @@ $(document).ready(function(){
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="database.html">NexusLIMS database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Developer documentation</a></li>
@@ -95,7 +96,10 @@ $(document).ready(function(){
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/nexusLIMS.harvesters.nemo.html">nexusLIMS.harvesters.nemo package</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
 </ul>
 </li>
@@ -147,6 +151,7 @@ $(document).ready(function(){
 <ul class="globaltoc">
     <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="database.html">NexusLIMS database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="development.html">Developer documentation</a></li>
@@ -246,7 +251,7 @@ installation was performed using the <a class="reference external" href="https:/
 then this top-level folder is the <code class="docutils literal notranslate"><span class="pre">/srv/curator</span></code> directory in the
 <code class="docutils literal notranslate"><span class="pre">mdcs_cdcs_1</span></code> container. This can be accessed by telling docker to execute
 an interactive <code class="docutils literal notranslate"><span class="pre">bash</span></code> shell within the container from your host system:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker <span class="nb">exec</span> -it mdcs_cdcs_1 bash
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>docker<span class="w"> </span><span class="nb">exec</span><span class="w"> </span>-it<span class="w"> </span>mdcs_cdcs_1<span class="w"> </span>bash
 </pre></div>
 </div>
 <div class="admonition-a-development-tip admonition">
@@ -299,7 +304,7 @@ to reload Django in order to show any of those changes. This can be done by
 restarting the Docker container, or you can get Django to restart itself
 automatically by “touching” a special file in the <code class="docutils literal notranslate"><span class="pre">mdcs</span></code> directory:</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># run from within the mdcs_cdcs_1 docker container:</span>
-touch /srv/curator/mdcs/wsgi.py
+touch<span class="w"> </span>/srv/curator/mdcs/wsgi.py
 </pre></div>
 </div>
 </section>
@@ -323,13 +328,13 @@ directory (at least in the Docker-installed version) named <code class="docutils
 You can either manually copy any changed files into the <code class="docutils literal notranslate"><span class="pre">static.prod</span></code>
 directory (after logging into the docker container with
 <code class="docutils literal notranslate"><span class="pre">docker</span> <span class="pre">exec</span> <span class="pre">-it</span> <span class="pre">mdcs_cdcs_1</span> <span class="pre">bash</span></code>) with a command like:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp -R /srv/curator/static/* /srv/curator/static.prod/
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>cp<span class="w"> </span>-R<span class="w"> </span>/srv/curator/static/*<span class="w"> </span>/srv/curator/static.prod/
 </pre></div>
 </div>
 <p>Or you can instruct Django to do this for you (the recommended method) using
 the <a class="reference external" href="https://docs.djangoproject.com/en/2.2/ref/contrib/staticfiles/"><code class="docutils literal notranslate"><span class="pre">collectstatic</span></code> command</a>. From the <code class="docutils literal notranslate"><span class="pre">/srv/curator</span></code> directory inside
 the <code class="docutils literal notranslate"><span class="pre">mdcs_cdcs_1</span></code> container, run the following:</p>
-<div class="highlight-bash notranslate" id="collectstatic"><div class="highlight"><pre><span></span>python manage.py collectstatic -c --noinput
+<div class="highlight-bash notranslate" id="collectstatic"><div class="highlight"><pre><span></span>python<span class="w"> </span>manage.py<span class="w"> </span>collectstatic<span class="w"> </span>-c<span class="w"> </span>--noinput
 </pre></div>
 </div>
 <p>This may take a little bit of time depending on how many files you have, but the
@@ -371,13 +376,13 @@ as <code class="docutils literal notranslate"><span class="pre">for</span></code
 other programming language, to dynamically generate the content that is
 ultimately displayed to the user. Consider the following example (copied from
 the Django documentation):</p>
-<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">athlete_list</span> <span class="cp">%}</span><span class="x"></span>
-<span class="x">    Number of athletes: </span><span class="cp">{{</span> <span class="nv">athlete_list</span><span class="o">|</span><span class="nf">length</span> <span class="cp">}}</span><span class="x"></span>
-<span class="cp">{%</span> <span class="k">elif</span> <span class="nv">athlete_in_locker_room_list</span> <span class="cp">%}</span><span class="x"></span>
+<div class="highlight-django notranslate"><div class="highlight"><pre><span></span><span class="cp">{%</span> <span class="k">if</span> <span class="nv">athlete_list</span> <span class="cp">%}</span>
+<span class="x">    Number of athletes: </span><span class="cp">{{</span> <span class="nv">athlete_list</span><span class="o">|</span><span class="nf">length</span> <span class="cp">}}</span>
+<span class="cp">{%</span> <span class="k">elif</span> <span class="nv">athlete_in_locker_room_list</span> <span class="cp">%}</span>
 <span class="x">    Athletes should be out of the locker room soon!</span>
-<span class="cp">{%</span> <span class="k">else</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">else</span> <span class="cp">%}</span>
 <span class="x">    No athletes.</span>
-<span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span><span class="x"></span>
+<span class="cp">{%</span> <span class="k">endif</span> <span class="cp">%}</span>
 </pre></div>
 </div>
 <p>In this example, the <code class="docutils literal notranslate"><span class="pre">{%</span> <span class="pre">if</span> <span class="pre">...</span> <span class="pre">%}</span></code> tag checks a variable (<code class="docutils literal notranslate"><span class="pre">athlete_list</span></code>),
@@ -604,7 +609,7 @@ difficult to use standard IDE tools for debugging. A useful tool for this is a
 Python module called <a class="reference external" href="https://github.com/romanvm/python-web-pdb"><code class="docutils literal notranslate"><span class="pre">web-pdb</span></code></a>, which allows you to define breakpoints in the
 Python sources, and open up a web-accessible Python debugger session. To use
 it, you will need to install it in the <code class="docutils literal notranslate"><span class="pre">mdcs_cdcs_1</span></code> container with:</p>
-<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip install web-pdb
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>pip<span class="w"> </span>install<span class="w"> </span>web-pdb
 </pre></div>
 </div>
 <p>And then to use it, insert the following line at the place you want to stop
@@ -650,8 +655,8 @@ the product identified is necessarily the best available for the purpose.</p>
       
     </p>
     <p>
-        &copy; Copyright 2022, NIST Office of Data and Informatics.<br/>
-      Last updated on Jul, 18, 2022.<br/>
+        &copy; Copyright 2023, NIST Office of Data and Informatics.<br/>
+      Last updated on Apr, 25, 2023.<br/>
     </p>
   </div>
 </footer>

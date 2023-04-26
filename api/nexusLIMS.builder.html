@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>nexusLIMS.builder package &#8212; NexusLIMS 1.1.0 documentation</title>
+    <title>nexusLIMS.builder package &#8212; NexusLIMS 1.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../_static/custom-styles.css" />
@@ -62,7 +62,7 @@ $(document).ready(function(){
         </button>
         <a class="navbar-brand" href="../index.html"><span><img src="../_static/logo_horizontal.png"></span>
            </a>
-        <span class="navbar-text navbar-version pull-left"><b></b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.3.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -83,6 +83,7 @@ $(document).ready(function(){
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../database.html">NexusLIMS database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../development.html">Developer documentation</a></li>
@@ -95,7 +96,10 @@ $(document).ready(function(){
 <li class="toctree-l3 current"><a class="current reference internal" href="#">nexusLIMS.builder package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="nexusLIMS.db.html">nexusLIMS.db package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nexusLIMS.harvesters.nemo.html">nexusLIMS.harvesters.nemo package</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
 </ul>
 </li>
@@ -147,6 +151,7 @@ $(document).ready(function(){
 <ul class="globaltoc">
     <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../database.html">NexusLIMS database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../development.html">Developer documentation</a></li>
@@ -196,12 +201,13 @@ $(document).ready(function(){
       
   <section id="module-nexusLIMS.builder">
 <span id="nexuslims-builder-package"></span><h1>nexusLIMS.builder package<a class="headerlink" href="#module-nexusLIMS.builder" title="Permalink to this headline">¶</a></h1>
+<p>Build records from Nexus sessions.</p>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </section>
 <section id="module-nexusLIMS.builder.record_builder">
 <span id="nexuslims-builder-record-builder-module"></span><h2>nexusLIMS.builder.record_builder module<a class="headerlink" href="#module-nexusLIMS.builder.record_builder" title="Permalink to this headline">¶</a></h2>
-<p><strong>Attributes</strong></p>
+<p>Builds NexusLIMS records.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="nexusLIMS.builder.record_builder.XSD_PATH">
 <span class="sig-prename descclassname"><span class="pre">nexusLIMS.builder.record_builder.</span></span><span class="sig-name descname"><span class="pre">XSD_PATH</span></span><a class="headerlink" href="#nexusLIMS.builder.record_builder.XSD_PATH" title="Permalink to this definition">¶</a></dt>
@@ -209,7 +215,7 @@ $(document).ready(function(){
 which is used to validate XML records built by this module</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -217,8 +223,8 @@ which is used to validate XML records built by this module</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="nexusLIMS.builder.record_builder.build_acq_activities">
 <span class="sig-prename descclassname"><span class="pre">nexusLIMS.builder.record_builder.</span></span><span class="sig-name descname"><span class="pre">build_acq_activities</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">instrument</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_from</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_to</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generate_previews</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/builder/record_builder.html#build_acq_activities"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.builder.record_builder.build_acq_activities" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build an XML string representation of each AcquisitionActivity for a
-single microscopy session. This includes setup parameters and metadata
+<dd><p>Build an XML string representation of each AcquisitionActivity for a session.</p>
+<p>This includes setup parameters and metadata
 associated with each dataset obtained during a microscopy session. Unique
 AcquisitionActivities are delimited via clustering of file collection
 time to detect “long” breaks during a session.</p>
@@ -228,16 +234,16 @@ time to detect “long” breaks during a session.</p>
 <li><p><strong>instrument</strong> (<a class="reference internal" href="nexusLIMS.html#nexusLIMS.instruments.Instrument" title="nexusLIMS.instruments.Instrument"><code class="xref py py-class docutils literal notranslate"><span class="pre">Instrument</span></code></a>) – One of the NexusLIMS instruments contained in the
 <a class="reference internal" href="nexusLIMS.html#nexusLIMS.instruments.instrument_db" title="nexusLIMS.instruments.instrument_db"><code class="xref py py-attr docutils literal notranslate"><span class="pre">instrument_db</span></code></a> database.
 Controls what instrument calendar is used to get events.</p></li>
-<li><p><strong>dt_from</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><em>datetime.datetime</em></a>) – The starting timestamp that will be used to determine which files go
+<li><p><strong>dt_from</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><em>datetime</em></a>) – The starting timestamp that will be used to determine which files go
 in this record</p></li>
-<li><p><strong>dt_to</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><em>datetime.datetime</em></a>) – The ending timestamp used to determine the last point in time for
+<li><p><strong>dt_to</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><em>datetime</em></a>) – The ending timestamp used to determine the last point in time for
 which files should be associated with this record</p></li>
-<li><p><strong>generate_previews</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether or not to create the preview thumbnail images</p></li>
+<li><p><strong>generate_previews</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – Whether or not to create the preview thumbnail images</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><ul class="simple">
-<li><p><strong>activities</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of)</p></li>
+<li><p><strong>activities</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">list</span></code></a> of)</p></li>
 <li><p><a class="reference internal" href="nexusLIMS.schemas.html#nexusLIMS.schemas.activity.AcquisitionActivity" title="nexusLIMS.schemas.activity.AcquisitionActivity"><code class="xref py py-obj docutils literal notranslate"><span class="pre">AcquisitionActivity</span></code></a> – The list of <a class="reference internal" href="nexusLIMS.schemas.html#nexusLIMS.schemas.activity.AcquisitionActivity" title="nexusLIMS.schemas.activity.AcquisitionActivity"><code class="xref py py-class docutils literal notranslate"><span class="pre">AcquisitionActivity</span></code></a>
 objects generated for the record</p></li>
 </ul>
@@ -248,31 +254,31 @@ objects generated for the record</p></li>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="nexusLIMS.builder.record_builder.build_new_session_records">
-<span class="sig-prename descclassname"><span class="pre">nexusLIMS.builder.record_builder.</span></span><span class="sig-name descname"><span class="pre">build_new_session_records</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/nexusLIMS/builder/record_builder.html#build_new_session_records"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.builder.record_builder.build_new_session_records" title="Permalink to this definition">¶</a></dt>
-<dd><p>Fetches new records that need to be built from the database (using
-<a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.get_sessions_to_build" title="nexusLIMS.db.session_handler.get_sessions_to_build"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_sessions_to_build()</span></code></a>), builds
-those records using
-<a class="reference internal" href="#nexusLIMS.builder.record_builder.build_record" title="nexusLIMS.builder.record_builder.build_record"><code class="xref py py-func docutils literal notranslate"><span class="pre">build_record()</span></code></a> (saving to the NexusLIMS folder), and returns a
-list of resulting .xml files to be uploaded to CDCS.</p>
+<span class="sig-prename descclassname"><span class="pre">nexusLIMS.builder.record_builder.</span></span><span class="sig-name descname"><span class="pre">build_new_session_records</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.10/library/typing.html#typing.List" title="(in Python v3.10)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><span class="pre">Path</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/nexusLIMS/builder/record_builder.html#build_new_session_records"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.builder.record_builder.build_new_session_records" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build records for new sessions from the database.</p>
+<p>Uses <a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.get_sessions_to_build" title="nexusLIMS.db.session_handler.get_sessions_to_build"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_sessions_to_build()</span></code></a>) and builds
+those records using <a class="reference internal" href="#nexusLIMS.builder.record_builder.build_record" title="nexusLIMS.builder.record_builder.build_record"><code class="xref py py-func docutils literal notranslate"><span class="pre">build_record()</span></code></a> (saving to the NexusLIMS folder), and
+returns a list of resulting .xml files to be uploaded to CDCS.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p><strong>xml_files</strong> – A list of record files that were successfully built and saved to
 centralized storage</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>List[<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)">str</a>]</p>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3.10/library/typing.html#typing.List" title="(in Python v3.10)"><em>List</em></a>[<a class="reference external" href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><em>Path</em></a>]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="nexusLIMS.builder.record_builder.build_record">
-<span class="sig-prename descclassname"><span class="pre">nexusLIMS.builder.record_builder.</span></span><span class="sig-name descname"><span class="pre">build_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><span class="pre">nexusLIMS.db.session_handler.Session</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Union" title="(in Python v3.7)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/constants.html#None" title="(in Python v3.7)"><span class="pre">None</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generate_previews</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../_modules/nexusLIMS/builder/record_builder.html#build_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.builder.record_builder.build_record" title="Permalink to this definition">¶</a></dt>
-<dd><p>Construct an XML document conforming to the NexusLIMS schema from a
+<span class="sig-prename descclassname"><span class="pre">nexusLIMS.builder.record_builder.</span></span><span class="sig-name descname"><span class="pre">build_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><span class="pre">Session</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.10/library/typing.html#typing.Optional" title="(in Python v3.10)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generate_previews</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a></span></span><a class="reference internal" href="../_modules/nexusLIMS/builder/record_builder.html#build_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.builder.record_builder.build_record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Build a NexusLIMS XML record of an Experiment.</p>
+<p>Construct an XML document conforming to the NexusLIMS schema from a
 directory containing microscopy data files. Accepts either a
 <a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> object or an Instrument
 and date range (for backwards compatibility). For calendar parsing,
-currently no logic is implemented for a query that returns multiple records</p>
+currently no logic is implemented for a query that returns multiple records.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
@@ -282,7 +288,7 @@ will be ignored, and the values from the Session object will be used
 instead</p></li>
 <li><p><strong>sample_id</strong> – A unique identifier pointing to a sample identifier for data
 collected in this record. If None, a UUIDv4 will be generated</p></li>
-<li><p><strong>generate_previews</strong> – Whether or not to create the preview thumbnail images</p></li>
+<li><p><strong>generate_previews</strong> – Whether to create the preview thumbnail images</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -290,35 +296,34 @@ collected in this record. If None, a UUIDv4 will be generated</p></li>
 for the data contained in the provided path</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="nexusLIMS.builder.record_builder.dry_run_file_find">
-<span class="sig-prename descclassname"><span class="pre">nexusLIMS.builder.record_builder.</span></span><span class="sig-name descname"><span class="pre">dry_run_file_find</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><span class="pre">nexusLIMS.db.session_handler.Session</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/nexusLIMS/builder/record_builder.html#dry_run_file_find"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.builder.record_builder.dry_run_file_find" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the files that would be included for any records to be created based
-off the supplied session</p>
+<span class="sig-prename descclassname"><span class="pre">nexusLIMS.builder.record_builder.</span></span><span class="sig-name descname"><span class="pre">dry_run_file_find</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><span class="pre">Session</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.10/library/typing.html#typing.List" title="(in Python v3.10)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><span class="pre">Path</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/nexusLIMS/builder/record_builder.html#dry_run_file_find"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.builder.record_builder.dry_run_file_find" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the files that <em>would</em> be included for a record built for the supplied session.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>s</strong> – A session read from the database</p>
+<dd class="field-odd"><p><strong>s</strong> (<a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><em>Session</em></a>) – A session read from the database</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>files</strong> – A list of strings containing the files that would be included for the
+<dd class="field-even"><p><strong>files</strong> – A list of Paths containing the files that would be included for the
 record of this session (if it were not a dry run)</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>List[<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)">str</a>]</p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/typing.html#typing.List" title="(in Python v3.10)"><em>List</em></a>[<a class="reference external" href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><em>Path</em></a>]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="nexusLIMS.builder.record_builder.dry_run_get_sharepoint_reservation_event">
-<span class="sig-prename descclassname"><span class="pre">nexusLIMS.builder.record_builder.</span></span><span class="sig-name descname"><span class="pre">dry_run_get_sharepoint_reservation_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><span class="pre">nexusLIMS.db.session_handler.Session</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent" title="nexusLIMS.harvesters.ReservationEvent"><span class="pre">nexusLIMS.harvesters.ReservationEvent</span></a></span></span><a class="reference internal" href="../_modules/nexusLIMS/builder/record_builder.html#dry_run_get_sharepoint_reservation_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.builder.record_builder.dry_run_get_sharepoint_reservation_event" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get the calendar event that would be used to create a record based off
-the supplied session</p>
+<span class="sig-prename descclassname"><span class="pre">nexusLIMS.builder.record_builder.</span></span><span class="sig-name descname"><span class="pre">dry_run_get_sharepoint_reservation_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">s</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><span class="pre">Session</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent" title="nexusLIMS.harvesters.reservation_event.ReservationEvent"><span class="pre">ReservationEvent</span></a></span></span><a class="reference internal" href="../_modules/nexusLIMS/builder/record_builder.html#dry_run_get_sharepoint_reservation_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.builder.record_builder.dry_run_get_sharepoint_reservation_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the calendar event that <em>would</em> be used based off the supplied session.</p>
+<p>Only implemented for the Sharepoint harvester.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>s</strong> – A session read from the database</p>
@@ -328,49 +333,49 @@ the supplied session</p>
 record of this session (if it were not a dry run)</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent" title="nexusLIMS.harvesters.ReservationEvent"><em>ReservationEvent</em></a></p>
+<dd class="field-odd"><p><a class="reference internal" href="nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent" title="nexusLIMS.harvesters.reservation_event.ReservationEvent"><em>ReservationEvent</em></a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="nexusLIMS.builder.record_builder.dump_record">
-<span class="sig-prename descclassname"><span class="pre">nexusLIMS.builder.record_builder.</span></span><span class="sig-name descname"><span class="pre">dump_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><span class="pre">nexusLIMS.db.session_handler.Session</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Union" title="(in Python v3.7)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/constants.html#None" title="(in Python v3.7)"><span class="pre">None</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generate_previews</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/builder/record_builder.html#dump_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.builder.record_builder.dump_record" title="Permalink to this definition">¶</a></dt>
-<dd><p>Writes an XML record for a <a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>
+<span class="sig-prename descclassname"><span class="pre">nexusLIMS.builder.record_builder.</span></span><span class="sig-name descname"><span class="pre">dump_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><span class="pre">Session</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.10/library/typing.html#typing.Optional" title="(in Python v3.10)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><span class="pre">Path</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generate_previews</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><span class="pre">Path</span></a></span></span><a class="reference internal" href="../_modules/nexusLIMS/builder/record_builder.html#dump_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.builder.record_builder.dump_record" title="Permalink to this definition">¶</a></dt>
+<dd><p>Dump a record to an XML file.</p>
+<p>Writes an XML record for a <a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a>
 composed of information pulled from the appropriate reservation system
 as well as metadata extracted from the microscope data (e.g. dm3 or
 other files).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>session</strong> – A <a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> object
+<li><p><strong>session</strong> (<a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><em>Session</em></a>) – A <a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> object
 representing a unit of time on one of the instruments known to NexusLIMS</p></li>
-<li><p><strong>filename</strong> (<em>None</em><em> or </em><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The filename of the dumped xml file to write. If None, a default name
+<li><p><strong>filename</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/typing.html#typing.Optional" title="(in Python v3.10)"><em>Optional</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><em>Path</em></a><em>]</em>) – The filename of the dumped xml file to write. If None, a default name
 will be generated from the other parameters</p></li>
-<li><p><strong>generate_previews</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether or not to create the preview thumbnail images</p></li>
+<li><p><strong>generate_previews</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – Whether or not to create the preview thumbnail images</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p><strong>filename</strong> – The name of the created record that was returned</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><em>Path</em></a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="nexusLIMS.builder.record_builder.get_files">
-<span class="sig-prename descclassname"><span class="pre">nexusLIMS.builder.record_builder.</span></span><span class="sig-name descname"><span class="pre">get_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_from</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_to</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/builder/record_builder.html#get_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.builder.record_builder.get_files" title="Permalink to this definition">¶</a></dt>
-<dd><p>Get list of files under a path that were last modified between the two
-given timestamps.</p>
+<span class="sig-prename descclassname"><span class="pre">nexusLIMS.builder.record_builder.</span></span><span class="sig-name descname"><span class="pre">get_files</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><span class="pre">Path</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_from</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.10/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><span class="pre">datetime</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.10/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><span class="pre">datetime</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.10/library/typing.html#typing.List" title="(in Python v3.10)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><span class="pre">Path</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/nexusLIMS/builder/record_builder.html#get_files"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.builder.record_builder.get_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get files under a path that were last modified between the two given timestamps.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The file path in which to search for files</p></li>
-<li><p><strong>dt_from</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><em>datetime.datetime</em></a>) – The starting timestamp that will be used to determine which files go
+<li><p><strong>path</strong> – The file path in which to search for files</p></li>
+<li><p><strong>dt_from</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><em>datetime</em></a>) – The starting timestamp that will be used to determine which files go
 in this record</p></li>
-<li><p><strong>dt_to</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><em>datetime.datetime</em></a>) – The ending timestamp used to determine the last point in time for
+<li><p><strong>dt_to</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><em>datetime</em></a>) – The ending timestamp used to determine the last point in time for
 which files should be associated with this record</p></li>
 </ul>
 </dd>
@@ -379,15 +384,16 @@ which files should be associated with this record</p></li>
 time range provided (sorted by modification time)</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>List[<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)">str</a>]</p>
+<dd class="field-odd"><p><em>List</em>[<a class="reference external" href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><em>Path</em></a>]</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="nexusLIMS.builder.record_builder.get_reservation_event">
-<span class="sig-prename descclassname"><span class="pre">nexusLIMS.builder.record_builder.</span></span><span class="sig-name descname"><span class="pre">get_reservation_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><span class="pre">nexusLIMS.db.session_handler.Session</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent" title="nexusLIMS.harvesters.ReservationEvent"><span class="pre">nexusLIMS.harvesters.ReservationEvent</span></a></span></span><a class="reference internal" href="../_modules/nexusLIMS/builder/record_builder.html#get_reservation_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.builder.record_builder.get_reservation_event" title="Permalink to this definition">¶</a></dt>
-<dd><p>Handles the abstraction of choosing the right “version” of the
+<span class="sig-prename descclassname"><span class="pre">nexusLIMS.builder.record_builder.</span></span><span class="sig-name descname"><span class="pre">get_reservation_event</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">session</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><span class="pre">Session</span></a></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference internal" href="nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent" title="nexusLIMS.harvesters.reservation_event.ReservationEvent"><span class="pre">ReservationEvent</span></a></span></span><a class="reference internal" href="../_modules/nexusLIMS/builder/record_builder.html#get_reservation_event"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.builder.record_builder.get_reservation_event" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a ReservationEvent representation of a Session.</p>
+<p>Handles the abstraction of choosing the right “version” of the
 <code class="docutils literal notranslate"><span class="pre">res_event_from_session</span></code> method from the harvester specified in the
 instrument database. This allows for one consistent function name to call
 a different method depending on which harvester is specified for each
@@ -395,24 +401,26 @@ instrument (currently just NEMO or Sharepoint).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>session</strong> – The <a class="reference internal" href="nexusLIMS.db.html#nexusLIMS.db.session_handler.Session" title="nexusLIMS.db.session_handler.Session"><code class="xref py py-class docutils literal notranslate"><span class="pre">Session</span></code></a> for which to
-fetch a matching <a class="reference internal" href="nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent" title="nexusLIMS.harvesters.ReservationEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReservationEvent</span></code></a> from
+fetch a matching
+<a class="reference internal" href="nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent" title="nexusLIMS.harvesters.reservation_event.ReservationEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReservationEvent</span></code></a> from
 the relevant harvester</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>res_event</strong> – A <a class="reference internal" href="nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent" title="nexusLIMS.harvesters.ReservationEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReservationEvent</span></code></a> representation of
-a reservation that matches the instrument and timespan specified in
-<code class="docutils literal notranslate"><span class="pre">session</span></code>.</p>
+<dd class="field-even"><p><strong>res_event</strong> – A <a class="reference internal" href="nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent" title="nexusLIMS.harvesters.reservation_event.ReservationEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReservationEvent</span></code></a>
+representation of a reservation that matches the instrument and timespan
+specified in <code class="docutils literal notranslate"><span class="pre">session</span></code>.</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference internal" href="nexusLIMS.harvesters.html#nexusLIMS.harvesters.ReservationEvent" title="nexusLIMS.harvesters.ReservationEvent"><em>ReservationEvent</em></a></p>
+<dd class="field-odd"><p><a class="reference internal" href="nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent" title="nexusLIMS.harvesters.reservation_event.ReservationEvent"><em>ReservationEvent</em></a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="nexusLIMS.builder.record_builder.process_new_records">
-<span class="sig-prename descclassname"><span class="pre">nexusLIMS.builder.record_builder.</span></span><span class="sig-name descname"><span class="pre">process_new_records</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_from</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Union" title="(in Python v3.7)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/constants.html#None" title="(in Python v3.7)"><span class="pre">None</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><span class="pre">datetime.datetime</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.Union" title="(in Python v3.7)"><span class="pre">Union</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/constants.html#None" title="(in Python v3.7)"><span class="pre">None</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><span class="pre">datetime.datetime</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/builder/record_builder.html#process_new_records"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.builder.record_builder.process_new_records" title="Permalink to this definition">¶</a></dt>
-<dd><p>Using <a class="reference internal" href="#nexusLIMS.builder.record_builder.build_new_session_records" title="nexusLIMS.builder.record_builder.build_new_session_records"><code class="xref py py-meth docutils literal notranslate"><span class="pre">build_new_session_records()</span></code></a>, process new records,
+<span class="sig-prename descclassname"><span class="pre">nexusLIMS.builder.record_builder.</span></span><span class="sig-name descname"><span class="pre">process_new_records</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dry_run</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><span class="pre">bool</span></a></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_from</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.10/library/typing.html#typing.Optional" title="(in Python v3.10)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.10/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><span class="pre">datetime</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dt_to</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.10/library/typing.html#typing.Optional" title="(in Python v3.10)"><span class="pre">Optional</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.10/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><span class="pre">datetime</span></a><span class="p"><span class="pre">]</span></span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/builder/record_builder.html#process_new_records"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.builder.record_builder.process_new_records" title="Permalink to this definition">¶</a></dt>
+<dd><p>Process new records (this is the main entrypoint to the record builder).</p>
+<p>Using <a class="reference internal" href="#nexusLIMS.builder.record_builder.build_new_session_records" title="nexusLIMS.builder.record_builder.build_new_session_records"><code class="xref py py-meth docutils literal notranslate"><span class="pre">build_new_session_records()</span></code></a>, process new records,
 save them to disk, and upload them to the NexusLIMS CDCS instance.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -437,17 +445,17 @@ be fetched.</p></li>
 <dl class="py function">
 <dt class="sig sig-object py" id="nexusLIMS.builder.record_builder.validate_record">
 <span class="sig-prename descclassname"><span class="pre">nexusLIMS.builder.record_builder.</span></span><span class="sig-name descname"><span class="pre">validate_record</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">xml_filename</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/builder/record_builder.html#validate_record"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.builder.record_builder.validate_record" title="Permalink to this definition">¶</a></dt>
-<dd><p>Validate an .xml record against the Nexus schema</p>
+<dd><p>Validate an .xml record against the Nexus schema.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>xml_filename</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.7/library/io.html#io.StringIO" title="(in Python v3.7)"><em>io.StringIO</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.7/library/io.html#io.BytesIO" title="(in Python v3.7)"><em>io.BytesIO</em></a>) – The path to the xml file to be validated (can also be a file-like
+<dd class="field-odd"><p><strong>xml_filename</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.10/library/io.html#io.StringIO" title="(in Python v3.10)"><em>StringIO</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3.10/library/io.html#io.BytesIO" title="(in Python v3.10)"><em>BytesIO</em></a>) – The path to the xml file to be validated (can also be a file-like
 object like StringIO or BytesIO)</p>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p><strong>validates</strong> – Whether or not the record validates against the Nexus schema</p>
+<dd class="field-even"><p><strong>validates</strong> – Whether the record validates against the Nexus schema</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)">bool</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -475,8 +483,8 @@ object like StringIO or BytesIO)</p>
       
     </p>
     <p>
-        &copy; Copyright 2022, NIST Office of Data and Informatics.<br/>
-      Last updated on Jul, 18, 2022.<br/>
+        &copy; Copyright 2023, NIST Office of Data and Informatics.<br/>
+      Last updated on Apr, 25, 2023.<br/>
     </p>
   </div>
 </footer>

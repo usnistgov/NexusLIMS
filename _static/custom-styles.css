@@ -129,3 +129,10 @@ dt#nexusLIMS\.instruments\.instrument_db > em {
 blockquote {
     font-size: unset;
 }
+
+/* make page TOC a little more nicely formatted */
+ul.globaltoc + h4 + ul > li > ul {
+    margin-left: -25px;
+    width: 100%;
+    overflow-wrap: anywhere;
+}

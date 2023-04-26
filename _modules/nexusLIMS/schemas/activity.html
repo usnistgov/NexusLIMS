@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>nexusLIMS.schemas.activity &#8212; NexusLIMS 1.1.0 documentation</title>
+    <title>nexusLIMS.schemas.activity &#8212; NexusLIMS 1.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom-styles.css" />
@@ -28,26 +28,27 @@ $(document).ready(function(){
   // Mark external (non-nist.gov) A tags with class "external"
   //If the adress start with https and ends with nist.gov
   var re_nist = new RegExp('^https?:\/\/((^\/)*\.)*nist\\.gov(\/|$)');
+  var re_nist_github = new RegExp('^https:\/\/github.com\/usnistgov(\/|$)');
   //Regex to find address that start with https
   var re_absolute_address = new RegExp('^((https?:)?\/\/)');
   $("a").each(function(){
     var url=$(this).attr('href');
-    if(re_nist.test(url) || !re_absolute_address.test(url)){
-      $(this).addClass('local');
+    if(re_nist.test(url) || !re_absolute_address.test(url) || re_nist_github.test(url)){
+      $(this).addClass('leave_notice_local');
     }else{
       //This a href appears to be external, so tag it
-      $(this).addClass('external');
+      $(this).addClass('leave_notice_external');
     }
   });
   // Add leaveNotice to external A elements
-  $('a.external').leaveNotice();
+  $('a.leave_notice_external').leaveNotice();
 });
 </script>
 <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
 
   </head><body>
 
-  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+  <div id="navbar" class="navbar navbar-default ">
     <div class="container">
       <div class="navbar-header">
         <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
@@ -58,7 +59,7 @@ $(document).ready(function(){
         </button>
         <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logo_horizontal.png"></span>
            </a>
-        <span class="navbar-text navbar-version pull-left"><b></b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.3.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -79,6 +80,7 @@ $(document).ready(function(){
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../database.html">NexusLIMS database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development.html">Developer documentation</a></li>
@@ -91,7 +93,10 @@ $(document).ready(function(){
 <li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/nexusLIMS.harvesters.nemo.html">nexusLIMS.harvesters.nemo package</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
 </ul>
 </li>
@@ -143,6 +148,7 @@ $(document).ready(function(){
 <ul class="globaltoc">
     <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../database.html">NexusLIMS database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development.html">Developer documentation</a></li>
@@ -197,33 +203,41 @@ $(document).ready(function(){
 <span class="c1">#  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,</span>
 <span class="c1">#  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.</span>
 <span class="c1">#</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The &quot;Acquisition Activity&quot; module.</span>
 
-<span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
-<span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span> <span class="k">as</span> <span class="n">_datetime</span>
-<span class="kn">import</span> <span class="nn">math</span> <span class="k">as</span> <span class="nn">_math</span>
+<span class="sd">Provides a class to represent and operate on an Acquisition Activity (as defined by the</span>
+<span class="sd">NexusLIMS `Experiment` schema), as well as a helper method to cluster a list of</span>
+<span class="sd">filenames by the files&#39; modification times.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span> <span class="k">as</span> <span class="n">dt</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">timeit</span> <span class="kn">import</span> <span class="n">default_timer</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">quote</span><span class="p">,</span> <span class="n">unquote</span>
 <span class="kn">from</span> <span class="nn">xml.sax.saxutils</span> <span class="kn">import</span> <span class="n">escape</span>
-<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">quote</span> <span class="k">as</span> <span class="n">_urlquote</span>
-<span class="kn">from</span> <span class="nn">timeit</span> <span class="kn">import</span> <span class="n">default_timer</span> <span class="k">as</span> <span class="n">_timer</span>
-<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span> <span class="k">as</span> <span class="n">_etree</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 
-<span class="kn">import</span> <span class="nn">hyperspy.api_nogui</span> <span class="k">as</span> <span class="nn">_hs</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">_np</span>
-<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KernelDensity</span> <span class="k">as</span> <span class="n">_KernelDensity</span>
-<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">argrelextrema</span> <span class="k">as</span> <span class="n">_argrelextrema</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span> <span class="k">as</span> <span class="n">_GridSearchCV</span>
-<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">LeaveOneOut</span> <span class="k">as</span> <span class="n">_LeaveOneOut</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>
+<span class="kn">from</span> <span class="nn">scipy.signal</span> <span class="kn">import</span> <span class="n">argrelextrema</span>
+<span class="kn">from</span> <span class="nn">sklearn.model_selection</span> <span class="kn">import</span> <span class="n">GridSearchCV</span><span class="p">,</span> <span class="n">LeaveOneOut</span>
+<span class="kn">from</span> <span class="nn">sklearn.neighbors</span> <span class="kn">import</span> <span class="n">KernelDensity</span>
 
-<span class="kn">from</span> <span class="nn">nexusLIMS.extractors</span> <span class="kn">import</span> <span class="n">parse_metadata</span> <span class="k">as</span> <span class="n">_parse_metadata</span>
-<span class="kn">from</span> <span class="nn">nexusLIMS.extractors</span> <span class="kn">import</span> <span class="n">flatten_dict</span> <span class="k">as</span> <span class="n">_flatten_dict</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.extractors</span> <span class="kn">import</span> <span class="n">flatten_dict</span><span class="p">,</span> <span class="n">parse_metadata</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="n">current_system_tz</span>
 
-<span class="n">_logger</span> <span class="o">=</span> <span class="n">_logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-<span class="n">_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">_logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="cluster_filelist_mtimes"><a class="viewcode-back" href="../../../api/nexusLIMS.schemas.html#nexusLIMS.schemas.activity.cluster_filelist_mtimes">[docs]</a><span class="k">def</span> <span class="nf">cluster_filelist_mtimes</span><span class="p">(</span><span class="n">filelist</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Cluster a list of files by modification time.</span>
+
 <span class="sd">    Perform a statistical clustering of the timestamps (`mtime` values) of a</span>
 <span class="sd">    list of files to find &quot;relatively&quot; large gaps in acquisition time. The</span>
 <span class="sd">    definition of `relatively` depends on the context of the entire list of</span>
@@ -260,14 +274,14 @@ $(document).ready(function(){
 <span class="sd">    aa_boundaries : List[float]</span>
 <span class="sd">        A list of the `mtime` values that represent boundaries between</span>
 <span class="sd">        discrete Acquisition Activities</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Starting clustering of file mtimes&#39;</span><span class="p">)</span>
-    <span class="n">start_timer</span> <span class="o">=</span> <span class="n">_timer</span><span class="p">()</span>
-    <span class="n">mtimes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">filelist</span><span class="p">])</span>
+<span class="sd">    &quot;&quot;&quot;</span>  <span class="c1"># noqa: E501</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting clustering of file mtimes&quot;</span><span class="p">)</span>
+    <span class="n">start_timer</span> <span class="o">=</span> <span class="n">default_timer</span><span class="p">()</span>
+    <span class="n">mtimes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">f</span><span class="p">)</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">filelist</span><span class="p">])</span>
 
     <span class="c1"># remove duplicate file mtimes (since they cause errors below):</span>
-    <span class="n">mtimes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">mtimes</span><span class="p">)))</span>
-    <span class="n">m_array</span> <span class="o">=</span> <span class="n">_np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mtimes</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+    <span class="n">mtimes</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">mtimes</span><span class="p">))</span>
+    <span class="n">m_array</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">mtimes</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">mtimes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
         <span class="c1"># if there was only one file, don&#39;t do any more processing and just</span>
@@ -283,38 +297,117 @@ $(document).ready(function(){
     <span class="c1"># biased towards smaller values). we do cross-validation using the Leave</span>
     <span class="c1"># One Out strategy and using the total log-likelihood from the KDE as</span>
     <span class="c1"># the score to maximize (goodness of fit)</span>
-    <span class="n">bandwidths</span> <span class="o">=</span> <span class="n">_np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span><span class="n">_math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">mtime_diff</span><span class="p">)),</span>
-                              <span class="n">_math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">mtime_diff</span><span class="p">)),</span>
-                              <span class="mi">35</span><span class="p">,</span> <span class="n">base</span><span class="o">=</span><span class="n">_math</span><span class="o">.</span><span class="n">e</span><span class="p">)</span>
-    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;KDE bandwidth grid search&#39;</span><span class="p">)</span>
-    <span class="n">grid</span> <span class="o">=</span> <span class="n">_GridSearchCV</span><span class="p">(</span><span class="n">_KernelDensity</span><span class="p">(</span><span class="n">kernel</span><span class="o">=</span><span class="s1">&#39;gaussian&#39;</span><span class="p">),</span>
-                         <span class="p">{</span><span class="s1">&#39;bandwidth&#39;</span><span class="p">:</span> <span class="n">bandwidths</span><span class="p">},</span>
-                         <span class="n">cv</span><span class="o">=</span><span class="n">_LeaveOneOut</span><span class="p">(),</span> <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="n">bandwidths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">logspace</span><span class="p">(</span>
+        <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">min</span><span class="p">(</span><span class="n">mtime_diff</span><span class="p">)),</span>
+        <span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">mtime_diff</span><span class="p">)),</span>
+        <span class="mi">35</span><span class="p">,</span>
+        <span class="n">base</span><span class="o">=</span><span class="n">math</span><span class="o">.</span><span class="n">e</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;KDE bandwidth grid search&quot;</span><span class="p">)</span>
+    <span class="n">grid</span> <span class="o">=</span> <span class="n">GridSearchCV</span><span class="p">(</span>
+        <span class="n">KernelDensity</span><span class="p">(</span><span class="n">kernel</span><span class="o">=</span><span class="s2">&quot;gaussian&quot;</span><span class="p">),</span>
+        <span class="p">{</span><span class="s2">&quot;bandwidth&quot;</span><span class="p">:</span> <span class="n">bandwidths</span><span class="p">},</span>
+        <span class="n">cv</span><span class="o">=</span><span class="n">LeaveOneOut</span><span class="p">(),</span>
+        <span class="n">n_jobs</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">grid</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">m_array</span><span class="p">)</span>
-    <span class="n">bw</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">best_params_</span><span class="p">[</span><span class="s1">&#39;bandwidth&#39;</span><span class="p">]</span>
-    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Using bandwidth of </span><span class="si">{</span><span class="n">bw</span><span class="si">:</span><span class="s1">.3f</span><span class="si">}</span><span class="s1"> minutes for KDE&#39;</span><span class="p">)</span>
+    <span class="n">bandwidth</span> <span class="o">=</span> <span class="n">grid</span><span class="o">.</span><span class="n">best_params_</span><span class="p">[</span><span class="s2">&quot;bandwidth&quot;</span><span class="p">]</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using bandwidth of </span><span class="si">%.3f</span><span class="s2"> minutes for KDE&quot;</span><span class="p">,</span> <span class="n">bandwidth</span><span class="p">)</span>
 
     <span class="c1"># Calculate AcquisitionActivity boundaries by &quot;clustering&quot; the timestamps</span>
     <span class="c1"># using KDE using KDTree nearest neighbor estimates, and the previously</span>
     <span class="c1"># identified &quot;optimal&quot; bandwidth</span>
-    <span class="n">kde</span> <span class="o">=</span> <span class="n">_KernelDensity</span><span class="p">(</span><span class="n">kernel</span><span class="o">=</span><span class="s1">&#39;gaussian&#39;</span><span class="p">,</span>
-                         <span class="n">bandwidth</span><span class="o">=</span><span class="n">bw</span><span class="p">)</span>
-    <span class="n">kde</span> <span class="o">=</span> <span class="n">kde</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">m_array</span><span class="p">)</span>
-    <span class="n">s</span> <span class="o">=</span> <span class="n">_np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">m_array</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">m_array</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">num</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">mtimes</span><span class="p">)</span><span class="o">*</span><span class="mi">10</span><span class="p">)</span>
-    <span class="n">e</span> <span class="o">=</span> <span class="n">kde</span><span class="o">.</span><span class="n">score_samples</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
+    <span class="n">kde</span> <span class="o">=</span> <span class="n">KernelDensity</span><span class="p">(</span><span class="n">kernel</span><span class="o">=</span><span class="s2">&quot;gaussian&quot;</span><span class="p">,</span> <span class="n">bandwidth</span><span class="o">=</span><span class="n">bandwidth</span><span class="p">)</span>
+    <span class="n">kde</span><span class="p">:</span> <span class="n">KernelDensity</span> <span class="o">=</span> <span class="n">kde</span><span class="o">.</span><span class="n">fit</span><span class="p">(</span><span class="n">m_array</span><span class="p">)</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linspace</span><span class="p">(</span><span class="n">m_array</span><span class="o">.</span><span class="n">min</span><span class="p">(),</span> <span class="n">m_array</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">num</span><span class="o">=</span><span class="nb">len</span><span class="p">(</span><span class="n">mtimes</span><span class="p">)</span> <span class="o">*</span> <span class="mi">10</span><span class="p">)</span>
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">kde</span><span class="o">.</span><span class="n">score_samples</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 
-    <span class="n">mins</span> <span class="o">=</span> <span class="n">_argrelextrema</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">_np</span><span class="o">.</span><span class="n">less</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>      <span class="c1"># the minima indices</span>
-    <span class="n">aa_boundaries</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">mins</span><span class="p">]</span>     <span class="c1"># the minima mtime values</span>
-    <span class="n">end_timer</span> <span class="o">=</span> <span class="n">_timer</span><span class="p">()</span>
-    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Detected </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">aa_boundaries</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="si">}</span><span class="s1"> activities in &#39;</span>
-                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">end_timer</span> <span class="o">-</span> <span class="n">start_timer</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> seconds&#39;</span><span class="p">)</span>
+    <span class="n">mins</span> <span class="o">=</span> <span class="n">argrelextrema</span><span class="p">(</span><span class="n">scores</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">less</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># the minima indices</span>
+    <span class="n">aa_boundaries</span> <span class="o">=</span> <span class="p">[</span><span class="n">s</span><span class="p">[</span><span class="n">m</span><span class="p">]</span> <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="n">mins</span><span class="p">]</span>  <span class="c1"># the minima mtime values</span>
+    <span class="n">end_timer</span> <span class="o">=</span> <span class="n">default_timer</span><span class="p">()</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s2">&quot;Detected </span><span class="si">%i</span><span class="s2"> activities in </span><span class="si">%.2f</span><span class="s2"> seconds&quot;</span><span class="p">,</span>
+        <span class="nb">len</span><span class="p">(</span><span class="n">aa_boundaries</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+        <span class="n">end_timer</span> <span class="o">-</span> <span class="n">start_timer</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">aa_boundaries</span></div>
 
 
-<div class="viewcode-block" id="AcquisitionActivity"><a class="viewcode-back" href="../../../api/nexusLIMS.schemas.html#nexusLIMS.schemas.activity.AcquisitionActivity">[docs]</a><span class="k">class</span> <span class="nc">AcquisitionActivity</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A collection of files/metadata attributed to a physical acquisition activity</span>
+<span class="k">def</span> <span class="nf">_escape</span><span class="p">(</span><span class="n">val</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Any</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check to see if a value needs to be escaped and escape it or just return it as is.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    val</span>
+<span class="sd">        The value to conditionally escape</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    Any</span>
+<span class="sd">        The value either as-is or escaped</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">c</span> <span class="ow">in</span> <span class="n">val</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="s2">&quot;&lt;&amp;&quot;</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">escape</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">val</span>
+
+
+<span class="k">def</span> <span class="nf">_add_dataset_element</span><span class="p">(</span>
+    <span class="n">file</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">aq_ac_xml_el</span><span class="p">:</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">,</span>
+    <span class="n">meta</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
+    <span class="n">unique_meta</span><span class="p">:</span> <span class="n">Dict</span><span class="p">,</span>
+    <span class="n">warning</span><span class="p">:</span> <span class="n">List</span><span class="p">,</span>
+<span class="p">):</span>
+    <span class="c1"># escape any bad characters in the filename</span>
+    <span class="n">file</span> <span class="o">=</span> <span class="n">_escape</span><span class="p">(</span><span class="n">file</span><span class="p">)</span>
+
+    <span class="c1"># build path to thumbnail</span>
+    <span class="n">rel_fname</span> <span class="o">=</span> <span class="n">file</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;mmfnexus_path&quot;</span><span class="p">],</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+    <span class="n">rel_thumb_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rel_fname</span><span class="si">}</span><span class="s2">.thumb.png&quot;</span>
+
+    <span class="c1"># encode for safe URLs</span>
+    <span class="n">rel_fname</span> <span class="o">=</span> <span class="n">quote</span><span class="p">(</span><span class="n">rel_fname</span><span class="p">)</span>
+    <span class="n">rel_thumb_name</span> <span class="o">=</span> <span class="n">quote</span><span class="p">(</span><span class="n">rel_thumb_name</span><span class="p">)</span>
+
+    <span class="c1"># f is string; um is a dictionary, w is a list</span>
+    <span class="n">dset_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">aq_ac_xml_el</span><span class="p">,</span> <span class="s2">&quot;dataset&quot;</span><span class="p">)</span>
+    <span class="n">dset_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;DatasetType&quot;</span><span class="p">]))</span>
+    <span class="n">dset_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;role&quot;</span><span class="p">,</span> <span class="s2">&quot;Experimental&quot;</span><span class="p">)</span>
+
+    <span class="n">dset_name_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dset_el</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span>
+    <span class="n">dset_name_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">file</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="n">dset_loc_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dset_el</span><span class="p">,</span> <span class="s2">&quot;location&quot;</span><span class="p">)</span>
+    <span class="n">dset_loc_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">rel_fname</span>
+
+    <span class="c1"># check if preview image exists before adding it XML structure</span>
+    <span class="k">if</span> <span class="n">rel_thumb_name</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;/&quot;</span><span class="p">:</span>
+        <span class="n">test_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;nexusLIMS_path&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="n">unquote</span><span class="p">(</span><span class="n">rel_thumb_name</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+    <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="c1"># this shouldn&#39;t happen, but just in case...</span>
+        <span class="n">test_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;nexusLIMS_path&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="n">unquote</span><span class="p">(</span><span class="n">rel_thumb_name</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">test_path</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+        <span class="n">dset_prev_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dset_el</span><span class="p">,</span> <span class="s2">&quot;preview&quot;</span><span class="p">)</span>
+        <span class="n">dset_prev_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">rel_thumb_name</span>
+
+    <span class="k">for</span> <span class="n">meta_k</span><span class="p">,</span> <span class="n">meta_v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">unique_meta</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()):</span>
+        <span class="k">if</span> <span class="n">meta_k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;warnings&quot;</span><span class="p">,</span> <span class="s2">&quot;DatasetType&quot;</span><span class="p">]:</span>
+            <span class="n">meta_v</span> <span class="o">=</span> <span class="n">_escape</span><span class="p">(</span><span class="n">meta_v</span><span class="p">)</span>  <span class="c1"># noqa: PLW2901</span>
+            <span class="n">meta_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dset_el</span><span class="p">,</span> <span class="s2">&quot;meta&quot;</span><span class="p">)</span>
+            <span class="n">meta_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">meta_k</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">meta_k</span> <span class="ow">in</span> <span class="n">warning</span><span class="p">:</span>
+                <span class="n">meta_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">)</span>
+            <span class="n">meta_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">meta_v</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">aq_ac_xml_el</span>
+
+
+<div class="viewcode-block" id="AcquisitionActivity"><a class="viewcode-back" href="../../../api/nexusLIMS.schemas.html#nexusLIMS.schemas.activity.AcquisitionActivity">[docs]</a><span class="k">class</span> <span class="nc">AcquisitionActivity</span><span class="p">:</span>  <span class="c1"># pylint: disable=too-many-instance-attributes</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    A collection of files/metadata attributed to a physical acquisition activity.</span>
 
 <span class="sd">    Instances of this class correspond to AcquisitionActivity nodes in the</span>
 <span class="sd">    `NexusLIMS schema &lt;https://data.nist.gov/od/dm/nexus/experiment/v1.0&gt;`_</span>
@@ -344,58 +437,58 @@ $(document).ready(function(){
 <span class="sd">    previews : list</span>
 <span class="sd">        A list of filenames pointing to the previews for each file in</span>
 <span class="sd">        ``files``</span>
-<span class="sd">    sigs : list</span>
-<span class="sd">        A list of *lazy* (to minimize loading times) HyperSpy signals in</span>
-<span class="sd">        this AcquisitionActivity. HyperSpy is used to facilitate metadata</span>
-<span class="sd">        reading</span>
 <span class="sd">    meta : list</span>
 <span class="sd">        A list of dictionaries containing the &quot;important&quot; metadata for each</span>
-<span class="sd">        signal/file in ``sigs`` and ``files``</span>
+<span class="sd">        file in ``files``</span>
 <span class="sd">    warnings : list</span>
 <span class="sd">        A list of metadata values that may be untrustworthy because of the</span>
 <span class="sd">        software</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span>
-                 <span class="n">start</span><span class="o">=</span><span class="n">_datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
-                 <span class="n">end</span><span class="o">=</span><span class="n">_datetime</span><span class="o">.</span><span class="n">now</span><span class="p">(),</span>
-                 <span class="n">mode</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">,</span>
-                 <span class="n">unique_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">setup_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">unique_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">previews</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">sigs</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">warnings</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Create a new AcquisitionActivity</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">start</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">end</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>  <span class="c1"># pylint: disable=too-many-arguments # noqa: 0913</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">start</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">end</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">unique_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">setup_params</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">unique_meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">files</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">previews</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">meta</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">warnings</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Create a new AcquisitionActivity.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">start</span> <span class="o">=</span> <span class="n">start</span> <span class="k">if</span> <span class="n">start</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">dt</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">tz</span><span class="o">=</span><span class="n">current_system_tz</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">end</span> <span class="k">if</span> <span class="n">end</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">dt</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">tz</span><span class="o">=</span><span class="n">current_system_tz</span><span class="p">())</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">mode</span> <span class="o">=</span> <span class="n">mode</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">unique_params</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span> <span class="k">if</span> <span class="n">unique_params</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">unique_params</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">setup_params</span> <span class="o">=</span> <span class="n">setup_params</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">unique_meta</span> <span class="o">=</span> <span class="n">unique_meta</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">files</span> <span class="o">=</span> <span class="p">[]</span> <span class="k">if</span> <span class="n">files</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">files</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">previews</span> <span class="o">=</span> <span class="p">[]</span> <span class="k">if</span> <span class="n">previews</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">previews</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">sigs</span> <span class="o">=</span> <span class="p">[]</span> <span class="k">if</span> <span class="n">sigs</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">sigs</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">meta</span> <span class="o">=</span> <span class="p">[]</span> <span class="k">if</span> <span class="n">meta</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">meta</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span> <span class="o">=</span> <span class="p">[]</span> <span class="k">if</span> <span class="n">warnings</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">warnings</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="si">:</span><span class="s1">&lt;12</span><span class="si">}</span><span class="s1"> AcquisitionActivity; &#39;</span> <span class="o">+</span> \
-               <span class="sa">f</span><span class="s1">&#39;start: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s1">; &#39;</span> <span class="o">+</span> \
-               <span class="sa">f</span><span class="s1">&#39;end: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return custom representation of AcquisitionActivity.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="si">:</span><span class="s2">&lt;12</span><span class="si">}</span><span class="s2"> AcquisitionActivity; &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;start: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">; &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;end: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">end</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s1"> AcquisitionActivity </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="s1">&#39;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Return custom string representation of AcquisitionActivity.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2"> AcquisitionActivity </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">mode</span><span class="si">}</span><span class="s2">&quot;</span>
 
-<div class="viewcode-block" id="AcquisitionActivity.add_file"><a class="viewcode-back" href="../../../api/nexusLIMS.schemas.html#nexusLIMS.schemas.activity.AcquisitionActivity.add_file">[docs]</a>    <span class="k">def</span> <span class="nf">add_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">,</span> <span class="n">generate_preview</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="AcquisitionActivity.add_file"><a class="viewcode-back" href="../../../api/nexusLIMS.schemas.html#nexusLIMS.schemas.activity.AcquisitionActivity.add_file">[docs]</a>    <span class="k">def</span> <span class="nf">add_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fname</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">generate_preview</span><span class="o">=</span><span class="kc">True</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Add file to AcquisitionActivity.</span>
+
 <span class="sd">        Add a file to this activity&#39;s file list, parse its metadata (storing</span>
 <span class="sd">        a flattened copy of it to this activity), generate a preview</span>
-<span class="sd">        thumbnail, get the file&#39;s type, and a lazy HyperSpy signal</span>
+<span class="sd">        thumbnail, get the file&#39;s type, and a lazy HyperSpy signal.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -404,39 +497,44 @@ $(document).ready(function(){
 <span class="sd">        generate_preview : bool</span>
 <span class="sd">            Whether or not to create the preview thumbnail images</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="n">fname</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">fname</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">fname</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">fname</span><span class="p">))</span>
             <span class="n">gen_prev</span> <span class="o">=</span> <span class="n">generate_preview</span>
-            <span class="n">meta</span><span class="p">,</span> <span class="n">preview_fname</span> <span class="o">=</span> <span class="n">_parse_metadata</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span>
-                                                  <span class="n">generate_preview</span><span class="o">=</span><span class="n">gen_prev</span><span class="p">)</span>
+            <span class="n">meta</span><span class="p">,</span> <span class="n">preview_fname</span> <span class="o">=</span> <span class="n">parse_metadata</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">generate_preview</span><span class="o">=</span><span class="n">gen_prev</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">meta</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
                 <span class="c1"># Something bad happened, so we need to alert the user</span>
-                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Could not parse metadata of </span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="k">pass</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Could not parse metadata of </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">s</span> <span class="o">=</span> <span class="n">_hs</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">fname</span><span class="p">,</span> <span class="n">lazy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">previews</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">preview_fname</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">sigs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_flatten_dict</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">]))</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">w</span><span class="p">)</span>
-                                      <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s1">&#39;nx_meta&#39;</span><span class="p">][</span><span class="s1">&#39;warnings&#39;</span><span class="p">]])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">flatten_dict</span><span class="p">(</span><span class="n">meta</span><span class="p">[</span><span class="s2">&quot;nx_meta&quot;</span><span class="p">]))</span>
+                <span class="k">if</span> <span class="s2">&quot;warnings&quot;</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;nx_meta&quot;</span><span class="p">]:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="p">[</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">w</span><span class="p">)</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">[</span><span class="s2">&quot;nx_meta&quot;</span><span class="p">][</span><span class="s2">&quot;warnings&quot;</span><span class="p">]],</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span><span class="o">.</span><span class="n">append</span><span class="p">([])</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">fname</span> <span class="o">+</span> <span class="s1">&#39; was not found&#39;</span><span class="p">)</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;appended </span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s1"> to files&#39;</span><span class="p">)</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;self.files is now </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+            <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">fname</span><span class="si">}</span><span class="s2"> was not found&quot;</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;appended </span><span class="si">%s</span><span class="s2"> to files&quot;</span><span class="p">,</span> <span class="n">fname</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;self.files is now </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="AcquisitionActivity.store_unique_params"><a class="viewcode-back" href="../../../api/nexusLIMS.schemas.html#nexusLIMS.schemas.activity.AcquisitionActivity.store_unique_params">[docs]</a>    <span class="k">def</span> <span class="nf">store_unique_params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Store unique metadata keys.</span>
+
 <span class="sd">        Analyze the metadata keys contained in this AcquisitionActivity and</span>
-<span class="sd">        store the unique values in a set (``self.unique_params``)</span>
+<span class="sd">        store the unique values in a set (``self.unique_params``).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># self.meta is a list of dictionaries</span>
-        <span class="k">for</span> <span class="n">m</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">unique_params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
+        <span class="k">for</span> <span class="n">meta</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unique_params</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">meta</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span></div>
 
 <div class="viewcode-block" id="AcquisitionActivity.store_setup_params"><a class="viewcode-back" href="../../../api/nexusLIMS.schemas.html#nexusLIMS.schemas.activity.AcquisitionActivity.store_setup_params">[docs]</a>    <span class="k">def</span> <span class="nf">store_setup_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">values_to_search</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Store common metadata keys as &quot;setup parameters&quot;.</span>
+
 <span class="sd">        Search the metadata of files in this AcquisitionActivity for those</span>
 <span class="sd">        containing identical values over all files, which will then be defined</span>
 <span class="sd">        as parameters attributed to experimental setup, rather than individual</span>
@@ -455,26 +553,26 @@ $(document).ready(function(){
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Make sure unique params are defined before proceeding:</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">unique_params</span> <span class="o">==</span> <span class="nb">set</span><span class="p">():</span>
-            <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Storing unique parameters for files in &#39;</span>
-                         <span class="s1">&#39;AcquisitionActivity&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Storing unique parameters for files in AcquisitionActivity&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">store_unique_params</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Only one file found in this activity, so leaving &#39;</span>
-                         <span class="s1">&#39;metadata associated with the file, rather than &#39;</span>
-                         <span class="s1">&#39;activity&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;Only one file found in this activity, so leaving &quot;</span>
+                <span class="s2">&quot;metadata associated with the file, rather than &quot;</span>
+                <span class="s2">&quot;activity&quot;</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">setup_params</span> <span class="o">=</span> <span class="p">{}</span>
             <span class="k">return</span>
 
         <span class="k">if</span> <span class="n">values_to_search</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">values_to_search</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">unique_params</span>
 
-        <span class="c1"># m will be individual dictionaries, since meta is list of dicts</span>
+        <span class="c1"># meta will be individual dictionaries, since self.meta is list of dicts</span>
         <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="n">setup_params</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="k">for</span> <span class="n">m</span><span class="p">,</span> <span class="n">f</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">meta</span><span class="p">,</span> <span class="n">_file</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">):</span>
             <span class="c1"># loop through the values_to_search</span>
-            <span class="c1"># print(f)</span>
             <span class="c1"># using .copy() on the set allows us to remove values during each</span>
             <span class="c1"># iteration, as described in:</span>
             <span class="c1"># https://stackoverflow.com/a/22847851/1435788</span>
@@ -485,15 +583,19 @@ $(document).ready(function(){
                 <span class="c1"># and remove from values_to_search to prevent it being searched</span>
                 <span class="c1"># on subsequent iterations.</span>
                 <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">vts</span> <span class="ow">in</span> <span class="n">m</span><span class="p">:</span>
-                        <span class="c1"># this value was found in m, so store it</span>
-                        <span class="n">setup_params</span><span class="p">[</span><span class="n">vts</span><span class="p">]</span> <span class="o">=</span> <span class="n">m</span><span class="p">[</span><span class="n">vts</span><span class="p">]</span>
-                        <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;iter: </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">; adding </span><span class="si">{</span><span class="n">vts</span><span class="si">}</span><span class="s1"> = </span><span class="si">{</span><span class="n">m</span><span class="p">[</span><span class="n">vts</span><span class="p">]</span><span class="si">}</span><span class="s1"> to &#39;</span>
-                                      <span class="sa">f</span><span class="s1">&#39;setup_params&#39;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">vts</span> <span class="ow">in</span> <span class="n">meta</span><span class="p">:</span>
+                        <span class="c1"># this value was found in meta, so store it</span>
+                        <span class="n">setup_params</span><span class="p">[</span><span class="n">vts</span><span class="p">]</span> <span class="o">=</span> <span class="n">meta</span><span class="p">[</span><span class="n">vts</span><span class="p">]</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                            <span class="s2">&quot;iter: </span><span class="si">%i</span><span class="s2">; adding </span><span class="si">%s</span><span class="s2"> = </span><span class="si">%s</span><span class="s2"> to setup_params&quot;</span><span class="p">,</span>
+                            <span class="n">i</span><span class="p">,</span>
+                            <span class="n">vts</span><span class="p">,</span>
+                            <span class="n">meta</span><span class="p">[</span><span class="n">vts</span><span class="p">],</span>
+                        <span class="p">)</span>
                     <span class="k">else</span><span class="p">:</span>
-                        <span class="c1"># this value wasn&#39;t present in m, so it can&#39;t be</span>
+                        <span class="c1"># this value wasn&#39;t present in meta, so it can&#39;t be</span>
                         <span class="c1"># common to all, so remove it:</span>
-                        <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;iter: </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">; removing </span><span class="si">{</span><span class="n">vts</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;iter: </span><span class="si">%i</span><span class="s2">; removing </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">vts</span><span class="p">)</span>
                         <span class="n">values_to_search</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">vts</span><span class="p">)</span>
                 <span class="c1"># On the subsequent iterations test if values are same/different</span>
                 <span class="c1"># If different, then remove the key from setup_params and</span>
@@ -505,62 +607,70 @@ $(document).ready(function(){
                         <span class="c1"># but if it is, it means this value, which should</span>
                         <span class="c1"># have already been added to setup_params is somehow</span>
                         <span class="c1"># new, so delete vts from values to search</span>
-                        <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;iter: </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">; &#39;</span>
-                                      <span class="sa">f</span><span class="s1">&#39;removing </span><span class="si">{</span><span class="n">vts</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
-                        <span class="n">values_to_search</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">vts</span><span class="p">)</span>      <span class="c1"># pragma: no cover</span>
-                    <span class="k">if</span> <span class="n">vts</span> <span class="ow">in</span> <span class="n">m</span><span class="p">:</span>
-                        <span class="k">if</span> <span class="n">setup_params</span><span class="p">[</span><span class="n">vts</span><span class="p">]</span> <span class="o">==</span> <span class="n">m</span><span class="p">[</span><span class="n">vts</span><span class="p">]:</span>
-                            <span class="c1"># value in m matches that already in setup_params</span>
-                            <span class="c1"># so allow it to stay in setup_params</span>
-                            <span class="k">pass</span>
-                        <span class="k">else</span><span class="p">:</span>
-                            <span class="c1"># value does not match, so this must be a</span>
-                            <span class="c1"># individual dataset metadata, so remove it from</span>
-                            <span class="c1"># setup_params, and remove it from values_to_search</span>
-                            <span class="n">_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;iter: </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">; vts=</span><span class="si">{</span><span class="n">vts</span><span class="si">}</span><span class="s1"> - &#39;</span>
-                                          <span class="sa">f</span><span class="s1">&#39;m[vts]=</span><span class="si">{</span><span class="n">m</span><span class="p">[</span><span class="n">vts</span><span class="p">]</span><span class="si">}</span><span class="s1"> != &#39;</span>
-                                          <span class="sa">f</span><span class="s1">&#39;setup_params[vts]=&#39;</span>
-                                          <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">setup_params</span><span class="p">[</span><span class="n">vts</span><span class="p">]</span><span class="si">}</span><span class="s1">; removing &#39;</span>
-                                          <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">vts</span><span class="si">}</span><span class="s1"> from setup_params and values &#39;</span>
-                                          <span class="sa">f</span><span class="s1">&#39;to search&#39;</span><span class="p">)</span>
-                            <span class="k">del</span> <span class="n">setup_params</span><span class="p">[</span><span class="n">vts</span><span class="p">]</span>
-                            <span class="n">values_to_search</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">vts</span><span class="p">)</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                            <span class="s2">&quot;iter: </span><span class="si">%i</span><span class="s2">; removing </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="n">i</span><span class="p">,</span>
+                            <span class="n">vts</span><span class="p">,</span>
+                        <span class="p">)</span>  <span class="c1"># pragma: no cover</span>
+                        <span class="n">values_to_search</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">vts</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
+                    <span class="k">if</span> <span class="n">vts</span> <span class="ow">in</span> <span class="n">meta</span> <span class="ow">and</span> <span class="n">setup_params</span><span class="p">[</span><span class="n">vts</span><span class="p">]</span> <span class="o">!=</span> <span class="n">meta</span><span class="p">[</span><span class="n">vts</span><span class="p">]:</span>
+                        <span class="c1"># value does not match, so this must be a</span>
+                        <span class="c1"># individual dataset metadata, so remove it from</span>
+                        <span class="c1"># setup_params, and remove it from values_to_search</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+                            <span class="s2">&quot;iter: </span><span class="si">%i</span><span class="s2">; vts=</span><span class="si">%s</span><span class="s2"> - &quot;</span>
+                            <span class="s2">&quot;meta[vts]=</span><span class="si">%s</span><span class="s2"> != setup_params[vts]=</span><span class="si">%s</span><span class="s2">; &quot;</span>
+                            <span class="s2">&quot;removing </span><span class="si">%s</span><span class="s2"> from setup_params and values to search&quot;</span><span class="p">,</span>
+                            <span class="n">i</span><span class="p">,</span>
+                            <span class="n">vts</span><span class="p">,</span>
+                            <span class="n">meta</span><span class="p">[</span><span class="n">vts</span><span class="p">],</span>
+                            <span class="n">setup_params</span><span class="p">[</span><span class="n">vts</span><span class="p">],</span>
+                            <span class="n">vts</span><span class="p">,</span>
+                        <span class="p">)</span>
+                        <span class="k">del</span> <span class="n">setup_params</span><span class="p">[</span><span class="n">vts</span><span class="p">]</span>
+                        <span class="n">values_to_search</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">vts</span><span class="p">)</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">setup_params</span> <span class="o">=</span> <span class="n">setup_params</span></div>
 
 <div class="viewcode-block" id="AcquisitionActivity.store_unique_metadata"><a class="viewcode-back" href="../../../api/nexusLIMS.schemas.html#nexusLIMS.schemas.activity.AcquisitionActivity.store_unique_metadata">[docs]</a>    <span class="k">def</span> <span class="nf">store_unique_metadata</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Store unique metadata keys as unique to each file.</span>
+
 <span class="sd">        For each file in this AcquisitionActivity, stores the metadata that</span>
 <span class="sd">        is unique rather than common to the entire AcquisitionActivity (which</span>
 <span class="sd">        are kept in ``self.setup_params``.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">setup_params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="si">}</span><span class="s1"> -- setup_params has not been defined; &#39;</span>
-                            <span class="sa">f</span><span class="s1">&#39;call store_setup_params() prior to using this &#39;</span>
-                            <span class="sa">f</span><span class="s1">&#39;method. Nothing was done.&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> -- setup_params has not been defined; call store_setup_params() &quot;</span>
+                <span class="s2">&quot;prior to using this method. Nothing was done.&quot;</span><span class="p">,</span>
+                <span class="bp">self</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="k">return</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">unique_meta</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">m</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">):</span>
-                <span class="n">tmp_unique</span> <span class="o">=</span> <span class="p">{}</span>
-                <span class="c1"># loop through each metadata dict, and if a given key k in m is</span>
-                <span class="c1"># not present in self.setup_params, add it it to the</span>
-                <span class="c1"># current dictionary (u_m) of unique_meta</span>
-                <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">m</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
-                    <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">setup_params</span><span class="p">:</span>
-                        <span class="c1"># this means k is unique to this file, so add it to</span>
-                        <span class="c1"># unique_meta</span>
-                        <span class="n">tmp_unique</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
-                <span class="n">unique_meta</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_unique</span><span class="p">)</span>
+
+        <span class="n">unique_meta</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">meta</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">:</span>
+            <span class="n">tmp_unique</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="c1"># loop through each metadata dict, and if a given key k in meta is</span>
+            <span class="c1"># not present in self.setup_params, add it to the</span>
+            <span class="c1"># current dictionary (u_m) of unique_meta</span>
+            <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">meta</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="k">if</span> <span class="n">k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">setup_params</span><span class="p">:</span>
+                    <span class="c1"># this means k is unique to this file, so add it to</span>
+                    <span class="c1"># unique_meta</span>
+                    <span class="n">tmp_unique</span><span class="p">[</span><span class="n">k</span><span class="p">]</span> <span class="o">=</span> <span class="n">v</span>
+            <span class="n">unique_meta</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">tmp_unique</span><span class="p">)</span>
 
         <span class="c1"># store what we calculated as unique metadata into the attribute</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">unique_meta</span> <span class="o">=</span> <span class="n">unique_meta</span></div>
 
-<div class="viewcode-block" id="AcquisitionActivity.as_xml"><a class="viewcode-back" href="../../../api/nexusLIMS.schemas.html#nexusLIMS.schemas.activity.AcquisitionActivity.as_xml">[docs]</a>    <span class="k">def</span> <span class="nf">as_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seqno</span><span class="p">,</span> <span class="n">sample_id</span><span class="p">,</span> <span class="n">print_xml</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="AcquisitionActivity.as_xml"><a class="viewcode-back" href="../../../api/nexusLIMS.schemas.html#nexusLIMS.schemas.activity.AcquisitionActivity.as_xml">[docs]</a>    <span class="k">def</span> <span class="nf">as_xml</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seqno</span><span class="p">,</span> <span class="n">sample_id</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Translate AcquisitionActivity to an XML representation.</span>
+
 <span class="sd">        Build an XML (``lxml``) representation of this AcquisitionActivity (for</span>
-<span class="sd">        use in instances of the NexusLIMS schema)</span>
+<span class="sd">        use in instances of the NexusLIMS schema).</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
@@ -570,9 +680,6 @@ $(document).ready(function(){
 <span class="sd">        sample_id : str</span>
 <span class="sd">            A unique identifier pointing to a sample identifier. No checks</span>
 <span class="sd">            are done on this value; it is merely reproduced in the XML output</span>
-<span class="sd">        print_xml : bool</span>
-<span class="sd">            Whether to print the XML output to the console or not (Default:</span>
-<span class="sd">            False)</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
@@ -581,80 +688,46 @@ $(document).ready(function(){
 <span class="sd">            properly-formed complete XML document since it does not have a</span>
 <span class="sd">            header or namespace definitions)</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">aqAc_xml_el</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;acquisitionActivity&quot;</span><span class="p">)</span>
-        <span class="n">aqAc_xml_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s1">&#39;seqno&#39;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">seqno</span><span class="p">))</span>
-        <span class="n">start_time_el</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">aqAc_xml_el</span><span class="p">,</span> <span class="s2">&quot;startTime&quot;</span><span class="p">)</span>
+        <span class="n">aq_ac_xml_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;acquisitionActivity&quot;</span><span class="p">)</span>
+        <span class="n">aq_ac_xml_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;seqno&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">seqno</span><span class="p">))</span>
+        <span class="n">start_time_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">aq_ac_xml_el</span><span class="p">,</span> <span class="s2">&quot;startTime&quot;</span><span class="p">)</span>
         <span class="n">start_time_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">start</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
-        <span class="n">sample_id_el</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">aqAc_xml_el</span><span class="p">,</span> <span class="s2">&quot;sampleID&quot;</span><span class="p">)</span>
+        <span class="n">sample_id_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">aq_ac_xml_el</span><span class="p">,</span> <span class="s2">&quot;sampleID&quot;</span><span class="p">)</span>
         <span class="n">sample_id_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">sample_id</span>
 
-        <span class="n">setup_el</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">aqAc_xml_el</span><span class="p">,</span> <span class="s2">&quot;setup&quot;</span><span class="p">)</span>
+        <span class="n">setup_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">aq_ac_xml_el</span><span class="p">,</span> <span class="s2">&quot;setup&quot;</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">pk</span><span class="p">,</span> <span class="n">pv</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">setup_params</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
-                             <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()):</span>
+        <span class="k">for</span> <span class="n">param_k</span><span class="p">,</span> <span class="n">param_v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">setup_params</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
+            <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">(),</span>
+        <span class="p">):</span>
             <span class="c1"># metadata values to skip in XML output</span>
-            <span class="k">if</span> <span class="n">pk</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;warnings&#39;</span><span class="p">,</span> <span class="s1">&#39;DatasetType&#39;</span><span class="p">]:</span>
-                <span class="k">pass</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">pv</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">c</span> <span class="ow">in</span> <span class="n">pv</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="s1">&#39;&lt;&amp;&#39;</span><span class="p">):</span>
-                    <span class="n">pv</span> <span class="o">=</span> <span class="n">escape</span><span class="p">(</span><span class="n">pv</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">param_k</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;warnings&quot;</span><span class="p">,</span> <span class="s2">&quot;DatasetType&quot;</span><span class="p">]:</span>
+                <span class="n">param_v</span> <span class="o">=</span> <span class="n">_escape</span><span class="p">(</span><span class="n">param_v</span><span class="p">)</span>  <span class="c1"># noqa: PLW2901</span>
                 <span class="c1"># for setup parameters, a key in the first dataset&#39;s warning</span>
                 <span class="c1"># list is the same as in all of them</span>
-                <span class="n">pk_warning</span> <span class="o">=</span> <span class="n">pk</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-                <span class="n">param_el</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">setup_el</span><span class="p">,</span> <span class="s2">&quot;param&quot;</span><span class="p">)</span>
-                <span class="n">param_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">pk</span><span class="p">))</span>
+                <span class="n">pk_warning</span> <span class="o">=</span> <span class="n">param_k</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+                <span class="n">param_el</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">setup_el</span><span class="p">,</span> <span class="s2">&quot;param&quot;</span><span class="p">)</span>
+                <span class="n">param_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">param_k</span><span class="p">))</span>
                 <span class="k">if</span> <span class="n">pk_warning</span><span class="p">:</span>
                     <span class="n">param_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">)</span>
-                <span class="n">param_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">pv</span><span class="p">)</span>
+                <span class="n">param_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">param_v</span><span class="p">)</span>
 
-        <span class="k">for</span> <span class="n">f</span><span class="p">,</span> <span class="n">m</span><span class="p">,</span> <span class="n">um</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span>
-                               <span class="bp">self</span><span class="o">.</span><span class="n">unique_meta</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span><span class="p">):</span>
-            <span class="c1"># escape any bad characters in the filename</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">c</span> <span class="ow">in</span> <span class="n">f</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="s1">&#39;&lt;&amp;&#39;</span><span class="p">):</span>
-                <span class="n">f</span> <span class="o">=</span> <span class="n">escape</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">_file</span><span class="p">,</span> <span class="n">meta</span><span class="p">,</span> <span class="n">unique_meta</span><span class="p">,</span> <span class="n">warning</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">files</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">meta</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">unique_meta</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">warnings</span><span class="p">,</span>
+        <span class="p">):</span>
+            <span class="n">aq_ac_xml_el</span> <span class="o">=</span> <span class="n">_add_dataset_element</span><span class="p">(</span>
+                <span class="n">_file</span><span class="p">,</span>
+                <span class="n">aq_ac_xml_el</span><span class="p">,</span>
+                <span class="n">meta</span><span class="p">,</span>
+                <span class="n">unique_meta</span><span class="p">,</span>
+                <span class="n">warning</span><span class="p">,</span>
+            <span class="p">)</span>
 
-            <span class="c1"># build path to thumbnail</span>
-            <span class="n">rel_fname</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;mmfnexus_path&quot;</span><span class="p">],</span> <span class="s1">&#39;&#39;</span><span class="p">)</span>
-            <span class="n">rel_thumb_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">rel_fname</span><span class="si">}</span><span class="s1">.thumb.png&#39;</span>
-
-            <span class="c1"># encode for safe URLs</span>
-            <span class="n">rel_fname</span> <span class="o">=</span> <span class="n">_urlquote</span><span class="p">(</span><span class="n">rel_fname</span><span class="p">)</span>
-            <span class="n">rel_thumb_name</span> <span class="o">=</span> <span class="n">_urlquote</span><span class="p">(</span><span class="n">rel_thumb_name</span><span class="p">)</span>
-
-            <span class="c1"># f is string; um is a dictionary, w is a list</span>
-            <span class="n">dset_el</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">aqAc_xml_el</span><span class="p">,</span> <span class="s2">&quot;dataset&quot;</span><span class="p">)</span>
-            <span class="n">dset_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;type&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">m</span><span class="p">[</span><span class="s2">&quot;DatasetType&quot;</span><span class="p">]))</span>
-            <span class="n">dset_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;role&quot;</span><span class="p">,</span> <span class="s2">&quot;Experimental&quot;</span><span class="p">)</span>
-
-            <span class="n">dset_name_el</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dset_el</span><span class="p">,</span> <span class="s2">&quot;name&quot;</span><span class="p">)</span>
-            <span class="n">dset_name_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-
-            <span class="n">dset_loc_el</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dset_el</span><span class="p">,</span> <span class="s2">&quot;location&quot;</span><span class="p">)</span>
-            <span class="n">dset_loc_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">rel_fname</span>
-
-            <span class="n">dset_prev_el</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dset_el</span><span class="p">,</span> <span class="s2">&quot;preview&quot;</span><span class="p">)</span>
-            <span class="n">dset_prev_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">rel_thumb_name</span>
-
-            <span class="k">for</span> <span class="n">meta_k</span><span class="p">,</span> <span class="n">meta_v</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">um</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span>
-                                         <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">i</span><span class="p">:</span> <span class="n">i</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">()):</span>
-                <span class="k">if</span> <span class="n">meta_k</span> <span class="ow">in</span> <span class="p">[</span><span class="s1">&#39;warnings&#39;</span><span class="p">,</span> <span class="s1">&#39;DatasetType&#39;</span><span class="p">]:</span>
-                    <span class="k">pass</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">meta_v</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">and</span> \
-                            <span class="nb">any</span><span class="p">(</span><span class="n">c</span> <span class="ow">in</span> <span class="n">meta_v</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="s1">&#39;&lt;&amp;&#39;</span><span class="p">):</span>
-                        <span class="n">meta_v</span> <span class="o">=</span> <span class="n">escape</span><span class="p">(</span><span class="n">meta_v</span><span class="p">)</span>
-                    <span class="n">meta_k_warning</span> <span class="o">=</span> <span class="n">meta_k</span> <span class="ow">in</span> <span class="n">w</span>
-                    <span class="n">meta_el</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">SubElement</span><span class="p">(</span><span class="n">dset_el</span><span class="p">,</span> <span class="s2">&quot;meta&quot;</span><span class="p">)</span>
-                    <span class="n">meta_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">meta_k</span><span class="p">))</span>
-                    <span class="k">if</span> <span class="n">meta_k_warning</span><span class="p">:</span>
-                        <span class="n">meta_el</span><span class="o">.</span><span class="n">set</span><span class="p">(</span><span class="s2">&quot;warning&quot;</span><span class="p">,</span> <span class="s2">&quot;true&quot;</span><span class="p">)</span>
-                    <span class="n">meta_el</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">meta_v</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">print_xml</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">_etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">aqAc_xml_el</span><span class="p">,</span> <span class="n">pretty_print</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                  <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;UTF-8&#39;</span><span class="p">))</span>
-
-        <span class="k">return</span> <span class="n">aqAc_xml_el</span></div></div>
+        <span class="k">return</span> <span class="n">aq_ac_xml_el</span></div></div>
 </pre></div>
 
     </div>
@@ -672,8 +745,8 @@ $(document).ready(function(){
       
     </p>
     <p>
-        &copy; Copyright 2022, NIST Office of Data and Informatics.<br/>
-      Last updated on Jul, 18, 2022.<br/>
+        &copy; Copyright 2023, NIST Office of Data and Informatics.<br/>
+      Last updated on Apr, 25, 2023.<br/>
     </p>
   </div>
 </footer>

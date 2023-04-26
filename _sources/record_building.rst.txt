@@ -68,7 +68,7 @@ Finding New Sessions
 
 The session finding is initiated by
 :py:func:`~nexusLIMS.builder.record_builder.process_new_records`. This method
-uses :py:func:`~nexusLIMS.harvesters.nemo.add_all_usage_events_to_db` to first
+uses :py:func:`~nexusLIMS.harvesters.nemo.utils.add_all_usage_events_to_db` to first
 query any enabled NEMO API Connectors, and adds rows to the NexusLIMS session
 log database for any newly created usage events (default is to look back seven
 days for usage events). The record builder then calls
@@ -215,14 +215,14 @@ instrument. (i.e. either :py:mod:`~nexusLIMS.harvesters.nemo` or
 :py:mod:`~nexusLIMS.harvesters.sharepoint_calendar` as of version
 1.1.0). Each of these modules implements a ``res_event_from_session`` method,
 used by the record builder to return a
-:py:class:`~nexusLIMS.harvesters.ReservationEvent` object representing the
-reservation that overlaps maximally with the unit of time (or a very simple
+:py:class:`~nexusLIMS.harvesters.reservation_event.ReservationEvent` object representing
+the reservation that overlaps maximally with the unit of time (or a very simple
 generic one, if no matching reservation was found). These functions operate
 serve as an adaptor layer to allow NexusLIMS to generate structurally-uniform
 representations of a reservation from differing calendaring applications.
 From this point on, identical code is used regardless of the original source of
 the reservation information. Once the
-:py:class:`~nexusLIMS.harvesters.ReservationEvent` is obtained,
+:py:class:`~nexusLIMS.harvesters.reservation_event.ReservationEvent` is obtained,
 it is serialized into XML format that is compatible with the Nexus Microscopy
 Schema. `(go to top) <overview_>`_
 
@@ -259,10 +259,10 @@ case the FEI Titan TEM in Building 223, connected to the SharePoint harvester):
     Calendar name:    FEI Titan TEM
     Calendar url:     https://sharepoint.url.com/Lists/FEI%20Titan%20Events/calendar.aspx
     Schema name:      FEI Titan TEM
-    Location:         223/B115
+    Location:         ***REMOVED***
     Property tag:     635816
     Filestore path:   ./Titan
-    Computer IP:      192.168.1.5
+    Computer IP:      ***REMOVED***
     Computer name:    TITAN12345678
     Computer mount:   M:/
 
@@ -386,8 +386,9 @@ methodology-specific ontology/schema, were one to exist.
     A few keys within the ``'nx_meta'`` :py:class:`dict` are reserved for
     internal use (again, not validated by a schema), and are parsed in a special
     way if they exist. These include (at present): ``'DatasetType'``,
-    ``'Data Type'``, ``'Creation Time'``, and ``'warnings'``. ``'DatasetType'``
-    is mapped to the ``@type`` attribute of ``<dataset>`` elements in the
+    ``'Data Type'``, ``'Creation Time'``, ``'Extraction Details'``, and 
+    ``'warnings'``. ``'DatasetType'`` is mapped to the ``@type`` attribute of
+    ``<dataset>`` elements in the
     NexusLIMS schema, and has a controlled vocabulary (see the schema
     documentation for details). ``'Data Type'`` is non-controlled, and should
     contain a human-readable value that describes the data (with spaces

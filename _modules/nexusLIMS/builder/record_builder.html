@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>nexusLIMS.builder.record_builder &#8212; NexusLIMS 1.1.0 documentation</title>
+    <title>nexusLIMS.builder.record_builder &#8212; NexusLIMS 1.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom-styles.css" />
@@ -28,26 +28,27 @@ $(document).ready(function(){
   // Mark external (non-nist.gov) A tags with class "external"
   //If the adress start with https and ends with nist.gov
   var re_nist = new RegExp('^https?:\/\/((^\/)*\.)*nist\\.gov(\/|$)');
+  var re_nist_github = new RegExp('^https:\/\/github.com\/usnistgov(\/|$)');
   //Regex to find address that start with https
   var re_absolute_address = new RegExp('^((https?:)?\/\/)');
   $("a").each(function(){
     var url=$(this).attr('href');
-    if(re_nist.test(url) || !re_absolute_address.test(url)){
-      $(this).addClass('local');
+    if(re_nist.test(url) || !re_absolute_address.test(url) || re_nist_github.test(url)){
+      $(this).addClass('leave_notice_local');
     }else{
       //This a href appears to be external, so tag it
-      $(this).addClass('external');
+      $(this).addClass('leave_notice_external');
     }
   });
   // Add leaveNotice to external A elements
-  $('a.external').leaveNotice();
+  $('a.leave_notice_external').leaveNotice();
 });
 </script>
 <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
 
   </head><body>
 
-  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+  <div id="navbar" class="navbar navbar-default ">
     <div class="container">
       <div class="navbar-header">
         <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
@@ -58,7 +59,7 @@ $(document).ready(function(){
         </button>
         <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logo_horizontal.png"></span>
            </a>
-        <span class="navbar-text navbar-version pull-left"><b></b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.3.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -79,6 +80,7 @@ $(document).ready(function(){
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../database.html">NexusLIMS database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development.html">Developer documentation</a></li>
@@ -91,7 +93,10 @@ $(document).ready(function(){
 <li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/nexusLIMS.harvesters.nemo.html">nexusLIMS.harvesters.nemo package</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
 </ul>
 </li>
@@ -143,6 +148,7 @@ $(document).ready(function(){
 <ul class="globaltoc">
     <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../database.html">NexusLIMS database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../development.html">Developer documentation</a></li>
@@ -198,7 +204,7 @@ $(document).ready(function(){
 <span class="c1">#  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.</span>
 <span class="c1">#</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">**Attributes**</span>
+<span class="sd">Builds NexusLIMS records.</span>
 
 <span class="sd">Attributes</span>
 <span class="sd">----------</span>
@@ -206,53 +212,56 @@ $(document).ready(function(){
 <span class="sd">    A string containing the path to the Nexus Experiment schema file,</span>
 <span class="sd">    which is used to validate XML records built by this module</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Union</span>
-
-<span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
-<span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
-<span class="kn">import</span> <span class="nn">pathlib</span> <span class="k">as</span> <span class="nn">_pathlib</span>
-<span class="kn">import</span> <span class="nn">shutil</span> <span class="k">as</span> <span class="nn">_shutil</span>
-<span class="kn">import</span> <span class="nn">sys</span> <span class="k">as</span> <span class="nn">_sys</span>
-<span class="kn">import</span> <span class="nn">argparse</span> <span class="k">as</span> <span class="nn">_ap</span>
-<span class="kn">from</span> <span class="nn">uuid</span> <span class="kn">import</span> <span class="n">uuid4</span> <span class="k">as</span> <span class="n">_uuid4</span>
-<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span> <span class="k">as</span> <span class="n">_etree</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span> <span class="k">as</span> <span class="n">_datetime</span>
-<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timedelta</span> <span class="k">as</span> <span class="n">_timedelta</span>
-<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span> <span class="k">as</span> <span class="n">_bytesIO</span>
-<span class="kn">import</span> <span class="nn">nexusLIMS.schemas.activity</span> <span class="k">as</span> <span class="nn">_activity</span>
-<span class="kn">from</span> <span class="nn">nexusLIMS.schemas.activity</span> <span class="kn">import</span> <span class="n">AcquisitionActivity</span> <span class="k">as</span> <span class="n">_AcqAc</span>
-<span class="kn">from</span> <span class="nn">nexusLIMS.schemas.activity</span> <span class="kn">import</span> <span class="n">cluster_filelist_mtimes</span>
-<span class="kn">from</span> <span class="nn">nexusLIMS.instruments</span> <span class="kn">import</span> <span class="n">Instrument</span>
-<span class="kn">from</span> <span class="nn">nexusLIMS.harvesters</span> <span class="kn">import</span> <span class="n">ReservationEvent</span> <span class="k">as</span> <span class="n">_ResEvent</span>
-<span class="kn">from</span> <span class="nn">nexusLIMS.harvesters</span> <span class="kn">import</span> <span class="n">sharepoint_calendar</span> <span class="k">as</span> <span class="n">_sp_cal</span>
-<span class="kn">from</span> <span class="nn">nexusLIMS.harvesters</span> <span class="kn">import</span> <span class="n">nemo</span> <span class="k">as</span> <span class="n">_nemo</span>
-<span class="kn">from</span> <span class="nn">nexusLIMS.harvesters.nemo</span> <span class="kn">import</span> <span class="n">NoDataConsentException</span><span class="p">,</span> <span class="n">NoMatchingReservationException</span>
-<span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="n">find_files_by_mtime</span> <span class="k">as</span> <span class="n">_find_files</span>
-<span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="n">gnu_find_files_by_mtime</span> <span class="k">as</span> <span class="n">_gnu_find_files</span>
-<span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="n">has_delay_passed</span> <span class="k">as</span> <span class="n">_has_delay_passed</span>
-<span class="kn">from</span> <span class="nn">nexusLIMS.extractors</span> <span class="kn">import</span> <span class="n">extension_reader_map</span> <span class="k">as</span> <span class="n">_ext</span>
-<span class="kn">from</span> <span class="nn">nexusLIMS.db.session_handler</span> <span class="kn">import</span> <span class="n">db_query</span> <span class="k">as</span> <span class="n">_dbq</span>
-<span class="kn">from</span> <span class="nn">nexusLIMS.db.session_handler</span> <span class="kn">import</span> <span class="n">get_sessions_to_build</span> <span class="k">as</span> <span class="n">_get_sessions</span>
-<span class="kn">from</span> <span class="nn">nexusLIMS.db.session_handler</span> <span class="kn">import</span> <span class="n">Session</span>
-<span class="kn">from</span> <span class="nn">nexusLIMS.cdcs</span> <span class="kn">import</span> <span class="n">upload_record_files</span> <span class="k">as</span> <span class="n">_upload_record_files</span>
-<span class="kn">from</span> <span class="nn">nexusLIMS</span> <span class="kn">import</span> <span class="n">version</span> <span class="k">as</span> <span class="n">_version</span>
-<span class="kn">from</span> <span class="nn">timeit</span> <span class="kn">import</span> <span class="n">default_timer</span> <span class="k">as</span> <span class="n">_timer</span>
+<span class="kn">import</span> <span class="nn">argparse</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span> <span class="k">as</span> <span class="n">dt</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">timedelta</span> <span class="k">as</span> <span class="n">td</span>
 <span class="kn">from</span> <span class="nn">importlib</span> <span class="kn">import</span> <span class="n">import_module</span><span class="p">,</span> <span class="n">util</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">BytesIO</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">timeit</span> <span class="kn">import</span> <span class="n">default_timer</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">uuid</span> <span class="kn">import</span> <span class="n">uuid4</span>
 
-<span class="n">_logger</span> <span class="o">=</span> <span class="n">_logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-<span class="n">XSD_PATH</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">_activity</span><span class="o">.</span><span class="vm">__file__</span><span class="p">),</span>
-                              <span class="s2">&quot;nexus-experiment.xsd&quot;</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>
+
+<span class="kn">from</span> <span class="nn">nexusLIMS</span> <span class="kn">import</span> <span class="n">version</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.cdcs</span> <span class="kn">import</span> <span class="n">upload_record_files</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.db.session_handler</span> <span class="kn">import</span> <span class="n">Session</span><span class="p">,</span> <span class="n">db_query</span><span class="p">,</span> <span class="n">get_sessions_to_build</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.extractors</span> <span class="kn">import</span> <span class="n">extension_reader_map</span> <span class="k">as</span> <span class="n">ext_map</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.harvesters</span> <span class="kn">import</span> <span class="n">nemo</span><span class="p">,</span> <span class="n">sharepoint_calendar</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.harvesters.nemo</span> <span class="kn">import</span> <span class="n">utils</span> <span class="k">as</span> <span class="n">nemo_utils</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.harvesters.reservation_event</span> <span class="kn">import</span> <span class="n">ReservationEvent</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.schemas</span> <span class="kn">import</span> <span class="n">activity</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.schemas.activity</span> <span class="kn">import</span> <span class="n">AcquisitionActivity</span><span class="p">,</span> <span class="n">cluster_filelist_mtimes</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">current_system_tz</span><span class="p">,</span>
+    <span class="n">find_files_by_mtime</span><span class="p">,</span>
+    <span class="n">gnu_find_files_by_mtime</span><span class="p">,</span>
+    <span class="n">has_delay_passed</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">XSD_PATH</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">activity</span><span class="o">.</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;nexus-experiment.xsd&quot;</span>
 
 
-<div class="viewcode-block" id="build_record"><a class="viewcode-back" href="../../../api/nexusLIMS.builder.html#nexusLIMS.builder.record_builder.build_record">[docs]</a><span class="k">def</span> <span class="nf">build_record</span><span class="p">(</span><span class="n">session</span><span class="p">:</span> <span class="n">Session</span><span class="p">,</span>
-                 <span class="n">sample_id</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                 <span class="n">generate_previews</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="build_record"><a class="viewcode-back" href="../../../api/nexusLIMS.builder.html#nexusLIMS.builder.record_builder.build_record">[docs]</a><span class="k">def</span> <span class="nf">build_record</span><span class="p">(</span>
+    <span class="n">session</span><span class="p">:</span> <span class="n">Session</span><span class="p">,</span>
+    <span class="n">sample_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">generate_previews</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build a NexusLIMS XML record of an Experiment.</span>
+
 <span class="sd">    Construct an XML document conforming to the NexusLIMS schema from a</span>
 <span class="sd">    directory containing microscopy data files. Accepts either a</span>
 <span class="sd">    :py:class:`~nexusLIMS.db.session_handler.Session` object or an Instrument</span>
 <span class="sd">    and date range (for backwards compatibility). For calendar parsing,</span>
-<span class="sd">    currently no logic is implemented for a query that returns multiple records</span>
+<span class="sd">    currently no logic is implemented for a query that returns multiple records.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -265,7 +274,7 @@ $(document).ready(function(){
 <span class="sd">        A unique identifier pointing to a sample identifier for data</span>
 <span class="sd">        collected in this record. If None, a UUIDv4 will be generated</span>
 <span class="sd">    generate_previews</span>
-<span class="sd">        Whether or not to create the preview thumbnail images</span>
+<span class="sd">        Whether to create the preview thumbnail images</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -273,55 +282,59 @@ $(document).ready(function(){
 <span class="sd">        A formatted string containing a well-formed and valid XML document</span>
 <span class="sd">        for the data contained in the provided path</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
     <span class="k">if</span> <span class="n">sample_id</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">sample_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">_uuid4</span><span class="p">())</span>
-
-    <span class="c1"># use instrument, dt_from, dt_to, and user from session:</span>
-    <span class="n">instrument</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">instrument</span>
-    <span class="n">dt_from</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">dt_from</span>
-    <span class="n">dt_to</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">dt_to</span>
-    <span class="n">user</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">user</span>
+        <span class="n">sample_id</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid4</span><span class="p">())</span>
 
     <span class="c1"># setup XML namespaces</span>
-    <span class="n">NX</span> <span class="o">=</span> <span class="s2">&quot;https://data.nist.gov/od/dm/nexus/experiment/v1.0&quot;</span>
-    <span class="n">XSI</span> <span class="o">=</span> <span class="s2">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
-    <span class="n">NSMAP</span> <span class="o">=</span> <span class="p">{</span><span class="kc">None</span><span class="p">:</span> <span class="n">NX</span><span class="p">,</span> <span class="s2">&quot;xsi&quot;</span><span class="p">:</span> <span class="n">XSI</span><span class="p">,</span> <span class="s2">&quot;nx&quot;</span><span class="p">:</span> <span class="n">NX</span><span class="p">}</span>
-    <span class="n">xml</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Experiment&quot;</span><span class="p">,</span> <span class="n">nsmap</span><span class="o">=</span><span class="n">NSMAP</span><span class="p">)</span>
+    <span class="n">nx_namespace</span> <span class="o">=</span> <span class="s2">&quot;https://data.nist.gov/od/dm/nexus/experiment/v1.0&quot;</span>
+    <span class="n">xsi_namespace</span> <span class="o">=</span> <span class="s2">&quot;http://www.w3.org/2001/XMLSchema-instance&quot;</span>
+    <span class="n">ns_map</span> <span class="o">=</span> <span class="p">{</span><span class="kc">None</span><span class="p">:</span> <span class="n">nx_namespace</span><span class="p">,</span> <span class="s2">&quot;xsi&quot;</span><span class="p">:</span> <span class="n">xsi_namespace</span><span class="p">,</span> <span class="s2">&quot;nx&quot;</span><span class="p">:</span> <span class="n">nx_namespace</span><span class="p">}</span>
+    <span class="n">xml</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">Element</span><span class="p">(</span><span class="s2">&quot;Experiment&quot;</span><span class="p">,</span> <span class="n">nsmap</span><span class="o">=</span><span class="n">ns_map</span><span class="p">)</span>
 
-    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Getting calendar events with instrument: </span><span class="si">{</span><span class="n">instrument</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, &quot;</span>
-                 <span class="sa">f</span><span class="s2">&quot;from </span><span class="si">{</span><span class="n">dt_from</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">dt_to</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">, &quot;</span>
-                 <span class="sa">f</span><span class="s2">&quot;user: </span><span class="si">{</span><span class="n">user</span><span class="si">}</span><span class="s2">; using harvester: </span><span class="si">{</span><span class="n">instrument</span><span class="o">.</span><span class="n">harvester</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="c1"># this now returns a nexusLIMS.harvesters.ReservationEvent, not a string</span>
-    <span class="c1"># DONE: Make this general to handle a session regardless of harvester,</span>
-    <span class="c1">#  not just sharepoint (as it is now)</span>
-    <span class="c1"># We need to make a consistent method that every harvester has</span>
-    <span class="c1"># implemented that takes a session and returns a matching</span>
-    <span class="c1"># ReservationEvent (if any)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s2">&quot;Getting calendar events with instrument: </span><span class="si">%s</span><span class="s2">, from </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">, &quot;</span>
+        <span class="s2">&quot;user: </span><span class="si">%s</span><span class="s2">; using harvester: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">dt_from</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">dt_to</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">user</span><span class="p">,</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">harvester</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="c1"># this returns a nexusLIMS.harvesters.reservation_event.ReservationEvent</span>
     <span class="n">res_event</span> <span class="o">=</span> <span class="n">get_reservation_event</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
-    <span class="c1"># res_event = _sp_cal.get_events(instrument=instrument, dt_from=dt_from,</span>
-    <span class="c1">#                                dt_to=dt_to, user=user)</span>
 
     <span class="n">output</span> <span class="o">=</span> <span class="n">res_event</span><span class="o">.</span><span class="n">as_xml</span><span class="p">()</span>
 
     <span class="k">for</span> <span class="n">child</span> <span class="ow">in</span> <span class="n">output</span><span class="p">:</span>
         <span class="n">xml</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">child</span><span class="p">)</span>
 
-    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Building acquisition activities for timespan from &quot;</span>
-                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dt_from</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2"> to </span><span class="si">{</span><span class="n">dt_to</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="n">activities</span> <span class="o">=</span> <span class="n">build_acq_activities</span><span class="p">(</span><span class="n">instrument</span><span class="p">,</span>
-                                      <span class="n">dt_from</span><span class="p">,</span> <span class="n">dt_to</span><span class="p">,</span>
-                                      <span class="n">generate_previews</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">activities</span><span class="p">):</span>
-        <span class="n">a_xml</span> <span class="o">=</span> <span class="n">a</span><span class="o">.</span><span class="n">as_xml</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">sample_id</span><span class="p">,</span> <span class="n">print_xml</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s2">&quot;Building acquisition activities for timespan from </span><span class="si">%s</span><span class="s2"> to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">dt_from</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">dt_to</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+    <span class="p">)</span>
+    <span class="n">activities</span> <span class="o">=</span> <span class="n">build_acq_activities</span><span class="p">(</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">instrument</span><span class="p">,</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">dt_from</span><span class="p">,</span>
+        <span class="n">session</span><span class="o">.</span><span class="n">dt_to</span><span class="p">,</span>
+        <span class="n">generate_previews</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">this_activity</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">activities</span><span class="p">):</span>
+        <span class="n">a_xml</span> <span class="o">=</span> <span class="n">this_activity</span><span class="o">.</span><span class="n">as_xml</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">sample_id</span><span class="p">)</span>
         <span class="n">xml</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">a_xml</span><span class="p">)</span>
 
-    <span class="k">return</span> <span class="n">_etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span><span class="n">xml</span><span class="p">,</span> <span class="n">xml_declaration</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s1">&#39;UTF-8&#39;</span><span class="p">,</span>
-                           <span class="n">pretty_print</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span></div>
+    <span class="k">return</span> <span class="n">etree</span><span class="o">.</span><span class="n">tostring</span><span class="p">(</span>
+        <span class="n">xml</span><span class="p">,</span>
+        <span class="n">xml_declaration</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;UTF-8&quot;</span><span class="p">,</span>
+        <span class="n">pretty_print</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span></div>
 
 
-<div class="viewcode-block" id="get_reservation_event"><a class="viewcode-back" href="../../../api/nexusLIMS.builder.html#nexusLIMS.builder.record_builder.get_reservation_event">[docs]</a><span class="k">def</span> <span class="nf">get_reservation_event</span><span class="p">(</span><span class="n">session</span><span class="p">:</span> <span class="n">Session</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_ResEvent</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="get_reservation_event"><a class="viewcode-back" href="../../../api/nexusLIMS.builder.html#nexusLIMS.builder.record_builder.get_reservation_event">[docs]</a><span class="k">def</span> <span class="nf">get_reservation_event</span><span class="p">(</span><span class="n">session</span><span class="p">:</span> <span class="n">Session</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReservationEvent</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get a ReservationEvent representation of a Session.</span>
+
 <span class="sd">    Handles the abstraction of choosing the right &quot;version&quot; of the</span>
 <span class="sd">    ``res_event_from_session`` method from the harvester specified in the</span>
 <span class="sd">    instrument database. This allows for one consistent function name to call</span>
@@ -332,42 +345,52 @@ $(document).ready(function(){
 <span class="sd">    ----------</span>
 <span class="sd">    session</span>
 <span class="sd">        The :py:class:`~nexusLIMS.db.session_handler.Session` for which to</span>
-<span class="sd">        fetch a matching :py:class:`~nexusLIMS.harvesters.ReservationEvent` from</span>
+<span class="sd">        fetch a matching</span>
+<span class="sd">        :py:class:`~nexusLIMS.harvesters.reservation_event.ReservationEvent` from</span>
 <span class="sd">        the relevant harvester</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    res_event : ~nexusLIMS.harvesters.ReservationEvent</span>
-<span class="sd">        A :py:class:`~nexusLIMS.harvesters.ReservationEvent` representation of</span>
-<span class="sd">        a reservation that matches the instrument and timespan specified in</span>
-<span class="sd">        ``session``.</span>
+<span class="sd">    res_event : ~nexusLIMS.harvesters.reservation_event.ReservationEvent</span>
+<span class="sd">        A :py:class:`~nexusLIMS.harvesters.reservation_event.ReservationEvent`</span>
+<span class="sd">        representation of a reservation that matches the instrument and timespan</span>
+<span class="sd">        specified in ``session``.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># try to find module and raise error if not found:</span>
-    <span class="k">if</span> <span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;.</span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">harvester</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                      <span class="s2">&quot;nexusLIMS.harvesters&quot;</span><span class="p">)</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Harvester </span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">harvester</span><span class="si">}</span><span class="s2"> &quot;</span>
-                                  <span class="sa">f</span><span class="s2">&quot;not found in nexusLIMS.harvesters&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="n">util</span><span class="o">.</span><span class="n">find_spec</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;.</span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">harvester</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;nexusLIMS.harvesters&quot;</span><span class="p">)</span>
+        <span class="ow">is</span> <span class="kc">None</span>
+    <span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Harvester </span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">harvester</span><span class="si">}</span><span class="s2"> not found in &quot;</span>
+            <span class="s2">&quot;nexusLIMS.harvesters&quot;</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
     <span class="c1"># use import_module to choose the correct harvester based on the instrument</span>
-    <span class="n">harvester</span> <span class="o">=</span> \
-        <span class="n">import_module</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;.</span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">harvester</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                      <span class="s2">&quot;nexusLIMS.harvesters&quot;</span><span class="p">)</span>
+    <span class="n">harvester</span> <span class="o">=</span> <span class="n">import_module</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;.</span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">harvester</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;nexusLIMS.harvesters&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="c1"># for PyCharm typing, explicitly specify what modules may be in `harvester`</span>
-    <span class="n">harvester</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">_nemo</span><span class="p">,</span> <span class="n">_sp_cal</span><span class="p">]</span>
+    <span class="c1"># harvester: Union[nemo, sharepoint_calendar]  # noqa: ERA001</span>
     <span class="c1"># DONE: check if that method exists for the given harvester and raise</span>
     <span class="c1">#  NotImplementedError if not</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">harvester</span><span class="p">,</span> <span class="s1">&#39;res_event_from_session&#39;</span><span class="p">):</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;res_event_from_session has not been &quot;</span>
-                                  <span class="sa">f</span><span class="s2">&quot;implemented for </span><span class="si">{</span><span class="n">harvester</span><span class="si">}</span><span class="s2">, which is &quot;</span>
-                                  <span class="sa">f</span><span class="s2">&quot;required to use this method.&quot;</span><span class="p">)</span>
-    <span class="n">res_event</span> <span class="o">=</span> <span class="n">harvester</span><span class="o">.</span><span class="n">res_event_from_session</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">res_event</span></div>
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">harvester</span><span class="p">,</span> <span class="s2">&quot;res_event_from_session&quot;</span><span class="p">):</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;res_event_from_session has not been implemented for </span><span class="si">{</span><span class="n">harvester</span><span class="si">}</span><span class="s2">, which &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;is required to use this method.&quot;</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">harvester</span><span class="o">.</span><span class="n">res_event_from_session</span><span class="p">(</span><span class="n">session</span><span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="build_acq_activities"><a class="viewcode-back" href="../../../api/nexusLIMS.builder.html#nexusLIMS.builder.record_builder.build_acq_activities">[docs]</a><span class="k">def</span> <span class="nf">build_acq_activities</span><span class="p">(</span><span class="n">instrument</span><span class="p">,</span> <span class="n">dt_from</span><span class="p">,</span> <span class="n">dt_to</span><span class="p">,</span> <span class="n">generate_previews</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Build an XML string representation of each AcquisitionActivity for a</span>
-<span class="sd">    single microscopy session. This includes setup parameters and metadata</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build an XML string representation of each AcquisitionActivity for a session.</span>
+
+<span class="sd">    This includes setup parameters and metadata</span>
 <span class="sd">    associated with each dataset obtained during a microscopy session. Unique</span>
 <span class="sd">    AcquisitionActivities are delimited via clustering of file collection</span>
 <span class="sd">    time to detect &quot;long&quot; breaks during a session.</span>
@@ -394,41 +417,41 @@ $(document).ready(function(){
 <span class="sd">        The list of :py:class:`~nexusLIMS.schemas.activity.AcquisitionActivity`</span>
 <span class="sd">        objects generated for the record</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s1">&#39;hyperspy.io_plugins.digital_micrograph&#39;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span>
-        <span class="n">_logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">)</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;hyperspy.io_plugins.digital_micrograph&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span>
+    <span class="p">)</span>
 
-    <span class="n">start_timer</span> <span class="o">=</span> <span class="n">_timer</span><span class="p">()</span>
-    <span class="n">path</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;mmfnexus_path&#39;</span><span class="p">],</span>
-                                          <span class="n">instrument</span><span class="o">.</span><span class="n">filestore_path</span><span class="p">))</span>
-    <span class="c1"># find the files to be included</span>
+    <span class="n">start_timer</span> <span class="o">=</span> <span class="n">default_timer</span><span class="p">()</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;mmfnexus_path&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="n">instrument</span><span class="o">.</span><span class="n">filestore_path</span>
+
+    <span class="c1"># find the files to be included (list of Paths)</span>
     <span class="n">files</span> <span class="o">=</span> <span class="n">get_files</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">dt_from</span><span class="p">,</span> <span class="n">dt_to</span><span class="p">)</span>
 
-    <span class="c1"># remove all files but those supported by nexusLIMS.extractors</span>
-    <span class="n">files</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span> <span class="k">if</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">splitext</span><span class="p">(</span><span class="n">f</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s1">&#39;.&#39;</span><span class="p">)</span> <span class="ow">in</span>
-             <span class="n">_ext</span><span class="o">.</span><span class="n">keys</span><span class="p">()]</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s2">&quot;Found </span><span class="si">%i</span><span class="s2"> files in </span><span class="si">%.2f</span><span class="s2"> seconds&quot;</span><span class="p">,</span>
+        <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">),</span>
+        <span class="n">default_timer</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_timer</span><span class="p">,</span>
+    <span class="p">)</span>
 
-    <span class="n">end_timer</span> <span class="o">=</span> <span class="n">_timer</span><span class="p">()</span>
-    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span><span class="si">}</span><span class="s1"> files in&#39;</span>
-                 <span class="sa">f</span><span class="s1">&#39; </span><span class="si">{</span><span class="n">end_timer</span> <span class="o">-</span> <span class="n">start_timer</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> seconds&#39;</span><span class="p">)</span>
-
-    <span class="c1"># return a string indicating no files found if none were found</span>
+    <span class="c1"># raise error if no file found were found</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="s1">&#39;No files found in this time range&#39;</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;No files found in this time range&quot;</span>
+        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
     <span class="c1"># get the timestamp boundaries of acquisition activities</span>
     <span class="n">aa_bounds</span> <span class="o">=</span> <span class="n">cluster_filelist_mtimes</span><span class="p">(</span><span class="n">files</span><span class="p">)</span>
 
     <span class="c1"># add the last file&#39;s modification time to the boundaries list to make</span>
     <span class="c1"># the loop below easier to process</span>
-    <span class="n">aa_bounds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="n">aa_bounds</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">files</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">)</span>
 
-    <span class="n">activities</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">_AcqAc</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">aa_bounds</span><span class="p">)</span>
+    <span class="n">activities</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">AcquisitionActivity</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[</span><span class="kc">None</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">aa_bounds</span><span class="p">)</span>
 
     <span class="n">i</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="n">aa_idx</span> <span class="o">=</span> <span class="mi">0</span>
     <span class="k">while</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">):</span>
         <span class="n">f</span> <span class="o">=</span> <span class="n">files</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-        <span class="n">mtime</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="n">mtime</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span>
 
         <span class="c1"># check this file&#39;s mtime, if it is less than this iteration&#39;s value</span>
         <span class="c1"># in the AA bounds, then it belongs to this iteration&#39;s AA</span>
@@ -436,19 +459,23 @@ $(document).ready(function(){
         <span class="k">if</span> <span class="n">mtime</span> <span class="o">&lt;=</span> <span class="n">aa_bounds</span><span class="p">[</span><span class="n">aa_idx</span><span class="p">]:</span>
             <span class="c1"># if current activity index is None, we need to start a new AA:</span>
             <span class="k">if</span> <span class="n">activities</span><span class="p">[</span><span class="n">aa_idx</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">start_time</span> <span class="o">=</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">mtime</span><span class="p">)</span>
-                <span class="n">activities</span><span class="p">[</span><span class="n">aa_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">_AcqAc</span><span class="p">(</span><span class="n">start</span><span class="o">=</span><span class="n">start_time</span><span class="p">)</span>
+                <span class="n">activities</span><span class="p">[</span><span class="n">aa_idx</span><span class="p">]</span> <span class="o">=</span> <span class="n">AcquisitionActivity</span><span class="p">(</span>
+                    <span class="n">start</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">mtime</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="n">instrument</span><span class="o">.</span><span class="n">timezone</span><span class="p">),</span>
+                <span class="p">)</span>
 
             <span class="c1"># add this file to the AA</span>
-            <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s1">&#39;Adding file </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span><span class="si">}</span><span class="s1"> &#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">f</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;mmfnexus_path&quot;</span><span class="p">],</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1"> &#39;</span>
-                <span class="sa">f</span><span class="s1">&#39;to activity </span><span class="si">{</span><span class="n">aa_idx</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-            <span class="n">activities</span><span class="p">[</span><span class="n">aa_idx</span><span class="p">]</span><span class="o">.</span><span class="n">add_file</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">generate_previews</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="s2">&quot;Adding file </span><span class="si">%i</span><span class="s2">/</span><span class="si">%i</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> to activity </span><span class="si">%i</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">i</span><span class="p">,</span>
+                <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">),</span>
+                <span class="nb">str</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;mmfnexus_path&quot;</span><span class="p">],</span> <span class="s2">&quot;&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">),</span>
+                <span class="n">aa_idx</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">activities</span><span class="p">[</span><span class="n">aa_idx</span><span class="p">]</span><span class="o">.</span><span class="n">add_file</span><span class="p">(</span><span class="n">fname</span><span class="o">=</span><span class="n">f</span><span class="p">,</span> <span class="n">generate_preview</span><span class="o">=</span><span class="n">generate_previews</span><span class="p">)</span>
             <span class="c1"># assume this file is the last one in the activity (this will be</span>
             <span class="c1"># true on the last iteration where mtime is &lt;= to the</span>
             <span class="c1"># aa_bounds value)</span>
-            <span class="n">activities</span><span class="p">[</span><span class="n">aa_idx</span><span class="p">]</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">mtime</span><span class="p">)</span>
+            <span class="n">activities</span><span class="p">[</span><span class="n">aa_idx</span><span class="p">]</span><span class="o">.</span><span class="n">end</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span><span class="n">mtime</span><span class="p">,</span> <span class="n">tz</span><span class="o">=</span><span class="n">instrument</span><span class="o">.</span><span class="n">timezone</span><span class="p">)</span>
             <span class="n">i</span> <span class="o">+=</span> <span class="mi">1</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># this file&#39;s mtime is after the boundary and is thus part of the</span>
@@ -457,28 +484,29 @@ $(document).ready(function(){
             <span class="n">aa_idx</span> <span class="o">+=</span> <span class="mi">1</span>
 
     <span class="c1"># Remove any &quot;None&quot; activities from list</span>
-    <span class="n">activities</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">_AcqAc</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">activities</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
+    <span class="n">activities</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">AcquisitionActivity</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">activities</span> <span class="k">if</span> <span class="n">a</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">]</span>
 
-    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Finished detecting activities&#39;</span><span class="p">)</span>
-    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">a</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">activities</span><span class="p">):</span>
-        <span class="c1"># aa_logger = _logging.getLogger(&#39;nexusLIMS.schemas.activity&#39;)</span>
-        <span class="c1"># aa_logger.setLevel(_logging.ERROR)</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Activity </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">: storing setup parameters&#39;</span><span class="p">)</span>
-        <span class="n">a</span><span class="o">.</span><span class="n">store_setup_params</span><span class="p">()</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Activity </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s1">: storing unique metadata values&#39;</span><span class="p">)</span>
-        <span class="n">a</span><span class="o">.</span><span class="n">store_unique_metadata</span><span class="p">()</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Finished detecting activities&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">this_activity</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">activities</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Activity </span><span class="si">%i</span><span class="s2">: storing setup parameters&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+        <span class="n">this_activity</span><span class="o">.</span><span class="n">store_setup_params</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Activity </span><span class="si">%i</span><span class="s2">: storing unique metadata values&quot;</span><span class="p">,</span> <span class="n">i</span><span class="p">)</span>
+        <span class="n">this_activity</span><span class="o">.</span><span class="n">store_unique_metadata</span><span class="p">()</span>
 
     <span class="k">return</span> <span class="n">activities</span></div>
 
 
-<div class="viewcode-block" id="get_files"><a class="viewcode-back" href="../../../api/nexusLIMS.builder.html#nexusLIMS.builder.record_builder.get_files">[docs]</a><span class="k">def</span> <span class="nf">get_files</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">dt_from</span><span class="p">,</span> <span class="n">dt_to</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Get list of files under a path that were last modified between the two</span>
-<span class="sd">    given timestamps.</span>
+<div class="viewcode-block" id="get_files"><a class="viewcode-back" href="../../../api/nexusLIMS.builder.html#nexusLIMS.builder.record_builder.get_files">[docs]</a><span class="k">def</span> <span class="nf">get_files</span><span class="p">(</span>
+    <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">dt_from</span><span class="p">:</span> <span class="n">dt</span><span class="p">,</span>
+    <span class="n">dt_to</span><span class="p">:</span> <span class="n">dt</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get files under a path that were last modified between the two given timestamps.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    path : str</span>
+<span class="sd">    path</span>
 <span class="sd">        The file path in which to search for files</span>
 <span class="sd">    dt_from : datetime.datetime</span>
 <span class="sd">        The starting timestamp that will be used to determine which files go</span>
@@ -489,24 +517,47 @@ $(document).ready(function(){
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    files : List[str]</span>
+<span class="sd">    files : List[pathlib.Path]</span>
 <span class="sd">        A list of the files that have modification times within the</span>
 <span class="sd">        time range provided (sorted by modification time)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Starting new file-finding in </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Starting new file-finding in </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+
+    <span class="c1"># read file finding strategy from environment and set to default of exclusive</span>
+    <span class="n">strategy</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;NexusLIMS_file_strategy&quot;</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="s2">&quot;exclusive&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="n">strategy</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;inclusive&quot;</span><span class="p">,</span> <span class="s2">&quot;exclusive&quot;</span><span class="p">]:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s1">&#39;File finding strategy (env variable &quot;NexusLIMS_file_strategy&quot;) had &#39;</span>
+            <span class="s1">&#39;an unexpected value: &quot;</span><span class="si">%s</span><span class="s1">&quot;. Setting value to &quot;exclusive&quot;.&#39;</span><span class="p">,</span>
+            <span class="n">strategy</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">strategy</span> <span class="o">=</span> <span class="s2">&quot;exclusive&quot;</span>
+
+    <span class="n">extension_arg</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">strategy</span> <span class="o">==</span> <span class="s2">&quot;inclusive&quot;</span> <span class="k">else</span> <span class="n">ext_map</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">files</span> <span class="o">=</span> <span class="n">_gnu_find_files</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">dt_from</span><span class="p">,</span> <span class="n">dt_to</span><span class="p">,</span> <span class="n">_ext</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
-    <span class="k">except</span> <span class="p">(</span><span class="ne">NotImplementedError</span><span class="p">,</span> <span class="ne">RuntimeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;GNU find returned error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="se">\n</span><span class="s1">Falling back to pure &#39;</span>
-                        <span class="sa">f</span><span class="s1">&#39;Python implementation&#39;</span><span class="p">)</span>
-        <span class="n">files</span> <span class="o">=</span> <span class="n">_find_files</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">dt_from</span><span class="p">,</span> <span class="n">dt_to</span><span class="p">)</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">gnu_find_files_by_mtime</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">dt_from</span><span class="p">,</span> <span class="n">dt_to</span><span class="p">,</span> <span class="n">extensions</span><span class="o">=</span><span class="n">extension_arg</span><span class="p">)</span>
+
+    <span class="c1"># exclude following from coverage because find_files_by_mtime is deprecated as of</span>
+    <span class="c1"># 1.2.0 and does not support extensions at all (like the above method)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="ne">NotImplementedError</span><span class="p">,</span> <span class="ne">RuntimeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">exception</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;GNU find returned error: </span><span class="si">%s</span><span class="se">\n</span><span class="s2">Falling back to pure Python implementation&quot;</span><span class="p">,</span>
+            <span class="n">exception</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">files</span> <span class="o">=</span> <span class="n">find_files_by_mtime</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">dt_from</span><span class="p">,</span> <span class="n">dt_to</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">files</span></div>
 
 
-<div class="viewcode-block" id="dump_record"><a class="viewcode-back" href="../../../api/nexusLIMS.builder.html#nexusLIMS.builder.record_builder.dump_record">[docs]</a><span class="k">def</span> <span class="nf">dump_record</span><span class="p">(</span><span class="n">session</span><span class="p">:</span> <span class="n">Session</span><span class="p">,</span>
-                <span class="n">filename</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                <span class="n">generate_previews</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="dump_record"><a class="viewcode-back" href="../../../api/nexusLIMS.builder.html#nexusLIMS.builder.record_builder.dump_record">[docs]</a><span class="k">def</span> <span class="nf">dump_record</span><span class="p">(</span>
+    <span class="n">session</span><span class="p">:</span> <span class="n">Session</span><span class="p">,</span>
+    <span class="n">filename</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">generate_previews</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Dump a record to an XML file.</span>
+
 <span class="sd">    Writes an XML record for a :py:class:`~nexusLIMS.db.session_handler.Session`</span>
 <span class="sd">    composed of information pulled from the appropriate reservation system</span>
 <span class="sd">    as well as metadata extracted from the microscope data (e.g. dm3 or</span>
@@ -514,10 +565,10 @@ $(document).ready(function(){
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    session</span>
+<span class="sd">    session : nexusLIMS.db.session_handler.Session</span>
 <span class="sd">        A :py:class:`~nexusLIMS.db.session_handler.Session` object</span>
 <span class="sd">        representing a unit of time on one of the instruments known to NexusLIMS</span>
-<span class="sd">    filename : None or str</span>
+<span class="sd">    filename : typing.Optional[pathlib.Path]</span>
 <span class="sd">        The filename of the dumped xml file to write. If None, a default name</span>
 <span class="sd">        will be generated from the other parameters</span>
 <span class="sd">    generate_previews : bool</span>
@@ -525,26 +576,27 @@ $(document).ready(function(){
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    filename : str</span>
+<span class="sd">    filename : pathlib.Path</span>
 <span class="sd">        The name of the created record that was returned</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">filename</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">filename</span> <span class="o">=</span> <span class="s1">&#39;compiled_record&#39;</span> <span class="o">+</span> \
-                   <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">instrument</span>
-                    <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">+</span> \
-                   <span class="n">session</span><span class="o">.</span><span class="n">dt_from</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s1">&#39;_%Y-%m-</span><span class="si">%d</span><span class="s1">&#39;</span><span class="p">)</span> <span class="o">+</span> \
-                   <span class="p">(</span><span class="sa">f</span><span class="s1">&#39;_</span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">user</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">user</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">)</span> <span class="o">+</span> <span class="s1">&#39;.xml&#39;</span>
-    <span class="n">_pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="n">text</span> <span class="o">=</span> <span class="n">build_record</span><span class="p">(</span><span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span>
-                            <span class="n">generate_previews</span><span class="o">=</span><span class="n">generate_previews</span><span class="p">)</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
+            <span class="s2">&quot;compiled_record&quot;</span>
+            <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">instrument</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="o">+</span> <span class="n">session</span><span class="o">.</span><span class="n">dt_from</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;_%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="o">+</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;_</span><span class="si">{</span><span class="n">session</span><span class="o">.</span><span class="n">user</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">if</span> <span class="n">session</span><span class="o">.</span><span class="n">user</span> <span class="k">else</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="o">+</span> <span class="s2">&quot;.xml&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="n">filename</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">filename</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">text</span> <span class="o">=</span> <span class="n">build_record</span><span class="p">(</span><span class="n">session</span><span class="o">=</span><span class="n">session</span><span class="p">,</span> <span class="n">generate_previews</span><span class="o">=</span><span class="n">generate_previews</span><span class="p">)</span>
         <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">filename</span></div>
 
 
 <div class="viewcode-block" id="validate_record"><a class="viewcode-back" href="../../../api/nexusLIMS.builder.html#nexusLIMS.builder.record_builder.validate_record">[docs]</a><span class="k">def</span> <span class="nf">validate_record</span><span class="p">(</span><span class="n">xml_filename</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Validate an .xml record against the Nexus schema</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Validate an .xml record against the Nexus schema.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -555,26 +607,26 @@ $(document).ready(function(){
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    validates : bool</span>
-<span class="sd">        Whether or not the record validates against the Nexus schema</span>
+<span class="sd">        Whether the record validates against the Nexus schema</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">xsd_doc</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">XSD_PATH</span><span class="p">)</span>
-    <span class="n">xml_schema</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">XMLSchema</span><span class="p">(</span><span class="n">xsd_doc</span><span class="p">)</span>
-    <span class="n">xml_doc</span> <span class="o">=</span> <span class="n">_etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">xml_filename</span><span class="p">)</span>
-    <span class="n">validates</span> <span class="o">=</span> <span class="n">xml_schema</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">xml_doc</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">validates</span></div>
+    <span class="n">xsd_doc</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">XSD_PATH</span><span class="p">)</span>  <span class="c1"># noqa: S320</span>
+    <span class="n">xml_schema</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">XMLSchema</span><span class="p">(</span><span class="n">xsd_doc</span><span class="p">)</span>
+    <span class="n">xml_doc</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">parse</span><span class="p">(</span><span class="n">xml_filename</span><span class="p">)</span>  <span class="c1"># noqa: S320</span>
+
+    <span class="k">return</span> <span class="n">xml_schema</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">xml_doc</span><span class="p">)</span></div>
 
 
-<div class="viewcode-block" id="build_new_session_records"><a class="viewcode-back" href="../../../api/nexusLIMS.builder.html#nexusLIMS.builder.record_builder.build_new_session_records">[docs]</a><span class="k">def</span> <span class="nf">build_new_session_records</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Fetches new records that need to be built from the database (using</span>
-<span class="sd">    :py:func:`~nexusLIMS.db.session_handler.get_sessions_to_build`), builds</span>
-<span class="sd">    those records using</span>
-<span class="sd">    :py:func:`build_record` (saving to the NexusLIMS folder), and returns a</span>
-<span class="sd">    list of resulting .xml files to be uploaded to CDCS.</span>
+<div class="viewcode-block" id="build_new_session_records"><a class="viewcode-back" href="../../../api/nexusLIMS.builder.html#nexusLIMS.builder.record_builder.build_new_session_records">[docs]</a><span class="k">def</span> <span class="nf">build_new_session_records</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Build records for new sessions from the database.</span>
+
+<span class="sd">    Uses :py:func:`~nexusLIMS.db.session_handler.get_sessions_to_build`) and builds</span>
+<span class="sd">    those records using :py:func:`build_record` (saving to the NexusLIMS folder), and</span>
+<span class="sd">    returns a list of resulting .xml files to be uploaded to CDCS.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    xml_files : List[str]</span>
+<span class="sd">    xml_files : typing.List[pathlib.Path]</span>
 <span class="sd">        A list of record files that were successfully built and saved to</span>
 <span class="sd">        centralized storage</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -582,99 +634,119 @@ $(document).ready(function(){
     <span class="c1"># usage events from any NEMO instances;</span>
     <span class="c1"># nexusLIMS.harvesters.nemo.add_all_usage_events_to_db() must be used</span>
     <span class="c1"># first to do so</span>
-    <span class="n">sessions</span> <span class="o">=</span> <span class="n">_get_sessions</span><span class="p">()</span>
+    <span class="n">sessions</span> <span class="o">=</span> <span class="n">get_sessions_to_build</span><span class="p">()</span>
     <span class="k">if</span> <span class="ow">not</span> <span class="n">sessions</span><span class="p">:</span>
-        <span class="n">_sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;No &#39;TO_BE_BUILT&#39; sessions were found. Exiting.&quot;</span><span class="p">)</span>
+        <span class="n">sys</span><span class="o">.</span><span class="n">exit</span><span class="p">(</span><span class="s2">&quot;No &#39;TO_BE_BUILT&#39; sessions were found. Exiting.&quot;</span><span class="p">)</span>
     <span class="n">xml_files</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="c1"># loop through the sessions</span>
     <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sessions</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">db_row</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">insert_record_generation_event</span><span class="p">()</span>
             <span class="n">record_text</span> <span class="o">=</span> <span class="n">build_record</span><span class="p">(</span><span class="n">session</span><span class="o">=</span><span class="n">s</span><span class="p">)</span>
-        <span class="k">except</span> <span class="p">(</span><span class="ne">FileNotFoundError</span><span class="p">,</span> <span class="ne">Exception</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="ne">FileNotFoundError</span><span class="p">):</span>
+        <span class="k">except</span> <span class="p">(</span>  <span class="c1"># pylint: disable=broad-exception-caught</span>
+            <span class="ne">FileNotFoundError</span><span class="p">,</span>
+            <span class="ne">Exception</span><span class="p">,</span>
+        <span class="p">)</span> <span class="k">as</span> <span class="n">exception</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exception</span><span class="p">,</span> <span class="ne">FileNotFoundError</span><span class="p">):</span>
                 <span class="c1"># if no files were found for this session log, mark it as so in</span>
                 <span class="c1"># the database</span>
-                <span class="n">path</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;mmfnexus_path&#39;</span><span class="p">],</span>
-                                     <span class="n">s</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">filestore_path</span><span class="p">)</span>
-                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;No files found in &#39;</span>
-                                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s1"> between &#39;</span>
-                                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">dt_from</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s1"> and &#39;</span>
-                                <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">dt_to</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+                <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;mmfnexus_path&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="n">s</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">filestore_path</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;No files found in </span><span class="si">%s</span><span class="s2"> between </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">path</span><span class="p">,</span>
+                    <span class="n">s</span><span class="o">.</span><span class="n">dt_from</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+                    <span class="n">s</span><span class="o">.</span><span class="n">dt_to</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+                <span class="p">)</span>
 
-                <span class="k">if</span> <span class="n">_has_delay_passed</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">dt_to</span><span class="p">):</span>
-                    <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Marking </span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">session_identifier</span><span class="si">}</span><span class="s1"> as &#39;</span>
-                                    <span class="sa">f</span><span class="s1">&#39;&quot;NO_FILES_FOUND&quot;&#39;</span><span class="p">)</span>
-                    <span class="n">s</span><span class="o">.</span><span class="n">update_session_status</span><span class="p">(</span><span class="s1">&#39;NO_FILES_FOUND&#39;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">has_delay_passed</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">dt_to</span><span class="p">):</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="s1">&#39;Marking </span><span class="si">%s</span><span class="s1"> as &quot;NO_FILES_FOUND&quot;&#39;</span><span class="p">,</span>
+                        <span class="n">s</span><span class="o">.</span><span class="n">session_identifier</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">s</span><span class="o">.</span><span class="n">update_session_status</span><span class="p">(</span><span class="s2">&quot;NO_FILES_FOUND&quot;</span><span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="c1"># if the delay hasn&#39;t passed, log and delete the record generation event</span>
-                    <span class="c1"># we inserted previously</span>
-                    <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Configured record building delay has &#39;</span>
-                                    <span class="sa">f</span><span class="s1">&#39;not passed; Removing previously inserted &#39;</span>
-                                    <span class="sa">f</span><span class="s1">&#39;RECORD_GENERATION &#39;</span>
-                                    <span class="sa">f</span><span class="s1">&#39;row for </span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">session_identifier</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-                    <span class="n">_dbq</span><span class="p">(</span><span class="s2">&quot;DELETE FROM session_log &quot;</span>
-                         <span class="s2">&quot;WHERE id_session_log = ?&quot;</span><span class="p">,</span>
-                         <span class="p">(</span><span class="n">db_row</span><span class="p">[</span><span class="s1">&#39;id_session_log&#39;</span><span class="p">],</span> <span class="p">))</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">NoDataConsentException</span><span class="p">):</span>
-                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;User requested this session not be &quot;</span>
-                                <span class="sa">f</span><span class="s2">&quot;harvested, so no record was built. &quot;</span>
-                                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Marking </span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">session_identifier</span><span class="si">}</span><span class="s1"> as &#39;</span>
-                             <span class="sa">f</span><span class="s1">&#39;&quot;NO_CONSENT&quot;&#39;</span><span class="p">)</span>
-                <span class="n">s</span><span class="o">.</span><span class="n">update_session_status</span><span class="p">(</span><span class="s1">&#39;NO_CONSENT&#39;</span><span class="p">)</span>
-            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="n">NoMatchingReservationException</span><span class="p">):</span>
-                <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No matching reservation found for this &quot;</span>
-                                <span class="sa">f</span><span class="s2">&quot;session, so assuming no consent was given. &quot;</span>
-                                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Marking </span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">session_identifier</span><span class="si">}</span><span class="s1"> as &#39;</span>
-                             <span class="sa">f</span><span class="s1">&#39;&quot;NO_RESERVATION&quot;&#39;</span><span class="p">)</span>
-                <span class="n">s</span><span class="o">.</span><span class="n">update_session_status</span><span class="p">(</span><span class="s1">&#39;NO_RESERVATION&#39;</span><span class="p">)</span>
+                    <span class="c1"># if the delay hasn&#39;t passed, log and delete the record</span>
+                    <span class="c1"># generation event we inserted previously</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="s2">&quot;Configured record building delay has not passed; &quot;</span>
+                        <span class="s2">&quot;Removing previously inserted RECORD_GENERATION row for </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                        <span class="n">s</span><span class="o">.</span><span class="n">session_identifier</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">db_query</span><span class="p">(</span>
+                        <span class="s2">&quot;DELETE FROM session_log WHERE id_session_log = ?&quot;</span><span class="p">,</span>
+                        <span class="p">(</span>  <span class="c1"># pylint: disable=used-before-assignment</span>
+                            <span class="n">db_row</span><span class="p">[</span><span class="s2">&quot;id_session_log&quot;</span><span class="p">],</span>
+                        <span class="p">),</span>
+                    <span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exception</span><span class="p">,</span> <span class="n">nemo</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">NoDataConsentError</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;User requested this session not be harvested, &quot;</span>
+                    <span class="s2">&quot;so no record was built. </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">exception</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Marking </span><span class="si">%s</span><span class="s1"> as &quot;NO_CONSENT&quot;&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">session_identifier</span><span class="p">)</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">update_session_status</span><span class="p">(</span><span class="s2">&quot;NO_CONSENT&quot;</span><span class="p">)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">exception</span><span class="p">,</span> <span class="n">nemo</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">NoMatchingReservationError</span><span class="p">):</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;No matching reservation found for this session, &quot;</span>
+                    <span class="s2">&quot;so assuming no consent was given. </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">exception</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Marking </span><span class="si">%s</span><span class="s1"> as &quot;NO_RESERVATION&quot;&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">session_identifier</span><span class="p">)</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">update_session_status</span><span class="p">(</span><span class="s2">&quot;NO_RESERVATION&quot;</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Could not generate record text: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Marking </span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">session_identifier</span><span class="si">}</span><span class="s1"> as &quot;ERROR&quot;&#39;</span><span class="p">)</span>
-                <span class="n">s</span><span class="o">.</span><span class="n">update_session_status</span><span class="p">(</span><span class="s1">&#39;ERROR&#39;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s2">&quot;Could not generate record text&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">exception</span><span class="p">(</span><span class="s1">&#39;Marking </span><span class="si">%s</span><span class="s1"> as &quot;ERROR&quot;&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">session_identifier</span><span class="p">)</span>
+                <span class="n">s</span><span class="o">.</span><span class="n">update_session_status</span><span class="p">(</span><span class="s2">&quot;ERROR&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">validate_record</span><span class="p">(</span><span class="n">_bytesIO</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">record_text</span><span class="p">,</span> <span class="s1">&#39;UTF-8&#39;</span><span class="p">))):</span>
-                <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Validated newly generated record&#39;</span><span class="p">)</span>
-                <span class="c1"># generate filename for saved record and make sure path exists</span>
-                <span class="c1"># DONE: fix this for NEMO records since session_identifier is</span>
-                <span class="c1">#  a URL and it doesn&#39;t work right</span>
-                <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">harvester</span> <span class="o">==</span> <span class="s1">&#39;nemo&#39;</span><span class="p">:</span>
-                    <span class="c1"># for NEMO session_identifier is a URL of usage_event</span>
-                    <span class="n">unique_suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">_nemo</span><span class="o">.</span><span class="n">id_from_url</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">session_identifier</span><span class="p">)</span><span class="si">}</span><span class="s1">&#39;</span>
-                <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-                    <span class="c1"># assume session_identifier is a UUID</span>
-                    <span class="n">unique_suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">session_identifier</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
-                <span class="n">basename</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">dt_from</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">_&#39;</span> \
-                           <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1">_&#39;</span> \
-                           <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">unique_suffix</span><span class="si">}</span><span class="s1">.xml&#39;</span>
-                <span class="n">filename</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;nexusLIMS_path&#39;</span><span class="p">],</span> <span class="s1">&#39;..&#39;</span><span class="p">,</span>
-                                         <span class="s1">&#39;records&#39;</span><span class="p">,</span> <span class="n">basename</span><span class="p">)</span>
-                <span class="n">filename</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-                <span class="n">_pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-                                                                <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="c1"># write the record to disk and append to list of files generated</span>
-                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s1">&#39;w&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                    <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">record_text</span><span class="p">)</span>
-                <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Wrote record to </span><span class="si">{</span><span class="n">filename</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-                <span class="n">xml_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
-                <span class="c1"># Mark this session as completed in the database</span>
-                <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Marking </span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">session_identifier</span><span class="si">}</span><span class="s1"> as &quot;COMPLETED&quot;&#39;</span><span class="p">)</span>
-                <span class="n">s</span><span class="o">.</span><span class="n">update_session_status</span><span class="p">(</span><span class="s1">&#39;COMPLETED&#39;</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Marking </span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">session_identifier</span><span class="si">}</span><span class="s1"> as &quot;ERROR&quot;&#39;</span><span class="p">)</span>
-                <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Could not validate record, did not write to &#39;</span>
-                              <span class="sa">f</span><span class="s1">&#39;disk&#39;</span><span class="p">)</span>
-                <span class="n">s</span><span class="o">.</span><span class="n">update_session_status</span><span class="p">(</span><span class="s1">&#39;ERROR&#39;</span><span class="p">)</span>
+            <span class="n">xml_files</span> <span class="o">=</span> <span class="n">_record_validation_flow</span><span class="p">(</span><span class="n">record_text</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">xml_files</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">xml_files</span></div>
 
 
-<div class="viewcode-block" id="process_new_records"><a class="viewcode-back" href="../../../api/nexusLIMS.builder.html#nexusLIMS.builder.record_builder.process_new_records">[docs]</a><span class="k">def</span> <span class="nf">process_new_records</span><span class="p">(</span><span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-                        <span class="n">dt_from</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">_datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-                        <span class="n">dt_to</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="kc">None</span><span class="p">,</span> <span class="n">_datetime</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="k">def</span> <span class="nf">_record_validation_flow</span><span class="p">(</span><span class="n">record_text</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">xml_files</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+    <span class="k">if</span> <span class="n">validate_record</span><span class="p">(</span><span class="n">BytesIO</span><span class="p">(</span><span class="nb">bytes</span><span class="p">(</span><span class="n">record_text</span><span class="p">,</span> <span class="s2">&quot;UTF-8&quot;</span><span class="p">))):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Validated newly generated record&quot;</span><span class="p">)</span>
+        <span class="c1"># generate filename for saved record and make sure path exists</span>
+        <span class="c1"># DONE: fix this for NEMO records since session_identifier is</span>
+        <span class="c1">#  a URL and it doesn&#39;t work right</span>
+        <span class="k">if</span> <span class="n">s</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">harvester</span> <span class="o">==</span> <span class="s2">&quot;nemo&quot;</span><span class="p">:</span>
+            <span class="c1"># for NEMO session_identifier is a URL of usage_event</span>
+            <span class="n">unique_suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">nemo_utils</span><span class="o">.</span><span class="n">id_from_url</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">session_identifier</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="c1"># assume session_identifier is a UUID</span>
+            <span class="n">unique_suffix</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">session_identifier</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="n">basename</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">dt_from</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">)</span><span class="si">}</span><span class="s1">_&#39;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">_&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">unique_suffix</span><span class="si">}</span><span class="s2">.xml&quot;</span>
+        <span class="p">)</span>
+        <span class="n">filename</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;nexusLIMS_path&quot;</span><span class="p">])</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;records&quot;</span> <span class="o">/</span> <span class="n">basename</span>
+        <span class="n">filename</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="c1"># write the record to disk and append to list of files generated</span>
+        <span class="k">with</span> <span class="n">filename</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">mode</span><span class="o">=</span><span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">record_text</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Wrote record to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+        <span class="n">xml_files</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">filename</span><span class="p">))</span>
+        <span class="c1"># Mark this session as completed in the database</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Marking </span><span class="si">%s</span><span class="s1"> as &quot;COMPLETED&quot;&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">session_identifier</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">update_session_status</span><span class="p">(</span><span class="s2">&quot;COMPLETED&quot;</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s1">&#39;Marking </span><span class="si">%s</span><span class="s1"> as &quot;ERROR&quot;&#39;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">session_identifier</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Could not validate record, did not write to disk&quot;</span><span class="p">)</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">update_session_status</span><span class="p">(</span><span class="s2">&quot;ERROR&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">xml_files</span>
+
+
+<div class="viewcode-block" id="process_new_records"><a class="viewcode-back" href="../../../api/nexusLIMS.builder.html#nexusLIMS.builder.record_builder.process_new_records">[docs]</a><span class="k">def</span> <span class="nf">process_new_records</span><span class="p">(</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">dry_run</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="n">dt_from</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">dt</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">dt_to</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">dt</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Process new records (this is the main entrypoint to the record builder).</span>
+
 <span class="sd">    Using :py:meth:`build_new_session_records()`, process new records,</span>
 <span class="sd">    save them to disk, and upload them to the NexusLIMS CDCS instance.</span>
 
@@ -697,20 +769,22 @@ $(document).ready(function(){
 <span class="sd">        be fetched.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">dry_run</span><span class="p">:</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;!!DRY RUN!! Only finding files, not building records&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;!!DRY RUN!! Only finding files, not building records&quot;</span><span class="p">)</span>
         <span class="c1"># get &#39;TO_BE_BUILT&#39; sessions from the database</span>
-        <span class="n">sessions</span> <span class="o">=</span> <span class="n">_get_sessions</span><span class="p">()</span>
+        <span class="n">sessions</span> <span class="o">=</span> <span class="n">get_sessions_to_build</span><span class="p">()</span>
         <span class="c1"># get Session objects for NEMO usage events without adding to DB</span>
         <span class="c1"># DONE: NEMO usage events fetched should take a time range;</span>
-        <span class="n">sessions</span> <span class="o">+=</span> <span class="n">_nemo</span><span class="o">.</span><span class="n">get_usage_events_as_sessions</span><span class="p">(</span><span class="n">dt_from</span><span class="o">=</span><span class="n">dt_from</span><span class="p">,</span>
-                                                       <span class="n">dt_to</span><span class="o">=</span><span class="n">dt_to</span><span class="p">)</span>
+        <span class="n">sessions</span> <span class="o">+=</span> <span class="n">nemo_utils</span><span class="o">.</span><span class="n">get_usage_events_as_sessions</span><span class="p">(</span>
+            <span class="n">dt_from</span><span class="o">=</span><span class="n">dt_from</span><span class="p">,</span>
+            <span class="n">dt_to</span><span class="o">=</span><span class="n">dt_to</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">sessions</span><span class="p">:</span>
-            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No &#39;TO_BE_BUILT&#39; sessions were found. Exiting.&quot;</span><span class="p">)</span>
-            <span class="k">return</span> <span class="kc">None</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No &#39;TO_BE_BUILT&#39; sessions were found. Exiting.&quot;</span><span class="p">)</span>
+            <span class="k">return</span>
         <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">sessions</span><span class="p">:</span>
             <span class="c1"># at this point, sessions can be from any type of harvester</span>
-            <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
-            <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
             <span class="c1"># DONE: generalize this from just sharepoint to any harvester</span>
             <span class="c1">#       (prob. new function that takes session and determines</span>
             <span class="c1">#       where it came from and then gets the matching reservation</span>
@@ -720,33 +794,35 @@ $(document).ready(function(){
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># DONE: NEMO usage events fetcher should take a time range; we also</span>
         <span class="c1">#  need a consistent response for testing</span>
-        <span class="n">_nemo</span><span class="o">.</span><span class="n">add_all_usage_events_to_db</span><span class="p">(</span><span class="n">dt_from</span><span class="o">=</span><span class="n">dt_from</span><span class="p">,</span>
-                                         <span class="n">dt_to</span><span class="o">=</span><span class="n">dt_to</span><span class="p">)</span>
+        <span class="n">nemo_utils</span><span class="o">.</span><span class="n">add_all_usage_events_to_db</span><span class="p">(</span><span class="n">dt_from</span><span class="o">=</span><span class="n">dt_from</span><span class="p">,</span> <span class="n">dt_to</span><span class="o">=</span><span class="n">dt_to</span><span class="p">)</span>
         <span class="n">xml_files</span> <span class="o">=</span> <span class="n">build_new_session_records</span><span class="p">()</span>
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">xml_files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No XML files built, so no files uploaded&quot;</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No XML files built, so no files uploaded&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">files_uploaded</span><span class="p">,</span> <span class="n">record_ids</span> <span class="o">=</span> <span class="n">_upload_record_files</span><span class="p">(</span><span class="n">xml_files</span><span class="p">)</span>
+            <span class="n">files_uploaded</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">upload_record_files</span><span class="p">(</span><span class="n">xml_files</span><span class="p">)</span>
             <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files_uploaded</span><span class="p">:</span>
-                <span class="n">uploaded_dir</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">f</span><span class="p">),</span> <span class="s1">&#39;uploaded&#39;</span><span class="p">))</span>
-                <span class="n">_pathlib</span><span class="o">.</span><span class="n">Path</span><span class="p">(</span><span class="n">uploaded_dir</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">uploaded_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;uploaded&quot;</span>
+                <span class="n">Path</span><span class="p">(</span><span class="n">uploaded_dir</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-                <span class="n">_shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">uploaded_dir</span><span class="p">)</span>
-                <span class="n">_os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-            <span class="n">files_not_uploaded</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">xml_files</span>
-                                  <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">files_uploaded</span><span class="p">]</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copy2</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">uploaded_dir</span><span class="p">)</span>
+                <span class="n">Path</span><span class="p">(</span><span class="n">f</span><span class="p">)</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+            <span class="n">files_not_uploaded</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">xml_files</span> <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">files_uploaded</span><span class="p">]</span>
 
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">files_not_uploaded</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Some record files were not uploaded: &#39;</span>
-                              <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">files_not_uploaded</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span></div>
+                <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span>
+                    <span class="s2">&quot;Some record files were not uploaded: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="n">files_not_uploaded</span><span class="p">,</span>
+                <span class="p">)</span>
+    <span class="k">return</span></div>
 
 
 <div class="viewcode-block" id="dry_run_get_sharepoint_reservation_event"><a class="viewcode-back" href="../../../api/nexusLIMS.builder.html#nexusLIMS.builder.record_builder.dry_run_get_sharepoint_reservation_event">[docs]</a><span class="k">def</span> <span class="nf">dry_run_get_sharepoint_reservation_event</span><span class="p">(</span>
-        <span class="n">s</span><span class="p">:</span> <span class="n">Session</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">_ResEvent</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Get the calendar event that would be used to create a record based off</span>
-<span class="sd">    the supplied session</span>
+    <span class="n">s</span><span class="p">:</span> <span class="n">Session</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ReservationEvent</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the calendar event that *would* be used based off the supplied session.</span>
+
+<span class="sd">    Only implemented for the Sharepoint harvester.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -755,65 +831,69 @@ $(document).ready(function(){
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    res_event : ~nexusLIMS.harvesters.ReservationEvent</span>
+<span class="sd">    res_event : ~nexusLIMS.harvesters.reservation_event.ReservationEvent</span>
 <span class="sd">        A list of strings containing the files that would be included for the</span>
 <span class="sd">        record of this session (if it were not a dry run)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">xml</span> <span class="o">=</span> <span class="n">_sp_cal</span><span class="o">.</span><span class="n">fetch_xml</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">instrument</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">dt_from</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">dt_to</span><span class="p">)</span>
-    <span class="n">res_event</span> <span class="o">=</span> <span class="n">_sp_cal</span><span class="o">.</span><span class="n">res_event_from_xml</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span>
-    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">res_event</span><span class="p">)</span>
+    <span class="n">xml</span> <span class="o">=</span> <span class="n">sharepoint_calendar</span><span class="o">.</span><span class="n">fetch_xml</span><span class="p">(</span><span class="n">s</span><span class="o">.</span><span class="n">instrument</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">dt_from</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">dt_to</span><span class="p">)</span>
+    <span class="n">res_event</span> <span class="o">=</span> <span class="n">sharepoint_calendar</span><span class="o">.</span><span class="n">res_event_from_xml</span><span class="p">(</span><span class="n">xml</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="n">res_event</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">res_event</span></div>
 
 
-<div class="viewcode-block" id="dry_run_file_find"><a class="viewcode-back" href="../../../api/nexusLIMS.builder.html#nexusLIMS.builder.record_builder.dry_run_file_find">[docs]</a><span class="k">def</span> <span class="nf">dry_run_file_find</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">Session</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Get the files that would be included for any records to be created based</span>
-<span class="sd">    off the supplied session</span>
+<div class="viewcode-block" id="dry_run_file_find"><a class="viewcode-back" href="../../../api/nexusLIMS.builder.html#nexusLIMS.builder.record_builder.dry_run_file_find">[docs]</a><span class="k">def</span> <span class="nf">dry_run_file_find</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="n">Session</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the files that *would* be included for a record built for the supplied session.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    s</span>
+<span class="sd">    s : nexusLIMS.db.session_handler.Session</span>
 <span class="sd">        A session read from the database</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    files : List[str]</span>
-<span class="sd">        A list of strings containing the files that would be included for the</span>
+<span class="sd">    files : typing.List[pathlib.Path]</span>
+<span class="sd">        A list of Paths containing the files that would be included for the</span>
 <span class="sd">        record of this session (if it were not a dry run)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">path</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;mmfnexus_path&#39;</span><span class="p">],</span>
-                                          <span class="n">s</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">filestore_path</span><span class="p">))</span>
-    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Searching for files for </span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s1"> in &#39;</span>
-                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="si">}</span><span class="s1"> between &#39;</span>
-                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">dt_from</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s1"> and &#39;</span>
-                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">dt_to</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;mmfnexus_path&quot;</span><span class="p">])</span> <span class="o">/</span> <span class="n">s</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">filestore_path</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s2">&quot;Searching for files for </span><span class="si">%s</span><span class="s2"> in </span><span class="si">%s</span><span class="s2"> between </span><span class="si">%s</span><span class="s2"> and </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">,</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">dt_from</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+        <span class="n">s</span><span class="o">.</span><span class="n">dt_to</span><span class="o">.</span><span class="n">isoformat</span><span class="p">(),</span>
+    <span class="p">)</span>
     <span class="n">files</span> <span class="o">=</span> <span class="n">get_files</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">dt_from</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">dt_to</span><span class="p">)</span>
 
-    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Results for </span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">session_identifier</span><span class="si">}</span><span class="s1"> on </span><span class="si">{</span><span class="n">s</span><span class="o">.</span><span class="n">instrument</span><span class="si">}</span><span class="s1">:&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Results for </span><span class="si">%s</span><span class="s2"> on </span><span class="si">%s</span><span class="s2">:&quot;</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">session_identifier</span><span class="p">,</span> <span class="n">s</span><span class="o">.</span><span class="n">instrument</span><span class="p">)</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;No files found for this session&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No files found for this session&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">)</span><span class="si">}</span><span class="s1"> files for this session&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Found </span><span class="si">%i</span><span class="s2"> files for this session&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">files</span><span class="p">))</span>
     <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">files</span><span class="p">:</span>
-        <span class="n">mtime</span> <span class="o">=</span> <span class="n">_datetime</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span>
-            <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getmtime</span><span class="p">(</span><span class="n">f</span><span class="p">))</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;*mtime* </span><span class="si">{</span><span class="n">mtime</span><span class="si">}</span><span class="s1"> - </span><span class="si">{</span><span class="n">f</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">mtime</span> <span class="o">=</span> <span class="n">dt</span><span class="o">.</span><span class="n">fromtimestamp</span><span class="p">(</span>
+            <span class="n">f</span><span class="o">.</span><span class="n">stat</span><span class="p">()</span><span class="o">.</span><span class="n">st_mtime</span><span class="p">,</span>
+            <span class="n">tz</span><span class="o">=</span><span class="n">s</span><span class="o">.</span><span class="n">instrument</span><span class="o">.</span><span class="n">timezone</span><span class="p">,</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;*mtime* </span><span class="si">%s</span><span class="s2"> - </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">mtime</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">files</span></div>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    If running as a module, process new records (with some control flags)</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="c1"># If running as a module, process new records (with some control flags)</span>
     <span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="n">setup_loggers</span>
 
-    <span class="n">parser</span> <span class="o">=</span> <span class="n">_ap</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
+    <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">()</span>
 
     <span class="c1"># Optional argument flag which defaults to False</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s2">&quot;-n&quot;</span><span class="p">,</span> <span class="s2">&quot;--dry-run&quot;</span><span class="p">,</span>
-                        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
-                        <span class="n">dest</span><span class="o">=</span><span class="s1">&#39;dry_run&#39;</span><span class="p">,</span>
-                        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;-n&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;--dry-run&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+        <span class="n">dest</span><span class="o">=</span><span class="s2">&quot;dry_run&quot;</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="c1"># Optional verbosity counter (eg. -v, -vv, -vvv, etc.)</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
@@ -822,37 +902,37 @@ $(document).ready(function(){
         <span class="n">action</span><span class="o">=</span><span class="s2">&quot;count&quot;</span><span class="p">,</span>
         <span class="n">default</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
         <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Verbosity (-v, -vv); corresponds to python logging level. &quot;</span>
-             <span class="s2">&quot;0 is WARN, 1 (-v) is INFO, 2 (-vv) is DEBUG. ERROR and &quot;</span>
-             <span class="s2">&quot;CRITICAL are always shown.&quot;</span><span class="p">)</span>
+        <span class="s2">&quot;0 is WARN, 1 (-v) is INFO, 2 (-vv) is DEBUG. ERROR and &quot;</span>
+        <span class="s2">&quot;CRITICAL are always shown.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="c1"># Specify output of &quot;--version&quot;</span>
     <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
         <span class="s2">&quot;--version&quot;</span><span class="p">,</span>
         <span class="n">action</span><span class="o">=</span><span class="s2">&quot;version&quot;</span><span class="p">,</span>
-        <span class="n">version</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;%(prog)s (version </span><span class="si">{</span><span class="n">_version</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="n">version</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;%(prog)s (version </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
 
     <span class="c1"># set up logging</span>
-    <span class="n">logging_levels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="n">_logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span>
-                      <span class="mi">1</span><span class="p">:</span> <span class="n">_logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span>
-                      <span class="mi">2</span><span class="p">:</span> <span class="n">_logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">}</span>
+    <span class="n">logging_levels</span> <span class="o">=</span> <span class="p">{</span><span class="mi">0</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">WARNING</span><span class="p">,</span> <span class="mi">1</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">,</span> <span class="mi">2</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">}</span>
 
-    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">dry_run</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
-            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Increasing verbosity so output of &quot;dry-run&quot; &#39;</span>
-                            <span class="s1">&#39;will be shown&#39;</span><span class="p">)</span>
-            <span class="n">args</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">dry_run</span> <span class="ow">and</span> <span class="n">args</span><span class="o">.</span><span class="n">verbose</span> <span class="o">&lt;=</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s1">&#39;Increasing verbosity so output of &quot;dry-run&quot; will be shown&#39;</span><span class="p">)</span>
+        <span class="n">args</span><span class="o">.</span><span class="n">verbose</span> <span class="o">=</span> <span class="mi">1</span>
 
     <span class="n">setup_loggers</span><span class="p">(</span><span class="n">logging_levels</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">verbose</span><span class="p">])</span>
     <span class="c1"># when running as script, __name__ is &quot;__main__&quot;, so we need to set level</span>
     <span class="c1"># explicitly since the setup_loggers function won&#39;t find it</span>
-    <span class="n">_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging_levels</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">verbose</span><span class="p">])</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging_levels</span><span class="p">[</span><span class="n">args</span><span class="o">.</span><span class="n">verbose</span><span class="p">])</span>
 
     <span class="c1"># by default only fetch the last week&#39;s worth of data from the NEMO</span>
     <span class="c1"># harvesters to speed things up</span>
-    <span class="n">process_new_records</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">dry_run</span><span class="p">,</span>
-                        <span class="n">dt_from</span><span class="o">=</span><span class="n">_datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span> <span class="o">-</span> <span class="n">_timedelta</span><span class="p">(</span><span class="n">weeks</span><span class="o">=</span><span class="mi">1</span><span class="p">))</span>
+    <span class="n">process_new_records</span><span class="p">(</span>
+        <span class="n">dry_run</span><span class="o">=</span><span class="n">args</span><span class="o">.</span><span class="n">dry_run</span><span class="p">,</span>
+        <span class="n">dt_from</span><span class="o">=</span><span class="n">dt</span><span class="o">.</span><span class="n">now</span><span class="p">(</span><span class="n">tz</span><span class="o">=</span><span class="n">current_system_tz</span><span class="p">())</span> <span class="o">-</span> <span class="n">td</span><span class="p">(</span><span class="n">weeks</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+    <span class="p">)</span>
 </pre></div>
 
     </div>
@@ -870,8 +950,8 @@ $(document).ready(function(){
       
     </p>
     <p>
-        &copy; Copyright 2022, NIST Office of Data and Informatics.<br/>
-      Last updated on Jul, 18, 2022.<br/>
+        &copy; Copyright 2023, NIST Office of Data and Informatics.<br/>
+      Last updated on Apr, 25, 2023.<br/>
     </p>
   </div>
 </footer>

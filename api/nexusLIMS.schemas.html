@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>nexusLIMS.schemas package &#8212; NexusLIMS 1.1.0 documentation</title>
+    <title>nexusLIMS.schemas package &#8212; NexusLIMS 1.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../_static/custom-styles.css" />
@@ -18,7 +18,7 @@
     <link rel="shortcut icon" href="../_static/nexusLIMS_bare_logo.ico"/>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="prev" title="nexusLIMS.harvesters package" href="nexusLIMS.harvesters.html" />
+    <link rel="prev" title="nexusLIMS.harvesters.nemo package" href="nexusLIMS.harvesters.nemo.html" />
 <link rel="stylesheet" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css">
   <script src="https://code.jquery.com/jquery-1.12.4.min.js" type="text/javascript"></script>
   <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js" type="text/javascript" defer="defer"></script>
@@ -61,7 +61,7 @@ $(document).ready(function(){
         </button>
         <a class="navbar-brand" href="../index.html"><span><img src="../_static/logo_horizontal.png"></span>
            </a>
-        <span class="navbar-text navbar-version pull-left"><b></b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.3.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -82,6 +82,7 @@ $(document).ready(function(){
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../database.html">NexusLIMS database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../development.html">Developer documentation</a></li>
@@ -94,7 +95,10 @@ $(document).ready(function(){
 <li class="toctree-l3"><a class="reference internal" href="nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="nexusLIMS.db.html">nexusLIMS.db package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="nexusLIMS.harvesters.nemo.html">nexusLIMS.harvesters.nemo package</a></li>
+</ul>
+</li>
 <li class="toctree-l3 current"><a class="current reference internal" href="#">nexusLIMS.schemas package</a></li>
 </ul>
 </li>
@@ -109,7 +113,7 @@ $(document).ready(function(){
               
                 
   <li>
-    <a href="nexusLIMS.harvesters.html" title="Previous Chapter: nexusLIMS.harvesters package"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Previous</span>
+    <a href="nexusLIMS.harvesters.nemo.html" title="Previous Chapter: nexusLIMS.harvesters.nemo package"><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Previous</span>
     </a>
   </li>
   <li class="dummy-sidebarrel">
@@ -146,6 +150,7 @@ $(document).ready(function(){
 <ul class="globaltoc">
     <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../database.html">NexusLIMS database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../development.html">Developer documentation</a></li>
@@ -195,57 +200,60 @@ $(document).ready(function(){
       
   <section id="module-nexusLIMS.schemas">
 <span id="nexuslims-schemas-package"></span><h1>nexusLIMS.schemas package<a class="headerlink" href="#module-nexusLIMS.schemas" title="Permalink to this headline">¶</a></h1>
+<p>Schema tools for NexusLIMS.</p>
 <section id="submodules">
 <h2>Submodules<a class="headerlink" href="#submodules" title="Permalink to this headline">¶</a></h2>
 </section>
 <section id="module-nexusLIMS.schemas.activity">
 <span id="nexuslims-schemas-activity-module"></span><h2>nexusLIMS.schemas.activity module<a class="headerlink" href="#module-nexusLIMS.schemas.activity" title="Permalink to this headline">¶</a></h2>
+<p>The “Acquisition Activity” module.</p>
+<p>Provides a class to represent and operate on an Acquisition Activity (as defined by the
+NexusLIMS <cite>Experiment</cite> schema), as well as a helper method to cluster a list of
+filenames by the files’ modification times.</p>
 <dl class="py class">
 <dt class="sig sig-object py" id="nexusLIMS.schemas.activity.AcquisitionActivity">
-<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nexusLIMS.schemas.activity.</span></span><span class="sig-name descname"><span class="pre">AcquisitionActivity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">datetime.datetime(2022,</span> <span class="pre">7,</span> <span class="pre">18,</span> <span class="pre">10,</span> <span class="pre">24,</span> <span class="pre">2,</span> <span class="pre">268527)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">datetime.datetime(2022,</span> <span class="pre">7,</span> <span class="pre">18,</span> <span class="pre">10,</span> <span class="pre">24,</span> <span class="pre">2,</span> <span class="pre">268530)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setup_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique_meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previews</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sigs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warnings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/schemas/activity.html#AcquisitionActivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.schemas.activity.AcquisitionActivity" title="Permalink to this definition">¶</a></dt>
-<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.7/library/functions.html#object" title="(in Python v3.7)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>A collection of files/metadata attributed to a physical acquisition activity</p>
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">nexusLIMS.schemas.activity.</span></span><span class="sig-name descname"><span class="pre">AcquisitionActivity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">start</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">end</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mode</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">setup_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">unique_meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">files</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">previews</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">meta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">warnings</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/schemas/activity.html#AcquisitionActivity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.schemas.activity.AcquisitionActivity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3.10/library/functions.html#object" title="(in Python v3.10)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>A collection of files/metadata attributed to a physical acquisition activity.</p>
 <p>Instances of this class correspond to AcquisitionActivity nodes in the
 <a class="reference external" href="https://data.nist.gov/od/dm/nexus/experiment/v1.0">NexusLIMS schema</a></p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>start</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><em>datetime.datetime</em></a>) – The start point of this AcquisitionActivity</p></li>
-<li><p><strong>end</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/datetime.html#datetime.datetime" title="(in Python v3.7)"><em>datetime.datetime</em></a>) – The end point of this AcquisitionActivity</p></li>
-<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The microscope mode for this AcquisitionActivity (i.e. ‘IMAGING’,
+<li><p><strong>start</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><em>datetime</em></a>) – The start point of this AcquisitionActivity</p></li>
+<li><p><strong>end</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/datetime.html#datetime.datetime" title="(in Python v3.10)"><em>datetime</em></a>) – The end point of this AcquisitionActivity</p></li>
+<li><p><strong>mode</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The microscope mode for this AcquisitionActivity (i.e. ‘IMAGING’,
 ‘DIFFRACTION’, ‘SCANNING’, etc.)</p></li>
-<li><p><strong>unique_params</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#set" title="(in Python v3.7)"><em>set</em></a>) – A set of dictionary keys that comprises all unique metadata keys
+<li><p><strong>unique_params</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#set" title="(in Python v3.10)"><em>set</em></a>) – A set of dictionary keys that comprises all unique metadata keys
 contained within the files of this AcquisitionActivity</p></li>
-<li><p><strong>setup_params</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#dict" title="(in Python v3.7)"><em>dict</em></a>) – A dictionary containing metadata about the data that is shared
+<li><p><strong>setup_params</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#dict" title="(in Python v3.10)"><em>dict</em></a>) – A dictionary containing metadata about the data that is shared
 amongst all data files in this AcquisitionActivity</p></li>
-<li><p><strong>unique_meta</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – A list of dictionaries (one for each file in this
+<li><p><strong>unique_meta</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – A list of dictionaries (one for each file in this
 AcquisitionActivity) containing metadata key-value pairs that are
 unique to each file in <code class="docutils literal notranslate"><span class="pre">files</span></code> (i.e. those that could not be moved
 into <code class="docutils literal notranslate"><span class="pre">setup_params</span></code>)</p></li>
-<li><p><strong>files</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – A list of filenames belonging to this AcquisitionActivity</p></li>
-<li><p><strong>previews</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – A list of filenames pointing to the previews for each file in
+<li><p><strong>files</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – A list of filenames belonging to this AcquisitionActivity</p></li>
+<li><p><strong>previews</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – A list of filenames pointing to the previews for each file in
 <code class="docutils literal notranslate"><span class="pre">files</span></code></p></li>
-<li><p><strong>sigs</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – A list of <em>lazy</em> (to minimize loading times) HyperSpy signals in
-this AcquisitionActivity. HyperSpy is used to facilitate metadata
-reading</p></li>
-<li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – A list of dictionaries containing the “important” metadata for each
-signal/file in <code class="docutils literal notranslate"><span class="pre">sigs</span></code> and <code class="docutils literal notranslate"><span class="pre">files</span></code></p></li>
-<li><p><strong>warnings</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – A list of metadata values that may be untrustworthy because of the
+<li><p><strong>meta</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – A list of dictionaries containing the “important” metadata for each
+file in <code class="docutils literal notranslate"><span class="pre">files</span></code></p></li>
+<li><p><strong>warnings</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – A list of metadata values that may be untrustworthy because of the
 software</p></li>
 </ul>
 </dd>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="nexusLIMS.schemas.activity.AcquisitionActivity.add_file">
-<span class="sig-name descname"><span class="pre">add_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generate_preview</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/schemas/activity.html#AcquisitionActivity.add_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.schemas.activity.AcquisitionActivity.add_file" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add a file to this activity’s file list, parse its metadata (storing
+<span class="sig-name descname"><span class="pre">add_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">fname</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.10/library/pathlib.html#pathlib.Path" title="(in Python v3.10)"><span class="pre">Path</span></a></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">generate_preview</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/schemas/activity.html#AcquisitionActivity.add_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.schemas.activity.AcquisitionActivity.add_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add file to AcquisitionActivity.</p>
+<p>Add a file to this activity’s file list, parse its metadata (storing
 a flattened copy of it to this activity), generate a preview
-thumbnail, get the file’s type, and a lazy HyperSpy signal</p>
+thumbnail, get the file’s type, and a lazy HyperSpy signal.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – The file to be added to the file list</p></li>
-<li><p><strong>generate_preview</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether or not to create the preview thumbnail images</p></li>
+<li><p><strong>fname</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – The file to be added to the file list</p></li>
+<li><p><strong>generate_preview</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#bool" title="(in Python v3.10)"><em>bool</em></a>) – Whether or not to create the preview thumbnail images</p></li>
 </ul>
 </dd>
 </dl>
@@ -253,18 +261,17 @@ thumbnail, get the file’s type, and a lazy HyperSpy signal</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="nexusLIMS.schemas.activity.AcquisitionActivity.as_xml">
-<span class="sig-name descname"><span class="pre">as_xml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seqno</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_id</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">print_xml</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/schemas/activity.html#AcquisitionActivity.as_xml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.schemas.activity.AcquisitionActivity.as_xml" title="Permalink to this definition">¶</a></dt>
-<dd><p>Build an XML (<code class="docutils literal notranslate"><span class="pre">lxml</span></code>) representation of this AcquisitionActivity (for
-use in instances of the NexusLIMS schema)</p>
+<span class="sig-name descname"><span class="pre">as_xml</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seqno</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sample_id</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/schemas/activity.html#AcquisitionActivity.as_xml"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.schemas.activity.AcquisitionActivity.as_xml" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate AcquisitionActivity to an XML representation.</p>
+<p>Build an XML (<code class="docutils literal notranslate"><span class="pre">lxml</span></code>) representation of this AcquisitionActivity (for
+use in instances of the NexusLIMS schema).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>seqno</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#int" title="(in Python v3.7)"><em>int</em></a>) – An integer number representing what number activity this is in a
+<li><p><strong>seqno</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#int" title="(in Python v3.10)"><em>int</em></a>) – An integer number representing what number activity this is in a
 sequence of activities.</p></li>
-<li><p><strong>sample_id</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a>) – A unique identifier pointing to a sample identifier. No checks
+<li><p><strong>sample_id</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a>) – A unique identifier pointing to a sample identifier. No checks
 are done on this value; it is merely reproduced in the XML output</p></li>
-<li><p><strong>print_xml</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#bool" title="(in Python v3.7)"><em>bool</em></a>) – Whether to print the XML output to the console or not (Default:
-False)</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
@@ -273,7 +280,7 @@ properly-formed complete XML document since it does not have a
 header or namespace definitions)</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -281,7 +288,8 @@ header or namespace definitions)</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="nexusLIMS.schemas.activity.AcquisitionActivity.store_setup_params">
 <span class="sig-name descname"><span class="pre">store_setup_params</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">values_to_search</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/schemas/activity.html#AcquisitionActivity.store_setup_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.schemas.activity.AcquisitionActivity.store_setup_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Search the metadata of files in this AcquisitionActivity for those
+<dd><p>Store common metadata keys as “setup parameters”.</p>
+<p>Search the metadata of files in this AcquisitionActivity for those
 containing identical values over all files, which will then be defined
 as parameters attributed to experimental setup, rather than individual
 datasets.</p>
@@ -290,7 +298,7 @@ consistent across all files in this AcquisitionActivity as an
 attribute (<code class="docutils literal notranslate"><span class="pre">self.setup_params</span></code>).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>values_to_search</strong> (<a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#list" title="(in Python v3.7)"><em>list</em></a>) – A list (or tuple, set, or other iterable type) containing values to
+<dd class="field-odd"><p><strong>values_to_search</strong> (<a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#list" title="(in Python v3.10)"><em>list</em></a>) – A list (or tuple, set, or other iterable type) containing values to
 search for in the metadata dictionary list. If None (default), all
 values contained in any file will be searched.</p>
 </dd>
@@ -300,7 +308,8 @@ values contained in any file will be searched.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="nexusLIMS.schemas.activity.AcquisitionActivity.store_unique_metadata">
 <span class="sig-name descname"><span class="pre">store_unique_metadata</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/schemas/activity.html#AcquisitionActivity.store_unique_metadata"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.schemas.activity.AcquisitionActivity.store_unique_metadata" title="Permalink to this definition">¶</a></dt>
-<dd><p>For each file in this AcquisitionActivity, stores the metadata that
+<dd><p>Store unique metadata keys as unique to each file.</p>
+<p>For each file in this AcquisitionActivity, stores the metadata that
 is unique rather than common to the entire AcquisitionActivity (which
 are kept in <code class="docutils literal notranslate"><span class="pre">self.setup_params</span></code>.</p>
 </dd></dl>
@@ -308,16 +317,18 @@ are kept in <code class="docutils literal notranslate"><span class="pre">self.se
 <dl class="py method">
 <dt class="sig sig-object py" id="nexusLIMS.schemas.activity.AcquisitionActivity.store_unique_params">
 <span class="sig-name descname"><span class="pre">store_unique_params</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/nexusLIMS/schemas/activity.html#AcquisitionActivity.store_unique_params"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.schemas.activity.AcquisitionActivity.store_unique_params" title="Permalink to this definition">¶</a></dt>
-<dd><p>Analyze the metadata keys contained in this AcquisitionActivity and
-store the unique values in a set (<code class="docutils literal notranslate"><span class="pre">self.unique_params</span></code>)</p>
+<dd><p>Store unique metadata keys.</p>
+<p>Analyze the metadata keys contained in this AcquisitionActivity and
+store the unique values in a set (<code class="docutils literal notranslate"><span class="pre">self.unique_params</span></code>).</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="nexusLIMS.schemas.activity.cluster_filelist_mtimes">
-<span class="sig-prename descclassname"><span class="pre">nexusLIMS.schemas.activity.</span></span><span class="sig-name descname"><span class="pre">cluster_filelist_mtimes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filelist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.7/library/typing.html#typing.List" title="(in Python v3.7)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/nexusLIMS/schemas/activity.html#cluster_filelist_mtimes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.schemas.activity.cluster_filelist_mtimes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Perform a statistical clustering of the timestamps (<cite>mtime</cite> values) of a
+<span class="sig-prename descclassname"><span class="pre">nexusLIMS.schemas.activity.</span></span><span class="sig-name descname"><span class="pre">cluster_filelist_mtimes</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filelist</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><a class="reference external" href="https://docs.python.org/3.10/library/typing.html#typing.List" title="(in Python v3.10)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><a class="reference external" href="https://docs.python.org/3.10/library/typing.html#typing.List" title="(in Python v3.10)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span></span></span><a class="reference internal" href="../_modules/nexusLIMS/schemas/activity.html#cluster_filelist_mtimes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#nexusLIMS.schemas.activity.cluster_filelist_mtimes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Cluster a list of files by modification time.</p>
+<p>Perform a statistical clustering of the timestamps (<cite>mtime</cite> values) of a
 list of files to find “relatively” large gaps in acquisition time. The
 definition of <cite>relatively</cite> depends on the context of the entire list of
 files. For example, if many files are simultaneously acquired,
@@ -335,7 +346,7 @@ the distribution of the data itself, rather than a pre-supposed optimum.
 The KDE minima approach was suggested <a class="reference external" href="https://stackoverflow.com/a/35151947/1435788">here</a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>filelist</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3.7/library/stdtypes.html#str" title="(in Python v3.7)"><em>str</em></a><em>]</em>) – The files (as a list) whose timestamps will be interrogated to find
+<dd class="field-odd"><p><strong>filelist</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3.10/library/stdtypes.html#str" title="(in Python v3.10)"><em>str</em></a><em>]</em>) – The files (as a list) whose timestamps will be interrogated to find
 “relatively” large gaps in acquisition time (as a means to find the
 breaks between discrete Acquisition Activities)</p>
 </dd>
@@ -344,7 +355,7 @@ breaks between discrete Acquisition Activities)</p>
 discrete Acquisition Activities</p>
 </dd>
 <dt class="field-odd">Return type</dt>
-<dd class="field-odd"><p>List[<a class="reference external" href="https://docs.python.org/3.7/library/functions.html#float" title="(in Python v3.7)">float</a>]</p>
+<dd class="field-odd"><p><em>List</em>[<a class="reference external" href="https://docs.python.org/3.10/library/functions.html#float" title="(in Python v3.10)"><em>float</em></a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -372,8 +383,8 @@ discrete Acquisition Activities</p>
       
     </p>
     <p>
-        &copy; Copyright 2022, NIST Office of Data and Informatics.<br/>
-      Last updated on Jul, 18, 2022.<br/>
+        &copy; Copyright 2023, NIST Office of Data and Informatics.<br/>
+      Last updated on Apr, 25, 2023.<br/>
     </p>
   </div>
 </footer>

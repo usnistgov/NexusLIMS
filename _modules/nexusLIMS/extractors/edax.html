@@ -1,0 +1,372 @@
+
+<!DOCTYPE html>
+
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>nexusLIMS.extractors.edax &#8212; NexusLIMS 1.3.0 documentation</title>
+    <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
+    <link rel="stylesheet" type="text/css" href="../../../_static/custom-styles.css" />
+    <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
+    <script src="../../../_static/jquery.js"></script>
+    <script src="../../../_static/underscore.js"></script>
+    <script src="../../../_static/doctools.js"></script>
+    <script src="../../../_static/custom.js"></script>
+    <link rel="shortcut icon" href="../../../_static/nexusLIMS_bare_logo.ico"/>
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" />
+<link rel="stylesheet" href="https://pages.nist.gov/nist-header-footer/css/nist-combined.css">
+  <script src="https://code.jquery.com/jquery-1.12.4.min.js" type="text/javascript"></script>
+  <script src="https://pages.nist.gov/nist-header-footer/js/nist-header-footer.js" type="text/javascript" defer="defer"></script>
+
+
+<script type="text/javascript" src="https://pages.nist.gov/leaveNotice/js/jquery.leaveNotice-nist.min.js"></script>
+<script>
+$(document).ready(function(){
+  // Mark external (non-nist.gov) A tags with class "external"
+  //If the adress start with https and ends with nist.gov
+  var re_nist = new RegExp('^https?:\/\/((^\/)*\.)*nist\\.gov(\/|$)');
+  var re_nist_github = new RegExp('^https:\/\/github.com\/usnistgov(\/|$)');
+  //Regex to find address that start with https
+  var re_absolute_address = new RegExp('^((https?:)?\/\/)');
+  $("a").each(function(){
+    var url=$(this).attr('href');
+    if(re_nist.test(url) || !re_absolute_address.test(url) || re_nist_github.test(url)){
+      $(this).addClass('leave_notice_local');
+    }else{
+      //This a href appears to be external, so tag it
+      $(this).addClass('leave_notice_external');
+    }
+  });
+  // Add leaveNotice to external A elements
+  $('a.leave_notice_external').leaveNotice();
+});
+</script>
+<link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
+
+  </head><body>
+
+  <div id="navbar" class="navbar navbar-default ">
+    <div class="container">
+      <div class="navbar-header">
+        <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".nav-collapse">
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logo_horizontal.png"></span>
+           </a>
+        <span class="navbar-text navbar-version pull-left"><b>1.3.0</b></span>
+      </div>
+
+        <div class="collapse navbar-collapse nav-collapse">
+          <ul class="nav navbar-nav">
+            
+                <li><a href="../../../api.html">API Docs</a></li>
+                <li><a href="https://github.com/usnistgov/NexusLIMS">Repository</a></li>
+                <li><a href="https://www.nist.gov/mml/odi">NIST ODI</a></li>
+            
+            
+              <li class="dropdown globaltoc-container">
+  <a role="button"
+     id="dLabelGlobalToc"
+     data-toggle="dropdown"
+     data-target="#"
+     href="../../../index.html">Site Map <b class="caret"></b></a>
+  <ul class="dropdown-menu globaltoc"
+      role="menu"
+      aria-labelledby="dLabelGlobalToc"><ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../session_logger_app.html">Session logging (deprecated)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API documentation</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/nexusLIMS.html">nexusLIMS package</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/nexusLIMS.harvesters.nemo.html">nexusLIMS.harvesters.nemo package</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</ul>
+</li>
+              
+            
+            
+              
+                
+  <li class="dummy-sidebarrel">
+    <a><span class="glyphicon glyphicon-chevron-left visible-sm"></span><span class="hidden-sm hidden-tablet">&laquo; Previous</span>
+    </a>
+  </li>
+  <li class="dummy-sidebarrel">
+    <a><span class="glyphicon glyphicon-chevron-right visible-sm"></span><span class="hidden-sm hidden-tablet">Next &raquo;</span>
+    </a>
+  </li>
+              
+            
+            
+            
+            
+          </ul>
+
+          
+            
+<form class="navbar-form navbar-right" action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+          
+        </div>
+    </div>
+  </div>
+
+<div class="container">
+  <div class="row">
+      <div class="col-md-3">
+        <div id="sidebar" class="bs-sidenav" role="complementary"><img src="../../../_static/nexusLIMS_bare_logo.png">
+<h4><a href="../../../index.html" title="Return to documentation home">
+    NexusLIMS Documentation</a></h4>
+<ul class="globaltoc">
+    <ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../database.html">NexusLIMS database</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../record_building.html">Record building workflow</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../development.html">Developer documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../taxonomy.html">NexusLIMS taxonomy</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../schema_documentation.html">Schema documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../customizing_cdcs.html">Tips for customizing CDCS</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../session_logger_app.html">Session logging (deprecated)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../api.html">API documentation</a></li>
+</ul>
+
+</ul><h4>
+    <a class="no-hover">Page content</a>
+</h4>
+
+
+<form action="../../../search.html" method="get">
+ <div class="form-group">
+  <input type="text" name="q" class="form-control" placeholder="Search" />
+ </div>
+  <input type="hidden" name="check_keywords" value="yes" />
+  <input type="hidden" name="area" value="default" />
+</form>
+        </div>
+      </div>
+    <div class="body col-md-9 content" role="main">
+      
+  <h1>Source code for nexusLIMS.extractors.edax</h1><div class="highlight"><pre>
+<span></span><span class="c1">#  NIST Public License - 2023</span>
+<span class="c1">#</span>
+<span class="c1">#  This software was developed by employees of the National Institute of</span>
+<span class="c1">#  Standards and Technology (NIST), an agency of the Federal Government</span>
+<span class="c1">#  and is being made available as a public service. Pursuant to title 17</span>
+<span class="c1">#  United States Code Section 105, works of NIST employees are not subject</span>
+<span class="c1">#  to copyright protection in the United States.  This software may be</span>
+<span class="c1">#  subject to foreign copyright.  Permission in the United States and in</span>
+<span class="c1">#  foreign countries, to the extent that NIST may hold copyright, to use,</span>
+<span class="c1">#  copy, modify, create derivative works, and distribute this software and</span>
+<span class="c1">#  its documentation without fee is hereby granted on a non-exclusive basis,</span>
+<span class="c1">#  provided that this notice and disclaimer of warranty appears in all copies.</span>
+<span class="c1">#</span>
+<span class="c1">#  THE SOFTWARE IS PROVIDED &quot;AS IS&quot; WITHOUT ANY WARRANTY OF ANY KIND,</span>
+<span class="c1">#  EITHER EXPRESSED, IMPLIED, OR STATUTORY, INCLUDING, BUT NOT LIMITED</span>
+<span class="c1">#  TO, ANY WARRANTY THAT THE SOFTWARE WILL CONFORM TO SPECIFICATIONS, ANY</span>
+<span class="c1">#  IMPLIED WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE,</span>
+<span class="c1">#  AND FREEDOM FROM INFRINGEMENT, AND ANY WARRANTY THAT THE DOCUMENTATION</span>
+<span class="c1">#  WILL CONFORM TO THE SOFTWARE, OR ANY WARRANTY THAT THE SOFTWARE WILL BE</span>
+<span class="c1">#  ERROR FREE.  IN NO EVENT SHALL NIST BE LIABLE FOR ANY DAMAGES, INCLUDING,</span>
+<span class="c1">#  BUT NOT LIMITED TO, DIRECT, INDIRECT, SPECIAL OR CONSEQUENTIAL DAMAGES,</span>
+<span class="c1">#  ARISING OUT OF, RESULTING FROM, OR IN ANY WAY CONNECTED WITH THIS SOFTWARE,</span>
+<span class="c1">#  WHETHER OR NOT BASED UPON WARRANTY, CONTRACT, TORT, OR OTHERWISE, WHETHER</span>
+<span class="c1">#  OR NOT INJURY WAS SUSTAINED BY PERSONS OR PROPERTY OR OTHERWISE, AND</span>
+<span class="c1">#  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,</span>
+<span class="c1">#  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.</span>
+<span class="c1">#</span>
+<span class="sd">&quot;&quot;&quot;Parse metadata from EDAX EDS spectra saved as .spc and .msa files.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">hyperspy.io</span> <span class="kn">import</span> <span class="n">load</span>
+
+<span class="kn">from</span> <span class="nn">nexusLIMS.extractors.utils</span> <span class="kn">import</span> <span class="n">_set_instr_name_and_time</span>
+<span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="n">try_getting_dict_value</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="get_spc_metadata"><a class="viewcode-back" href="../../../api/nexusLIMS.extractors.html#nexusLIMS.extractors.edax.get_spc_metadata">[docs]</a><span class="k">def</span> <span class="nf">get_spc_metadata</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the metadata (as a dict) from a .spc file.</span>
+
+<span class="sd">    This type of file is produced by EDAX EDS software. It is read by HyperSpy&#39;s</span>
+<span class="sd">    file reader and relevant metadata extracted and returned</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename</span>
+<span class="sd">        path to a .spc file saved by EDAX software (Genesis, TEAM, etc.)</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    metadata : Optional[Dict]</span>
+<span class="sd">        The metadata of interest extracted from the file. If None, the file</span>
+<span class="sd">        could not be opened</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">mdict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;nx_meta&quot;</span><span class="p">:</span> <span class="p">{}}</span>
+
+    <span class="c1"># assume all .spc datasets are EDS single spectra</span>
+    <span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;nx_meta&quot;</span><span class="p">][</span><span class="s2">&quot;DatasetType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Spectrum&quot;</span>
+    <span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;nx_meta&quot;</span><span class="p">][</span><span class="s2">&quot;Data Type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;EDS_Spectrum&quot;</span>
+
+    <span class="n">_set_instr_name_and_time</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+
+    <span class="n">s</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">lazy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+    <span class="c1"># original_metadata puts the entire xml under the root node &quot;spc_header&quot;,</span>
+    <span class="c1"># so this will just bump that all up to the root level for ease of use.</span>
+    <span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;original_metadata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">original_metadata</span><span class="p">[</span><span class="s2">&quot;spc_header&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">as_dictionary</span><span class="p">()</span>
+
+    <span class="n">term_mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;azimuth&quot;</span><span class="p">:</span> <span class="s2">&quot;Azimuthal Angle (deg)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;liveTime&quot;</span><span class="p">:</span> <span class="s2">&quot;Live Time (s)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;detReso&quot;</span><span class="p">:</span> <span class="s2">&quot;Detector Energy Resolution (eV)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;elevation&quot;</span><span class="p">:</span> <span class="s2">&quot;Elevation Angle (deg)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;evPerChan&quot;</span><span class="p">:</span> <span class="s2">&quot;Channel Size (eV)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;kV&quot;</span><span class="p">:</span> <span class="s2">&quot;Accelerating Voltage (kV)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;numPts&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of Spectrum Channels&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;startEnergy&quot;</span><span class="p">:</span> <span class="s2">&quot;Starting Energy (keV)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;endEnergy&quot;</span><span class="p">:</span> <span class="s2">&quot;Ending Energy (keV)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;tilt&quot;</span><span class="p">:</span> <span class="s2">&quot;Stage Tilt (deg)&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">in_term</span><span class="p">,</span> <span class="n">out_term</span> <span class="ow">in</span> <span class="n">term_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">try_getting_dict_value</span><span class="p">(</span><span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;original_metadata&quot;</span><span class="p">],</span> <span class="n">in_term</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;not found&quot;</span><span class="p">:</span>
+            <span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;nx_meta&quot;</span><span class="p">][</span><span class="n">out_term</span><span class="p">]</span> <span class="o">=</span> <span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;original_metadata&quot;</span><span class="p">][</span><span class="n">in_term</span><span class="p">]</span>
+
+    <span class="c1"># add any elements present:</span>
+    <span class="k">if</span> <span class="s2">&quot;Sample&quot;</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">metadata</span> <span class="ow">and</span> <span class="s2">&quot;elements&quot;</span> <span class="ow">in</span> <span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">Sample</span><span class="p">:</span>
+        <span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;nx_meta&quot;</span><span class="p">][</span><span class="s2">&quot;Elements&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">metadata</span><span class="o">.</span><span class="n">Sample</span><span class="o">.</span><span class="n">elements</span>
+
+    <span class="k">return</span> <span class="n">mdict</span></div>
+
+
+<div class="viewcode-block" id="get_msa_metadata"><a class="viewcode-back" href="../../../api/nexusLIMS.extractors.html#nexusLIMS.extractors.edax.get_msa_metadata">[docs]</a><span class="k">def</span> <span class="nf">get_msa_metadata</span><span class="p">(</span><span class="n">filename</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the metadata (as a dict) from an .msa spectrum file.</span>
+
+<span class="sd">    This file may be saved by a number of different EDS acquisition software, but</span>
+<span class="sd">    most often is produced as an export from EDAX or Oxford software. This format is</span>
+<span class="sd">    a standard, but vendors (such as EDAX) often add other values into the metadata</span>
+<span class="sd">    header. See https://www.microscopy.org/resources/scientific_data/ for the fomal</span>
+<span class="sd">    specification.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    filename</span>
+<span class="sd">        path to a .msa file saved by various EDS software packages</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    metadata : Optional[Dict]</span>
+<span class="sd">        The metadata of interest extracted from the file. If None, the file</span>
+<span class="sd">        could not be opened</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">s</span> <span class="o">=</span> <span class="n">load</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="n">lazy</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">mdict</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;nx_meta&quot;</span><span class="p">:</span> <span class="p">{}}</span>
+    <span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;original_metadata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">original_metadata</span><span class="o">.</span><span class="n">as_dictionary</span><span class="p">()</span>
+
+    <span class="c1"># assume all .spc datasets are EDS single spectra</span>
+    <span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;nx_meta&quot;</span><span class="p">][</span><span class="s2">&quot;DatasetType&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;Spectrum&quot;</span>
+    <span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;nx_meta&quot;</span><span class="p">][</span><span class="s2">&quot;Data Type&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;EDS_Spectrum&quot;</span>
+
+    <span class="n">_set_instr_name_and_time</span><span class="p">(</span><span class="n">mdict</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+
+    <span class="n">term_mapping</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;AZIMANGLE-dg&quot;</span><span class="p">:</span> <span class="s2">&quot;Azimuthal Angle (deg)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;AmpTime (usec)&quot;</span><span class="p">:</span> <span class="s2">&quot;Amplifier Time (μs)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Analyzer Type&quot;</span><span class="p">:</span> <span class="s2">&quot;Analyzer Type&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;BEAMKV   -kV&quot;</span><span class="p">:</span> <span class="s2">&quot;Beam Energy (keV)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;CHOFFSET&quot;</span><span class="p">:</span> <span class="s2">&quot;Channel Offset&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;COMMENT&quot;</span><span class="p">:</span> <span class="s2">&quot;EDAX Comment&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;DATATYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;Data Format&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;DATE&quot;</span><span class="p">:</span> <span class="s2">&quot;EDAX Date&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;ELEVANGLE-dg&quot;</span><span class="p">:</span> <span class="s2">&quot;Elevation Angle (deg)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Elements&quot;</span><span class="p">:</span> <span class="s2">&quot;User-Selected Elements&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;FILENAME&quot;</span><span class="p">:</span> <span class="s2">&quot;Originating File of MSA Export&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;FORMAT&quot;</span><span class="p">:</span> <span class="s2">&quot;File Format&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;FPGA Version&quot;</span><span class="p">:</span> <span class="s2">&quot;FPGA Version&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;LIVETIME  -s&quot;</span><span class="p">:</span> <span class="s2">&quot;Live Time (s)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;NCOLUMNS&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of Data Columns&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;NPOINTS&quot;</span><span class="p">:</span> <span class="s2">&quot;Number of Data Points&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;OFFSET&quot;</span><span class="p">:</span> <span class="s2">&quot;Offset&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;OWNER&quot;</span><span class="p">:</span> <span class="s2">&quot;EDAX Owner&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;REALTIME  -s&quot;</span><span class="p">:</span> <span class="s2">&quot;Real Time (s)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;RESO (MnKa)&quot;</span><span class="p">:</span> <span class="s2">&quot;Energy Resolution (eV)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;SIGNALTYPE&quot;</span><span class="p">:</span> <span class="s2">&quot;Signal Type&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TACTYLR  -cm&quot;</span><span class="p">:</span> <span class="s2">&quot;Active Layer Thickness (cm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TBEWIND  -cm&quot;</span><span class="p">:</span> <span class="s2">&quot;Be Window Thickness (cm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TDEADLYR -cm&quot;</span><span class="p">:</span> <span class="s2">&quot;Dead Layer Thickness (cm)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TIME&quot;</span><span class="p">:</span> <span class="s2">&quot;EDAX Time&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TITLE&quot;</span><span class="p">:</span> <span class="s2">&quot;EDAX Title&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;TakeOff Angle&quot;</span><span class="p">:</span> <span class="s2">&quot;TakeOff Angle (deg)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;Tilt Angle&quot;</span><span class="p">:</span> <span class="s2">&quot;Stage Tilt (deg)&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;VERSION&quot;</span><span class="p">:</span> <span class="s2">&quot;MSA Format Version&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;XLABEL&quot;</span><span class="p">:</span> <span class="s2">&quot;X Column Label&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;XPERCHAN&quot;</span><span class="p">:</span> <span class="s2">&quot;X Units Per Channel&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;XUNITS&quot;</span><span class="p">:</span> <span class="s2">&quot;X Column Units&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;YLABEL&quot;</span><span class="p">:</span> <span class="s2">&quot;Y Column Label&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;YUNITS&quot;</span><span class="p">:</span> <span class="s2">&quot;Y Column Units&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">for</span> <span class="n">in_term</span><span class="p">,</span> <span class="n">out_term</span> <span class="ow">in</span> <span class="n">term_mapping</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="k">if</span> <span class="n">try_getting_dict_value</span><span class="p">(</span><span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;original_metadata&quot;</span><span class="p">],</span> <span class="n">in_term</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;not found&quot;</span><span class="p">:</span>
+            <span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;nx_meta&quot;</span><span class="p">][</span><span class="n">out_term</span><span class="p">]</span> <span class="o">=</span> <span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;original_metadata&quot;</span><span class="p">][</span><span class="n">in_term</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">mdict</span></div>
+</pre></div>
+
+    </div>
+      
+  </div>
+</div>
+  
+<footer class="footer">
+  <div class="container">
+    <p class="pull-right">
+      <a href="#">Back to top</a>
+      
+        <br/>
+        
+      
+    </p>
+    <p>
+        &copy; Copyright 2023, NIST Office of Data and Informatics.<br/>
+      Last updated on Apr, 25, 2023.<br/>
+    </p>
+  </div>
+</footer>
+
+  </body>
+</html>

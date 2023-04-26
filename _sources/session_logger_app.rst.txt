@@ -152,7 +152,7 @@ database file as expected, and raises an error if not.
 
 Using the database file on the mounted drive, the logger application queries
 the ``instruments`` table in the database using the `"hostname"` of the current
-computer. In this way, a computer name (such as ``TITAN52331880``) gets mapped
+computer. In this way, a computer name (such as ``***REMOVED***``) gets mapped
 to an instrument persistent identifier (PID) (such as ``FEI-Titan-TEM-635816``)
 and this value is stored for later use.
 

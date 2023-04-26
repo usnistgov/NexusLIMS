@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>nexusLIMS.cdcs &#8212; NexusLIMS 1.1.0 documentation</title>
+    <title>nexusLIMS.cdcs &#8212; NexusLIMS 1.3.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../_static/custom-styles.css" />
@@ -28,26 +28,27 @@ $(document).ready(function(){
   // Mark external (non-nist.gov) A tags with class "external"
   //If the adress start with https and ends with nist.gov
   var re_nist = new RegExp('^https?:\/\/((^\/)*\.)*nist\\.gov(\/|$)');
+  var re_nist_github = new RegExp('^https:\/\/github.com\/usnistgov(\/|$)');
   //Regex to find address that start with https
   var re_absolute_address = new RegExp('^((https?:)?\/\/)');
   $("a").each(function(){
     var url=$(this).attr('href');
-    if(re_nist.test(url) || !re_absolute_address.test(url)){
-      $(this).addClass('local');
+    if(re_nist.test(url) || !re_absolute_address.test(url) || re_nist_github.test(url)){
+      $(this).addClass('leave_notice_local');
     }else{
       //This a href appears to be external, so tag it
-      $(this).addClass('external');
+      $(this).addClass('leave_notice_external');
     }
   });
   // Add leaveNotice to external A elements
-  $('a.external').leaveNotice();
+  $('a.leave_notice_external').leaveNotice();
 });
 </script>
 <link rel="stylesheet" type="text/css" href="https://pages.nist.gov/leaveNotice/css/jquery.leaveNotice.css" />
 
   </head><body>
 
-  <div id="navbar" class="navbar navbar-default navbar-fixed-top">
+  <div id="navbar" class="navbar navbar-default ">
     <div class="container">
       <div class="navbar-header">
         <!-- .btn-navbar is used as the toggle for collapsed navbar content -->
@@ -58,7 +59,7 @@ $(document).ready(function(){
         </button>
         <a class="navbar-brand" href="../../index.html"><span><img src="../../_static/logo_horizontal.png"></span>
            </a>
-        <span class="navbar-text navbar-version pull-left"><b></b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.3.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -79,6 +80,7 @@ $(document).ready(function(){
       role="menu"
       aria-labelledby="dLabelGlobalToc"><ul>
 <li class="toctree-l1"><a class="reference internal" href="../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../database.html">NexusLIMS database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../development.html">Developer documentation</a></li>
@@ -91,7 +93,10 @@ $(document).ready(function(){
 <li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.builder.html">nexusLIMS.builder package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.db.html">nexusLIMS.db package</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.extractors.html">nexusLIMS.extractors package</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.harvesters.html">nexusLIMS.harvesters package</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/nexusLIMS.harvesters.nemo.html">nexusLIMS.harvesters.nemo package</a></li>
+</ul>
+</li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/nexusLIMS.schemas.html">nexusLIMS.schemas package</a></li>
 </ul>
 </li>
@@ -143,6 +148,7 @@ $(document).ready(function(){
 <ul class="globaltoc">
     <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../index.html">Package introduction</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../database.html">NexusLIMS database</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../record_building.html">Record building workflow</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../development.html">Developer documentation</a></li>
@@ -196,26 +202,38 @@ $(document).ready(function(){
 <span class="c1">#  OR NOT INJURY WAS SUSTAINED BY PERSONS OR PROPERTY OR OTHERWISE, AND</span>
 <span class="c1">#  WHETHER OR NOT LOSS WAS SUSTAINED FROM, OR AROSE OUT OF THE RESULTS OF,</span>
 <span class="c1">#  OR USE OF, THE SOFTWARE OR SERVICES PROVIDED HEREUNDER.</span>
-<span class="kn">import</span> <span class="nn">os</span>
-<span class="kn">import</span> <span class="nn">os</span> <span class="k">as</span> <span class="nn">_os</span>
-<span class="kn">import</span> <span class="nn">requests</span> <span class="k">as</span> <span class="nn">_requests</span>
-<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span> <span class="k">as</span> <span class="n">_glob</span>
-<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urljoin</span> <span class="k">as</span> <span class="n">_urljoin</span>
-<span class="kn">import</span> <span class="nn">sys</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">A module to handle the uploading of previously-built XML records to a CDCS instance.</span>
+
+<span class="sd">See https://github.com/usnistgov/NexusLIMS-CDCS for more details on the NexusLIMS</span>
+<span class="sd">customizations to the CDCS application.</span>
+
+<span class="sd">This module can also be run directly to upload records to a CDCS instance without</span>
+<span class="sd">invoking the record builder.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
 <span class="kn">import</span> <span class="nn">argparse</span>
-<span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="n">nexus_req</span> <span class="k">as</span> <span class="n">_nx_req</span><span class="p">,</span> \
-    <span class="n">AuthenticationError</span> <span class="k">as</span> <span class="n">_authError</span>
-<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span> <span class="k">as</span> <span class="n">_tqdm</span>
-<span class="kn">import</span> <span class="nn">logging</span> <span class="k">as</span> <span class="nn">_logging</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">glob</span> <span class="kn">import</span> <span class="n">glob</span>
+<span class="kn">from</span> <span class="nn">http</span> <span class="kn">import</span> <span class="n">HTTPStatus</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">urllib.parse</span> <span class="kn">import</span> <span class="n">urljoin</span>
 
-<span class="n">_logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">()</span>
-<span class="n">_logger</span> <span class="o">=</span> <span class="n">_logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
-<span class="n">_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">_logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
+
+<span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="n">AuthenticationError</span><span class="p">,</span> <span class="n">nexus_req</span>
+
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">()</span>
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+<span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">_cdcs_url</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Return the url to the NexusLIMS CDCS instance by fetching it from the environment</span>
+<div class="viewcode-block" id="cdcs_url"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.cdcs.cdcs_url">[docs]</a><span class="k">def</span> <span class="nf">cdcs_url</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Return the url to the NexusLIMS CDCS instance by fetching it from the environment.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -227,17 +245,20 @@ $(document).ready(function(){
 <span class="sd">    ValueError</span>
 <span class="sd">        If the ``cdcs_url`` environment variable is not defined, raise a ``ValueError``</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;cdcs_url&#39;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+    <span class="n">url</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;cdcs_url&quot;</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">url</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;&#39;cdcs_url&#39; environment variable is not defined&quot;</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">url</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;&#39;cdcs_url&#39; environment variable is not defined&quot;</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">url</span></div>
 
 
 <div class="viewcode-block" id="get_workspace_id"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.cdcs.get_workspace_id">[docs]</a><span class="k">def</span> <span class="nf">get_workspace_id</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Get the workspace ID that the user has access to (should be the Global</span>
-<span class="sd">    Public Workspace)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the workspace ID that the user has access to.</span>
+
+<span class="sd">    This should be the Global Public Workspace in the current NexusLIMS CDCS</span>
+<span class="sd">    implementation.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -246,19 +267,21 @@ $(document).ready(function(){
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># assuming there&#39;s only one workspace for this user (that is the public</span>
     <span class="c1"># workspace)</span>
-    <span class="n">_endpoint</span> <span class="o">=</span> <span class="n">_urljoin</span><span class="p">(</span><span class="n">_cdcs_url</span><span class="p">(),</span> <span class="s1">&#39;rest/workspace/read_access&#39;</span><span class="p">)</span>
-    <span class="n">_r</span> <span class="o">=</span> <span class="n">_nx_req</span><span class="p">(</span><span class="n">_endpoint</span><span class="p">,</span> <span class="n">_requests</span><span class="o">.</span><span class="n">get</span><span class="p">,</span> <span class="n">basic_auth</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">_r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">401</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">_authError</span><span class="p">(</span><span class="s1">&#39;Could not authenticate to CDCS. Are the &#39;</span>
-                         <span class="s1">&#39;nexusLIMS_user and nexusLIMS_pass environment &#39;</span>
-                         <span class="s1">&#39;variables set correctly?&#39;</span><span class="p">)</span>
-    <span class="n">workspace_id</span> <span class="o">=</span> <span class="n">_r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">workspace_id</span></div>
+    <span class="n">_endpoint</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">cdcs_url</span><span class="p">(),</span> <span class="s2">&quot;rest/workspace/read_access&quot;</span><span class="p">)</span>
+    <span class="n">_r</span> <span class="o">=</span> <span class="n">nexus_req</span><span class="p">(</span><span class="n">_endpoint</span><span class="p">,</span> <span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="n">basic_auth</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">_r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="n">HTTPStatus</span><span class="o">.</span><span class="n">UNAUTHORIZED</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;Could not authenticate to CDCS. Are the nexusLIMS_user and &quot;</span>
+            <span class="s2">&quot;nexusLIMS_pass environment variables set correctly?&quot;</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>  <span class="c1"># return workspace id</span></div>
 
 
 <div class="viewcode-block" id="get_template_id"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.cdcs.get_template_id">[docs]</a><span class="k">def</span> <span class="nf">get_template_id</span><span class="p">():</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Get the template ID for the schema (so the record can be associated with it)</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Get the template ID for the schema (so the record can be associated with it).</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
@@ -266,18 +289,20 @@ $(document).ready(function(){
 <span class="sd">        The template ID</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># get the current template (XSD) id value:</span>
-    <span class="n">_endpoint</span> <span class="o">=</span> <span class="n">_urljoin</span><span class="p">(</span><span class="n">_cdcs_url</span><span class="p">(),</span> <span class="s1">&#39;rest/template-version-manager/global&#39;</span><span class="p">)</span>
-    <span class="n">_r</span> <span class="o">=</span> <span class="n">_nx_req</span><span class="p">(</span><span class="n">_endpoint</span><span class="p">,</span> <span class="n">_requests</span><span class="o">.</span><span class="n">get</span><span class="p">,</span> <span class="n">basic_auth</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">_r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">401</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="n">_authError</span><span class="p">(</span><span class="s1">&#39;Could not authenticate to CDCS. Are the &#39;</span>
-                         <span class="s1">&#39;nexusLIMS_user and nexusLIMS_pass environment &#39;</span>
-                         <span class="s1">&#39;variables set correctly?&#39;</span><span class="p">)</span>
-    <span class="n">template_id</span> <span class="o">=</span> <span class="n">_r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;current&#39;</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">template_id</span></div>
+    <span class="n">_endpoint</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">cdcs_url</span><span class="p">(),</span> <span class="s2">&quot;rest/template-version-manager/global&quot;</span><span class="p">)</span>
+    <span class="n">_r</span> <span class="o">=</span> <span class="n">nexus_req</span><span class="p">(</span><span class="n">_endpoint</span><span class="p">,</span> <span class="s2">&quot;GET&quot;</span><span class="p">,</span> <span class="n">basic_auth</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">_r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="n">HTTPStatus</span><span class="o">.</span><span class="n">UNAUTHORIZED</span><span class="p">:</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;Could not authenticate to CDCS. Are the nexusLIMS_user and nexusLIMS_pass &quot;</span>
+            <span class="s2">&quot;environment variables set correctly?&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="n">AuthenticationError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">_r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;current&quot;</span><span class="p">]</span>  <span class="c1"># return template id</span></div>
 
 
 <div class="viewcode-block" id="upload_record_content"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.cdcs.upload_record_content">[docs]</a><span class="k">def</span> <span class="nf">upload_record_content</span><span class="p">(</span><span class="n">xml_content</span><span class="p">,</span> <span class="n">title</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Upload a single XML record to the NexusLIMS CDCS instance.</span>
 
 <span class="sd">    Parameters</span>
@@ -295,39 +320,38 @@ $(document).ready(function(){
 <span class="sd">    record_id : str</span>
 <span class="sd">        The id (on the server) of the record that was uploaded</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">endpoint</span> <span class="o">=</span> <span class="n">_urljoin</span><span class="p">(</span><span class="n">_cdcs_url</span><span class="p">(),</span> <span class="s1">&#39;rest/data/&#39;</span><span class="p">)</span>
+    <span class="n">endpoint</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">cdcs_url</span><span class="p">(),</span> <span class="s2">&quot;rest/data/&quot;</span><span class="p">)</span>
 
     <span class="n">payload</span> <span class="o">=</span> <span class="p">{</span>
-        <span class="s1">&#39;template&#39;</span><span class="p">:</span> <span class="n">get_template_id</span><span class="p">(),</span>
-        <span class="s1">&#39;title&#39;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
-        <span class="s1">&#39;xml_content&#39;</span><span class="p">:</span> <span class="n">xml_content</span>
+        <span class="s2">&quot;template&quot;</span><span class="p">:</span> <span class="n">get_template_id</span><span class="p">(),</span>
+        <span class="s2">&quot;title&quot;</span><span class="p">:</span> <span class="n">title</span><span class="p">,</span>
+        <span class="s2">&quot;xml_content&quot;</span><span class="p">:</span> <span class="n">xml_content</span><span class="p">,</span>
     <span class="p">}</span>
 
-    <span class="n">post_r</span> <span class="o">=</span> <span class="n">_nx_req</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">_requests</span><span class="o">.</span><span class="n">post</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> <span class="n">basic_auth</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">post_r</span> <span class="o">=</span> <span class="n">nexus_req</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span> <span class="s2">&quot;POST&quot;</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">payload</span><span class="p">,</span> <span class="n">basic_auth</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="n">post_r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">201</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">post_r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">HTTPStatus</span><span class="o">.</span><span class="n">CREATED</span><span class="p">:</span>
         <span class="c1"># anything other than 201 status means something went wrong</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Got error while uploading </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">:</span><span class="se">\n</span><span class="s1">&#39;</span>
-                      <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">post_r</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Got error while uploading </span><span class="si">%s</span><span class="s2">:</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">post_r</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">post_r</span>
 
     <span class="c1"># assign this record to the public workspace</span>
-    <span class="n">record_id</span> <span class="o">=</span> <span class="n">post_r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s1">&#39;id&#39;</span><span class="p">]</span>
-    <span class="n">record_url</span> <span class="o">=</span> <span class="n">_urljoin</span><span class="p">(</span><span class="n">_cdcs_url</span><span class="p">(),</span>
-                          <span class="sa">f</span><span class="s1">&#39;data?id=</span><span class="si">{</span><span class="n">record_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="n">wrk_endpoint</span> <span class="o">=</span> <span class="n">_urljoin</span><span class="p">(</span><span class="n">_cdcs_url</span><span class="p">(),</span>
-                            <span class="sa">f</span><span class="s1">&#39;rest/data/</span><span class="si">{</span><span class="n">record_id</span><span class="si">}</span><span class="s1">/assign/&#39;</span>
-                            <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">get_workspace_id</span><span class="p">()</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">record_id</span> <span class="o">=</span> <span class="n">post_r</span><span class="o">.</span><span class="n">json</span><span class="p">()[</span><span class="s2">&quot;id&quot;</span><span class="p">]</span>
+    <span class="n">record_url</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">cdcs_url</span><span class="p">(),</span> <span class="sa">f</span><span class="s2">&quot;data?id=</span><span class="si">{</span><span class="n">record_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">wrk_endpoint</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span>
+        <span class="n">cdcs_url</span><span class="p">(),</span>
+        <span class="sa">f</span><span class="s2">&quot;rest/data/</span><span class="si">{</span><span class="n">record_id</span><span class="si">}</span><span class="s2">/assign/</span><span class="si">{</span><span class="n">get_workspace_id</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 
-    <span class="n">r</span> <span class="o">=</span> <span class="n">_nx_req</span><span class="p">(</span><span class="n">wrk_endpoint</span><span class="p">,</span> <span class="n">_requests</span><span class="o">.</span><span class="n">patch</span><span class="p">,</span> <span class="n">basic_auth</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="n">_</span> <span class="o">=</span> <span class="n">nexus_req</span><span class="p">(</span><span class="n">wrk_endpoint</span><span class="p">,</span> <span class="s2">&quot;PATCH&quot;</span><span class="p">,</span> <span class="n">basic_auth</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
-    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Record &quot;</span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">&quot; available at </span><span class="si">{</span><span class="n">record_url</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Record &quot;</span><span class="si">%s</span><span class="s1">&quot; available at </span><span class="si">%s</span><span class="s1">&#39;</span><span class="p">,</span> <span class="n">title</span><span class="p">,</span> <span class="n">record_url</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">post_r</span><span class="p">,</span> <span class="n">record_id</span></div>
 
 
 <div class="viewcode-block" id="delete_record"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.cdcs.delete_record">[docs]</a><span class="k">def</span> <span class="nf">delete_record</span><span class="p">(</span><span class="n">record_id</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Delete a Data record from the NexusLIMS CDCS instance via REST API</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Delete a Data record from the NexusLIMS CDCS instance via REST API.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -336,89 +360,105 @@ $(document).ready(function(){
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    r : :py:class:`~requests.Response`</span>
+<span class="sd">    response : :py:class:`~requests.Response`</span>
 <span class="sd">        The REST response returned from the CDCS instance after attempting</span>
-<span class="sd">        the delete</span>
+<span class="sd">        the delete operation</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">endpoint</span> <span class="o">=</span> <span class="n">_urljoin</span><span class="p">(</span><span class="n">_cdcs_url</span><span class="p">(),</span> <span class="sa">f</span><span class="s1">&#39;rest/data/</span><span class="si">{</span><span class="n">record_id</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="n">r</span> <span class="o">=</span> <span class="n">_nx_req</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">_requests</span><span class="o">.</span><span class="n">delete</span><span class="p">,</span> <span class="n">basic_auth</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">204</span><span class="p">:</span>
+    <span class="n">endpoint</span> <span class="o">=</span> <span class="n">urljoin</span><span class="p">(</span><span class="n">cdcs_url</span><span class="p">(),</span> <span class="sa">f</span><span class="s2">&quot;rest/data/</span><span class="si">{</span><span class="n">record_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">response</span> <span class="o">=</span> <span class="n">nexus_req</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span> <span class="s2">&quot;DELETE&quot;</span><span class="p">,</span> <span class="n">basic_auth</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">HTTPStatus</span><span class="o">.</span><span class="n">NO_CONTENT</span><span class="p">:</span>
         <span class="c1"># anything other than 204 status means something went wrong</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Got error while deleting </span><span class="si">{</span><span class="n">record_id</span><span class="si">}</span><span class="s1">:</span><span class="se">\n</span><span class="s1">&#39;</span>
-                      <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="n">r</span><span class="o">.</span><span class="n">text</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">r</span></div>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Received error while deleting </span><span class="si">%s</span><span class="s2">:</span><span class="se">\n</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">record_id</span><span class="p">,</span> <span class="n">response</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">response</span></div>
 
 
-<div class="viewcode-block" id="upload_record_files"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.cdcs.upload_record_files">[docs]</a><span class="k">def</span> <span class="nf">upload_record_files</span><span class="p">(</span><span class="n">files_to_upload</span><span class="p">,</span> <span class="n">progress</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="upload_record_files"><a class="viewcode-back" href="../../api/nexusLIMS.html#nexusLIMS.cdcs.upload_record_files">[docs]</a><span class="k">def</span> <span class="nf">upload_record_files</span><span class="p">(</span>
+    <span class="n">files_to_upload</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]],</span>
+    <span class="o">*</span><span class="p">,</span>
+    <span class="n">progress</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Upload record files to CDCS.</span>
+
 <span class="sd">    Upload a list of .xml files (or all .xml files in the current directory)</span>
-<span class="sd">    to the NexusLIMS CDCS instance using :py:meth:`upload_record_content`</span>
+<span class="sd">    to the NexusLIMS CDCS instance using :py:meth:`upload_record_content`.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
-<span class="sd">    files_to_upload : list or None</span>
+<span class="sd">    files_to_upload : typing.Optional[typing.List[pathlib.Path]]</span>
 <span class="sd">        The list of .xml files to upload. If ``None``, all .xml files in the</span>
 <span class="sd">        current directory will be used instead.</span>
 <span class="sd">    progress : bool</span>
-<span class="sd">        Whether or not to show a progress bar for uploading</span>
+<span class="sd">        Whether to show a progress bar for uploading</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
-<span class="sd">    files_uploaded : :obj:`list` of :obj:`str`</span>
+<span class="sd">    files_uploaded : list of pathlib.Path</span>
 <span class="sd">        A list of the files that were successfully uploaded</span>
-<span class="sd">    record_ids : :obj:`list` of :obj:`str`</span>
-<span class="sd">        A list of the record id values (onthe server) that were uploaded</span>
+<span class="sd">    record_ids : list of str</span>
+<span class="sd">        A list of the record id values (on the server) that were uploaded</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">if</span> <span class="n">files_to_upload</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Using all .xml files in this directory&#39;</span><span class="p">)</span>
-        <span class="n">files_to_upload</span> <span class="o">=</span> <span class="n">_glob</span><span class="p">(</span><span class="s1">&#39;*.xml&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using all .xml files in this directory&quot;</span><span class="p">)</span>
+        <span class="n">files_to_upload</span> <span class="o">=</span> <span class="n">glob</span><span class="p">(</span><span class="s2">&quot;*.xml&quot;</span><span class="p">)</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s1">&#39;Using .xml files from command line&#39;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Using .xml files from command line&quot;</span><span class="p">)</span>
 
-    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Found </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">files_to_upload</span><span class="p">)</span><span class="si">}</span><span class="s1"> files to upload</span><span class="se">\n</span><span class="s1">&#39;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Found </span><span class="si">%s</span><span class="s2"> files to upload</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">files_to_upload</span><span class="p">))</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">files_to_upload</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="s1">&#39;No .xml files were found (please specify on the &#39;</span> \
-              <span class="s1">&#39;command line, or run this script from a directory &#39;</span> \
-              <span class="s1">&#39;containing one or more .xml files&#39;</span>
-        <span class="n">_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;No .xml files were found (please specify on the &quot;</span>
+            <span class="s2">&quot;command line, or run this script from a directory &quot;</span>
+            <span class="s2">&quot;containing one or more .xml files&quot;</span>
+        <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
     <span class="n">files_uploaded</span> <span class="o">=</span> <span class="p">[]</span>
     <span class="n">record_ids</span> <span class="o">=</span> <span class="p">[]</span>
 
-    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">_tqdm</span><span class="p">(</span><span class="n">files_to_upload</span><span class="p">)</span> <span class="k">if</span> <span class="n">progress</span> <span class="k">else</span> <span class="n">files_to_upload</span><span class="p">:</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="s1">&#39;r&#39;</span><span class="p">)</span> <span class="k">as</span> <span class="n">xml_file</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">files_to_upload</span><span class="p">)</span> <span class="k">if</span> <span class="n">progress</span> <span class="k">else</span> <span class="n">files_to_upload</span><span class="p">:</span>
+        <span class="n">f_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">f_path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">xml_file</span><span class="p">:</span>
             <span class="n">xml_content</span> <span class="o">=</span> <span class="n">xml_file</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
-        <span class="n">title</span> <span class="o">=</span> <span class="n">_os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-        <span class="n">r</span><span class="p">,</span> <span class="n">record_id</span> <span class="o">=</span> <span class="n">upload_record_content</span><span class="p">(</span><span class="n">xml_content</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
+        <span class="n">title</span> <span class="o">=</span> <span class="n">f_path</span><span class="o">.</span><span class="n">stem</span>
+        <span class="n">response</span><span class="p">,</span> <span class="n">record_id</span> <span class="o">=</span> <span class="n">upload_record_content</span><span class="p">(</span><span class="n">xml_content</span><span class="p">,</span> <span class="n">title</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">r</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">201</span><span class="p">:</span>
-            <span class="n">_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Could not upload </span><span class="si">{</span><span class="n">title</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">response</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="n">HTTPStatus</span><span class="o">.</span><span class="n">CREATED</span><span class="p">:</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Could not upload </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">f_path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
             <span class="k">continue</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">files_uploaded</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-            <span class="n">record_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record_id</span><span class="p">)</span>
 
-    <span class="n">_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Successfully uploaded </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">files_uploaded</span><span class="p">)</span><span class="si">}</span><span class="s1"> of &#39;</span>
-                 <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">files_to_upload</span><span class="p">)</span><span class="si">}</span><span class="s1"> files&#39;</span><span class="p">)</span>
+        <span class="n">files_uploaded</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">f_path</span><span class="p">)</span>
+        <span class="n">record_ids</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">record_id</span><span class="p">)</span>
+
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+        <span class="s2">&quot;Successfully uploaded </span><span class="si">%i</span><span class="s2"> of </span><span class="si">%i</span><span class="s2"> files&quot;</span><span class="p">,</span>
+        <span class="nb">len</span><span class="p">(</span><span class="n">files_uploaded</span><span class="p">),</span>
+        <span class="nb">len</span><span class="p">(</span><span class="n">files_to_upload</span><span class="p">),</span>
+    <span class="p">)</span>
 
     <span class="k">return</span> <span class="n">files_uploaded</span><span class="p">,</span> <span class="n">record_ids</span></div>
 
 
-<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>   <span class="c1"># pragma: no cover</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
     <span class="n">parser</span> <span class="o">=</span> <span class="n">argparse</span><span class="o">.</span><span class="n">ArgumentParser</span><span class="p">(</span>
-        <span class="n">description</span><span class="o">=</span><span class="s1">&#39;Communicate with the Nexus CDCS instance&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;--upload-records&#39;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;Upload .xml records to the the Nexus CDCS&#39;</span><span class="p">,</span>
-                        <span class="n">action</span><span class="o">=</span><span class="s1">&#39;store_true&#39;</span><span class="p">)</span>
-    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span><span class="s1">&#39;xml&#39;</span><span class="p">,</span>
-                        <span class="n">nargs</span><span class="o">=</span><span class="s1">&#39;*&#39;</span><span class="p">,</span>
-                        <span class="n">help</span><span class="o">=</span><span class="s1">&#39;(used with --upload-records) &#39;</span>
-                             <span class="s1">&#39;Files to upload (separated by space and &#39;</span>
-                             <span class="s1">&#39;surrounded by quotes, if needed). If no files &#39;</span>
-                             <span class="s1">&#39;are specified, all .xml files in the current &#39;</span>
-                             <span class="s1">&#39;directory will be used instead.&#39;</span><span class="p">)</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Communicate with the Nexus CDCS instance&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;--upload-records&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;Upload .xml records to the the Nexus CDCS&quot;</span><span class="p">,</span>
+        <span class="n">action</span><span class="o">=</span><span class="s2">&quot;store_true&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">parser</span><span class="o">.</span><span class="n">add_argument</span><span class="p">(</span>
+        <span class="s2">&quot;xml&quot;</span><span class="p">,</span>
+        <span class="n">nargs</span><span class="o">=</span><span class="s2">&quot;*&quot;</span><span class="p">,</span>
+        <span class="n">help</span><span class="o">=</span><span class="s2">&quot;(used with --upload-records) &quot;</span>
+        <span class="s2">&quot;Files to upload (separated by space and &quot;</span>
+        <span class="s2">&quot;surrounded by quotes, if needed). If no files &quot;</span>
+        <span class="s2">&quot;are specified, all .xml files in the current &quot;</span>
+        <span class="s2">&quot;directory will be used instead.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
 
     <span class="n">args</span> <span class="o">=</span> <span class="n">parser</span><span class="o">.</span><span class="n">parse_args</span><span class="p">()</span>
 
@@ -426,11 +466,11 @@ $(document).ready(function(){
         <span class="n">parser</span><span class="o">.</span><span class="n">print_help</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">args</span><span class="o">.</span><span class="n">upload_records</span><span class="p">:</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># noqa: PLR2004</span>
             <span class="c1"># no files were provided, so assume the user wanted to glob all</span>
             <span class="c1"># .xml files in the current directory</span>
             <span class="n">upload_record_files</span><span class="p">(</span><span class="kc">None</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">argv</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">2</span><span class="p">:</span>  <span class="c1"># noqa: PLR2004</span>
             <span class="n">upload_record_files</span><span class="p">(</span><span class="n">args</span><span class="o">.</span><span class="n">xml</span><span class="p">)</span>
 </pre></div>
 
@@ -449,8 +489,8 @@ $(document).ready(function(){
       
     </p>
     <p>
-        &copy; Copyright 2022, NIST Office of Data and Informatics.<br/>
-      Last updated on Jul, 18, 2022.<br/>
+        &copy; Copyright 2023, NIST Office of Data and Informatics.<br/>
+      Last updated on Apr, 25, 2023.<br/>
     </p>
   </div>
 </footer>
