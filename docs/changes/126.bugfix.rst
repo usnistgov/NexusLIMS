@@ -1,0 +1,2 @@
+Fixed issue where "process new records" script was emailing an error alert on conditions
+that were not errors. 

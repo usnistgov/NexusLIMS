@@ -90,23 +90,29 @@ function script_trap_exit() {
         stringArr=()
         # do some more detailed checks to allow us to specify which text was
         # found in the output:
-        if grep -q -i -E 'critical' "${LOGPATH}"; then
-            stringArr+=("critical")
-        elif grep -q -i -E 'error' "${LOGPATH}"; then
-            stringArr+=("error")
-        elif grep -q -i -E 'fatal' "${LOGPATH}"; then
-            stringArr+=("fatal")
-        elif grep -q -i -E 'no_files_found' "${LOGPATH}"; then
-            stringArr+=("no_files_found")
-        fi
-        found_strings=$(IFS=, ; echo "${stringArr[*]}")
-        # ignore (somewhat) common DNS issues and don't alert
-        if grep -q -i -E "Temporary failure in name resolution" "${LOGPATH}"; then
-            # do nothing
-            :
-        else
-            send_email 'dummy_param'
-        fi
+            if grep -q -i -E 'critical' "${LOGPATH}"; then
+                stringArr+=("critical")
+            elif grep -q -i -E 'error' "${LOGPATH}"; then
+                stringArr+=("error")
+            elif grep -q -i -E 'fatal' "${LOGPATH}"; then
+                stringArr+=("fatal")
+            elif grep -q -i -E 'no_files_found' "${LOGPATH}"; then
+                stringArr+=("no_files_found")
+            fi
+            found_strings=$(IFS=, ; echo "${stringArr[*]}")
+        
+            # ignore (somewhat) common DNS issues and don't alert
+            if grep -q -i -E "Temporary failure in name resolution" "${LOGPATH}"; then
+                :
+            elif grep -q -E "NoDataConsentError" "${LOGPATH}"; then
+                # don't alert on NoDataConsentError
+                :
+            elif grep -q -E "NoMatchingReservationError" "${LOGPATH}"; then
+                # don't alert on NoMatchingReservationError
+                :
+            else
+                send_email 'dummy_param'
+            fi
         else
         # do nothing
         :
