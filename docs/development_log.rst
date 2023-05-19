@@ -1,4 +1,20 @@
-v1.3.0 (2023-04-25)
+v1.3.1 (2023-05-19)
+===================
+
+Bug fixes
+---------
+
+- Fixed issue where "process new records" script was emailing an error alert on conditions
+  that were not errors. (`#126 <https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/126>`_)
+
+
+Miscellaneous/Development changes
+---------------------------------
+
+- Fixed pipeline runner to not run tests when they're not needed. (`#129 <https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/129>`_)
+
+
+v1.3.0 (2023-04-14)
 ===================
 
 New features

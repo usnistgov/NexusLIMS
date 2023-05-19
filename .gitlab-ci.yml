@@ -28,6 +28,14 @@ cache:
 linting:
     stage: linting
     extends: .env_setup
+    rules:
+      - if: $CI_COMMIT_TAG
+        when: never 
+      - if: $CI_COMMIT_BRANCH == "public"
+        when: never
+      - if: $CI_COMMIT_BRANCH == "nist-pages"
+        when: never
+      - when: always
     retry: 2
     script:
       - poetry install
@@ -41,9 +49,14 @@ nexusLIMS_tests:
       - TOX_SKIP_ENV=lint poetry run tox
     retry: 2
     extends: .env_setup
-    except:
-        - public
-        - nist-pages
+    rules:
+      - if: $CI_COMMIT_TAG
+        when: never 
+      - if: $CI_COMMIT_BRANCH == "public"
+        when: never
+      - if: $CI_COMMIT_BRANCH == "nist-pages"
+        when: never
+      - when: always
     after_script:
       # cache the coverage results so they can be published, always returning true
       - mv tests/coverage .
@@ -64,9 +77,14 @@ pages:
     - mkdir -p public/doc && rsync -avr _build/ public/doc/
   retry: 2
   extends: .env_setup
-  except:
-    - public
-    - nist-pages
+  rules:
+    - if: $CI_COMMIT_TAG
+      when: never 
+    - if: $CI_COMMIT_BRANCH == "public"
+      when: never
+    - if: $CI_COMMIT_BRANCH == "nist-pages"
+      when: never
+    - when: always
   after_script:
     - tar -xzf coverage.tar.gz -C public/ || true
   artifacts:
