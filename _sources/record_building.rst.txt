@@ -259,10 +259,10 @@ case the FEI Titan TEM in Building 223, connected to the SharePoint harvester):
     Calendar name:    FEI Titan TEM
     Calendar url:     https://sharepoint.url.com/Lists/FEI%20Titan%20Events/calendar.aspx
     Schema name:      FEI Titan TEM
-    Location:         ***REMOVED***
+    Location:         223/B115
     Property tag:     635816
     Filestore path:   ./Titan
-    Computer IP:      ***REMOVED***
+    Computer IP:      192.168.1.5
     Computer name:    TITAN12345678
     Computer mount:   M:/
 

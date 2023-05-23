@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>Changelog &#8212; NexusLIMS 1.3.0 documentation</title>
+    <title>Changelog &#8212; NexusLIMS 1.3.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="_static/custom-styles.css" />
@@ -62,7 +62,7 @@ $(document).ready(function(){
         </button>
         <a class="navbar-brand" href="index.html"><span><img src="_static/logo_horizontal.png"></span>
            </a>
-        <span class="navbar-text navbar-version pull-left"><b>1.3.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.3.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -168,7 +168,8 @@ $(document).ready(function(){
 
 <ul>
 <li><a class="reference internal" href="#">Changelog</a><ul>
-<li><a class="reference internal" href="#v1-3-0-2023-04-25">v1.3.0 (2023-04-25)</a></li>
+<li><a class="reference internal" href="#v1-3-1-2023-05-19">v1.3.1 (2023-05-19)</a></li>
+<li><a class="reference internal" href="#v1-3-0-2023-04-14">v1.3.0 (2023-04-14)</a></li>
 <li><a class="reference internal" href="#v1-2-0-2023-03-31">v1.2.0 (2023-03-31)</a></li>
 <li><a class="reference internal" href="#v1-1-1-2022-06-15">v1.1.1 (2022-06-15)</a></li>
 <li><a class="reference internal" href="#v1-1-0-2021-12-12">v1.1.0 (2021-12-12)</a></li>
@@ -197,48 +198,64 @@ $(document).ready(function(){
       
   <section id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
-<section id="v1-3-0-2023-04-25">
-<h2>v1.3.0 (2023-04-25)<a class="headerlink" href="#v1-3-0-2023-04-25" title="Permalink to this headline">¶</a></h2>
+<section id="v1-3-1-2023-05-19">
+<h2>v1.3.1 (2023-05-19)<a class="headerlink" href="#v1-3-1-2023-05-19" title="Permalink to this headline">¶</a></h2>
+<section id="bug-fixes">
+<h3>Bug fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed issue where “process new records” script was emailing an error alert on conditions
+that were not errors. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/126">#126</a>)</p></li>
+</ul>
+</section>
+<section id="miscellaneous-development-changes">
+<h3>Miscellaneous/Development changes<a class="headerlink" href="#miscellaneous-development-changes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Fixed pipeline runner to not run tests when they’re not needed. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/129">#129</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="v1-3-0-2023-04-14">
+<h2>v1.3.0 (2023-04-14)<a class="headerlink" href="#v1-3-0-2023-04-14" title="Permalink to this headline">¶</a></h2>
 <section id="new-features">
 <h3>New features<a class="headerlink" href="#new-features" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Add support for reading <code class="docutils literal notranslate"><span class="pre">.spc</span></code> and <code class="docutils literal notranslate"><span class="pre">.msa</span></code> EDS spectrum files produced by EDAX
-acquisition softwares. (<a class="reference external" href="#">#122</a>)</p></li>
+acquisition softwares. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/122">#122</a>)</p></li>
 </ul>
 </section>
 <section id="documentation-improvements">
 <h3>Documentation improvements<a class="headerlink" href="#documentation-improvements" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Add <a class="reference external" href="https://towncrier.readthedocs.io/">towncrier</a> to manage documentation of
-changes in a semi-automated manner. (<a class="reference external" href="#">#125</a>)</p></li>
+changes in a semi-automated manner. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/125">#125</a>)</p></li>
 </ul>
 </section>
 </section>
 <section id="v1-2-0-2023-03-31">
 <h2>v1.2.0 (2023-03-31)<a class="headerlink" href="#v1-2-0-2023-03-31" title="Permalink to this headline">¶</a></h2>
-<section id="id3">
-<h3>New features<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h3>
+<section id="id5">
+<h3>New features<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Added new “default” extractor for filetypes we don’t know how to read
-that will add very basic file-based metadata otherwise (<a class="reference external" href="#">#121</a>)</p></li>
+that will add very basic file-based metadata otherwise (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/121">#121</a>)</p></li>
 <li><p>Added a configuration environment variable for file finding
 (<code class="docutils literal notranslate"><span class="pre">NexusLIMS_file_strategy</span></code>). A value of <code class="docutils literal notranslate"><span class="pre">&quot;inclusive&quot;</span></code> will add all files found in
 the time range of a session to the record (even if we don’t know how to parse it beyond
 basic metadata). A value of <code class="docutils literal notranslate"><span class="pre">&quot;exclusive&quot;</span></code> will exlcude files that do not have an
-explicit extractor defined (this was the previous behavior) (<a class="reference external" href="#">#121</a>)</p></li>
+explicit extractor defined (this was the previous behavior) (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/121">#121</a>)</p></li>
 <li><p>Added a way to “ignore” files during the file finding routine via an environment
 variable named <code class="docutils literal notranslate"><span class="pre">NexusLIMS_ignore_patterns</span></code>. It should be a JSON-formatted list
 provided as a string. Each item of the list will be passed to the GNU find command
-as a pattern to ignore. (<a class="reference external" href="#">#121</a>)</p></li>
+as a pattern to ignore. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/121">#121</a>)</p></li>
 </ul>
 </section>
-<section id="bug-fixes">
-<h3>Bug fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h3>
+<section id="id9">
+<h3>Bug fixes<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><p>Fixed Poetry not installing due to change in upstream installer location (<a class="reference external" href="#">#117</a>)</p></li>
+<li><p>Fixed Poetry not installing due to change in upstream installer location (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/117">#117</a>)</p></li>
 <li><p>Fixed issue where record builder would not run (and we wouldn’t even be alerted!)
-if the network shares for <code class="docutils literal notranslate"><span class="pre">mmfnexus_path</span></code> and <code class="docutils literal notranslate"><span class="pre">nexusLIMS_path</span></code> were not mounted. (<a class="reference external" href="#">#118</a>)</p></li>
-<li><p>Fixed bug introduced by change to API response for reservation questions in NEMO 4.3.2 (<a class="reference external" href="#">#119</a>)</p></li>
+if the network shares for <code class="docutils literal notranslate"><span class="pre">mmfnexus_path</span></code> and <code class="docutils literal notranslate"><span class="pre">nexusLIMS_path</span></code> were not mounted. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/118">#118</a>)</p></li>
+<li><p>Fixed bug introduced by change to API response for reservation questions in NEMO 4.3.2 (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/119">#119</a>)</p></li>
 <li><p>Fix for development bug introduced by upgrade of tox package to 4.0.</p></li>
 </ul>
 </section>
@@ -246,37 +263,37 @@ if the network shares for <code class="docutils literal notranslate"><span class
 <h3>Enhancements<a class="headerlink" href="#enhancements" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Added support for <code class="docutils literal notranslate"><span class="pre">&quot;NO_CONSENT&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;NO_RESERVATION&quot;</span></code> statuses in the
-<code class="docutils literal notranslate"><span class="pre">session_log</span></code> table of the NexusLIMS database (<a class="reference external" href="#">#105</a>)</p></li>
+<code class="docutils literal notranslate"><span class="pre">session_log</span></code> table of the NexusLIMS database (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/105">#105</a>)</p></li>
 <li><p>Harvesters (and other parts of the code that use network resources) will now retry
-their requests if they fail in order to make the record building process more resilient (<a class="reference external" href="#">#112</a>)</p></li>
+their requests if they fail in order to make the record building process more resilient (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/112">#112</a>)</p></li>
 <li><p>Harvester will now read periodic table element information from NEMO reservation
 questions and include them in the XML records. Also updated the schema and CDCS XSLT
-to allow for and display this information in the front end. (<a class="reference external" href="#">#120</a>)</p></li>
+to allow for and display this information in the front end. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/120">#120</a>)</p></li>
 <li><p>File finding now works on a directory of symbolic links (in addition to a regular
 folder hierarchy).</p></li>
 </ul>
 </section>
-<section id="id13">
-<h3>Documentation improvements<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h3>
+<section id="id16">
+<h3>Documentation improvements<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Improved documentation to be public-facing and also set up structure for public
 repository at <a class="reference external" href="https://github.com/usnistgov/nexuslims">https://github.com/usnistgov/nexuslims</a>,
 <a class="reference external" href="https://github.com/usnistgov/NexusLIMS-CDCS">https://github.com/usnistgov/NexusLIMS-CDCS</a>, and
-<a class="reference external" href="https://github.com/usnistgov/nexuslims-cdcs-docker">https://github.com/usnistgov/nexuslims-cdcs-docker</a> (<a class="reference external" href="#">#111</a>)</p></li>
-<li><p>Add NIST branding to documentation via header/footer script from pages.nist.gov (<a class="reference external" href="#">#113</a>)</p></li>
+<a class="reference external" href="https://github.com/usnistgov/nexuslims-cdcs-docker">https://github.com/usnistgov/nexuslims-cdcs-docker</a> (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/111">#111</a>)</p></li>
+<li><p>Add NIST branding to documentation via header/footer script from pages.nist.gov (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/113">#113</a>)</p></li>
 </ul>
 </section>
-<section id="miscellaneous-development-changes">
-<h3>Miscellaneous/Development changes<a class="headerlink" href="#miscellaneous-development-changes" title="Permalink to this headline">¶</a></h3>
+<section id="id19">
+<h3>Miscellaneous/Development changes<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>If the record building delay has not passed and no files were found, a
 <code class="docutils literal notranslate"><span class="pre">RECORD_GENERATION</span></code> event will no longer be added to the <code class="docutils literal notranslate"><span class="pre">session_log</span></code> table
-in the database to avoid cluttering things up. (<a class="reference external" href="#">#107</a>)</p></li>
-<li><p>Public facing branches are now excluded from CI/CD pipeline to prevent test failures (<a class="reference external" href="#">#114</a>)</p></li>
+in the database to avoid cluttering things up. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/107">#107</a>)</p></li>
+<li><p>Public facing branches are now excluded from CI/CD pipeline to prevent test failures (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/114">#114</a>)</p></li>
 <li><p>Updated code to use various linters, including
 <a class="reference external" href="https://pycqa.github.io/isort/">isort</a>, <a class="reference external" href="https://github.com/psf/black">black</a>,
 <a class="reference external" href="https://pylint.readthedocs.io/en/latest/">pylint</a>, and
-<a class="reference external" href="https://beta.ruff.rs/docs/">ruff</a>. (<a class="reference external" href="#">#121</a>)</p></li>
+<a class="reference external" href="https://beta.ruff.rs/docs/">ruff</a>. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/121">#121</a>)</p></li>
 <li><p>Add support for Python 3.10(.9)</p></li>
 <li><p>Moved URL configration to environment variables</p></li>
 <li><p>Updated third-party dependencies to recent latest versions</p></li>
@@ -292,93 +309,93 @@ in the database to avoid cluttering things up. (<a class="reference external" hr
 </section>
 <section id="v1-1-1-2022-06-15">
 <h2>v1.1.1 (2022-06-15)<a class="headerlink" href="#v1-1-1-2022-06-15" title="Permalink to this headline">¶</a></h2>
-<section id="id19">
-<h3>Bug fixes<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h3>
+<section id="id23">
+<h3>Bug fixes<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Fixed issue where record builder would crash if only one file was found during the
-activity (and added explicit test for this condition). (<a class="reference external" href="#">#96</a>)</p></li>
+activity (and added explicit test for this condition). (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/96">#96</a>)</p></li>
 <li><p>Fix issue in NEMO harvester where not-yet-ended sessions would cause the harvester
-to try to insert rows that violated database constraints. (<a class="reference external" href="#">#99</a>)</p></li>
+to try to insert rows that violated database constraints. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/99">#99</a>)</p></li>
 <li><p>Implemented a “lockfile” system so concurrent runs of the record builder will not
 be allowed, preventing extra entries in the <code class="docutils literal notranslate"><span class="pre">session_log</span></code> table that were causing
-errors. (<a class="reference external" href="#">#101</a>)</p></li>
+errors. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/101">#101</a>)</p></li>
 <li><p>Fix reading reservation and usage event times from NEMO servers with differing datetime
-formats. (<a class="reference external" href="#">#103</a>)</p></li>
+formats. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/103">#103</a>)</p></li>
 <li><p>The NEMO harvester no longer attempts to build records without explicit “data consent”
 supplied by the user during the reservation questions (previously, if no reservation
-was found, the harvester would return a generic event and a record would still be built). (<a class="reference external" href="#">#104</a>)</p></li>
-<li><p>Fixed bug where null bytes in a TIFF file caused an error in metadata extraction (<a class="reference external" href="#">#110</a>)</p></li>
+was found, the harvester would return a generic event and a record would still be built). (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/104">#104</a>)</p></li>
+<li><p>Fixed bug where null bytes in a TIFF file caused an error in metadata extraction (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/110">#110</a>)</p></li>
 </ul>
 </section>
-<section id="id26">
-<h3>Enhancements<a class="headerlink" href="#id26" title="Permalink to this headline">¶</a></h3>
+<section id="id30">
+<h3>Enhancements<a class="headerlink" href="#id30" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Add ability for record builder to insert a link to reservation information in the
-<code class="docutils literal notranslate"><span class="pre">summary</span></code> node (modified schema to hold this and record builder to insert it). (<a class="reference external" href="#">#90</a>)</p></li>
+<code class="docutils literal notranslate"><span class="pre">summary</span></code> node (modified schema to hold this and record builder to insert it). (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/90">#90</a>)</p></li>
 <li><p>Contributed a <a class="reference external" href="https://github.com/usnistgov/NEMO/pull/97">PR</a> to the upstream NEMO
 project to allow for displaying of a single reservation, so that we may link to it
-and include it as a reference in records built by NexusLIMS. (<a class="reference external" href="#">#92</a>)</p></li>
+and include it as a reference in records built by NexusLIMS. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/92">#92</a>)</p></li>
 <li><p>Made the default <cite>data_consent</cite> value for the NEMO harvester False, so we will not
 harvest data from sessions that do not have reservation questions defined (users
-now have to opt-in to have their data curated by NexusLIMS). (<a class="reference external" href="#">#93</a>)</p></li>
+now have to opt-in to have their data curated by NexusLIMS). (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/93">#93</a>)</p></li>
 <li><p>NEMO harvester now limits its API requests to only tools defined in the NexusLIMS
-database, which is more efficient and greatly speeds up the harvesting process. (<a class="reference external" href="#">#94</a>)</p></li>
+database, which is more efficient and greatly speeds up the harvesting process. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/94">#94</a>)</p></li>
 <li><p>The record builder will now retry for a configurable number of days if it does not find
 any files for a session (useful for machines that have a delay in data syncing to
 centralized file storage). Configured via the <code class="docutils literal notranslate"><span class="pre">nexusLIMS_file_delay_days</span></code> environment
-variable. (<a class="reference external" href="#">#102</a>)</p></li>
+variable. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/102">#102</a>)</p></li>
 <li><p>Made datetime formats for NEMO API harvester configurable (both sending and receiving)
-so that it can work regardless of configuration on the NEMO server. (<a class="reference external" href="#">#103</a>)</p></li>
+so that it can work regardless of configuration on the NEMO server. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/103">#103</a>)</p></li>
 <li><p>Record generation events in the database now have timezone information for better
-specificity in multi-timezone setups. (<a class="reference external" href="#">#106</a>)</p></li>
+specificity in multi-timezone setups. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/106">#106</a>)</p></li>
 <li><p>Add <code class="docutils literal notranslate"><span class="pre">pid</span></code> attribute to Experiment schema to allow for integration with CDCS’s handle
-implementation. (<a class="reference external" href="#">#109</a>)</p></li>
+implementation. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/109">#109</a>)</p></li>
 </ul>
 </section>
-<section id="id35">
-<h3>Miscellaneous/Development changes<a class="headerlink" href="#id35" title="Permalink to this headline">¶</a></h3>
+<section id="id39">
+<h3>Miscellaneous/Development changes<a class="headerlink" href="#id39" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><p>Configured tests to run on-premises, which speeds up various testing operations. (<a class="reference external" href="#">#57</a>)</p></li>
+<li><p>Configured tests to run on-premises, which speeds up various testing operations. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/57">#57</a>)</p></li>
 <li><p>Drastically restructured repository to look more like a proper Python library than just
-a collection of files and scripts. (<a class="reference external" href="#">#60</a>)</p></li>
+a collection of files and scripts. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/60">#60</a>)</p></li>
 <li><p>Migrated project organization and packaging from
-<a class="reference external" href="https://pipenv.pypa.io/en/latest/">pipenv</a> to <a class="reference external" href="https://python-poetry.org/">poetry</a>. (<a class="reference external" href="#">#88</a>)</p></li>
-<li><p>Fixed some tests that started failing due to tool ID changes on our local NEMO server. (<a class="reference external" href="#">#97</a>)</p></li>
-<li><p>Improved logging from NEMO harvester making it easier to debug issues when they occur. (<a class="reference external" href="#">#98</a>)</p></li>
-<li><p>Session processing script is now smarter about email alerts. (<a class="reference external" href="#">#100</a>)</p></li>
+<a class="reference external" href="https://pipenv.pypa.io/en/latest/">pipenv</a> to <a class="reference external" href="https://python-poetry.org/">poetry</a>. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/88">#88</a>)</p></li>
+<li><p>Fixed some tests that started failing due to tool ID changes on our local NEMO server. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/97">#97</a>)</p></li>
+<li><p>Improved logging from NEMO harvester making it easier to debug issues when they occur. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/98">#98</a>)</p></li>
+<li><p>Session processing script is now smarter about email alerts. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/100">#100</a>)</p></li>
 <li><p>CI/CD pipeline will now retry failed tests (should be more resilient against transient
 failures due to network issues).</p></li>
 <li><p>Made some changes to the codebase in preparation of making it public-facing on Github.</p></li>
 </ul>
 </section>
-<section id="id42">
-<h3>Deprecations and/or Removals<a class="headerlink" href="#id42" title="Permalink to this headline">¶</a></h3>
+<section id="id46">
+<h3>Deprecations and/or Removals<a class="headerlink" href="#id46" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Removed a variety of associated files that were not important for the Python package
-(old presentations, diagrams, reports, etc.) (<a class="reference external" href="#">#60</a>)</p></li>
+(old presentations, diagrams, reports, etc.) (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/60">#60</a>)</p></li>
 <li><p><a class="reference internal" href="api/nexusLIMS.harvesters.html#module-nexusLIMS.harvesters.sharepoint_calendar" title="nexusLIMS.harvesters.sharepoint_calendar"><code class="xref py py-mod docutils literal notranslate"><span class="pre">nexusLIMS.harvesters.sharepoint_calendar</span></code></a> module was deprecated after
 the SharePoint calendaring system was decommissioned in the Nexus facility. All
-harvester development will center around NEMO for the foreseeable future. (<a class="reference external" href="#">#108</a>)</p></li>
+harvester development will center around NEMO for the foreseeable future. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/108">#108</a>)</p></li>
 <li><p>Removed enumeration restriction on PIDs from the schema so it is more general (and
-easier to add new instruments without having to do an XML schema migration). (<a class="reference external" href="#">#110</a>)</p></li>
+easier to add new instruments without having to do an XML schema migration). (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/110">#110</a>)</p></li>
 </ul>
 </section>
 </section>
 <section id="v1-1-0-2021-12-12">
 <h2>v1.1.0 (2021-12-12)<a class="headerlink" href="#v1-1-0-2021-12-12" title="Permalink to this headline">¶</a></h2>
-<section id="id46">
-<h3>New features<a class="headerlink" href="#id46" title="Permalink to this headline">¶</a></h3>
+<section id="id50">
+<h3>New features<a class="headerlink" href="#id50" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Major new feature in this release is the implementation of a reservation and metadata
 harvester for the <a class="reference external" href="https://github.com/usnistgov/NEMO">NEMO</a> facility management
 system. All planned future feature development will focus on this harvester, and the
 SharePoint calendar harvester will be deprecated in a future release. See the
 <a class="reference internal" href="record_building.html"><span class="doc">Record building workflow</span></a> docs and the <a class="reference internal" href="api/nexusLIMS.harvesters.nemo.html"><span class="doc">nexusLIMS.harvesters.nemo package</span></a> docs
-for more details. (<a class="reference external" href="#">#89</a>)</p></li>
+for more details. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/89">#89</a>)</p></li>
 </ul>
 </section>
-<section id="id48">
-<h3>Enhancements<a class="headerlink" href="#id48" title="Permalink to this headline">¶</a></h3>
+<section id="id52">
+<h3>Enhancements<a class="headerlink" href="#id52" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Add support to NEMO harvester for multiple samples in a set of reservation questions.
 The required structure for reservation questions is documented in the
@@ -390,28 +407,28 @@ inspecting files stored on servers in different timezones.</p></li>
 is now possible using the NEMO reservation questions).</p></li>
 </ul>
 </section>
-<section id="id49">
-<h3>Documentation improvements<a class="headerlink" href="#id49" title="Permalink to this headline">¶</a></h3>
+<section id="id53">
+<h3>Documentation improvements<a class="headerlink" href="#id53" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Documented new NEMO harvester and updated record generation documentation to describe
 how the process works with multiple harvesters.</p></li>
 <li><p>Fixed broken image paths in README.</p></li>
 </ul>
 </section>
-<section id="id50">
-<h3>Miscellaneous/Development changes<a class="headerlink" href="#id50" title="Permalink to this headline">¶</a></h3>
+<section id="id54">
+<h3>Miscellaneous/Development changes<a class="headerlink" href="#id54" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Migrated project structure from <a class="reference external" href="https://pipenv.pypa.io/en/latest/"><code class="docutils literal notranslate"><span class="pre">pipenv</span></code></a> to <a class="reference external" href="https://python-poetry.org/"><code class="docutils literal notranslate"><span class="pre">poetry</span></code></a> for better dependency
 resolution, easier and faster deployment, and configuration of project via
 <code class="docutils literal notranslate"><span class="pre">pyproject.toml</span></code>. Also implemented <a class="reference external" href="https://tox.wiki/en/latest/"><code class="docutils literal notranslate"><span class="pre">tox</span></code></a> for the running of tests, doc builds,
-and pipelines. (<a class="reference external" href="#">#88</a>)</p>
+and pipelines. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/88">#88</a>)</p>
 </li>
 <li><p>Refactored some functions from the SharePoint harvester into the
 <a class="reference internal" href="api/nexusLIMS.html#module-nexusLIMS.utils" title="nexusLIMS.utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">nexusLIMS.utils</span></code></a> module for easier use throughout the rest of the codebase.</p></li>
 </ul>
 </section>
-<section id="id53">
-<h3>Deprecations and/or Removals<a class="headerlink" href="#id53" title="Permalink to this headline">¶</a></h3>
+<section id="id57">
+<h3>Deprecations and/or Removals<a class="headerlink" href="#id57" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Removed the “Session Logger” application in favor of using NEMO and its usage events
 to track session timestamps.</p></li>
@@ -420,75 +437,75 @@ to track session timestamps.</p></li>
 </section>
 <section id="v1-0-1-2021-09-15">
 <h2>v1.0.1 (2021-09-15)<a class="headerlink" href="#v1-0-1-2021-09-15" title="Permalink to this headline">¶</a></h2>
-<section id="id54">
-<h3>New features<a class="headerlink" href="#id54" title="Permalink to this headline">¶</a></h3>
+<section id="id58">
+<h3>New features<a class="headerlink" href="#id58" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Implemented a “file viewer” on the front-end NexusLIMS application which also allows
 for downloading single, multiple, or all data files from a particular record in
-<code class="docutils literal notranslate"><span class="pre">.zip</span></code> archives. (<a class="reference external" href="#">#61</a>)</p></li>
+<code class="docutils literal notranslate"><span class="pre">.zip</span></code> archives. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/61">#61</a>)</p></li>
 <li><p>Implemented a metadata extractor for <code class="docutils literal notranslate"><span class="pre">.ser</span></code> and <code class="docutils literal notranslate"><span class="pre">.emi</span></code> files produced by the TIA
-application on FEI TEMs. (<a class="reference external" href="#">#62</a>)</p></li>
-<li><p>Added ability to export a record as XML in the front end NexusLIMS application. (<a class="reference external" href="#">#65</a>)</p></li>
+application on FEI TEMs. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/62">#62</a>)</p></li>
+<li><p>Added ability to export a record as XML in the front end NexusLIMS application. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/65">#65</a>)</p></li>
 <li><p>Added a “tutorial” feature to the front-end of the NexusLIMS application, which leads
-users through a tour describing what the various parts of the application do. (<a class="reference external" href="#">#71</a>)</p></li>
+users through a tour describing what the various parts of the application do. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/71">#71</a>)</p></li>
 <li><p>Added new “dry run” mode and additional verbosity options to record builder that allow
-one to see what records <cite>would</cite> be built without actually doing anything. (<a class="reference external" href="#">#77</a>)</p></li>
+one to see what records <cite>would</cite> be built without actually doing anything. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/77">#77</a>)</p></li>
 </ul>
 </section>
-<section id="id60">
-<h3>Bug fixes<a class="headerlink" href="#id60" title="Permalink to this headline">¶</a></h3>
+<section id="id64">
+<h3>Bug fixes<a class="headerlink" href="#id64" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Fixed issue where Session Logger app was failing due to incompatibilities between
-the code and certain database states. (<a class="reference external" href="#">#53</a>)</p></li>
+the code and certain database states. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/53">#53</a>)</p></li>
 <li><p>Fixed issue where Session Logger app was leaving behind a temporary file on the
-microscope computers by making it clean up after itself. (<a class="reference external" href="#">#55</a>)</p></li>
+microscope computers by making it clean up after itself. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/55">#55</a>)</p></li>
 <li><p>Fixed issue where multiple copies of the Session Logger app were able to be run at the
-same time, which shouldn’t have been possible. (<a class="reference external" href="#">#59</a>)</p></li>
-<li><p>Fixed the “back to previous” button in the front-end application that was broken. (<a class="reference external" href="#">#64</a>)</p></li>
+same time, which shouldn’t have been possible. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/59">#59</a>)</p></li>
+<li><p>Fixed the “back to previous” button in the front-end application that was broken. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/64">#64</a>)</p></li>
 <li><p>Fixed issue with SharePoint harvester where records were being assigned to the person
-who <cite>created</cite> a calendar event, not the person whose name was on the actual event. (<a class="reference external" href="#">#72</a>)</p></li>
+who <cite>created</cite> a calendar event, not the person whose name was on the actual event. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/72">#72</a>)</p></li>
 <li><p>Fixed a deployment issue related to <code class="docutils literal notranslate"><span class="pre">pipenv</span></code> and how it specifies packages to be
-installed. (<a class="reference external" href="#">#73</a>)</p></li>
+installed. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/73">#73</a>)</p></li>
 <li><p>Fixed issues with <code class="docutils literal notranslate"><span class="pre">.ser</span></code> file handling (and contributed various fixes upstream to the
 HyperSpy project: <a class="reference external" href="https://github.com/hyperspy/hyperspy/pull/2533">1</a>,
 <a class="reference external" href="https://github.com/hyperspy/hyperspy/pull/2531">2</a>,
-<a class="reference external" href="https://github.com/hyperspy/hyperspy/pull/2529">3</a>). (<a class="reference external" href="#">#74</a>)</p></li>
+<a class="reference external" href="https://github.com/hyperspy/hyperspy/pull/2529">3</a>). (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/74">#74</a>)</p></li>
 </ul>
 </section>
-<section id="id71">
-<h3>Enhancements<a class="headerlink" href="#id71" title="Permalink to this headline">¶</a></h3>
+<section id="id75">
+<h3>Enhancements<a class="headerlink" href="#id75" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Added customized loading text while the list of records is loading in the front-end
-NexusLIMS application. (<a class="reference external" href="#">#58</a>)</p></li>
+NexusLIMS application. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/58">#58</a>)</p></li>
 <li><p>Tweaked heuristic in SharePoint harvester to better match sessions to calendar events
 (previously, if there were multiple reservations in one day, they may have been
-incorrectly attributed to a session). (<a class="reference external" href="#">#67</a>)</p></li>
-<li><p>Added explicit support for Python 3.8.X versions. (<a class="reference external" href="#">#75</a>)</p></li>
+incorrectly attributed to a session). (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/67">#67</a>)</p></li>
+<li><p>Added explicit support for Python 3.8.X versions. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/75">#75</a>)</p></li>
 <li><p>Implemented bash script to run record builder automatically, which can then be scheduled
-via a tool such as <code class="docutils literal notranslate"><span class="pre">cron</span></code>. (<a class="reference external" href="#">#76</a>)</p></li>
+via a tool such as <code class="docutils literal notranslate"><span class="pre">cron</span></code>. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/76">#76</a>)</p></li>
 <li><p>Added version information to Session Logger app to make it easier for users to know
-if they are up to date or not. (<a class="reference external" href="#">#79</a>)</p></li>
-<li><p>Small tweak to make acquisition activity links easier to click in record display. (<a class="reference external" href="#">#81</a>)</p></li>
+if they are up to date or not. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/79">#79</a>)</p></li>
+<li><p>Small tweak to make acquisition activity links easier to click in record display. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/81">#81</a>)</p></li>
 </ul>
 </section>
-<section id="id78">
-<h3>Documentation improvements<a class="headerlink" href="#id78" title="Permalink to this headline">¶</a></h3>
+<section id="id82">
+<h3>Documentation improvements<a class="headerlink" href="#id82" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Added “taxonomy” of terms used in the NexusLIMS project to the documentation (see
-<a class="reference internal" href="taxonomy.html"><span class="doc">NexusLIMS taxonomy</span></a> for details). (<a class="reference external" href="#">#40</a>)</p></li>
+<a class="reference internal" href="taxonomy.html"><span class="doc">NexusLIMS taxonomy</span></a> for details). (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/40">#40</a>)</p></li>
 <li><p>Added XML Schema documentation for the Nexus <code class="docutils literal notranslate"><span class="pre">Experiment</span></code> schema to the documentation
-(see <a class="reference internal" href="schema_documentation.html"><span class="doc">Schema documentation</span></a> for details). (<a class="reference external" href="#">#51</a>)</p></li>
-<li><p>Added links to NexusLIMS documentation in the front-end NexusLIMS CDCS application. (<a class="reference external" href="#">#68</a>)</p></li>
+(see <a class="reference internal" href="schema_documentation.html"><span class="doc">Schema documentation</span></a> for details). (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/51">#51</a>)</p></li>
+<li><p>Added links to NexusLIMS documentation in the front-end NexusLIMS CDCS application. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/68">#68</a>)</p></li>
 <li><p>Added many documentation pages to more thoroughly explain how NexusLIMS works,
 including improvements to the project README, as well as the following pages:
 <a class="reference internal" href="database.html"><span class="doc">NexusLIMS database</span></a>, <a class="reference internal" href="session_logger_app.html"><span class="doc">Session logging (deprecated)</span></a>, <a class="reference internal" href="development.html"><span class="doc">Developer documentation</span></a>,
 and pages about data security.</p></li>
 </ul>
 </section>
-<section id="id82">
-<h3>Miscellaneous/Development changes<a class="headerlink" href="#id82" title="Permalink to this headline">¶</a></h3>
+<section id="id86">
+<h3>Miscellaneous/Development changes<a class="headerlink" href="#id86" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><p>Improvement to logging to make it easier to debug records not being built correctly. (<a class="reference external" href="#">#80</a>)</p></li>
+<li><p>Improvement to logging to make it easier to debug records not being built correctly. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/80">#80</a>)</p></li>
 <li><p>Added new <a class="reference internal" href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent" title="nexusLIMS.harvesters.reservation_event.ReservationEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReservationEvent</span></code></a> class
 to abstract the concept of a calendar reservation event. This reduces dependencies on
 the SharePoint-specific way things were written before and will help in the future
@@ -501,8 +518,8 @@ implementation of the NEMO harvester.</p></li>
 </section>
 <section id="v0-0-9-2020-02-24-first-real-working-release">
 <h2>v0.0.9 (2020-02-24) - First real working release<a class="headerlink" href="#v0-0-9-2020-02-24-first-real-working-release" title="Permalink to this headline">¶</a></h2>
-<section id="id84">
-<h3>New features<a class="headerlink" href="#id84" title="Permalink to this headline">¶</a></h3>
+<section id="id88">
+<h3>New features<a class="headerlink" href="#id88" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Added extractor for TIFF image files produced by FEI SEM and FIB instruments.</p></li>
 <li><p>Record builder can now be run automatically and will do the whole process (probing
@@ -510,8 +527,8 @@ database, finding files, extracting metadata, building record XML, and uploading
 CDCS frontend).</p></li>
 </ul>
 </section>
-<section id="id85">
-<h3>Enhancements<a class="headerlink" href="#id85" title="Permalink to this headline">¶</a></h3>
+<section id="id89">
+<h3>Enhancements<a class="headerlink" href="#id89" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Acquisition activities are now split up by clustering of file acquisition times, rather
 than inspecting when an instrument switches modes. This is more realistic to how
@@ -531,14 +548,14 @@ a record rather than a pure Python implementation.</p></li>
 <li><p>Various XSLT enhancements for better display of record data.</p></li>
 </ul>
 </section>
-<section id="id86">
-<h3>Documentation improvements<a class="headerlink" href="#id86" title="Permalink to this headline">¶</a></h3>
+<section id="id90">
+<h3>Documentation improvements<a class="headerlink" href="#id90" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Added record building documentation: <a class="reference internal" href="record_building.html"><span class="doc">Record building workflow</span></a>.</p></li>
 </ul>
 </section>
-<section id="id87">
-<h3>Miscellaneous/Development changes<a class="headerlink" href="#id87" title="Permalink to this headline">¶</a></h3>
+<section id="id91">
+<h3>Miscellaneous/Development changes<a class="headerlink" href="#id91" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Added helper script to update XLST on NexusLIMS front-end via API, making things easier
 for development.</p></li>
@@ -550,11 +567,11 @@ for development.</p></li>
 </section>
 <section id="v0-0-2-2020-01-08-pre-release-version">
 <h2>v0.0.2 (2020-01-08) - Pre-release version<a class="headerlink" href="#v0-0-2-2020-01-08-pre-release-version" title="Permalink to this headline">¶</a></h2>
-<section id="id88">
-<h3>New features<a class="headerlink" href="#id88" title="Permalink to this headline">¶</a></h3>
+<section id="id92">
+<h3>New features<a class="headerlink" href="#id92" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Added ability to use custom CA certificate for network communications (useful if
-communicating with servers with self-signed certificates). (<a class="reference external" href="#">#49</a>)</p></li>
+communicating with servers with self-signed certificates). (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/49">#49</a>)</p></li>
 <li><p>Added javascript-powered XLST for more interactive and fully-featured display of records
 in the CDCS front-end (T. Bina).</p></li>
 <li><p>Added session logging .exe application that can be deployed on individual microscope PCs
@@ -567,23 +584,23 @@ experiments, which are then translated into XML for the final record.</p></li>
 acquisition activities in record building.</p></li>
 </ul>
 </section>
-<section id="id90">
-<h3>Bug fixes<a class="headerlink" href="#id90" title="Permalink to this headline">¶</a></h3>
+<section id="id94">
+<h3>Bug fixes<a class="headerlink" href="#id94" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><p>Updated endpoint for sharepoint calendar API that had broken due to a change in that service. (<a class="reference external" href="#">#37</a>)</p></li>
+<li><p>Updated endpoint for sharepoint calendar API that had broken due to a change in that service. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/37">#37</a>)</p></li>
 <li><p>Fixed issue where schema had duplicate “labels” for certain fields that was causing
-a confusing display in the CDCS “curate” page. (<a class="reference external" href="#">#42</a>)</p></li>
+a confusing display in the CDCS “curate” page. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/42">#42</a>)</p></li>
 </ul>
 </section>
-<section id="id93">
-<h3>Enhancements<a class="headerlink" href="#id93" title="Permalink to this headline">¶</a></h3>
+<section id="id97">
+<h3>Enhancements<a class="headerlink" href="#id97" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Added other Nexus instruments to the schema so we can have records from more than just
-a single <code class="docutils literal notranslate"><span class="pre">Instrument</span></code> (as it was in initial testing). (<a class="reference external" href="#">#32</a>)</p></li>
-<li><p>Added a <code class="docutils literal notranslate"><span class="pre">unit</span></code> attribute to parameter values in the <cite>Nexus Experiment</cite> schema. (<a class="reference external" href="#">#41</a>)</p></li>
-<li><p>Added a place to insert “project” information into <cite>Nexus Experiment</cite> schema (<a class="reference external" href="#">#44</a>)</p></li>
+a single <code class="docutils literal notranslate"><span class="pre">Instrument</span></code> (as it was in initial testing). (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/32">#32</a>)</p></li>
+<li><p>Added a <code class="docutils literal notranslate"><span class="pre">unit</span></code> attribute to parameter values in the <cite>Nexus Experiment</cite> schema. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/41">#41</a>)</p></li>
+<li><p>Added a place to insert “project” information into <cite>Nexus Experiment</cite> schema (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/44">#44</a>)</p></li>
 <li><p>Improved the implementation of the <code class="docutils literal notranslate"><span class="pre">Instrument</span></code> type within the <cite>Nexus Experiment</cite>
-schema. (<a class="reference external" href="#">#45</a>)</p></li>
+schema. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/45">#45</a>)</p></li>
 <li><p>Added spiffy logo for NexusLIMS (see <a class="reference internal" href="index.html#logo"><span class="std std-ref">the README</span></a> for more details on its
 origins).</p></li>
 <li><p>Formatted repository as a proper Python package that can be installed via <code class="docutils literal notranslate"><span class="pre">pip</span></code>.</p></li>
@@ -594,19 +611,19 @@ in the application code.</p></li>
 <li><p>XSLT now properly displays preview images rather than a placeholder for each dataset.</p></li>
 </ul>
 </section>
-<section id="id98">
-<h3>Documentation improvements<a class="headerlink" href="#id98" title="Permalink to this headline">¶</a></h3>
+<section id="id102">
+<h3>Documentation improvements<a class="headerlink" href="#id102" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><p>Fix links in README to point to new upstream project location. (<a class="reference external" href="#">#36</a>)</p></li>
-<li><p>Added basic documentation for NexusLIMS package and link via a badge on the README. (<a class="reference external" href="#">#43</a>)</p></li>
+<li><p>Fix links in README to point to new upstream project location. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/36">#36</a>)</p></li>
+<li><p>Added basic documentation for NexusLIMS package and link via a badge on the README. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/43">#43</a>)</p></li>
 </ul>
 </section>
-<section id="id101">
-<h3>Miscellaneous/Development changes<a class="headerlink" href="#id101" title="Permalink to this headline">¶</a></h3>
+<section id="id105">
+<h3>Miscellaneous/Development changes<a class="headerlink" href="#id105" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><p>Moved project out of a personal account and into it’s own NexusLIMS group on Gitlab. (<a class="reference external" href="#">#29</a>)</p></li>
+<li><p>Moved project out of a personal account and into it’s own NexusLIMS group on Gitlab. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/29">#29</a>)</p></li>
 <li><p>Added dedicated folder (separate form data storage location) for NexusLIMS to write
-dumps of extracted metadata and preview images. (<a class="reference external" href="#">#38</a>)</p></li>
+dumps of extracted metadata and preview images. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/38">#38</a>)</p></li>
 <li><p>Added database initialization script to create correct NexusLIMS DB structure.</p></li>
 <li><p>Refactored record builder and calendar harvesting into separate submodules to better
 delineate functionality of the various parts of NexusLIMS</p></li>
@@ -615,25 +632,25 @@ delineate functionality of the various parts of NexusLIMS</p></li>
 </section>
 <section id="v0-0-1-2019-03-26-pre-release-version">
 <h2>v0.0.1 (2019-03-26) - Pre-release version<a class="headerlink" href="#v0-0-1-2019-03-26-pre-release-version" title="Permalink to this headline">¶</a></h2>
-<section id="id104">
-<h3>New features<a class="headerlink" href="#id104" title="Permalink to this headline">¶</a></h3>
+<section id="id108">
+<h3>New features<a class="headerlink" href="#id108" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><p>Implemented SharePoint calendar metadata harvesting for equipment reservations. (<a class="reference external" href="#">#26</a>)</p></li>
-<li><p>Added metadata extractor for FEI TIFF image files produced by SEMs and FIBs. (<a class="reference external" href="#">#35</a>)</p></li>
+<li><p>Implemented SharePoint calendar metadata harvesting for equipment reservations. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/26">#26</a>)</p></li>
+<li><p>Added metadata extractor for FEI TIFF image files produced by SEMs and FIBs. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/35">#35</a>)</p></li>
 <li><p>Created repository to hold initial work on NexusLIMS.</p></li>
 </ul>
 </section>
-<section id="id107">
-<h3>Enhancements<a class="headerlink" href="#id107" title="Permalink to this headline">¶</a></h3>
+<section id="id111">
+<h3>Enhancements<a class="headerlink" href="#id111" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
 <li><p>Added a concept of “role” (experimental, calibration, etc.) to datasets in the
-<cite>Nexus Experiment</cite> schema (<a class="reference external" href="#">#23</a>)</p></li>
+<cite>Nexus Experiment</cite> schema (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/23">#23</a>)</p></li>
 </ul>
 </section>
-<section id="id109">
-<h3>Miscellaneous/Development changes<a class="headerlink" href="#id109" title="Permalink to this headline">¶</a></h3>
+<section id="id113">
+<h3>Miscellaneous/Development changes<a class="headerlink" href="#id113" title="Permalink to this headline">¶</a></h3>
 <ul class="simple">
-<li><p>Added CI/CD pipeline for backend tests. (<a class="reference external" href="#">#30</a>)</p></li>
+<li><p>Added CI/CD pipeline for backend tests. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/30">#30</a>)</p></li>
 </ul>
 </section>
 </section>
@@ -660,7 +677,7 @@ delineate functionality of the various parts of NexusLIMS</p></li>
     </p>
     <p>
         &copy; Copyright 2023, NIST Office of Data and Informatics.<br/>
-      Last updated on Apr, 25, 2023.<br/>
+      Last updated on May, 22, 2023.<br/>
     </p>
   </div>
 </footer>
