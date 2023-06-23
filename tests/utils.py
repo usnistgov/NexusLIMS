@@ -29,6 +29,9 @@
 import tarfile
 from pathlib import Path
 
+import numpy as np
+from PIL import Image
+
 tars = {
     "CORRUPTED": "test_corrupted.dm3.tar.gz",
     "LIST_SIGNAL": "list_signal_dataZeroed.dm3.tar.gz",
@@ -56,6 +59,7 @@ tars = {
     "FEI_SER": "fei_emi_ser_test_files.tar.gz",
     "DB": "test_db.sqlite.tar.gz",
     "RECORD": "2018-11-13_FEI-Titan-TEM-635816_7de34313.xml.tar.gz",
+    "IMAGE_FILES": "test_image_thumb_sources.tar.gz",
 }
 
 
@@ -96,3 +100,49 @@ def get_full_file_path(filename, fei_ser_files):
     fixture/dictionary
     """
     return [i for i in fei_ser_files if filename in str(i)][0]
+
+
+def assert_images_equal(image_1: Path, image_2: Path):
+    """
+    Test that images are similar using Pillow.
+
+    Parameters
+    ----------
+    image_1
+        The first image to compare
+    image_2
+        The second image to compare
+
+    Raises
+    ------
+    AssertionError
+        If normalized sum of image content square difference is
+        greater than 0.1%
+
+    Notes
+    -----
+    This method has been adapted from one proposed by Jennifer Helsby
+    (redshiftzero) at https://www.redshiftzero.com/pytest-image/,
+    and is used here under that code's CC BY-NC-SA 4.0 license.
+    """
+    img1 = Image.open(image_1)
+    img2 = Image.open(image_2)
+
+    # Convert to same mode and size for comparison
+    img2 = img2.convert(img1.mode)
+    img2 = img2.resize(img1.size)
+
+    sum_sq_diff = np.sum(
+        (np.asarray(img1).astype("float") - np.asarray(img2).astype("float")) ** 2,
+    )
+
+    if sum_sq_diff == 0:
+        # Images are exactly the same
+        pass
+    else:
+        thresh = 0.001
+        normalized_sum_sq_diff = sum_sq_diff / np.sqrt(sum_sq_diff)
+        assert normalized_sum_sq_diff < thresh, (
+            f"Images differed; normalized diff: {normalized_sum_sq_diff}; "
+            f"Image 1: {image_1}; Image 2: {image_2}"
+        )

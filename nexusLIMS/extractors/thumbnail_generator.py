@@ -32,19 +32,21 @@ Data files are represented as either HyperSpy Signals, or as raw data files
 (in the case of tiff images)
 """
 import logging
+import shutil
 import tempfile
 import textwrap
 from pathlib import Path
-from typing import Optional, Tuple
+from typing import Optional, Tuple, Union
 
 import hyperspy.api as hs_api
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import numpy as np
 from hyperspy.drawing.marker import dict2marker
+from matplotlib.figure import Figure
 from matplotlib.offsetbox import AnchoredOffsetbox, OffsetImage
 from matplotlib.transforms import Bbox
-from PIL import Image
+from PIL import Image, UnidentifiedImageError
 from skimage import transform
 from skimage.io import imread
 from skimage.transform import resize
@@ -510,6 +512,136 @@ def sig_to_thumbnail(s, out_path: Path, dpi: int = 92):
     # if we have a different type of signal, just output a graphical
     # representation of the axis manager
     return _plot_axes_manager(s, out_path, dpi)
+
+
+def text_to_thumbnail(
+    f: Path,
+    out_path: Path,
+    output_size: int = 500,
+) -> Union[Figure, bool]:
+    """
+    Generate a preview thumbnail from a text file.
+
+    For a text file, the contents will be formatted and written to a 500x500
+    pixel jpg image of size 5 in by 5 in.
+
+    If the text file has many newlines, it is probably data and the first 42
+    characters of each of the first 20 lines of the text file will be written
+    to the image.
+
+    If the text file has a few (or fewer) newlines, it is probably a manually
+    generated note and the text will be written to a 42 column, 18 row box
+    until the space is exhausted.
+
+    Parameters
+    ----------
+    f
+        The path of a text file for which a thumbnail should be generated.
+    out_path
+        A path to the desired thumbnail filename. All formats supported by
+        :py:meth:`~matplotlib.figure.Figure.savefig` can be used.
+    output_size : int
+        The pixel width (and height, since the image is padded to square) of
+        the saved image file.
+
+    Returns
+    -------
+    f
+        Handle to a matplotlib Figure, or the value False if a preview could not be
+        generated
+    """
+    # close all currently open plots to ensure we don't leave a mess behind
+    # in memory
+    plt.close("all")
+    plt.rcParams["image.cmap"] = "gray"
+
+    try:
+        with Path.open(f, encoding="UTF-8") as textfile:
+            textlist = textfile.read().replace("\t", "   ").splitlines()
+    except UnicodeDecodeError as exc:
+        logger.warning("no preview generated; could not decode text file: %s", str(exc))
+        return False
+
+    textfig = plt.figure()
+    # 5 x 5" is a good size
+    size_inches = 5
+    textfig.set_size_inches(size_inches, size_inches)
+    dpi = output_size / size_inches
+    plt.axis("off")
+
+    # Number of newlines to distinguish between data-like and note-like text
+    paragraph_check = 15
+    num_lines_in_image = 19
+
+    if len(textlist) <= paragraph_check:
+        wrappedtext = []
+        for i in textlist:
+            wrappedtext = wrappedtext + textwrap.wrap(i, width=42)
+        lines_printed = 0
+        while lines_printed <= num_lines_in_image and lines_printed < len(wrappedtext):
+            textfig.text(
+                0.02,
+                0.9 - lines_printed / 18,
+                wrappedtext[lines_printed] + "\n",
+                fontsize=12,
+                fontfamily="monospace",
+            )
+            lines_printed = lines_printed + 1
+        # textfile is assumed to be hand-typed notes in paragraph format
+        # we will wrap text until we run out of space
+
+    else:
+        # 17 is the maximum number of lines that will fit in this size image
+        for i in range(17):
+            textfig.text(
+                0.02,
+                0.9 - i / 18,
+                textlist[i][0:48] + "\n",
+                fontsize=12,
+                fontfamily="monospace",
+            )
+        # textfile is assumed to be some form of column data.
+        # we will essentially create an image of the top left corner of the
+        # text file.
+
+    textfig.tight_layout()
+    textfig.savefig(out_path, dpi=dpi)
+    _pad_to_square(out_path, output_size)
+    return textfig
+
+
+def image_to_square_thumbnail(f: Path, out_path: Path, output_size: int) -> bool:
+    """
+    Generate a preview thumbnail from a non-data image file.
+
+    Images of common filetypes will be transformed into 500 x 500 pixel images
+    by first scaling the largest dimension to 500 pixels and then padding the
+    resulting image to square.
+
+    Parameters
+    ----------
+    f
+        The string of the path of an image file for which a thumbnail should be
+        generated.
+    out_path
+        A path to the desired thumbnail filename. All formats supported by
+        :py:meth:`~PIL.Image.Image.save` can be used.
+    output_size
+        The desired resulting size of the thumbnail image.
+
+    Returns
+    -------
+    Whether a preview was generated
+    """
+    shutil.copy(f, out_path)
+    try:
+        _pad_to_square(out_path, output_size)
+    except UnidentifiedImageError as exc:
+        logger.warning("no preview generated; PIL error text: %s", str(exc))
+        out_path.unlink()
+        return False
+
+    return True
 
 
 def _set_extent_and_save(mpl_axis, s, f, out_path, dpi):

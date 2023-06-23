@@ -37,7 +37,12 @@ from .digital_micrograph import get_dm3_metadata
 from .edax import get_msa_metadata, get_spc_metadata
 from .fei_emi import get_ser_metadata
 from .quanta_tif import get_quanta_metadata
-from .thumbnail_generator import down_sample_image, sig_to_thumbnail
+from .thumbnail_generator import (
+    down_sample_image,
+    image_to_square_thumbnail,
+    sig_to_thumbnail,
+    text_to_thumbnail,
+)
 
 logger = logging.getLogger(__name__)
 PLACEHOLDER_PREVIEW = Path(__file__).parent / "extractor_error.png"
@@ -49,6 +54,18 @@ extension_reader_map = {
     "ser": get_ser_metadata,
     "spc": get_spc_metadata,
     "msa": get_msa_metadata,
+}
+
+# filetypes that will only have basic metadata extracted but will nonetheless
+# have a custom preview image generated
+unextracted_preview_map = {
+    "txt": text_to_thumbnail,
+    "png": image_to_square_thumbnail,
+    "tiff": image_to_square_thumbnail,
+    "bmp": image_to_square_thumbnail,
+    "gif": image_to_square_thumbnail,
+    "jpg": image_to_square_thumbnail,
+    "jpeg": image_to_square_thumbnail,
 }
 
 
@@ -138,11 +155,19 @@ def parse_metadata(
     # Dealing with files we can't parse and extract
     if extension not in extension_reader_map:
         extractor_method = get_basic_metadata
-        generate_preview = False
-        logger.info(
-            "file extension was not in extension_reader_map; "
-            "setting generate_preview to False",
-        )
+        if extension not in unextracted_preview_map:
+            generate_preview = False
+            logger.info(
+                "file extension was not in extension_reader_map; "
+                "setting generate_preview to False",
+            )
+        else:
+            generate_preview = True
+            logger.info(
+                "file extension was not in extension_reader_map; "
+                "but file extension was in unextracted_preview_map; "
+                "setting generate_preview to True",
+            )
 
     else:
         extractor_method = extension_reader_map[extension]
@@ -188,7 +213,7 @@ def parse_metadata(
     return nx_meta, preview_fname
 
 
-def create_preview(fname: Path, *, overwrite: bool) -> Path:
+def create_preview(fname: Path, *, overwrite: bool) -> Optional[Path]:  # noqa: PLR0912
     """
     Generate a preview image for a given file using one of a few different methods.
 
@@ -205,8 +230,9 @@ def create_preview(fname: Path, *, overwrite: bool) -> Path:
 
     Returns
     -------
-    preview_fname : pathlib.Path
-        The filename of the generated preview image
+    preview_fname : Optional[pathlib.Path]
+        The filename of the generated preview image; if None, a preview could not be
+        successfully generated.
     """
     preview_fname = replace_mmf_path(fname, ".thumb.png")
 
@@ -222,6 +248,20 @@ def create_preview(fname: Path, *, overwrite: bool) -> Path:
         else:
             factor = 2
             down_sample_image(fname, out_path=preview_fname, factor=factor)
+
+    elif extension in unextracted_preview_map:
+        # use preview generation function from the map of functions defined
+        # at the top of this file (unextracted_preview_map)
+        preview_return = unextracted_preview_map[extension](
+            f=fname,
+            out_path=preview_fname,
+            output_size=500,
+        )
+
+        # handle the case where PIL cannot open an image
+        if preview_return is False:
+            preview_fname = None
+            return preview_fname
 
     else:
         load_options = {"lazy": True}

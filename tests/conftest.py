@@ -411,6 +411,70 @@ def quanta_just_modded_mdata():
     return Path(__file__).parent / "files" / "quanta_just_modded_mdata.tif"
 
 
+@pytest.fixture(scope="module")
+def text_paragraph_test_file():
+    """Text file imitating a natural language note to self."""
+    return Path(__file__).parent / "files" / "text_preview_test_paragraph.txt"
+
+
+@pytest.fixture(scope="module")
+def text_data_test_file():
+    """Text file imitating textual data output, e.g. column data."""
+    return Path(__file__).parent / "files" / "text_preview_test_data.txt"
+
+
+@pytest.fixture(scope="module")
+def basic_image_file():
+    """Image file that is not data, e.g. a screenshot."""
+    extract_files("IMAGE_FILES")
+    yield Path(__file__).parent / "files" / "test_image_thumb_source.bmp"
+    delete_files("IMAGE_FILES")
+
+
+@pytest.fixture(scope="module")
+def image_thumb_source_gif():
+    """Image file in GIF format for thumbnail testing."""
+    extract_files("IMAGE_FILES")
+    yield Path(__file__).parent / "files" / "test_image_thumb_source.gif"
+    delete_files("IMAGE_FILES")
+
+
+@pytest.fixture(scope="module")
+def image_thumb_source_png():
+    """Image file in PNG format for thumbnail testing."""
+    extract_files("IMAGE_FILES")
+    yield Path(__file__).parent / "files" / "test_image_thumb_source.png"
+    delete_files("IMAGE_FILES")
+
+
+@pytest.fixture(scope="module")
+def image_thumb_source_tif():
+    """Image file in TIF format for thumbnail testing."""
+    extract_files("IMAGE_FILES")
+    yield Path(__file__).parent / "files" / "test_image_thumb_source.tif"
+    delete_files("IMAGE_FILES")
+
+
+@pytest.fixture(scope="module")
+def image_thumb_source_jpg():
+    """Image file in JPG format for thumbnail testing."""
+    extract_files("IMAGE_FILES")
+    yield Path(__file__).parent / "files" / "test_image_thumb_source.jpg"
+    delete_files("IMAGE_FILES")
+
+
+@pytest.fixture(scope="module")
+def unreadable_image_file():
+    """File with a .jpg extension that is not readable as an image."""
+    return Path(__file__).parent / "files" / "unreadable_image.jpg"
+
+
+@pytest.fixture(scope="module")
+def binary_text_file():
+    """File with a .txt extension that is not readable as plaintext."""
+    return Path(__file__).parent / "files" / "binary_text.txt"
+
+
 # XML record test file
 
 

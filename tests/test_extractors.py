@@ -28,11 +28,16 @@ from nexusLIMS.extractors import (
 from nexusLIMS.extractors.basic_metadata import get_basic_metadata
 from nexusLIMS.extractors.edax import get_msa_metadata, get_spc_metadata
 from nexusLIMS.extractors.quanta_tif import get_quanta_metadata
-from nexusLIMS.extractors.thumbnail_generator import down_sample_image, sig_to_thumbnail
+from nexusLIMS.extractors.thumbnail_generator import (
+    down_sample_image,
+    image_to_square_thumbnail,
+    sig_to_thumbnail,
+    text_to_thumbnail,
+)
 from nexusLIMS.extractors.utils import _try_decimal, _zero_data_in_dm3
 from nexusLIMS.version import __version__
 
-from .utils import get_full_file_path
+from .utils import assert_images_equal, get_full_file_path
 
 
 class TestThumbnailGenerator:  # pylint: disable=too-many-public-methods
@@ -223,6 +228,54 @@ class TestThumbnailGenerator:  # pylint: disable=too-many-public-methods
             output_size=(500, 500),
         )
 
+    @pytest.mark.mpl_image_compare(style="default")
+    def test_text_paragraph_to_thumbnail(self, text_paragraph_test_file, output_path):
+        return text_to_thumbnail(text_paragraph_test_file, output_path)
+
+    @pytest.mark.mpl_image_compare(style="default")
+    def test_text_data_to_thumbnail(self, text_data_test_file, output_path):
+        return text_to_thumbnail(text_data_test_file, output_path)
+
+    def test_png_to_thumbnail(self, output_path, image_thumb_source_png):
+        baseline_thumb_png = (
+            Path(__file__).parent / "files" / "figs" / "test_image_thumb_png.png"
+        )
+        image_to_square_thumbnail(image_thumb_source_png, output_path, 500)
+        assert_images_equal(baseline_thumb_png, output_path)
+
+    def test_bmp_to_thumbnail(self, output_path, basic_image_file):
+        baseline_thumb_bmp = (
+            Path(__file__).parent / "files" / "figs" / "test_image_thumb_bmp.png"
+        )
+        image_to_square_thumbnail(basic_image_file, output_path, 500)
+        assert_images_equal(baseline_thumb_bmp, output_path)
+
+    def test_gif_to_thumbnail(self, output_path, image_thumb_source_gif):
+        baseline_thumb_gif = (
+            Path(__file__).parent / "files" / "figs" / "test_image_thumb_gif.png"
+        )
+        image_to_square_thumbnail(image_thumb_source_gif, output_path, 500)
+        assert_images_equal(baseline_thumb_gif, output_path)
+
+    def test_jpg_to_thumbnail(self, output_path, image_thumb_source_jpg):
+        baseline_thumb_jpg = (
+            Path(__file__).parent / "files" / "figs" / "test_image_thumb_jpg.png"
+        )
+        image_to_square_thumbnail(image_thumb_source_jpg, output_path, 500)
+        assert_images_equal(baseline_thumb_jpg, output_path)
+
+    def test_tif_to_thumbnail(self, output_path, image_thumb_source_tif):
+        baseline_thumb_tif = (
+            Path(__file__).parent / "files" / "figs" / "test_image_thumb_tif.png"
+        )
+        image_to_square_thumbnail(image_thumb_source_tif, output_path, 500)
+        assert_images_equal(baseline_thumb_tif, output_path)
+
+    def test_assert_image_fail(self, image_thumb_source_tif, quanta_test_file):
+        """Sanity check that for images that are not the same."""
+        with pytest.raises(AssertionError):
+            assert_images_equal(image_thumb_source_tif, quanta_test_file[0])
+
 
 class TestExtractorModule:
     """Tests the methods from __init__.py of nexusLIMS.extractors."""
@@ -388,8 +441,8 @@ class TestExtractorModule:
 
         self.remove_thumb_and_json(thumb_fname)
 
-    def test_parse_metadata_basic_extractor(self, basic_txt_file):
-        meta, thumb_fname = parse_metadata(fname=basic_txt_file)
+    def test_parse_metadata_basic_extractor(self, basic_txt_file_no_extension):
+        meta, thumb_fname = parse_metadata(fname=basic_txt_file_no_extension)
 
         assert thumb_fname is None
         assert meta["nx_meta"]["Data Type"] == "Unknown"
@@ -402,12 +455,64 @@ class TestExtractorModule:
 
         # remove json file
         Path(
-            str(basic_txt_file).replace(
+            str(basic_txt_file_no_extension).replace(
                 os.environ["mmfnexus_path"],
                 os.environ["nexusLIMS_path"],
             )
             + ".json",
         ).unlink()
+
+    def test_parse_metadata_with_image_preview(self, basic_image_file):
+        meta, thumb_fname = parse_metadata(fname=basic_image_file)
+
+        assert thumb_fname.is_file()
+        assert meta["nx_meta"]["Data Type"] == "Unknown"
+        assert meta["nx_meta"]["DatasetType"] == "Unknown"
+        assert (
+            meta["nx_meta"]["NexusLIMS Extraction"]["Module"]
+            == "nexusLIMS.extractors.basic_metadata"
+        )
+        assert meta["nx_meta"]["NexusLIMS Extraction"]["Version"] == __version__
+
+        self.remove_thumb_and_json(thumb_fname)
+
+    def test_parse_metadata_with_text_preview(self, basic_txt_file):
+        meta, thumb_fname = parse_metadata(fname=basic_txt_file)
+
+        assert thumb_fname.is_file()
+        assert meta["nx_meta"]["Data Type"] == "Unknown"
+        assert meta["nx_meta"]["DatasetType"] == "Unknown"
+        assert (
+            meta["nx_meta"]["NexusLIMS Extraction"]["Module"]
+            == "nexusLIMS.extractors.basic_metadata"
+        )
+        assert meta["nx_meta"]["NexusLIMS Extraction"]["Version"] == __version__
+
+        self.remove_thumb_and_json(thumb_fname)
+
+    def test_no_thumb_for_unreadable_image(self, unreadable_image_file):
+        meta, thumb_fname = parse_metadata(fname=unreadable_image_file)
+
+        assert thumb_fname is None
+        assert meta["nx_meta"]["Data Type"] == "Unknown"
+        assert meta["nx_meta"]["DatasetType"] == "Unknown"
+        assert (
+            meta["nx_meta"]["NexusLIMS Extraction"]["Module"]
+            == "nexusLIMS.extractors.basic_metadata"
+        )
+        assert meta["nx_meta"]["NexusLIMS Extraction"]["Version"] == __version__
+
+    def test_no_thumb_for_binary_text_file(self, binary_text_file):
+        meta, thumb_fname = parse_metadata(fname=binary_text_file)
+
+        assert thumb_fname is None
+        assert meta["nx_meta"]["Data Type"] == "Unknown"
+        assert meta["nx_meta"]["DatasetType"] == "Unknown"
+        assert (
+            meta["nx_meta"]["NexusLIMS Extraction"]["Module"]
+            == "nexusLIMS.extractors.basic_metadata"
+        )
+        assert meta["nx_meta"]["NexusLIMS Extraction"]["Version"] == __version__
 
     def test_flatten_dict(self):
         dict_to_flatten = {
