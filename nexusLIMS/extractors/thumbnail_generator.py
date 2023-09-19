@@ -555,12 +555,26 @@ def text_to_thumbnail(
     plt.close("all")
     plt.rcParams["image.cmap"] = "gray"
 
-    try:
-        with Path.open(f, encoding="UTF-8") as textfile:
-            textlist = textfile.read().replace("\t", "   ").splitlines()
-    except UnicodeDecodeError as exc:
-        logger.warning("no preview generated; could not decode text file: %s", str(exc))
-        return False
+    # some instruments produce text files with different encodings, so we try a few
+    # of the common ones. Also, escape "$" pattern that matplotlib
+    # will interpret as a math formula and replace "\t" with spaces for neat display
+    textcodecs = ["utf-8", "windows-1250", "windows-1252"]
+    for enc in textcodecs:
+        try:
+            with Path.open(f, encoding=enc) as textfile:
+                textlist = (
+                    textfile.read()
+                    .replace("$", r"\$")
+                    .replace("\t", "   ")
+                    .splitlines()
+                )
+        except UnicodeDecodeError as exc:
+            logger.warning(
+                "no preview generated; could not decode text file: %s",
+                str(exc),
+            )
+        else:
+            logger.info("opening the file with encoding: %s ", str(enc))
 
     textfig = plt.figure()
     # 5 x 5" is a good size

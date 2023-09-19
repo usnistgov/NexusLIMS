@@ -236,6 +236,10 @@ class TestThumbnailGenerator:  # pylint: disable=too-many-public-methods
     def test_text_data_to_thumbnail(self, text_data_test_file, output_path):
         return text_to_thumbnail(text_data_test_file, output_path)
 
+    @pytest.mark.mpl_image_compare(style="default")
+    def test_text_ansi_to_thumbnail(self, text_ansi_test_file, output_path):
+        return text_to_thumbnail(text_ansi_test_file, output_path)
+
     def test_png_to_thumbnail(self, output_path, image_thumb_source_png):
         baseline_thumb_png = (
             Path(__file__).parent / "files" / "figs" / "test_image_thumb_png.png"

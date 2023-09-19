@@ -424,6 +424,12 @@ def text_data_test_file():
 
 
 @pytest.fixture(scope="module")
+def text_ansi_test_file():
+    """Text file in ansi format from JEOL SEMs."""
+    return Path(__file__).parent / "files" / "text_preview_jeol_ansi.txt"
+
+
+@pytest.fixture(scope="module")
 def basic_image_file():
     """Image file that is not data, e.g. a screenshot."""
     extract_files("IMAGE_FILES")
