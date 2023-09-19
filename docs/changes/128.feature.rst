@@ -1,2 +1,0 @@
-Added ability to generate previews for "plain" image files (e.g. ``.jpg``, ``.png``,
-etc.) and plain text files.

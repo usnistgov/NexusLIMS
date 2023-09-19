@@ -1,1 +1,0 @@
-Fix problem arising from NEMO API change that removed ``username`` keyword.
