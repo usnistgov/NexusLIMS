@@ -6,7 +6,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
 
-    <title>v1.3.1 (2023-05-19) &#8212; NexusLIMS 1.3.1 documentation</title>
+    <title>v1.4.0 (2023-09-19) &#8212; NexusLIMS 1.4.0 documentation</title>
     <link rel="stylesheet" type="text/css" href="_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="_static/custom-styles.css" />
@@ -60,7 +60,7 @@ $(document).ready(function(){
         </button>
         <a class="navbar-brand" href="index.html"><span><img src="_static/logo_horizontal.png"></span>
            </a>
-        <span class="navbar-text navbar-version pull-left"><b>1.3.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.4.0</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -165,67 +165,72 @@ $(document).ready(function(){
 </h4>
 
 <ul>
-<li><a class="reference internal" href="#">v1.3.1 (2023-05-19)</a><ul>
+<li><a class="reference internal" href="#">v1.4.0 (2023-09-19)</a><ul>
+<li><a class="reference internal" href="#new-features">New features</a></li>
 <li><a class="reference internal" href="#bug-fixes">Bug fixes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#v1-3-1-2023-05-19">v1.3.1 (2023-05-19)</a><ul>
+<li><a class="reference internal" href="#id3">Bug fixes</a></li>
 <li><a class="reference internal" href="#miscellaneous-development-changes">Miscellaneous/Development changes</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#v1-3-0-2023-04-14">v1.3.0 (2023-04-14)</a><ul>
-<li><a class="reference internal" href="#new-features">New features</a></li>
+<li><a class="reference internal" href="#id6">New features</a></li>
 <li><a class="reference internal" href="#documentation-improvements">Documentation improvements</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#v1-2-0-2023-03-31">v1.2.0 (2023-03-31)</a><ul>
-<li><a class="reference internal" href="#id5">New features</a></li>
-<li><a class="reference internal" href="#id9">Bug fixes</a></li>
+<li><a class="reference internal" href="#id9">New features</a></li>
+<li><a class="reference internal" href="#id13">Bug fixes</a></li>
 <li><a class="reference internal" href="#enhancements">Enhancements</a></li>
-<li><a class="reference internal" href="#id16">Documentation improvements</a></li>
-<li><a class="reference internal" href="#id19">Miscellaneous/Development changes</a></li>
+<li><a class="reference internal" href="#id20">Documentation improvements</a></li>
+<li><a class="reference internal" href="#id23">Miscellaneous/Development changes</a></li>
 <li><a class="reference internal" href="#deprecations-and-or-removals">Deprecations and/or Removals</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#v1-1-1-2022-06-15">v1.1.1 (2022-06-15)</a><ul>
-<li><a class="reference internal" href="#id23">Bug fixes</a></li>
-<li><a class="reference internal" href="#id30">Enhancements</a></li>
-<li><a class="reference internal" href="#id39">Miscellaneous/Development changes</a></li>
-<li><a class="reference internal" href="#id46">Deprecations and/or Removals</a></li>
+<li><a class="reference internal" href="#id27">Bug fixes</a></li>
+<li><a class="reference internal" href="#id34">Enhancements</a></li>
+<li><a class="reference internal" href="#id43">Miscellaneous/Development changes</a></li>
+<li><a class="reference internal" href="#id50">Deprecations and/or Removals</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#v1-1-0-2021-12-12">v1.1.0 (2021-12-12)</a><ul>
-<li><a class="reference internal" href="#id50">New features</a></li>
-<li><a class="reference internal" href="#id52">Enhancements</a></li>
-<li><a class="reference internal" href="#id53">Documentation improvements</a></li>
-<li><a class="reference internal" href="#id54">Miscellaneous/Development changes</a></li>
-<li><a class="reference internal" href="#id57">Deprecations and/or Removals</a></li>
+<li><a class="reference internal" href="#id54">New features</a></li>
+<li><a class="reference internal" href="#id56">Enhancements</a></li>
+<li><a class="reference internal" href="#id57">Documentation improvements</a></li>
+<li><a class="reference internal" href="#id58">Miscellaneous/Development changes</a></li>
+<li><a class="reference internal" href="#id61">Deprecations and/or Removals</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#v1-0-1-2021-09-15">v1.0.1 (2021-09-15)</a><ul>
-<li><a class="reference internal" href="#id58">New features</a></li>
-<li><a class="reference internal" href="#id64">Bug fixes</a></li>
-<li><a class="reference internal" href="#id75">Enhancements</a></li>
-<li><a class="reference internal" href="#id82">Documentation improvements</a></li>
-<li><a class="reference internal" href="#id86">Miscellaneous/Development changes</a></li>
+<li><a class="reference internal" href="#id62">New features</a></li>
+<li><a class="reference internal" href="#id68">Bug fixes</a></li>
+<li><a class="reference internal" href="#id79">Enhancements</a></li>
+<li><a class="reference internal" href="#id86">Documentation improvements</a></li>
+<li><a class="reference internal" href="#id90">Miscellaneous/Development changes</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#v0-0-9-2020-02-24-first-real-working-release">v0.0.9 (2020-02-24) - First real working release</a><ul>
-<li><a class="reference internal" href="#id88">New features</a></li>
-<li><a class="reference internal" href="#id89">Enhancements</a></li>
-<li><a class="reference internal" href="#id90">Documentation improvements</a></li>
-<li><a class="reference internal" href="#id91">Miscellaneous/Development changes</a></li>
+<li><a class="reference internal" href="#id92">New features</a></li>
+<li><a class="reference internal" href="#id93">Enhancements</a></li>
+<li><a class="reference internal" href="#id94">Documentation improvements</a></li>
+<li><a class="reference internal" href="#id95">Miscellaneous/Development changes</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#v0-0-2-2020-01-08-pre-release-version">v0.0.2 (2020-01-08) - Pre-release version</a><ul>
-<li><a class="reference internal" href="#id92">New features</a></li>
-<li><a class="reference internal" href="#id94">Bug fixes</a></li>
-<li><a class="reference internal" href="#id97">Enhancements</a></li>
-<li><a class="reference internal" href="#id102">Documentation improvements</a></li>
-<li><a class="reference internal" href="#id105">Miscellaneous/Development changes</a></li>
+<li><a class="reference internal" href="#id96">New features</a></li>
+<li><a class="reference internal" href="#id98">Bug fixes</a></li>
+<li><a class="reference internal" href="#id101">Enhancements</a></li>
+<li><a class="reference internal" href="#id106">Documentation improvements</a></li>
+<li><a class="reference internal" href="#id109">Miscellaneous/Development changes</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#v0-0-1-2019-03-26-pre-release-version">v0.0.1 (2019-03-26) - Pre-release version</a><ul>
-<li><a class="reference internal" href="#id108">New features</a></li>
-<li><a class="reference internal" href="#id111">Enhancements</a></li>
-<li><a class="reference internal" href="#id113">Miscellaneous/Development changes</a></li>
+<li><a class="reference internal" href="#id112">New features</a></li>
+<li><a class="reference internal" href="#id115">Enhancements</a></li>
+<li><a class="reference internal" href="#id117">Miscellaneous/Development changes</a></li>
 </ul>
 </li>
 </ul>
@@ -245,10 +250,26 @@ $(document).ready(function(){
       </div>
     <div class="body col-md-9 content" role="main">
       
-  <section id="v1-3-1-2023-05-19">
-<h1>v1.3.1 (2023-05-19)<a class="headerlink" href="#v1-3-1-2023-05-19" title="Permalink to this headline">¶</a></h1>
+  <section id="v1-4-0-2023-09-19">
+<h1>v1.4.0 (2023-09-19)<a class="headerlink" href="#v1-4-0-2023-09-19" title="Permalink to this headline">¶</a></h1>
+<section id="new-features">
+<h2>New features<a class="headerlink" href="#new-features" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Added ability to generate previews for “plain” image files (e.g. <code class="docutils literal notranslate"><span class="pre">.jpg</span></code>, <code class="docutils literal notranslate"><span class="pre">.png</span></code>,
+etc.) and plain text files. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/128">#128</a>)</p></li>
+</ul>
+</section>
 <section id="bug-fixes">
 <h2>Bug fixes<a class="headerlink" href="#bug-fixes" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Fix problem arising from NEMO API change that removed <code class="docutils literal notranslate"><span class="pre">username</span></code> keyword. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/131">#131</a>)</p></li>
+</ul>
+</section>
+</section>
+<section id="v1-3-1-2023-05-19">
+<h1>v1.3.1 (2023-05-19)<a class="headerlink" href="#v1-3-1-2023-05-19" title="Permalink to this headline">¶</a></h1>
+<section id="id3">
+<h2>Bug fixes<a class="headerlink" href="#id3" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed issue where “process new records” script was emailing an error alert on conditions
 that were not errors. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/126">#126</a>)</p></li>
@@ -263,8 +284,8 @@ that were not errors. (<a class="reference external" href="https://gitlab.nist.g
 </section>
 <section id="v1-3-0-2023-04-14">
 <h1>v1.3.0 (2023-04-14)<a class="headerlink" href="#v1-3-0-2023-04-14" title="Permalink to this headline">¶</a></h1>
-<section id="new-features">
-<h2>New features<a class="headerlink" href="#new-features" title="Permalink to this headline">¶</a></h2>
+<section id="id6">
+<h2>New features<a class="headerlink" href="#id6" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Add support for reading <code class="docutils literal notranslate"><span class="pre">.spc</span></code> and <code class="docutils literal notranslate"><span class="pre">.msa</span></code> EDS spectrum files produced by EDAX
 acquisition softwares. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/122">#122</a>)</p></li>
@@ -280,8 +301,8 @@ changes in a semi-automated manner. (<a class="reference external" href="https:/
 </section>
 <section id="v1-2-0-2023-03-31">
 <h1>v1.2.0 (2023-03-31)<a class="headerlink" href="#v1-2-0-2023-03-31" title="Permalink to this headline">¶</a></h1>
-<section id="id5">
-<h2>New features<a class="headerlink" href="#id5" title="Permalink to this headline">¶</a></h2>
+<section id="id9">
+<h2>New features<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Added new “default” extractor for filetypes we don’t know how to read
 that will add very basic file-based metadata otherwise (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/121">#121</a>)</p></li>
@@ -296,8 +317,8 @@ provided as a string. Each item of the list will be passed to the GNU find comma
 as a pattern to ignore. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/121">#121</a>)</p></li>
 </ul>
 </section>
-<section id="id9">
-<h2>Bug fixes<a class="headerlink" href="#id9" title="Permalink to this headline">¶</a></h2>
+<section id="id13">
+<h2>Bug fixes<a class="headerlink" href="#id13" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed Poetry not installing due to change in upstream installer location (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/117">#117</a>)</p></li>
 <li><p>Fixed issue where record builder would not run (and we wouldn’t even be alerted!)
@@ -320,8 +341,8 @@ to allow for and display this information in the front end. (<a class="reference
 folder hierarchy).</p></li>
 </ul>
 </section>
-<section id="id16">
-<h2>Documentation improvements<a class="headerlink" href="#id16" title="Permalink to this headline">¶</a></h2>
+<section id="id20">
+<h2>Documentation improvements<a class="headerlink" href="#id20" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Improved documentation to be public-facing and also set up structure for public
 repository at <a class="reference external" href="https://github.com/usnistgov/nexuslims">https://github.com/usnistgov/nexuslims</a>,
@@ -330,8 +351,8 @@ repository at <a class="reference external" href="https://github.com/usnistgov/n
 <li><p>Add NIST branding to documentation via header/footer script from pages.nist.gov (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/113">#113</a>)</p></li>
 </ul>
 </section>
-<section id="id19">
-<h2>Miscellaneous/Development changes<a class="headerlink" href="#id19" title="Permalink to this headline">¶</a></h2>
+<section id="id23">
+<h2>Miscellaneous/Development changes<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>If the record building delay has not passed and no files were found, a
 <code class="docutils literal notranslate"><span class="pre">RECORD_GENERATION</span></code> event will no longer be added to the <code class="docutils literal notranslate"><span class="pre">session_log</span></code> table
@@ -356,8 +377,8 @@ in the database to avoid cluttering things up. (<a class="reference external" hr
 </section>
 <section id="v1-1-1-2022-06-15">
 <h1>v1.1.1 (2022-06-15)<a class="headerlink" href="#v1-1-1-2022-06-15" title="Permalink to this headline">¶</a></h1>
-<section id="id23">
-<h2>Bug fixes<a class="headerlink" href="#id23" title="Permalink to this headline">¶</a></h2>
+<section id="id27">
+<h2>Bug fixes<a class="headerlink" href="#id27" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed issue where record builder would crash if only one file was found during the
 activity (and added explicit test for this condition). (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/96">#96</a>)</p></li>
@@ -374,8 +395,8 @@ was found, the harvester would return a generic event and a record would still b
 <li><p>Fixed bug where null bytes in a TIFF file caused an error in metadata extraction (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/110">#110</a>)</p></li>
 </ul>
 </section>
-<section id="id30">
-<h2>Enhancements<a class="headerlink" href="#id30" title="Permalink to this headline">¶</a></h2>
+<section id="id34">
+<h2>Enhancements<a class="headerlink" href="#id34" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Add ability for record builder to insert a link to reservation information in the
 <code class="docutils literal notranslate"><span class="pre">summary</span></code> node (modified schema to hold this and record builder to insert it). (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/90">#90</a>)</p></li>
@@ -399,8 +420,8 @@ specificity in multi-timezone setups. (<a class="reference external" href="https
 implementation. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/109">#109</a>)</p></li>
 </ul>
 </section>
-<section id="id39">
-<h2>Miscellaneous/Development changes<a class="headerlink" href="#id39" title="Permalink to this headline">¶</a></h2>
+<section id="id43">
+<h2>Miscellaneous/Development changes<a class="headerlink" href="#id43" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Configured tests to run on-premises, which speeds up various testing operations. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/57">#57</a>)</p></li>
 <li><p>Drastically restructured repository to look more like a proper Python library than just
@@ -415,8 +436,8 @@ failures due to network issues).</p></li>
 <li><p>Made some changes to the codebase in preparation of making it public-facing on Github.</p></li>
 </ul>
 </section>
-<section id="id46">
-<h2>Deprecations and/or Removals<a class="headerlink" href="#id46" title="Permalink to this headline">¶</a></h2>
+<section id="id50">
+<h2>Deprecations and/or Removals<a class="headerlink" href="#id50" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Removed a variety of associated files that were not important for the Python package
 (old presentations, diagrams, reports, etc.) (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/60">#60</a>)</p></li>
@@ -430,8 +451,8 @@ easier to add new instruments without having to do an XML schema migration). (<a
 </section>
 <section id="v1-1-0-2021-12-12">
 <h1>v1.1.0 (2021-12-12)<a class="headerlink" href="#v1-1-0-2021-12-12" title="Permalink to this headline">¶</a></h1>
-<section id="id50">
-<h2>New features<a class="headerlink" href="#id50" title="Permalink to this headline">¶</a></h2>
+<section id="id54">
+<h2>New features<a class="headerlink" href="#id54" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Major new feature in this release is the implementation of a reservation and metadata
 harvester for the <a class="reference external" href="https://github.com/usnistgov/NEMO">NEMO</a> facility management
@@ -441,8 +462,8 @@ SharePoint calendar harvester will be deprecated in a future release. See the
 for more details. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/89">#89</a>)</p></li>
 </ul>
 </section>
-<section id="id52">
-<h2>Enhancements<a class="headerlink" href="#id52" title="Permalink to this headline">¶</a></h2>
+<section id="id56">
+<h2>Enhancements<a class="headerlink" href="#id56" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Add support to NEMO harvester for multiple samples in a set of reservation questions.
 The required structure for reservation questions is documented in the
@@ -454,16 +475,16 @@ inspecting files stored on servers in different timezones.</p></li>
 is now possible using the NEMO reservation questions).</p></li>
 </ul>
 </section>
-<section id="id53">
-<h2>Documentation improvements<a class="headerlink" href="#id53" title="Permalink to this headline">¶</a></h2>
+<section id="id57">
+<h2>Documentation improvements<a class="headerlink" href="#id57" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Documented new NEMO harvester and updated record generation documentation to describe
 how the process works with multiple harvesters.</p></li>
 <li><p>Fixed broken image paths in README.</p></li>
 </ul>
 </section>
-<section id="id54">
-<h2>Miscellaneous/Development changes<a class="headerlink" href="#id54" title="Permalink to this headline">¶</a></h2>
+<section id="id58">
+<h2>Miscellaneous/Development changes<a class="headerlink" href="#id58" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Migrated project structure from <a class="reference external" href="https://pipenv.pypa.io/en/latest/"><code class="docutils literal notranslate"><span class="pre">pipenv</span></code></a> to <a class="reference external" href="https://python-poetry.org/"><code class="docutils literal notranslate"><span class="pre">poetry</span></code></a> for better dependency
 resolution, easier and faster deployment, and configuration of project via
@@ -474,8 +495,8 @@ and pipelines. (<a class="reference external" href="https://gitlab.nist.gov/gitl
 <a class="reference internal" href="api/nexusLIMS.html#module-nexusLIMS.utils" title="nexusLIMS.utils"><code class="xref py py-mod docutils literal notranslate"><span class="pre">nexusLIMS.utils</span></code></a> module for easier use throughout the rest of the codebase.</p></li>
 </ul>
 </section>
-<section id="id57">
-<h2>Deprecations and/or Removals<a class="headerlink" href="#id57" title="Permalink to this headline">¶</a></h2>
+<section id="id61">
+<h2>Deprecations and/or Removals<a class="headerlink" href="#id61" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Removed the “Session Logger” application in favor of using NEMO and its usage events
 to track session timestamps.</p></li>
@@ -484,8 +505,8 @@ to track session timestamps.</p></li>
 </section>
 <section id="v1-0-1-2021-09-15">
 <h1>v1.0.1 (2021-09-15)<a class="headerlink" href="#v1-0-1-2021-09-15" title="Permalink to this headline">¶</a></h1>
-<section id="id58">
-<h2>New features<a class="headerlink" href="#id58" title="Permalink to this headline">¶</a></h2>
+<section id="id62">
+<h2>New features<a class="headerlink" href="#id62" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Implemented a “file viewer” on the front-end NexusLIMS application which also allows
 for downloading single, multiple, or all data files from a particular record in
@@ -499,8 +520,8 @@ users through a tour describing what the various parts of the application do. (<
 one to see what records <cite>would</cite> be built without actually doing anything. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/77">#77</a>)</p></li>
 </ul>
 </section>
-<section id="id64">
-<h2>Bug fixes<a class="headerlink" href="#id64" title="Permalink to this headline">¶</a></h2>
+<section id="id68">
+<h2>Bug fixes<a class="headerlink" href="#id68" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Fixed issue where Session Logger app was failing due to incompatibilities between
 the code and certain database states. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/53">#53</a>)</p></li>
@@ -519,8 +540,8 @@ HyperSpy project: <a class="reference external" href="https://github.com/hypersp
 <a class="reference external" href="https://github.com/hyperspy/hyperspy/pull/2529">3</a>). (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/74">#74</a>)</p></li>
 </ul>
 </section>
-<section id="id75">
-<h2>Enhancements<a class="headerlink" href="#id75" title="Permalink to this headline">¶</a></h2>
+<section id="id79">
+<h2>Enhancements<a class="headerlink" href="#id79" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Added customized loading text while the list of records is loading in the front-end
 NexusLIMS application. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/58">#58</a>)</p></li>
@@ -535,8 +556,8 @@ if they are up to date or not. (<a class="reference external" href="https://gitl
 <li><p>Small tweak to make acquisition activity links easier to click in record display. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/81">#81</a>)</p></li>
 </ul>
 </section>
-<section id="id82">
-<h2>Documentation improvements<a class="headerlink" href="#id82" title="Permalink to this headline">¶</a></h2>
+<section id="id86">
+<h2>Documentation improvements<a class="headerlink" href="#id86" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Added “taxonomy” of terms used in the NexusLIMS project to the documentation (see
 <a class="reference internal" href="taxonomy.html"><span class="doc">NexusLIMS taxonomy</span></a> for details). (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/40">#40</a>)</p></li>
@@ -549,8 +570,8 @@ including improvements to the project README, as well as the following pages:
 and pages about data security.</p></li>
 </ul>
 </section>
-<section id="id86">
-<h2>Miscellaneous/Development changes<a class="headerlink" href="#id86" title="Permalink to this headline">¶</a></h2>
+<section id="id90">
+<h2>Miscellaneous/Development changes<a class="headerlink" href="#id90" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Improvement to logging to make it easier to debug records not being built correctly. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/80">#80</a>)</p></li>
 <li><p>Added new <a class="reference internal" href="api/nexusLIMS.harvesters.html#nexusLIMS.harvesters.reservation_event.ReservationEvent" title="nexusLIMS.harvesters.reservation_event.ReservationEvent"><code class="xref py py-class docutils literal notranslate"><span class="pre">ReservationEvent</span></code></a> class
@@ -565,8 +586,8 @@ implementation of the NEMO harvester.</p></li>
 </section>
 <section id="v0-0-9-2020-02-24-first-real-working-release">
 <h1>v0.0.9 (2020-02-24) - First real working release<a class="headerlink" href="#v0-0-9-2020-02-24-first-real-working-release" title="Permalink to this headline">¶</a></h1>
-<section id="id88">
-<h2>New features<a class="headerlink" href="#id88" title="Permalink to this headline">¶</a></h2>
+<section id="id92">
+<h2>New features<a class="headerlink" href="#id92" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Added extractor for TIFF image files produced by FEI SEM and FIB instruments.</p></li>
 <li><p>Record builder can now be run automatically and will do the whole process (probing
@@ -574,8 +595,8 @@ database, finding files, extracting metadata, building record XML, and uploading
 CDCS frontend).</p></li>
 </ul>
 </section>
-<section id="id89">
-<h2>Enhancements<a class="headerlink" href="#id89" title="Permalink to this headline">¶</a></h2>
+<section id="id93">
+<h2>Enhancements<a class="headerlink" href="#id93" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Acquisition activities are now split up by clustering of file acquisition times, rather
 than inspecting when an instrument switches modes. This is more realistic to how
@@ -595,14 +616,14 @@ a record rather than a pure Python implementation.</p></li>
 <li><p>Various XSLT enhancements for better display of record data.</p></li>
 </ul>
 </section>
-<section id="id90">
-<h2>Documentation improvements<a class="headerlink" href="#id90" title="Permalink to this headline">¶</a></h2>
+<section id="id94">
+<h2>Documentation improvements<a class="headerlink" href="#id94" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Added record building documentation: <a class="reference internal" href="record_building.html"><span class="doc">Record building workflow</span></a>.</p></li>
 </ul>
 </section>
-<section id="id91">
-<h2>Miscellaneous/Development changes<a class="headerlink" href="#id91" title="Permalink to this headline">¶</a></h2>
+<section id="id95">
+<h2>Miscellaneous/Development changes<a class="headerlink" href="#id95" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Added helper script to update XLST on NexusLIMS front-end via API, making things easier
 for development.</p></li>
@@ -614,8 +635,8 @@ for development.</p></li>
 </section>
 <section id="v0-0-2-2020-01-08-pre-release-version">
 <h1>v0.0.2 (2020-01-08) - Pre-release version<a class="headerlink" href="#v0-0-2-2020-01-08-pre-release-version" title="Permalink to this headline">¶</a></h1>
-<section id="id92">
-<h2>New features<a class="headerlink" href="#id92" title="Permalink to this headline">¶</a></h2>
+<section id="id96">
+<h2>New features<a class="headerlink" href="#id96" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Added ability to use custom CA certificate for network communications (useful if
 communicating with servers with self-signed certificates). (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/49">#49</a>)</p></li>
@@ -631,16 +652,16 @@ experiments, which are then translated into XML for the final record.</p></li>
 acquisition activities in record building.</p></li>
 </ul>
 </section>
-<section id="id94">
-<h2>Bug fixes<a class="headerlink" href="#id94" title="Permalink to this headline">¶</a></h2>
+<section id="id98">
+<h2>Bug fixes<a class="headerlink" href="#id98" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Updated endpoint for sharepoint calendar API that had broken due to a change in that service. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/37">#37</a>)</p></li>
 <li><p>Fixed issue where schema had duplicate “labels” for certain fields that was causing
 a confusing display in the CDCS “curate” page. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/42">#42</a>)</p></li>
 </ul>
 </section>
-<section id="id97">
-<h2>Enhancements<a class="headerlink" href="#id97" title="Permalink to this headline">¶</a></h2>
+<section id="id101">
+<h2>Enhancements<a class="headerlink" href="#id101" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Added other Nexus instruments to the schema so we can have records from more than just
 a single <code class="docutils literal notranslate"><span class="pre">Instrument</span></code> (as it was in initial testing). (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/32">#32</a>)</p></li>
@@ -658,15 +679,15 @@ in the application code.</p></li>
 <li><p>XSLT now properly displays preview images rather than a placeholder for each dataset.</p></li>
 </ul>
 </section>
-<section id="id102">
-<h2>Documentation improvements<a class="headerlink" href="#id102" title="Permalink to this headline">¶</a></h2>
+<section id="id106">
+<h2>Documentation improvements<a class="headerlink" href="#id106" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Fix links in README to point to new upstream project location. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/36">#36</a>)</p></li>
 <li><p>Added basic documentation for NexusLIMS package and link via a badge on the README. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/43">#43</a>)</p></li>
 </ul>
 </section>
-<section id="id105">
-<h2>Miscellaneous/Development changes<a class="headerlink" href="#id105" title="Permalink to this headline">¶</a></h2>
+<section id="id109">
+<h2>Miscellaneous/Development changes<a class="headerlink" href="#id109" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Moved project out of a personal account and into it’s own NexusLIMS group on Gitlab. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/29">#29</a>)</p></li>
 <li><p>Added dedicated folder (separate form data storage location) for NexusLIMS to write
@@ -679,23 +700,23 @@ delineate functionality of the various parts of NexusLIMS</p></li>
 </section>
 <section id="v0-0-1-2019-03-26-pre-release-version">
 <h1>v0.0.1 (2019-03-26) - Pre-release version<a class="headerlink" href="#v0-0-1-2019-03-26-pre-release-version" title="Permalink to this headline">¶</a></h1>
-<section id="id108">
-<h2>New features<a class="headerlink" href="#id108" title="Permalink to this headline">¶</a></h2>
+<section id="id112">
+<h2>New features<a class="headerlink" href="#id112" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Implemented SharePoint calendar metadata harvesting for equipment reservations. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/26">#26</a>)</p></li>
 <li><p>Added metadata extractor for FEI TIFF image files produced by SEMs and FIBs. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/35">#35</a>)</p></li>
 <li><p>Created repository to hold initial work on NexusLIMS.</p></li>
 </ul>
 </section>
-<section id="id111">
-<h2>Enhancements<a class="headerlink" href="#id111" title="Permalink to this headline">¶</a></h2>
+<section id="id115">
+<h2>Enhancements<a class="headerlink" href="#id115" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Added a concept of “role” (experimental, calibration, etc.) to datasets in the
 <cite>Nexus Experiment</cite> schema (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/23">#23</a>)</p></li>
 </ul>
 </section>
-<section id="id113">
-<h2>Miscellaneous/Development changes<a class="headerlink" href="#id113" title="Permalink to this headline">¶</a></h2>
+<section id="id117">
+<h2>Miscellaneous/Development changes<a class="headerlink" href="#id117" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Added CI/CD pipeline for backend tests. (<a class="reference external" href="https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/30">#30</a>)</p></li>
 </ul>
@@ -723,7 +744,7 @@ delineate functionality of the various parts of NexusLIMS</p></li>
     </p>
     <p>
         &copy; Copyright 2023, NIST Office of Data and Informatics.<br/>
-      Last updated on May, 22, 2023.<br/>
+      Last updated on Sep, 19, 2023.<br/>
     </p>
   </div>
 </footer>

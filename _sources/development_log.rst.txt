@@ -1,3 +1,19 @@
+v1.4.0 (2023-09-19)
+===================
+
+New features
+------------
+
+- Added ability to generate previews for "plain" image files (e.g. ``.jpg``, ``.png``,
+  etc.) and plain text files. (`#128 <https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/128>`_)
+
+
+Bug fixes
+---------
+
+- Fix problem arising from NEMO API change that removed ``username`` keyword. (`#131 <https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/131>`_)
+
+
 v1.3.1 (2023-05-19)
 ===================
 
