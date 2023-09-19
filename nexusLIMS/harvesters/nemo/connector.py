@@ -293,7 +293,7 @@ class NemoConnector:
         """
         params = {}
         if isinstance(username, str):
-            params["username"] = username
+            params["username__iexact"] = username
             if username in self.users_by_username:
                 logger.debug('Using cached user info for username "%s"', username)
                 return [self.users_by_username[username]]
