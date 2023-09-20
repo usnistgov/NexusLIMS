@@ -1,3 +1,19 @@
+v1.4.1 (2023-09-20)
+===================
+
+Bug fixes
+---------
+
+- Resolved issue where text files that can't be opened with any encoding caused the record
+  builder to crash (`#134 <https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/134>`_)
+
+
+Documentation improvements
+--------------------------
+
+- Documented internal release and deploy process on Wiki
+
+
 v1.4.0 (2023-09-19)
 ===================
 
