@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>nexusLIMS.extractors.thumbnail_generator &#8212; NexusLIMS 1.4.0 documentation</title>
+    <title>nexusLIMS.extractors.thumbnail_generator &#8212; NexusLIMS 1.4.1 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom-styles.css" />
@@ -59,7 +59,7 @@ $(document).ready(function(){
         </button>
         <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logo_horizontal.png"></span>
            </a>
-        <span class="navbar-text navbar-version pull-left"><b>1.4.0</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.4.1</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -237,7 +237,6 @@ $(document).ready(function(){
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">INFO</span><span class="p">)</span>
-<span class="n">_dir_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span>
 <span class="n">mpl</span><span class="o">.</span><span class="n">use</span><span class="p">(</span><span class="s2">&quot;Agg&quot;</span><span class="p">)</span>
 
 
@@ -736,8 +735,8 @@ $(document).ready(function(){
     <span class="c1"># some instruments produce text files with different encodings, so we try a few</span>
     <span class="c1"># of the common ones. Also, escape &quot;$&quot; pattern that matplotlib</span>
     <span class="c1"># will interpret as a math formula and replace &quot;\t&quot; with spaces for neat display</span>
-    <span class="n">textcodecs</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="s2">&quot;windows-1250&quot;</span><span class="p">,</span> <span class="s2">&quot;windows-1252&quot;</span><span class="p">]</span>
-    <span class="k">for</span> <span class="n">enc</span> <span class="ow">in</span> <span class="n">textcodecs</span><span class="p">:</span>
+    <span class="n">textlist</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">enc</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;utf-8&quot;</span><span class="p">,</span> <span class="s2">&quot;windows-1250&quot;</span><span class="p">,</span> <span class="s2">&quot;windows-1252&quot;</span><span class="p">]:</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">with</span> <span class="n">Path</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="n">enc</span><span class="p">)</span> <span class="k">as</span> <span class="n">textfile</span><span class="p">:</span>
                 <span class="n">textlist</span> <span class="o">=</span> <span class="p">(</span>
@@ -748,11 +747,20 @@ $(document).ready(function(){
                 <span class="p">)</span>
         <span class="k">except</span> <span class="ne">UnicodeDecodeError</span> <span class="k">as</span> <span class="n">exc</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;no preview generated; could not decode text file: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;no preview generated; could not decode text file with encoding </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">enc</span><span class="p">,</span>
                 <span class="nb">str</span><span class="p">(</span><span class="n">exc</span><span class="p">),</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;opening the file with encoding: </span><span class="si">%s</span><span class="s2"> &quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">enc</span><span class="p">))</span>
+
+    <span class="k">if</span> <span class="n">textlist</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># textlist being None means that none of the encodings used could open the</span>
+        <span class="c1"># text file, so we should just return False to indicate no preview was generated</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+            <span class="s2">&quot;Could not generate preview of text file with any available encoding&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">False</span>
 
     <span class="n">textfig</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
     <span class="c1"># 5 x 5&quot; is a good size</span>
@@ -766,15 +774,15 @@ $(document).ready(function(){
     <span class="n">num_lines_in_image</span> <span class="o">=</span> <span class="mi">19</span>
 
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">textlist</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">paragraph_check</span><span class="p">:</span>
-        <span class="n">wrappedtext</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">wrapped_text</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">textlist</span><span class="p">:</span>
-            <span class="n">wrappedtext</span> <span class="o">=</span> <span class="n">wrappedtext</span> <span class="o">+</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
+            <span class="n">wrapped_text</span> <span class="o">=</span> <span class="n">wrapped_text</span> <span class="o">+</span> <span class="n">textwrap</span><span class="o">.</span><span class="n">wrap</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">42</span><span class="p">)</span>
         <span class="n">lines_printed</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="k">while</span> <span class="n">lines_printed</span> <span class="o">&lt;=</span> <span class="n">num_lines_in_image</span> <span class="ow">and</span> <span class="n">lines_printed</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">wrappedtext</span><span class="p">):</span>
+        <span class="k">while</span> <span class="n">lines_printed</span> <span class="o">&lt;=</span> <span class="n">num_lines_in_image</span> <span class="ow">and</span> <span class="n">lines_printed</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">wrapped_text</span><span class="p">):</span>
             <span class="n">textfig</span><span class="o">.</span><span class="n">text</span><span class="p">(</span>
                 <span class="mf">0.02</span><span class="p">,</span>
                 <span class="mf">0.9</span> <span class="o">-</span> <span class="n">lines_printed</span> <span class="o">/</span> <span class="mi">18</span><span class="p">,</span>
-                <span class="n">wrappedtext</span><span class="p">[</span><span class="n">lines_printed</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">wrapped_text</span><span class="p">[</span><span class="n">lines_printed</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="n">fontsize</span><span class="o">=</span><span class="mi">12</span><span class="p">,</span>
                 <span class="n">fontfamily</span><span class="o">=</span><span class="s2">&quot;monospace&quot;</span><span class="p">,</span>
             <span class="p">)</span>
@@ -931,7 +939,7 @@ $(document).ready(function(){
     <span class="p">)</span>
 
     <span class="c1"># Load &quot;watermark&quot; stamp and rescale to be appropriately sized</span>
-    <span class="n">stamp</span> <span class="o">=</span> <span class="n">imread</span><span class="p">(</span><span class="n">_dir_path</span> <span class="o">/</span> <span class="s2">&quot;spectrum_image_logo.svg.png&quot;</span><span class="p">)</span>
+    <span class="n">stamp</span> <span class="o">=</span> <span class="n">imread</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="vm">__file__</span><span class="p">)</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;spectrum_image_logo.svg.png&quot;</span><span class="p">)</span>
     <span class="n">stamp_width</span> <span class="o">=</span> <span class="nb">int</span><span class="p">((</span><span class="n">mpl_axis</span><span class="o">.</span><span class="n">figure</span><span class="o">.</span><span class="n">get_size_inches</span><span class="p">()</span> <span class="o">*</span> <span class="n">f</span><span class="o">.</span><span class="n">dpi</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span> <span class="o">/</span> <span class="mf">2.5</span><span class="p">)</span>
     <span class="n">scaling</span> <span class="o">=</span> <span class="n">stamp_width</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">stamp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
     <span class="n">stamp_height</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">stamp</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">*</span> <span class="nb">float</span><span class="p">(</span><span class="n">scaling</span><span class="p">))</span>
@@ -1186,7 +1194,7 @@ $(document).ready(function(){
     </p>
     <p>
         &copy; Copyright 2023, NIST Office of Data and Informatics.<br/>
-      Last updated on Sep, 19, 2023.<br/>
+      Last updated on Sep, 20, 2023.<br/>
     </p>
   </div>
 </footer>
