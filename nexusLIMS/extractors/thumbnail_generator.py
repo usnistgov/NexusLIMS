@@ -59,7 +59,6 @@ except AttributeError:  # pragma: no cover
 
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
-_dir_path = Path(__file__).parent
 mpl.use("Agg")
 
 
@@ -558,8 +557,8 @@ def text_to_thumbnail(
     # some instruments produce text files with different encodings, so we try a few
     # of the common ones. Also, escape "$" pattern that matplotlib
     # will interpret as a math formula and replace "\t" with spaces for neat display
-    textcodecs = ["utf-8", "windows-1250", "windows-1252"]
-    for enc in textcodecs:
+    textlist = None
+    for enc in ["utf-8", "windows-1250", "windows-1252"]:
         try:
             with Path.open(f, encoding=enc) as textfile:
                 textlist = (
@@ -570,11 +569,20 @@ def text_to_thumbnail(
                 )
         except UnicodeDecodeError as exc:
             logger.warning(
-                "no preview generated; could not decode text file: %s",
+                "no preview generated; could not decode text file with encoding %s: %s",
+                enc,
                 str(exc),
             )
         else:
             logger.info("opening the file with encoding: %s ", str(enc))
+
+    if textlist is None:
+        # textlist being None means that none of the encodings used could open the
+        # text file, so we should just return False to indicate no preview was generated
+        logger.warning(
+            "Could not generate preview of text file with any available encoding",
+        )
+        return False
 
     textfig = plt.figure()
     # 5 x 5" is a good size
@@ -588,15 +596,15 @@ def text_to_thumbnail(
     num_lines_in_image = 19
 
     if len(textlist) <= paragraph_check:
-        wrappedtext = []
+        wrapped_text = []
         for i in textlist:
-            wrappedtext = wrappedtext + textwrap.wrap(i, width=42)
+            wrapped_text = wrapped_text + textwrap.wrap(i, width=42)
         lines_printed = 0
-        while lines_printed <= num_lines_in_image and lines_printed < len(wrappedtext):
+        while lines_printed <= num_lines_in_image and lines_printed < len(wrapped_text):
             textfig.text(
                 0.02,
                 0.9 - lines_printed / 18,
-                wrappedtext[lines_printed] + "\n",
+                wrapped_text[lines_printed] + "\n",
                 fontsize=12,
                 fontfamily="monospace",
             )
@@ -753,7 +761,7 @@ def _plot_si(s, out_path, dpi):
     )
 
     # Load "watermark" stamp and rescale to be appropriately sized
-    stamp = imread(_dir_path / "spectrum_image_logo.svg.png")
+    stamp = imread(Path(__file__).parent / "spectrum_image_logo.svg.png")
     stamp_width = int((mpl_axis.figure.get_size_inches() * f.dpi)[0] / 2.5)
     scaling = stamp_width / float(stamp.shape[0])
     stamp_height = int(float(stamp.shape[1]) * float(scaling))
