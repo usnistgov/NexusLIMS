@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>nexusLIMS.extractors.quanta_tif &#8212; NexusLIMS 1.4.1 documentation</title>
+    <title>nexusLIMS.extractors.quanta_tif &#8212; NexusLIMS 1.4.2 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom-styles.css" />
@@ -59,7 +59,7 @@ $(document).ready(function(){
         </button>
         <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logo_horizontal.png"></span>
            </a>
-        <span class="navbar-text navbar-version pull-left"><b>1.4.1</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.4.2</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -208,6 +208,7 @@ $(document).ready(function(){
 <span class="kn">import</span> <span class="nn">contextlib</span>
 <span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">from</span> <span class="nn">decimal</span> <span class="kn">import</span> <span class="n">Decimal</span><span class="p">,</span> <span class="n">InvalidOperation</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">degrees</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
@@ -265,6 +266,7 @@ $(document).ready(function(){
     <span class="n">metadata_bytes</span> <span class="o">=</span> <span class="n">metadata_bytes</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="sa">b</span><span class="s2">&quot;</span><span class="se">\x00</span><span class="s2">&quot;</span><span class="p">,</span> <span class="sa">b</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
     <span class="n">metadata_str</span> <span class="o">=</span> <span class="n">metadata_bytes</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">metadata_str</span> <span class="o">=</span> <span class="n">metadata_str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">metadata_str</span> <span class="o">=</span> <span class="n">_fix_duplicate_multigis_metadata_tags</span><span class="p">(</span><span class="n">metadata_str</span><span class="p">)</span>
     <span class="n">buf</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">metadata_str</span><span class="p">)</span>
     <span class="n">config</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
     <span class="c1"># make ConfigParser respect upper/lowercase values</span>
@@ -285,6 +287,70 @@ $(document).ready(function(){
     <span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;nx_meta&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sort_dict</span><span class="p">(</span><span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;nx_meta&quot;</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">mdict</span></div>
+
+
+<span class="k">def</span> <span class="nf">_fix_duplicate_multigis_metadata_tags</span><span class="p">(</span><span class="n">metadata_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rename the metadata section headers to allow parsing by ``ConfigParser``.</span>
+
+<span class="sd">    Some instruments have metadata section titles like so:</span>
+
+<span class="sd">        [MultiGIS]</span>
+<span class="sd">        [MultiGISUnit1]</span>
+<span class="sd">        [MultiGISGas1]</span>
+<span class="sd">        [MultiGISGas2]</span>
+<span class="sd">        [MultiGISGas3]</span>
+<span class="sd">        [MultiGISUnit2]</span>
+<span class="sd">        [MultiGISGas1]</span>
+<span class="sd">        [MultiGISGas2]</span>
+<span class="sd">        [MultiGISGas3]</span>
+<span class="sd">        [MultiGISUnit3]</span>
+<span class="sd">        [MultiGISGas1]</span>
+<span class="sd">        [MultiGISGas2]</span>
+<span class="sd">        [MultiGISGas3]</span>
+
+<span class="sd">    Which causes errors because ``ConfigParser`` raises a ``DuplicateSectionError`` on</span>
+<span class="sd">    the first time it sees a duplicate of ``MultiGISGas1``. As a workaround, this method</span>
+<span class="sd">    will modify an entire string of &quot;Quanta&quot; metadata so that it instead reads like so:</span>
+
+<span class="sd">        [MultiGIS]</span>
+<span class="sd">        [MultiGISUnit1]</span>
+<span class="sd">        [MultiGISUnit1.MultiGISGas1]</span>
+<span class="sd">        [MultiGISUnit1.MultiGISGas2]</span>
+<span class="sd">        [MultiGISUnit1.MultiGISGas3]</span>
+<span class="sd">        [MultiGISUnit2]</span>
+<span class="sd">        [MultiGISUnit2.MultiGISGas1]</span>
+<span class="sd">        [MultiGISUnit2.MultiGISGas2]</span>
+<span class="sd">        [MultiGISUnit2.MultiGISGas3]</span>
+<span class="sd">        [MultiGISUnit3]</span>
+<span class="sd">        [MultiGISUnit3.MultiGISGas1]</span>
+<span class="sd">        [MultiGISUnit3.MultiGISGas2]</span>
+<span class="sd">        [MultiGISUnit3.MultiGISGas3]</span>
+
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">metadata_to_return</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="n">multi_gis_section_numbers</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\[MultiGISUnit(\d+)\]&quot;</span><span class="p">,</span> <span class="n">metadata_str</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">multi_gis_section_numbers</span><span class="p">:</span>
+        <span class="n">multi_gis_unit_indices</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">metadata_str</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[MultiGISUnit</span><span class="si">{</span><span class="n">num</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">num</span> <span class="ow">in</span> <span class="n">multi_gis_section_numbers</span>
+        <span class="p">]</span>
+        <span class="n">metadata_to_return</span> <span class="o">+=</span> <span class="n">metadata_str</span><span class="p">[:</span> <span class="n">multi_gis_unit_indices</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">num</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">multi_gis_section_numbers</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">&lt;</span> <span class="nb">len</span><span class="p">(</span><span class="n">multi_gis_unit_indices</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">to_process</span> <span class="o">=</span> <span class="n">metadata_str</span><span class="p">[</span>
+                    <span class="n">multi_gis_unit_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">:</span> <span class="n">multi_gis_unit_indices</span><span class="p">[</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">]</span>
+                <span class="p">]</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">to_process</span> <span class="o">=</span> <span class="n">metadata_str</span><span class="p">[</span><span class="n">multi_gis_unit_indices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="p">:]</span>
+            <span class="n">multi_gis_gas_tags</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;\[(MultiGISGas\d+)\]&quot;</span><span class="p">,</span> <span class="n">to_process</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">tag</span> <span class="ow">in</span> <span class="n">multi_gis_gas_tags</span><span class="p">:</span>
+                <span class="n">to_process</span> <span class="o">=</span> <span class="n">to_process</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="n">tag</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;MultiGISUnit</span><span class="si">{</span><span class="n">num</span><span class="si">}</span><span class="s2">.</span><span class="si">{</span><span class="n">tag</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">metadata_to_return</span> <span class="o">+=</span> <span class="n">to_process</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">metadata_to_return</span> <span class="o">=</span> <span class="n">metadata_str</span>
+
+    <span class="k">return</span> <span class="n">metadata_to_return</span>
 
 
 <div class="viewcode-block" id="parse_nx_meta"><a class="viewcode-back" href="../../../api/nexusLIMS.extractors.html#nexusLIMS.extractors.quanta_tif.parse_nx_meta">[docs]</a><span class="k">def</span> <span class="nf">parse_nx_meta</span><span class="p">(</span><span class="n">mdict</span><span class="p">):</span>
@@ -742,8 +808,8 @@ $(document).ready(function(){
       
     </p>
     <p>
-        &copy; Copyright 2023, NIST Office of Data and Informatics.<br/>
-      Last updated on Sep, 20, 2023.<br/>
+        &copy; Copyright 2024, NIST Office of Data and Informatics.<br/>
+      Last updated on May, 29, 2024.<br/>
     </p>
   </div>
 </footer>

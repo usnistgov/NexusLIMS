@@ -1,3 +1,13 @@
+v1.4.2 (2024-05-29)
+===================
+
+Bug fixes
+---------
+
+- Added workaround for issue where duplicate section titles would cause error in
+  ``quanta_tif`` extractor. (`#136 <https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/136>`_)
+
+
 v1.4.1 (2023-09-20)
 ===================
 
