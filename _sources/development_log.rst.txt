@@ -1,3 +1,13 @@
+v1.4.3 (2024-06-07)
+===================
+
+Bug fixes
+---------
+
+- Add ability to parse XML metadata included in some FEI/Thermo TIFF files that was
+  causing the TIFF extractor to fail when it was present. (`#137 <https://gitlab.nist.gov/gitlab/nexuslims/NexusMicroscopyLIMS/-/issues/137>`_)
+
+
 v1.4.2 (2024-05-29)
 ===================
 

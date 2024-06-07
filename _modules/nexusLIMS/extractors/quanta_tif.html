@@ -5,7 +5,7 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>nexusLIMS.extractors.quanta_tif &#8212; NexusLIMS 1.4.2 documentation</title>
+    <title>nexusLIMS.extractors.quanta_tif &#8212; NexusLIMS 1.4.3 documentation</title>
     <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/bootstrap-sphinx.css" />
     <link rel="stylesheet" type="text/css" href="../../../_static/custom-styles.css" />
@@ -59,7 +59,7 @@ $(document).ready(function(){
         </button>
         <a class="navbar-brand" href="../../../index.html"><span><img src="../../../_static/logo_horizontal.png"></span>
            </a>
-        <span class="navbar-text navbar-version pull-left"><b>1.4.2</b></span>
+        <span class="navbar-text navbar-version pull-left"><b>1.4.3</b></span>
       </div>
 
         <div class="collapse navbar-collapse nav-collapse">
@@ -212,6 +212,9 @@ $(document).ready(function(){
 <span class="kn">from</span> <span class="nn">decimal</span> <span class="kn">import</span> <span class="n">Decimal</span><span class="p">,</span> <span class="n">InvalidOperation</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">degrees</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Tuple</span>
+
+<span class="kn">from</span> <span class="nn">lxml</span> <span class="kn">import</span> <span class="n">etree</span>
 
 <span class="kn">from</span> <span class="nn">nexusLIMS.extractors.utils</span> <span class="kn">import</span> <span class="n">_set_instr_name_and_time</span>
 <span class="kn">from</span> <span class="nn">nexusLIMS.utils</span> <span class="kn">import</span> <span class="n">set_nested_dict_value</span><span class="p">,</span> <span class="n">sort_dict</span><span class="p">,</span> <span class="n">try_getting_dict_value</span>
@@ -267,6 +270,12 @@ $(document).ready(function(){
     <span class="n">metadata_str</span> <span class="o">=</span> <span class="n">metadata_bytes</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r\n</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">metadata_str</span> <span class="o">=</span> <span class="n">metadata_str</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\r</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="n">metadata_str</span> <span class="o">=</span> <span class="n">_fix_duplicate_multigis_metadata_tags</span><span class="p">(</span><span class="n">metadata_str</span><span class="p">)</span>
+
+    <span class="c1"># test if file has XML metadata and if so, extract it separately</span>
+    <span class="n">metadata_str</span><span class="p">,</span> <span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;FEI_XML_Metadata&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">_detect_and_process_xml_metadata</span><span class="p">(</span>
+        <span class="n">metadata_str</span><span class="p">,</span>
+    <span class="p">)</span>
+
     <span class="n">buf</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">StringIO</span><span class="p">(</span><span class="n">metadata_str</span><span class="p">)</span>
     <span class="n">config</span> <span class="o">=</span> <span class="n">configparser</span><span class="o">.</span><span class="n">ConfigParser</span><span class="p">()</span>
     <span class="c1"># make ConfigParser respect upper/lowercase values</span>
@@ -287,6 +296,78 @@ $(document).ready(function(){
     <span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;nx_meta&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">sort_dict</span><span class="p">(</span><span class="n">mdict</span><span class="p">[</span><span class="s2">&quot;nx_meta&quot;</span><span class="p">])</span>
 
     <span class="k">return</span> <span class="n">mdict</span></div>
+
+
+<span class="k">def</span> <span class="nf">_detect_and_process_xml_metadata</span><span class="p">(</span>
+    <span class="n">metadata_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Find and (if necessary) parse XML metadata in a Thermo Fisher FIB/SEM TIF file.</span>
+
+<span class="sd">    Some Thermo Fisher FIB/SEM files have additional metadata embedded as XML at the end</span>
+<span class="sd">    of the TIF file, which cannot be handled by the ``ConfigParser`` implementation of</span>
+<span class="sd">    :py:meth:`get_quanta_metadata`. This method will detect, parse, and remove the XML</span>
+<span class="sd">    from the metadata if present.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    metadata_str</span>
+<span class="sd">        The metadata at the end of the TIF file as a string. May or may not include</span>
+<span class="sd">        an XML section (this depends on the version of the Thermo software that saved</span>
+<span class="sd">        the image).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    metadata_str</span>
+<span class="sd">        The originally provided metadata as a string, but with the XML portion removed</span>
+<span class="sd">        if it was present</span>
+
+<span class="sd">    xml_metadata</span>
+<span class="sd">        A dictionary containing the metadata that was present in the XML portion. Will</span>
+<span class="sd">        be an empty dictionary if there was no XML.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">xml_regex</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">&#39;&lt;\?xml version=&quot;.+&quot;\?&gt;&#39;</span><span class="p">)</span>
+    <span class="n">regex_match</span> <span class="o">=</span> <span class="n">xml_regex</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">metadata_str</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">regex_match</span><span class="p">:</span>
+        <span class="c1"># there is an xml declaration in the metadata of this file, so parse it:</span>
+        <span class="n">xml_str</span> <span class="o">=</span> <span class="n">metadata_str</span><span class="p">[</span><span class="n">regex_match</span><span class="o">.</span><span class="n">span</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span> <span class="p">:]</span>
+        <span class="n">metadata_str</span> <span class="o">=</span> <span class="n">metadata_str</span><span class="p">[:</span> <span class="n">regex_match</span><span class="o">.</span><span class="n">span</span><span class="p">()[</span><span class="mi">0</span><span class="p">]]</span>
+        <span class="n">root</span> <span class="o">=</span> <span class="n">etree</span><span class="o">.</span><span class="n">fromstring</span><span class="p">(</span><span class="n">xml_str</span><span class="p">)</span>  <span class="c1"># noqa: S320</span>
+        <span class="k">return</span> <span class="n">metadata_str</span><span class="p">,</span> <span class="n">_xml_el_to_dict</span><span class="p">(</span><span class="n">root</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">metadata_str</span><span class="p">,</span> <span class="p">{}</span>
+
+
+<span class="k">def</span> <span class="nf">_xml_el_to_dict</span><span class="p">(</span><span class="n">node</span><span class="p">:</span> <span class="n">etree</span><span class="o">.</span><span class="n">ElementBase</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Convert an lxml.etree node tree into a dict.</span>
+
+<span class="sd">    This is used to transform the XML metadata section into a dictionary representation</span>
+<span class="sd">    so it can be stored alongside the other metadata.</span>
+
+<span class="sd">    Taken from https://stackoverflow.com/a/66103841/1435788</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">node</span><span class="o">.</span><span class="n">iterchildren</span><span class="p">():</span>
+        <span class="c1"># Remove namespace prefix</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">]</span> <span class="k">if</span> <span class="s2">&quot;}&quot;</span> <span class="ow">in</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span> <span class="k">else</span> <span class="n">element</span><span class="o">.</span><span class="n">tag</span>
+
+        <span class="c1"># Process element as tree element if the inner XML contains</span>
+        <span class="c1"># non-whitespace content</span>
+        <span class="k">if</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span> <span class="ow">and</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">element</span><span class="o">.</span><span class="n">text</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">value</span> <span class="o">=</span> <span class="n">_xml_el_to_dict</span><span class="p">(</span><span class="n">element</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">result</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">],</span> <span class="nb">list</span><span class="p">):</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">tempvalue</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">tempvalue</span><span class="p">,</span> <span class="n">value</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">result</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+    <span class="k">return</span> <span class="n">result</span>
 
 
 <span class="k">def</span> <span class="nf">_fix_duplicate_multigis_metadata_tags</span><span class="p">(</span><span class="n">metadata_str</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -360,6 +441,10 @@ $(document).ready(function(){
 <span class="sd">    Parse the &quot;important&quot; metadata that is saved at specific places within</span>
 <span class="sd">    the Quanta tag structure into a consistent place in the metadata dictionary</span>
 <span class="sd">    returned by :py:meth:`get_quanta_metadata`.</span>
+
+<span class="sd">    The metadata contained in the XML section (if present) is not parsed, since it</span>
+<span class="sd">    appears to only contain duplicates or slightly renamed metadata values compared</span>
+<span class="sd">    to the typical config-style section that is always present.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
@@ -809,7 +894,7 @@ $(document).ready(function(){
     </p>
     <p>
         &copy; Copyright 2024, NIST Office of Data and Informatics.<br/>
-      Last updated on May, 29, 2024.<br/>
+      Last updated on Jun, 07, 2024.<br/>
     </p>
   </div>
 </footer>
