@@ -1,3 +1,16 @@
+> 🚨 🚨 🚨
+> 
+> This project is no longer maintained, as the lead developer is no longer with NIST as of May, 2025.
+> For possibly mainted forks, please see the following:
+>
+>   - [datasophos/NexusLIMS](https://github.com/datasophos/NexusLIMS)
+>   - [pdessauw/NexusLIMS](https://github.com/pdessauw/NexusLIMS)
+>   - [Euclid-Techlabs-LLC/NexusLIMS](https://github.com/Euclid-Techlabs-LLC/NexusLIMS)
+> 
+> (these are not endorsements, merely a notice of fact)
+>
+> 🚨 🚨 🚨
+
 # Welcome to NexusLIMS!
 
 [![](https://img.shields.io/badge/NexusLIMS-Documentation-brightgreen)](https://pages.nist.gov/NexusLIMS)
