@@ -1,7 +1,7 @@
 > 🚨 🚨 🚨
 > 
 > This project is no longer maintained, as the lead developer is no longer with NIST as of May, 2025.
-> For possibly mainted forks, please see the following:
+> For possibly maintained forks, please see the following:
 >
 >   - [datasophos/NexusLIMS](https://github.com/datasophos/NexusLIMS)
 >   - [pdessauw/NexusLIMS](https://github.com/pdessauw/NexusLIMS)
