@@ -219,8 +219,9 @@ including:
 - [Ray Plante](https://www.nist.gov/people/raymond-plante) - Research Data and Computing Office
 - [Gretchen Greene](https://www.nist.gov/people/gretchen-greene) - Research Data and Computing Office
 - [Gary Harding](https://www.nist.gov/people/gary-harding) - Material Measurement Laboratory Data Division
-- [Katelyn Jones](https://www.nist.gov/people/katelyn-jones) - Material Measurement Laboratory Data Division
+- [Katelyn Jones](https://www.nist.gov/people/katelyn-jones) - Materials Science and AI Group
 - [Hamza Bouhanni](https://www.nist.gov/people/hamza-bouhanni) - Prometheus Computing
+- [Benjamin Long](https://www.nist.gov/people/benjamin-long) - Applied AI Research Group
 - Joshua Taillon - Previous NIST employee - Office of Data and Informatics
 
 As well as multiple [SURF](https://www.nist.gov/surf) students/undergraduate interns:
