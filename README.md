@@ -2,20 +2,17 @@
 
 [![](https://img.shields.io/badge/NexusLIMS-Documentation-brightgreen)](https://pages.nist.gov/NexusLIMS)
 
-The project serves as the development and documentation space for the back-end of the Nexus Microscopy
-Facility Laboratory Information Management System (NexusLIMS), developed by the NIST Office of Data
-and Informatics and described in the following *Microscopy and Microanalysis* article: 
-[https://doi.org/10.1017/S1431927621000222](https://doi.org/10.1017/S1431927621000222).
-This manuscript details the processes by which NexusLIMS harvests and combines data from multiple sources to build 
-a record of an experiment on a Nexus facility microscope.
+The project is actively maintained and continues to serve NIST Nexus Microscopy Facility Laboratory Information Management System (NexusLIMS), this project is currently maintained by the NIST Research Data and Computing Office in support of ongoing Microscopy Research Data Management (RDM) at NIST.
+
+Originally developed by the NIST Office of Data and Informatics and described in the following *Microscopy and Microanalysis* article: 
+[https://doi.org/10.1017/S1431927621000222](https://doi.org/10.1017/S1431927621000222).  This manuscript details the processes by which NexusLIMS harvests and combines data from multiple sources to build a record of an experiment on a Nexus facility microscope.
 
 This repository holds the "back-end" code that facilitates the building of experimental records from a 
 collection of instruments by extracting metadata from data files and harvesting experimental metadata 
-from one or more reservation calendar systems (such as [NEMO](https://github.com/usnistgov/NEMO)). This code will 
-extract metadata from those reservations and the data files it finds then build that metadata into an XML-formatted
-experimental record that conforms to the "Nexus Experiment" schema (available
-[here](https://doi.org/10.18434/M32245)) There is additional documentation available at 
-http://pages.nist.gov/NexusLIMS/.
+from one or more reservation calendar systems (such as [NEMO](https://github.com/usnistgov/NEMO)). NexusLIMS extracts metadata
+from those reservations and the data files it finds then build that metadata into an XML-formatted experimental record 
+that conforms to the "Nexus Experiment" schema developed and published [here](https://doi.org/10.18434/M32245)) 
+There is additional documentation available at http://pages.nist.gov/NexusLIMS/.
 
 The back-end code contained in this repository is the complement of the front-end user interface code available at
 the [NexusLIMS CDCS](https://github.com/usnistgov/NexusLIMS-CDCS) repository. For a "full" installation of NexusLIMS,
@@ -215,13 +212,16 @@ microscopy and crystallography communities, together with its storied NIST herit
 NexusLIMS has been developed through a great deal of work by a number of people
 including: 
 
-- [Joshua Taillon](https://www.nist.gov/people/joshua-taillon) - Office of Data and Informatics
-- [June Lau](https://www.nist.gov/people/june-w-lau) - Office of Data and Informatics
-- [Ryan White](https://www.nist.gov/people/ryan-white) - Applied Chemicals and Materials Division / Office of Data and Informatics (detail)
-- [Michael Katz](https://www.nist.gov/people/michael-katz) - Materials Science and Engineering Division / Office of Data and Informatics (detail)
-- [Marcus Newrock](https://www.nist.gov/people/marcus-william-newrock) - Office of Data and Informatics
-- [Ray Plante](https://www.nist.gov/people/raymond-plante) - Office of Data and Informatics
-- [Gretchen Greene](https://www.nist.gov/people/gretchen-greene) - Office of Data and Informatics
+- [June Lau](https://www.nist.gov/people/june-w-lau) - Research Data and Computing Office/ CHIPS Metrology 
+- [Ryan White](https://www.nist.gov/people/ryan-white) - Applied Chemicals and Materials Division 
+- [Michael Katz](https://www.nist.gov/people/michael-katz) - Material Measurement Laboratory Data Division
+- [Marcus Newrock](https://www.nist.gov/people/marcus-william-newrock) - Material Measurement Laboratory Data Division
+- [Ray Plante](https://www.nist.gov/people/raymond-plante) - Research Data and Computing Office
+- [Gretchen Greene](https://www.nist.gov/people/gretchen-greene) - Research Data and Computing Office
+- [Gary Harding](https://www.nist.gov/people/gary-harding) - Material Measurement Laboratory Data Division
+- [Katelyn Jones](https://www.nist.gov/people/katelyn-jones) - Material Measurement Laboratory Data Division
+- [Hamza Bouhanni](https://www.nist.gov/people/hamza-bouhanni) - Prometheus Computing
+- Joshua Taillon - Previous NIST employee - Office of Data and Informatics
 
 As well as multiple [SURF](https://www.nist.gov/surf) students/undergraduate interns:
 
