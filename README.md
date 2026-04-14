@@ -212,19 +212,19 @@ microscopy and crystallography communities, together with its storied NIST herit
 NexusLIMS has been developed through a great deal of work by a number of people
 including: 
 
-- [June Lau](https://www.nist.gov/people/june-w-lau) - Research Data and Computing Office/ CHIPS Metrology 
+- [June Lau](https://www.nist.gov/people/june-w-lau) - Research Data and Computing Office - Project Lead
 - [Ryan White](https://www.nist.gov/people/ryan-white) - Applied Chemicals and Materials Division 
-- [Michael Katz](https://www.nist.gov/people/michael-katz) - Material Measurement Laboratory Data Division
-- [Marcus Newrock](https://www.nist.gov/people/marcus-william-newrock) - Material Measurement Laboratory Data Division
+- [Michael Katz](https://www.nist.gov/people/michael-katz) - Material Data Division
+- [Marcus Newrock](https://www.nist.gov/people/marcus-william-newrock) - Material Data Division
 - [Ray Plante](https://www.nist.gov/people/raymond-plante) - Research Data and Computing Office
 - [Gretchen Greene](https://www.nist.gov/people/gretchen-greene) - Research Data and Computing Office
-- [Gary Harding](https://www.nist.gov/people/gary-harding) - Material Measurement Laboratory Data Division
-- [Katelyn Jones](https://www.nist.gov/people/katelyn-jones) - Materials Science and AI Group
+- [Gary Harding](https://www.nist.gov/people/gary-harding) - Material Data Division
+- [Katelyn Jones](https://www.nist.gov/people/katelyn-jones) - Material Data Division
 - [Hamza Bouhanni](https://www.nist.gov/people/hamza-bouhanni) - Prometheus Computing
 - [Benjamin Long](https://www.nist.gov/people/benjamin-long) - Applied AI Research Group
-- Joshua Taillon - Previous NIST employee - Office of Data and Informatics
+- Joshua Taillon - Former NIST employee
 
-As well as multiple [SURF](https://www.nist.gov/surf) students/undergraduate interns:
+As well as past [SURF](https://www.nist.gov/surf) students/undergraduate interns:
 
 - Rachel Devers - Montgomery College/University of Maryland College Park
 - Thomas Bina - Pennsylvania State University
