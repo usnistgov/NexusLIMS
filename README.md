@@ -213,16 +213,15 @@ NexusLIMS has been developed through a great deal of work by a number of people
 including: 
 
 - [June Lau](https://www.nist.gov/people/june-w-lau) - Research Data and Computing Office - Project Lead
-- [Ryan White](https://www.nist.gov/people/ryan-white) - Applied Chemicals and Materials Division 
+- [Hamza Bouhanni](https://www.nist.gov/people/hamza-bouhanni) - Prometheus Computing
+- [Gretchen Greene](https://www.nist.gov/people/gretchen-greene) - Research Data and Computing Office
 - [Michael Katz](https://www.nist.gov/people/michael-katz) - Material Data Division
+- [Benjamin Long](https://www.nist.gov/people/benjamin-long) - Applied AI Research Group
 - [Marcus Newrock](https://www.nist.gov/people/marcus-william-newrock) - Material Data Division
 - [Ray Plante](https://www.nist.gov/people/raymond-plante) - Research Data and Computing Office
-- [Gretchen Greene](https://www.nist.gov/people/gretchen-greene) - Research Data and Computing Office
-- [Gary Harding](https://www.nist.gov/people/gary-harding) - Material Data Division
-- [Katelyn Jones](https://www.nist.gov/people/katelyn-jones) - Material Data Division
-- [Hamza Bouhanni](https://www.nist.gov/people/hamza-bouhanni) - Prometheus Computing
-- [Benjamin Long](https://www.nist.gov/people/benjamin-long) - Applied AI Research Group
-- Joshua Taillon - Former NIST employee
+- [Ryan White](https://www.nist.gov/people/ryan-white) - Applied Chemicals and Materials Division 
+- Yannick Congo - Former staff memeber
+- Joshua Taillon - Former staff member
 
 As well as past [SURF](https://www.nist.gov/surf) students/undergraduate interns:
 
