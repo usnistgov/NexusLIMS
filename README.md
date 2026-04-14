@@ -216,7 +216,7 @@ including:
 - [Hamza Bouhanni](https://www.nist.gov/people/hamza-bouhanni) - Prometheus Computing
 - [Gretchen Greene](https://www.nist.gov/people/gretchen-greene) - Research Data and Computing Office
 - [Michael Katz](https://www.nist.gov/people/michael-katz) - Material Data Division
-- [Benjamin Long](https://www.nist.gov/people/benjamin-long) - Applied AI Research Group
+- [Benjamin Long](https://www.nist.gov/people/benjamin-long) - AI Research Measurement and Standards Division
 - [Marcus Newrock](https://www.nist.gov/people/marcus-william-newrock) - Material Data Division
 - [Ray Plante](https://www.nist.gov/people/raymond-plante) - Research Data and Computing Office
 - [Ryan White](https://www.nist.gov/people/ryan-white) - Applied Chemicals and Materials Division 
