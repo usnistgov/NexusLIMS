@@ -65,13 +65,17 @@ About the NexusLIMS team
 NexusLIMS has been developed through a great deal of work by a number of people
 including:
 
-- `Joshua Taillon <https://www.nist.gov/people/joshua-taillon>`_ - Office of Data and Informatics - Primary application developer
-- `June Lau <https://www.nist.gov/people/june-w-lau>`_ - Office of Data and Informatics
+- `June Lau <https://www.nist.gov/people/june-w-lau>`_ - Research Data and Computing Office/ CHIPS Metrology
+- `Gretchen Greene <https://www.nist.gov/people/gretchen-greene>`_ - Research Data and Computing Office
 - `Ryan White <https://www.nist.gov/people/ryan-white>`_ - Applied Chemicals and Materials Division / Office of Data and Informatics (detail)
 - `Michael Katz <https://www.nist.gov/people/michael-katz>`_ - Materials Science and Engineering Division / Office of Data and Informatics (detail)
 - `Marcus Newrock <https://www.nist.gov/people/marcus-william-newrock>`_ - Office of Data and Informatics
 - `Ray Plante <https://www.nist.gov/people/raymond-plante>`_ - Office of Data and Informatics
-- `Gretchen Greene <https://www.nist.gov/people/gretchen-greene>`_ - Office of Data and Informatics
+- `Hamza Bouhanni <https://www.nist.gov/people/hamza-bouhanni>`_ - Prometheus Computing / Research Data and Computing Office
+- `Katelyn Jones <https://www.nist.gov/people/katelyn-jones>`_ - Data Science and AI Group
+- `Benjamin Long <https://www.nist.gov/people/benjamin-long>`_ - Applied AI Research Group
+- `Joshua Taillo` - Previous NIST employee
+
 
 As well as multiple SURF students/undergraduate interns:
 
