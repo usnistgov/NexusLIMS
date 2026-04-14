@@ -3,7 +3,8 @@ Welcome to NexusLIMS!
 
 The project serves as the development and documentation space for the back-end
 of the Nexus Microscopy Facility Laboratory Information Management System
-(LIMS), developed by the NIST Office of Data and Informatics.
+(LIMS), developed by the NIST ADLP Research Data and Computing Office in coordination
+with the Material Measurement Laboratory Data Division.
 This documentation contains a number of pages that detail the processes by
 which NexusLIMS harvests and combines data from multiple sources to build
 a record of an experiment on a Nexus facility microscope.
