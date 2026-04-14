@@ -2,7 +2,7 @@
 
 [![](https://img.shields.io/badge/NexusLIMS-Documentation-brightgreen)](https://pages.nist.gov/NexusLIMS)
 
-The project is actively maintained and continues to serve NIST Nexus Microscopy Facility Laboratory Information Management System (NexusLIMS), this project is currently maintained by the NIST Research Data and Computing Office in support of ongoing Microscopy Research Data Management (RDM) at NIST.
+The project is actively developed and continues to serve NIST Nexus Microscopy Facility Laboratory Information Management System (NexusLIMS), this project is currently maintained by the NIST Research Data and Computing Office in support of ongoing Microscopy Research Data Management (RDM) at NIST.
 
 Originally developed by the NIST Office of Data and Informatics and described in the following *Microscopy and Microanalysis* article: 
 [https://doi.org/10.1017/S1431927621000222](https://doi.org/10.1017/S1431927621000222).  This manuscript details the processes by which NexusLIMS harvests and combines data from multiple sources to build a record of an experiment on a Nexus facility microscope.
