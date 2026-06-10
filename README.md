@@ -18,11 +18,10 @@ The back-end code contained in this repository is the complement of the front-en
 the [NexusLIMS CDCS](https://github.com/usnistgov/NexusLIMS-CDCS) repository. For a "full" installation of NexusLIMS,
 both the back-end and front-end parts are required.
 
-## Nexus Data Orchestra
-
-This repository is part of the Nexus Data Orchestra project family.
-
-See the project hub: [Nexus-Data-Orchestra-NDO](https://github.com/usnistgov/Nexus-Data-Orchestra-NDO)
+> [!IMPORTANT]
+> **Nexus Data Orchestra**
+>
+> This repository is part of the Nexus Data Orchestra project family. See the project hub: [Nexus-Data-Orchestra-NDO](https://github.com/usnistgov/Nexus-Data-Orchestra-NDO).
 
 ## Warnings and Limitations
 
